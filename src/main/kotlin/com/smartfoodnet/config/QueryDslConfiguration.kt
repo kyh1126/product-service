@@ -1,4 +1,4 @@
-package com.smartfoodnet.sample.config
+package com.smartfoodnet.config
 
 import com.querydsl.jpa.impl.JPAQueryFactory
 import org.springframework.context.annotation.Bean

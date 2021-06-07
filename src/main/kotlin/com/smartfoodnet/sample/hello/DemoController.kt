@@ -12,7 +12,7 @@ class DemoController {
     @Autowired
     lateinit var demoService: DemoService
 
-    @GetMapping("/")
+    @GetMapping("")
     fun getDemos(): List<Demo> {
         return demoService.getDemos()
     }

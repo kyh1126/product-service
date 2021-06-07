@@ -1,5 +1,6 @@
-package com.smartfoodnet.sample
+package com.smartfoodnet
 
+import com.smartfoodnet.sample.SampleJavaClass
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
