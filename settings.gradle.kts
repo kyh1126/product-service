@@ -1,1 +1,1 @@
-rootProject.name = "boilerplate-springboot-kotlin-jpa-querydsl"
+rootProject.name = "product-service"

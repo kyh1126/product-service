@@ -5,9 +5,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class SampleApplication
+class ProductApplication
 
 fun main(args: Array<String>) {
-	runApplication<SampleApplication>(*args)
+	runApplication<ProductApplication>(*args)
 	println(SampleJavaClass().sampleHello)
 }
