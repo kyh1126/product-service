@@ -1,0 +1,86 @@
+variables:
+  ECR_URL: 741704045536.dkr.ecr.ap-northeast-2.amazonaws.com
+  SERVICE_NAME: fn-product
+  ECR_NAME: fn-product
+stages:
+  - .pre
+  - build
+  - test
+  - docker-build
+  - deploy
+  - .post
+pre:
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+    - if: $CI_PIPELINE_SOURCE == "web"
+  stage: .pre
+  script:
+    - VERSION=$(grep -E "version =" build.gradle | cut -d "'" -f2)
+    - tag=release-v$VERSION
+
+build:
+  needs: [pre]
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+    - if: $CI_PIPELINE_SOURCE == "web"
+  stage: build
+  script:
+    - ./gradlew bootJar
+  artifacts:
+    paths:
+      - build/libs/*.jar
+    expire_in: 1 hour
+  allow_failure: false
+
+test:
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+    - if: $CI_PIPELINE_SOURCE == "web"
+  needs: [build]
+  stage: test
+  script:
+    - ./gradlew test
+  allow_failure: false
+
+docker-build:
+  stage: docker-build
+  script:
+    - VERSION=$(grep -E "version =" build.gradle | cut -d "'" -f2)
+    - aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin "$ECR_URL"
+    - docker build -t "$ECR_NAME" .
+    - docker tag "$ECR_NAME":latest "$ECR_URL"/"$ECR_NAME":latest
+    - docker tag "$ECR_NAME":latest "$ECR_URL"/"$ECR_NAME":"$VERSION"
+    - docker push "$ECR_URL"/"$ECR_NAME":latest
+    - docker push "$ECR_URL"/"$ECR_NAME":"$VERSION"
+
+deploy:
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+    - if: $CI_PIPELINE_SOURCE == "web"
+  needs: [docker-build]
+  stage: deploy
+  script:
+    - aws --region ap-northeast-2 ecs update-service --cluster sfn-dev --service "$SERVICE_NAME" --force-new-deployment > aws.log
+
+tag_commit:
+  needs: [deploy]
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+    - if: $CI_PIPELINE_SOURCE == "web"
+  stage: .post
+  before_script:
+    - echo $CI_PROJECT_URL
+    - project_url=$(echo $CI_PROJECT_URL | sed 's/http:\/\///')
+    - echo $project_url
+    - git remote set-url origin https://oauth2:$GITLAB_TOKEN@$project_url
+  script:
+    - VERSION=$(grep -E "version =" build.gradle | cut -d "'" -f2)
+    - tag=release-v$VERSION
+
+clean:
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+    - if: $CI_PIPELINE_SOURCE == "web"
+  stage: .post
+  script:
+    - docker rmi $(docker images | grep "$SERVICE_NAME" | tr -s ' ' | cut -d ' ' -f 3) -f
