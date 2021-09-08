@@ -27,6 +27,10 @@ sourceSets["main"].withConvention(org.jetbrains.kotlin.gradle.plugin.KotlinSourc
 }
 extra["testcontainersVersion"] = "1.15.3"
 
+tasks.getByName<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
+	this.archiveFileName.set("app.jar")
+}
+
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-web")
