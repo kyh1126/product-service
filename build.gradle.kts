@@ -67,7 +67,6 @@ dependencies {
 dependencyManagement {
 	imports {
 		mavenBom("org.testcontainers:testcontainers-bom:${property("testcontainersVersion")}")
-		mavenBom("io.awspring.cloud:spring-cloud-aws-dependencies:${property("springCloudAWSVersion")}")
 	}
 }
 
