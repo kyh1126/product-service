@@ -21,6 +21,9 @@ configurations {
 
 repositories {
 	mavenCentral()
+	maven(url = "http://nexus.smartfoodnet.com:8081/repository/sfn-maven/") {
+		isAllowInsecureProtocol = true
+	}
 }
 sourceSets["main"].withConvention(org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet::class){
 	kotlin.srcDir("$buildDir/generated/source/kapt/main")
@@ -43,19 +46,28 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.testcontainers:junit-jupiter")
 
-	// jpa second cache
-	implementation("org.hibernate:hibernate-ehcache")
 	//query dsl
 	implementation("com.querydsl:querydsl-core")
 	implementation("com.querydsl:querydsl-jpa")
-	kapt("com.querydsl:querydsl-apt:4.2.2:jpa")
+	kapt("com.querydsl:querydsl-apt:4.4.0:jpa")
 	kapt("org.springframework.boot:spring-boot-configuration-processor")
 	annotationProcessor(group = "com.querydsl", name = "querydsl-apt", classifier = "jpa")
+
+	implementation("org.springframework.boot:spring-boot-starter-validation")
+	implementation("io.springfox:springfox-boot-starter:3.0.0")
+	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.6.5")
+
+	// @Testcontainers 관련 설정
+	testImplementation("org.testcontainers:mysql")
+
+	// sfn common
+	implementation("sfn", "sfn-excel-module", "1.0.106")
 }
 
 dependencyManagement {
 	imports {
 		mavenBom("org.testcontainers:testcontainers-bom:${property("testcontainersVersion")}")
+		mavenBom("io.awspring.cloud:spring-cloud-aws-dependencies:${property("springCloudAWSVersion")}")
 	}
 }
 
