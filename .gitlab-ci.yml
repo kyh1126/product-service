@@ -15,7 +15,7 @@ pre:
     - if: $CI_PIPELINE_SOURCE == "web"
   stage: .pre
   script:
-    - VERSION=$(grep -E "version =" build.gradle | cut -d "'" -f2)
+    - VERSION=$(grep -E "version =" build.gradle.kts | cut -d "'" -f2)
     - tag=release-v$VERSION
 
 build:
@@ -45,7 +45,7 @@ test:
 docker-build:
   stage: docker-build
   script:
-    - VERSION=$(grep -E "version =" build.gradle | cut -d "'" -f2)
+    - VERSION=$(grep -E "version =" build.gradle.kts | cut -d "'" -f2)
     - aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin "$ECR_URL"
     - docker build -t "$ECR_NAME" .
     - docker tag "$ECR_NAME":latest "$ECR_URL"/"$ECR_NAME":latest
@@ -74,7 +74,7 @@ tag_commit:
     - echo $project_url
     - git remote set-url origin https://oauth2:$GITLAB_TOKEN@$project_url
   script:
-    - VERSION=$(grep -E "version =" build.gradle | cut -d "'" -f2)
+    - VERSION=$(grep -E "version =" build.gradle.kts | cut -d "'" -f2)
     - tag=release-v$VERSION
 
 clean:
