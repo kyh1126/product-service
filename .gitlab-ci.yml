@@ -15,7 +15,7 @@ pre:
     - if: $CI_PIPELINE_SOURCE == "web"
   stage: .pre
   script:
-    - VERSION=$(grep -E "version =" build.gradle.kts | cut -d "'" -f2)
+    - VERSION=$(grep -E "version =" build.gradle.kts | cut -d "\"" -f2)
     - tag=release-v$VERSION
 
 build:
@@ -74,7 +74,7 @@ tag_commit:
     - echo $project_url
     - git remote set-url origin https://oauth2:$GITLAB_TOKEN@$project_url
   script:
-    - VERSION=$(grep -E "version =" build.gradle.kts | cut -d "'" -f2)
+    - VERSION=$(grep -E "version =" build.gradle.kts | cut -d "\"" -f2)
     - tag=release-v$VERSION
 
 clean:
