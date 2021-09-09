@@ -12,6 +12,7 @@ stages:
 build:
   rules:
     - if: $CI_COMMIT_BRANCH == "master"
+    - if: $CI_COMMIT_BRANCH == "dev"
     - if: $CI_PIPELINE_SOURCE == "web"
   stage: build
   script:
@@ -25,6 +26,7 @@ build:
 test:
   rules:
     - if: $CI_COMMIT_BRANCH == "master"
+    - if: $CI_COMMIT_BRANCH == "dev"
     - if: $CI_PIPELINE_SOURCE == "web"
   needs: [build]
   stage: test
@@ -35,6 +37,7 @@ test:
 docker-build:
   rules:
     - if: $CI_COMMIT_BRANCH == "master"
+    - if: $CI_COMMIT_BRANCH == "dev"
     - if: $CI_PIPELINE_SOURCE == "web"
   needs: [ test ]
   stage: docker-build
@@ -50,6 +53,7 @@ docker-build:
 deploy:
   rules:
     - if: $CI_COMMIT_BRANCH == "master"
+    - if: $CI_COMMIT_BRANCH == "dev"
     - if: $CI_PIPELINE_SOURCE == "web"
   needs: [docker-build]
   stage: deploy
@@ -60,6 +64,7 @@ tag_commit:
   needs: [deploy]
   rules:
     - if: $CI_COMMIT_BRANCH == "master"
+    - if: $CI_COMMIT_BRANCH == "dev"
     - if: $CI_PIPELINE_SOURCE == "web"
   stage: .post
   before_script:
@@ -74,6 +79,7 @@ tag_commit:
 clean:
   rules:
     - if: $CI_COMMIT_BRANCH == "master"
+    - if: $CI_COMMIT_BRANCH == "dev"
     - if: $CI_PIPELINE_SOURCE == "web"
   stage: .post
   script:
