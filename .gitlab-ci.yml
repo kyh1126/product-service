@@ -3,23 +3,13 @@ variables:
   SERVICE_NAME: fn-product
   ECR_NAME: fn-product
 stages:
-  - .pre
   - build
   - test
   - docker-build
   - deploy
   - .post
-pre:
-  rules:
-    - if: $CI_COMMIT_BRANCH == "master"
-    - if: $CI_PIPELINE_SOURCE == "web"
-  stage: .pre
-  script:
-    - VERSION=$(grep -E "version =" build.gradle.kts | cut -d "\"" -f2)
-    - tag=release-v$VERSION
 
 build:
-  needs: [pre]
   rules:
     - if: $CI_COMMIT_BRANCH == "master"
     - if: $CI_PIPELINE_SOURCE == "web"
