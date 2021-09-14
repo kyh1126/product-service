@@ -2,6 +2,13 @@ server:
   port: 4008
   servlet:
     context-path: /fresh-networks/fn-product/v1
+logging:
+  level:
+    org:
+      hibernate:
+        type:
+          descriptor:
+            sql: trace
 spring:
   web:
     locale: ko_KR
@@ -26,8 +33,8 @@ spring:
         dialect:
           storage-engine: innodb
           format_sql: true
-        show_sql: false
-        format_sql: false
+        show_sql: true
+        format_sql: true
   datasource:
     hikari:
       maximumPoolSize: 10
