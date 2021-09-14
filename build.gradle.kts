@@ -34,6 +34,10 @@ tasks.getByName<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar
 	this.archiveFileName.set("app.jar")
 }
 
+tasks.getByName<Jar>("jar") {
+	enabled = false
+}
+
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-web")
