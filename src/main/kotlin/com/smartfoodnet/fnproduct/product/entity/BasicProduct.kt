@@ -13,6 +13,9 @@ class BasicProduct(
     @Column(name = "id")
     var id: Long? = null,
 
+    @Column(name = "partner_id")
+    var partnerId: Long,
+
     @Column(name = "name")
     var name: String,
 

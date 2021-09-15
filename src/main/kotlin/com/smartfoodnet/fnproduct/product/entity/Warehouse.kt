@@ -13,6 +13,9 @@ class Warehouse(
     @Column(name = "id")
     var id: Long? = null,
 
+    @Column(name = "partner_id")
+    var partnerId: Long,
+
     @Column(name = "code")
     var code: Int,
 
