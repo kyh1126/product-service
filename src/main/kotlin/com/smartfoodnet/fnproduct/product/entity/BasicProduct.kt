@@ -25,8 +25,9 @@ class BasicProduct(
     @Column(name = "barcode")
     var barcode: String,
 
-    @Column(name = "category_id")
-    var categoryId: Long,
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    var category: BasicProductCategory,
 
     @Column(name = "handling_temperature")
     var handlingTemperature: Int? = null,
@@ -37,8 +38,9 @@ class BasicProduct(
     @Column(name = "warehouse_code")
     var warehouseCode: Int? = null,
 
-    @Column(name = "supplier_id")
-    var supplierId: Long? = null,
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "supplier_id")
+    var supplier: Supplier? = null,
 
     @Column(name = "supply_price")
     var supplyPrice: Int? = null,

@@ -1,7 +1,7 @@
 package com.smartfoodnet.fnproduct.product.entity
 
-import com.smartfoodnet.fnproduct.product.vo.SeasonalOption
-import com.smartfoodnet.fnproduct.product.vo.SeasonalOptionConverter
+import com.smartfoodnet.fnproduct.product.model.vo.SeasonalOption
+import com.smartfoodnet.fnproduct.product.model.vo.SeasonalOptionConverter
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import java.time.Instant

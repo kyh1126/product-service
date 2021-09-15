@@ -1,4 +1,4 @@
-package com.smartfoodnet.fnproduct.product.vo
+package com.smartfoodnet.fnproduct.product.model.vo
 
 import javax.persistence.AttributeConverter
 import javax.persistence.Converter
