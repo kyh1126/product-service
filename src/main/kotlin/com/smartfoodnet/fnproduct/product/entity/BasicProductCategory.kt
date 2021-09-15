@@ -19,9 +19,6 @@ class BasicProductCategory(
     @Column(name = "level_2_category")
     var level2Category: Long? = null,
 
-    @Column(name = "level_3_category")
-    var level3Category: Long? = null,
-
     @Column(name = "order")
     var order: Int? = null,
 
