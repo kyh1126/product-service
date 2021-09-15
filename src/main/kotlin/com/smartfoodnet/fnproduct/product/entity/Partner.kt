@@ -6,15 +6,12 @@ import java.time.Instant
 import javax.persistence.*
 
 @Entity
-@Table(name = "supplier")
-class Supplier(
+@Table(name = "partner")
+class Partner(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     var id: Long? = null,
-
-    @Column(name = "partner_id")
-    var partnerId: Long,
 
     @Column(name = "name")
     var name: String,
