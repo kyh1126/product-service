@@ -42,4 +42,4 @@ spring:
 
 sfn:
   swagger:
-    host: api-dev.smartfoodnet.com
+    host: s-api-dev.smartfoodnet.com
