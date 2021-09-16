@@ -1,5 +1,6 @@
 package com.smartfoodnet.fnproduct.product.entity
 
+import com.smartfoodnet.fnproduct.code.entity.Code
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import java.time.Instant
@@ -13,14 +14,17 @@ class SubsidiaryMaterialCategory(
     @Column(name = "id")
     var id: Long? = null,
 
-    @Column(name = "level_1_category")
-    var level1Category: Long,
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "level_1_category")
+    var level1Category: Code,
 
-    @Column(name = "level_2_category")
-    var level2Category: Long? = null,
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "level_2_category")
+    var level2Category: Code? = null,
 
-    @Column(name = "level_3_category")
-    var level3Category: Long? = null,
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "level_3_category")
+    var level3Category: Code? = null,
 
     @Column(name = "order")
     var order: Int? = null,

@@ -1,5 +1,9 @@
 package com.smartfoodnet.fnproduct.product.entity
 
+import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
+import com.smartfoodnet.fnproduct.product.model.vo.BasicProductTypeConverter
+import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
+import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureTypeConverter
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import java.time.Instant
@@ -13,11 +17,18 @@ class BasicProduct(
     @Column(name = "id")
     var id: Long? = null,
 
+    @Column(name = "type")
+    @Convert(converter = BasicProductTypeConverter::class)
+    var type: BasicProductType,
+
     @Column(name = "partner_id")
-    var partnerId: Long,
+    var partnerId: Long? = null,
 
     @Column(name = "name")
     var name: String,
+
+    @Column(name = "code")
+    var code: String? = null,
 
     @Column(name = "barcode_yn")
     var barcodeYn: String = "N",
@@ -26,17 +37,19 @@ class BasicProduct(
     var barcode: String,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
-    var category: BasicProductCategory,
-
-    @Column(name = "handling_temperature")
-    var handlingTemperature: Int? = null,
-
-    @Column(name = "single_packaging_yn")
-    var singlePackagingYn: String = "N",
+    @JoinColumn(name = "basic_product_category_id")
+    var basicProductCategory: BasicProductCategory? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @Column(name = "warehouse_id")
+    @JoinColumn(name = "subsidiary_material_category_id")
+    var subsidiaryMaterialCategory: SubsidiaryMaterialCategory? = null,
+
+    @Column(name = "handling_temperature")
+    @Convert(converter = HandlingTemperatureTypeConverter::class)
+    var handlingTemperature: HandlingTemperatureType? = null,
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "warehouse_id")
     var warehouse: Warehouse? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -46,6 +59,12 @@ class BasicProduct(
     @Column(name = "supply_price")
     var supplyPrice: Int? = null,
 
+    @Column(name = "single_packaging_yn")
+    var singlePackagingYn: String = "N",
+
+    @Column(name = "expiration_date_management_yn")
+    var expirationDateManagementYn: String = "N",
+
     @Column(name = "pieces_per_box")
     var piecesPerBox: Int? = null,
 
@@ -54,9 +73,6 @@ class BasicProduct(
 
     @Column(name = "image_url")
     var imageUrl: String? = null,
-
-    @Column(name = "expiration_date_management_yn")
-    var expirationDateManagementYn: String = "N",
 
     @Column(name = "active_yn")
     var activeYn: String = "N",

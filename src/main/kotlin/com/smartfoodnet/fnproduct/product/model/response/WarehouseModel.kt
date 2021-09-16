@@ -22,8 +22,8 @@ data class WarehouseModel(
             return warehouse.run {
                 WarehouseModel(
                     id = id,
-                    code = code,
                     partnerId = partnerId,
+                    code = code,
                     name = name
                 )
             }
