@@ -28,8 +28,8 @@ data class BasicProductModel(
     @ApiModelProperty(value = "단수포장여부")
     var singlePackagingYn: String,
 
-    @ApiModelProperty(value = "입고처코드")
-    var warehouseCode: Int? = null,
+    @ApiModelProperty(value = "입고처")
+    var warehouse: WarehouseModel? = null,
 
     @ApiModelProperty(value = "공급사")
     var supplier: SupplierModel? = null,
@@ -65,7 +65,7 @@ data class BasicProductModel(
                     category = BasicProductCategoryModel.fromEntity(category),
                     handlingTemperature = handlingTemperature,
                     singlePackagingYn = singlePackagingYn,
-                    warehouseCode = warehouseCode,
+                    warehouse = warehouse?.let { WarehouseModel.fromEntity(it) },
                     supplier = supplier?.let { SupplierModel.fromEntity(it) },
                     supplyPrice = supplyPrice,
                     piecesPerBox = piecesPerBox,

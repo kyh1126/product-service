@@ -35,8 +35,9 @@ class BasicProduct(
     @Column(name = "single_packaging_yn")
     var singlePackagingYn: String = "N",
 
-    @Column(name = "warehouse_code")
-    var warehouseCode: Int? = null,
+    @ManyToOne(fetch = FetchType.LAZY)
+    @Column(name = "warehouse_id")
+    var warehouse: Warehouse? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "supplier_id")
