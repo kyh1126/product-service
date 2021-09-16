@@ -30,6 +30,9 @@ test:
     - if: $CI_PIPELINE_SOURCE == "web"
   needs: [build]
   stage: test
+  artifacts:
+    paths:
+      - build/libs/*.jar
   script:
     - ./gradlew test
   allow_failure: false

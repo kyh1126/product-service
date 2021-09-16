@@ -2,6 +2,13 @@ server:
   port: 4008
   servlet:
     context-path: /fresh-networks/fn-product/v1
+logging:
+  level:
+    org:
+      hibernate:
+        type:
+          descriptor:
+            sql: trace
 spring:
   web:
     locale: ko_KR
@@ -14,7 +21,7 @@ spring:
     generate-ddl: false
     open-in-view: false
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     properties:
@@ -26,20 +33,19 @@ spring:
         dialect:
           storage-engine: innodb
           format_sql: true
-        show_sql: false
-        format_sql: false
+        show_sql: true
+        format_sql: true
   datasource:
     hikari:
       maximumPoolSize: 10
       poolName: HikariCP
-    url: ${SPRING_DATASOURCE_BASE_URL:jdbc:mysql://sfn-dev-01.ch624l3cypvt.ap-northeast-2.rds.amazonaws.com:3306}/fn_products?serverTimezone=UTC&useCursors=false&sendStringParametersAsUnicode=false&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useSSL=false
-    username: ${SPRING_DATASOURCE_BASE_USERNAME:root}
-    password: ${SPRING_DATASOURCE_BASE_PASSWORD:1qaz1qaz}
+    url: ${SPRING_DATASOURCE_BASE_URL:jdbc:mysql://localhost:3306}/fn_products?serverTimezone=UTC&useCursors=false&sendStringParametersAsUnicode=false&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useSSL=false
+    username: root
+    password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
   mvc:
     format:
       date-time: yyyy-MM-dd HH:mm:ss
-
 sfn:
   swagger:
-    host: s-api-dev.smartfoodnet.com
+    host: localhost:4008
