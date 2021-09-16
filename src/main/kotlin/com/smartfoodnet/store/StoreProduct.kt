@@ -14,6 +14,18 @@ class StoreProduct (
     @Column(name = "id")
     var id: Long? = null,
 
+    @Column(name = "name")
+    var name: String,
+
+    @Column(name = "store_product_code")
+    var storeProductCode: String,
+
+    @Column(name = "option")
+    var option: String,
+
+    @Column(name = "option_code")
+    var optionCode: String,
+
     @Column(name = "deleted_at")
     var deletedAt: Instant? = null,
 
