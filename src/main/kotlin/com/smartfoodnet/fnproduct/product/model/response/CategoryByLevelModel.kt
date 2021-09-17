@@ -1,7 +1,7 @@
 package com.smartfoodnet.fnproduct.product.model.response
 
 import com.smartfoodnet.fnproduct.code.entity.Code
-import com.smartfoodnet.fnproduct.product.model.dto.BasicProductCategoryDto
+import com.smartfoodnet.fnproduct.product.model.dto.CategoryDto
 import io.swagger.annotations.ApiModelProperty
 
 data class CategoryByLevelModel(
@@ -12,7 +12,7 @@ data class CategoryByLevelModel(
     val label: String? = null,
 
     @ApiModelProperty(value = "해당 분류 이하의 분류 모델 목록")
-    var children: Set<BasicProductCategoryDto>,
+    var children: Set<CategoryDto>,
 ) {
 
     companion object {
@@ -21,7 +21,7 @@ data class CategoryByLevelModel(
                 CategoryByLevelModel(
                     value = id,
                     label = keyName,
-                    children = children.mapNotNull { BasicProductCategoryDto.fromEntity(it) }.toSet()
+                    children = children.mapNotNull { CategoryDto.fromEntity(it) }.toSet()
                 )
             }
         }
