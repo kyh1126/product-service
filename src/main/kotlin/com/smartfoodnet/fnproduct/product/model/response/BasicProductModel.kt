@@ -67,13 +67,13 @@ data class BasicProductModel(
     companion object {
         fun fromEntity(basicProduct: BasicProduct): BasicProductModel {
             return basicProduct.run {
-                val level3CategoryName = subsidiaryMaterialCategory?.level3Category?.keyName
+                val level2CategoryName = subsidiaryMaterialCategory?.level2Category?.keyName
 
                 BasicProductModel(
                     id = id,
                     type = type,
                     partnerId = partnerId,
-                    name = if (type == BasicProductType.SUB) level3CategoryName else name,
+                    name = if (type == BasicProductType.SUB) level2CategoryName else name,
                     code = code,
                     barcodeYn = barcodeYn,
                     barcode = barcode,

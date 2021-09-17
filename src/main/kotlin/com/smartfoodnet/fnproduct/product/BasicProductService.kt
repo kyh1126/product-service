@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional
 class BasicProductService(
     private val basicProductRepository: BasicProductRepository,
     private val basicProductCategoryRepository: BasicProductCategoryRepository,
+    private val subsidiaryMaterialCategoryRepository: SubsidiaryMaterialCategoryRepository,
 ) {
 
     fun getBasicProducts(partnerId: Long): List<BasicProductModel> {
@@ -19,6 +20,16 @@ class BasicProductService(
 
     fun getBasicProductCategories(level1CategoryId: Long?, level2CategoryId: Long?): List<CategoryByLevelModel> {
         return basicProductCategoryRepository.findByLevel1CategoryAndLevel2Category(level1CategoryId, level2CategoryId)
+            .groupBy({ it.level1Category }, { it.level2Category })
+            .map { CategoryByLevelModel.fromEntity(it.key, it.value) }
+    }
+
+    fun getSubsidiaryMaterialCategories(
+        level1CategoryId: Long?,
+        level2CategoryId: Long?,
+    ): List<CategoryByLevelModel> {
+        return subsidiaryMaterialCategoryRepository
+            .findByLevel1CategoryAndLevel2Category(level1CategoryId, level2CategoryId)
             .groupBy({ it.level1Category }, { it.level2Category })
             .map { CategoryByLevelModel.fromEntity(it.key, it.value) }
     }
