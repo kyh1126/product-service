@@ -18,12 +18,12 @@ class SubsidiaryMaterial(
     @Column(name = "basic_product_id")
     var basicProductId: Long,
 
+    @Column(name = "subsidiary_material_id")
+    var subsidiaryMaterialId: Long?,
+
     @Column(name = "seasonal_option")
     @Convert(converter = SeasonalOptionConverter::class)
     var seasonalOption: SeasonalOption,
-
-    @Column(name = "category_id")
-    var categoryId: Long,
 
     @Column(name = "name")
     var name: String,

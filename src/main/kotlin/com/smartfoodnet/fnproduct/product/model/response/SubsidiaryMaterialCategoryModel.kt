@@ -26,6 +26,9 @@ data class SubsidiaryMaterialCategoryModel(
 
     @ApiModelProperty(value = "소분류")
     var level3: String? = level3Category?.keyName,
+
+    @ApiModelProperty(value = "수량적용여부")
+    var quantityApplyYn: String,
 ) {
 
     companion object {
@@ -35,7 +38,8 @@ data class SubsidiaryMaterialCategoryModel(
                     id = id,
                     level1Category = level1Category,
                     level2Category = level2Category,
-                    level3Category = level3Category
+                    level3Category = level3Category,
+                    quantityApplyYn = quantityApplyYn
                 )
             }
         }
