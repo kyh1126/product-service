@@ -26,6 +26,9 @@ class SubsidiaryMaterialCategory(
     @JoinColumn(name = "level_3_category")
     var level3Category: Code? = null,
 
+    @Column(name = "quantity_apply_yn")
+    var quantityApplyYn: String = "N",
+
     @Column(name = "order")
     var order: Int? = null,
 

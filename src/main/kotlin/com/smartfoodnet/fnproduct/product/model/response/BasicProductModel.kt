@@ -16,7 +16,7 @@ data class BasicProductModel(
     val partnerId: Long?,
 
     @ApiModelProperty(value = "상품명")
-    var name: String,
+    var name: String?,
 
     @ApiModelProperty(value = "상품코드")
     var code: String? = null,
@@ -67,11 +67,13 @@ data class BasicProductModel(
     companion object {
         fun fromEntity(basicProduct: BasicProduct): BasicProductModel {
             return basicProduct.run {
+                val level3CategoryName = subsidiaryMaterialCategory?.level3Category?.keyName
+
                 BasicProductModel(
                     id = id,
                     type = type,
                     partnerId = partnerId,
-                    name = name,
+                    name = if (type == BasicProductType.SUB) level3CategoryName else name,
                     code = code,
                     barcodeYn = barcodeYn,
                     barcode = barcode,

@@ -6,7 +6,7 @@ import io.swagger.annotations.ApiModelProperty
 
 data class CategoryByLevelModel(
     @ApiModelProperty(value = "분류 id")
-    val id: Long? = null,
+    val value: Long? = null,
 
     @ApiModelProperty(value = "분류명")
     val label: String? = null,
@@ -19,7 +19,7 @@ data class CategoryByLevelModel(
         fun fromEntity(category: Code, children: List<Code?>): CategoryByLevelModel {
             return category.run {
                 CategoryByLevelModel(
-                    id = id,
+                    value = id,
                     label = keyName,
                     children = children.mapNotNull { BasicProductCategoryDto.fromEntity(it) }.toSet()
                 )
