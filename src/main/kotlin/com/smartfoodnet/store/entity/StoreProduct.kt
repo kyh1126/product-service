@@ -1,9 +1,9 @@
-package com.smartfoodnet.store
+package com.smartfoodnet.store.entity
 
+import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import java.time.Instant
-import java.time.LocalDate
 import javax.persistence.*
 
 @Entity
@@ -18,13 +18,17 @@ class StoreProduct (
     var name: String,
 
     @Column(name = "store_product_code")
-    var storeProductCode: String,
+    var storeProductCode: String?,
 
     @Column(name = "option")
-    var option: String,
+    var option: String? = null,
 
     @Column(name = "option_code")
-    var optionCode: String,
+    var optionCode: String? = null,
+
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "basic_product_id")
+//    var basicProduct: BasicProduct? = null,
 
     @Column(name = "deleted_at")
     var deletedAt: Instant? = null,
