@@ -14,21 +14,24 @@ class StoreProduct (
     @Column(name = "id")
     var id: Long? = null,
 
+    @Column(name = "partner_id")
+    var partnerId: Long? = null,
+
     @Column(name = "name")
-    var name: String,
+    var name: String?,
 
     @Column(name = "store_product_code")
     var storeProductCode: String?,
 
-    @Column(name = "option")
-    var option: String? = null,
+    @Column(name = "optional")
+    var optional: String? = null,
 
     @Column(name = "option_code")
     var optionCode: String? = null,
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "basic_product_id")
-//    var basicProduct: BasicProduct? = null,
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "basic_product_id")
+    var basicProduct: BasicProduct? = null,
 
     @Column(name = "deleted_at")
     var deletedAt: Instant? = null,
