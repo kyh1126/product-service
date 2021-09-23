@@ -22,7 +22,7 @@ class BasicProductCategory(
     @JoinColumn(name = "level_2_category")
     var level2Category: Code? = null,
 
-    @Column(name = "order")
+    @Column(name = "sort_order")
     var order: Int? = null,
 
     @Column(name = "deleted_at")

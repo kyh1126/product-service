@@ -25,7 +25,7 @@ class SubsidiaryMaterialCategory(
     @Column(name = "quantity_apply_yn")
     var quantityApplyYn: String = "N",
 
-    @Column(name = "order")
+    @Column(name = "sort_order")
     var order: Int? = null,
 
     @Column(name = "deleted_at")
