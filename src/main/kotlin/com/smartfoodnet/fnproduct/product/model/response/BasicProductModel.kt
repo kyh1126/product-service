@@ -9,7 +9,7 @@ data class BasicProductModel(
     @ApiModelProperty(value = "id")
     val id: Long? = null,
 
-    @ApiModelProperty(value = "구분 (BASIC:기본상품/CUSTOM_SUB:고객전용부자재/SUB:공통부자재)", allowableValues = "BASIC,CUSTOM_SUB,SUB")
+    @ApiModelProperty(value = "구분 (BASIC:기본상품/CUSTOM_SUB:고객전용부자재/SUB:공통부자재/PACKAGE:모음상품)", allowableValues = "BASIC,CUSTOM_SUB,SUB,PACKAGE")
     var type: BasicProductType,
 
     @ApiModelProperty(value = "화주(고객사) ID")

@@ -6,7 +6,8 @@ import javax.persistence.Converter
 enum class BasicProductType(val desc: String) {
     BASIC("기본상품"),
     CUSTOM_SUB("고객전용부자재"),
-    SUB("공통부자재");
+    SUB("공통부자재"),
+    PACKAGE("모음상품");
 
     companion object {
         fun fromName(name: String): BasicProductType {
