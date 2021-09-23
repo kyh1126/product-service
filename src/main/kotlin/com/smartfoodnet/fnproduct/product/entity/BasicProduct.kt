@@ -52,10 +52,6 @@ class BasicProduct(
     @JoinColumn(name = "warehouse_id")
     var warehouse: Warehouse? = null,
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "supplier_id")
-    var supplier: Supplier? = null,
-
     @Column(name = "supply_price")
     var supplyPrice: Int? = null,
 

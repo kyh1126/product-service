@@ -39,9 +39,6 @@ data class BasicProductModel(
     @ApiModelProperty(value = "입고처")
     var warehouse: WarehouseModel? = null,
 
-    @ApiModelProperty(value = "공급사")
-    var supplier: SupplierModel? = null,
-
     @ApiModelProperty(value = "공급가")
     var supplyPrice: Int? = null,
 
@@ -83,7 +80,6 @@ data class BasicProductModel(
                     },
                     handlingTemperature = handlingTemperature,
                     warehouse = warehouse?.let { WarehouseModel.fromEntity(it) },
-                    supplier = supplier?.let { SupplierModel.fromEntity(it) },
                     supplyPrice = supplyPrice,
                     singlePackagingYn = singlePackagingYn,
                     expirationDateManagementYn = expirationDateManagementYn,
