@@ -37,4 +37,14 @@ class BasicProductController(private val basicProductService: BasicProductServic
         return basicProductService.getSubsidiaryMaterialCategories(level1CategoryId, level2CategoryId)
     }
 
+    @Operation(summary = "기본상품 추가")
+    @PostMapping
+    fun createBasicProduct(
+        @Parameter(description = "대분류") @RequestParam(required = false) level1CategoryId: Long?,
+        @Parameter(description = "소분류") @RequestParam(required = false) level2CategoryId: Long?,
+    ): List<CategoryByLevelModel> {
+        // TODO: 로직 구현 예정
+        return basicProductService.getSubsidiaryMaterialCategories(level1CategoryId, level2CategoryId)
+    }
+
 }
