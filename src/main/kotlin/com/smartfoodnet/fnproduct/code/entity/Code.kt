@@ -9,7 +9,7 @@ class Code(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    var id: Long?,
+    var id: Long? = null,
 
     @Column(name = "group_id")
     var groupId: Int,
@@ -30,5 +30,5 @@ class Code(
     var description: String? = null,
 
     @Column(name = "deleted_at")
-    var deletedAt: Instant?,
+    var deletedAt: Instant? = null,
 )
