@@ -40,8 +40,8 @@ spring:
       maximumPoolSize: 10
       poolName: HikariCP
     url: ${SPRING_DATASOURCE_BASE_URL:jdbc:mysql://localhost:3306}/fn_products?serverTimezone=UTC&useCursors=false&sendStringParametersAsUnicode=false&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useSSL=false
-    username: root
-    password: root
+    username: ${SPRING_DATASOURCE_BASE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_BASE_PASSWORD:root}
     driver-class-name: com.mysql.cj.jdbc.Driver
   mvc:
     format:
