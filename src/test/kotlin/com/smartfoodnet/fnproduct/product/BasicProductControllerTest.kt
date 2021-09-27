@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.smartfoodnet.base.*
 import com.smartfoodnet.fnproduct.code.CodeRepository
 import com.smartfoodnet.fnproduct.product.entity.BasicProductCategory
+import com.smartfoodnet.fnproduct.product.entity.SubsidiaryMaterialCategory
 import com.smartfoodnet.fnproduct.product.model.response.CategoryByLevelModel
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional
 @UTF8AutoConfigureMockMvc
 internal class BasicProductControllerTest(
     private val basicProductCategoryRepository: BasicProductCategoryRepository,
+    private val subsidiaryMaterialCategoryRepository: SubsidiaryMaterialCategoryRepository,
     private val codeRepository: CodeRepository,
     private val objectMapper: ObjectMapper,
     private val mockMvc: MockMvc,
@@ -32,8 +34,8 @@ internal class BasicProductControllerTest(
     @Transactional
     fun givenBasicProductCategoryId_WhenGetBasicProductCategories_ThenReturn200_Success() {
         // given
-        val level1CategoryId = 1
-        val level2CategoryId = BasicProductCategories[level1CategoryId.toLong()]!![0]
+        val level1CategoryId = BasicProductCategories.keys.first()
+        val level2CategoryId = BasicProductCategories[level1CategoryId]!![0]
 
         // 기본 상품 카테고리 생성
         val categories: List<BasicProductCategory> = buildBasicProductCategory()
@@ -54,8 +56,43 @@ internal class BasicProductControllerTest(
             content { objectMapper.writeValueAsString(response) }
             jsonPath("$.payload[0].value") { value(level1CategoryId) }
             jsonPath("$.payload[0].label") {
-                val basicProductCategoryLevel1 = BasicProductCategoryCodes.fromId(level1CategoryId.toLong())
+                val basicProductCategoryLevel1 = BasicProductCategoryCodes.fromId(level1CategoryId)
                 value(basicProductCategoryLevel1.keyName)
+            }
+        }.andDo {
+            print()
+        }
+    }
+
+    @Test
+    @DisplayName("부자재 카테고리 조회 api 정상적으로 조회된다")
+    @Transactional
+    fun givenSubsidiaryMaterialCategoryId_WhenGetSubsidiaryMaterialCategories_ThenReturn200_Success() {
+        // given
+        val level1CategoryId = SubsidiaryMaterialCategories.keys.first()
+        val level2CategoryId = SubsidiaryMaterialCategories[level1CategoryId]!![0]
+
+        // 부자재 카테고리 생성
+        val categories: List<SubsidiaryMaterialCategory> = buildSubsidiaryMaterialCategory()
+        val response = categories.groupBy({ it.level1Category }, { it.level2Category })
+            .map { CategoryByLevelModel.fromEntity(it.key, it.value) }
+
+        codeRepository.saveAll(listOf(BasicProductCategoryCodes, SubsidiaryMaterialCategoryCodes).flatten())
+        subsidiaryMaterialCategoryRepository.saveAll(categories)
+
+        // when & then
+        mockMvc.get("$basicProductControllerPath/subsidiary-material-categories") {
+            param("level1CategoryId", level1CategoryId.toString())
+//            param("level2CategoryId", level2CategoryId.toString())
+            contentType = MediaType.APPLICATION_JSON
+            accept = MediaType.APPLICATION_JSON
+        }.andExpect {
+            status { isOk() }
+            content { objectMapper.writeValueAsString(response) }
+            jsonPath("$.payload[0].value") { value(level1CategoryId) }
+            jsonPath("$.payload[0].label") {
+                val subsidiaryMaterialCategoryLevel1 = SubsidiaryMaterialCategoryCodes.fromId(level1CategoryId)
+                value(subsidiaryMaterialCategoryLevel1.keyName)
             }
         }.andDo {
             print()
