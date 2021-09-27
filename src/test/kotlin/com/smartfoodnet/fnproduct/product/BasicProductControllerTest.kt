@@ -32,45 +32,33 @@ internal class BasicProductControllerTest(
     @Transactional
     fun givenBasicProductCategoryId_WhenGetBasicProductCategories_ThenReturn200_Success() {
         // given
-        val level1KeyName = "농산"
-        val categories = getBasicProductCategories(level1KeyName)
+        val level1CategoryId = 1
+        val level2CategoryId = BasicProductCategories[level1CategoryId.toLong()]!![0]
+
+        // 기본 상품 카테고리 생성
+        val categories: List<BasicProductCategory> = buildBasicProductCategory()
         val response = categories.groupBy({ it.level1Category }, { it.level2Category })
             .map { CategoryByLevelModel.fromEntity(it.key, it.value) }
 
-        categories.flatMap { listOf(it.level1Category, it.level2Category) }
-            .also { codeRepository.saveAll(it) }
+        codeRepository.saveAll(BasicProductCategoryCodes)
         basicProductCategoryRepository.saveAll(categories)
 
         // when & then
         mockMvc.get("$basicProductControllerPath/categories") {
+            param("level1CategoryId", level1CategoryId.toString())
+//            param("level2CategoryId", level2CategoryId.toString())
             contentType = MediaType.APPLICATION_JSON
             accept = MediaType.APPLICATION_JSON
         }.andExpect {
             status { isOk() }
             content { objectMapper.writeValueAsString(response) }
-            jsonPath("$.payload[0].value") { value("1") }
-            jsonPath("$.payload[0].label") { value(level1KeyName) }
+            jsonPath("$.payload[0].value") { value(level1CategoryId) }
+            jsonPath("$.payload[0].label") {
+                val basicProductCategoryLevel1 = BasicProductCategoryCodes.fromId(level1CategoryId.toLong())
+                value(basicProductCategoryLevel1.keyName)
+            }
         }.andDo {
             print()
-        }
-    }
-
-    fun getBasicProductCategories(keyName: String = "농산"): List<BasicProductCategory> {
-        if (keyName !in BasicProductCategories) {
-            throw NoSuchElementException("${BasicProductCategories.keys} 중 입력해주세요")
-        }
-        val level1Category = buildBasicProductCategoryLevel1(keyName = keyName)
-        val level2CategoryNames: List<String> = BasicProductCategories[keyName]!!
-
-        return (1..level2CategoryNames.size).map {
-            BasicProductCategory(
-                id = it.toLong(),
-                level1Category = level1Category,
-                level2Category = buildBasicProductCategoryLevel2(
-                    keyId = it,
-                    keyName = level2CategoryNames[it - 1]
-                )
-            )
         }
     }
 

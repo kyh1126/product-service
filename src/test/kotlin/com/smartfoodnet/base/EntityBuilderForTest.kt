@@ -1,39 +1,49 @@
 package com.smartfoodnet.base
 
 import com.smartfoodnet.fnproduct.code.entity.Code
+import com.smartfoodnet.fnproduct.product.entity.BasicProductCategory
+
+// ---------------------------------------------------------------------------------------------------------------------
+// -- Code
+// ---------------------------------------------------------------------------------------------------------------------
+const val BPCLevel1GroupId = 1
+const val BPCLevel1GroupName = "basic_product_category.level_1_category"
+const val BPCLevel2GroupId = 2
+const val BPCLevel2GroupName = "basic_product_category.level_2_category"
+
+internal val BasicProductCategoryCodes = listOf(
+    // Basic Product Category > level1
+    Code(1, BPCLevel1GroupId, BPCLevel1GroupName, "level1_1", 1, "농산"),
+    Code(2, BPCLevel1GroupId, BPCLevel1GroupName, "level1_2", 2, "수산"),
+    // Basic Product Category > level2
+    Code(3, BPCLevel2GroupId, BPCLevel2GroupName, "level2_1", 1, "쌀"),
+    Code(4, BPCLevel2GroupId, BPCLevel2GroupName, "level2_2", 2, "잡곡/혼합곡"),
+    Code(5, BPCLevel2GroupId, BPCLevel2GroupName, "level2_3", 3, "채소"),
+    Code(6, BPCLevel2GroupId, BPCLevel2GroupName, "level2_4", 4, "건어물"),
+)
+
+fun Collection<Code>.fromId(id: Long) = this.first { it.id == id }
 
 // ---------------------------------------------------------------------------------------------------------------------
 // -- BasicProductCategory
 // ---------------------------------------------------------------------------------------------------------------------
-const val basicProductCategoryLevel1GroupId = 1
-const val basicProductCategoryLevel2GroupId = 2
-
 internal val BasicProductCategories = mapOf(
-    "농산" to listOf("쌀", "잡곡/혼합곡", "채소", "과일", "견과류", "건과일", "냉동과일"),
-    "수산" to listOf("건어물", "생선류", "해산물", "해조류", "젓갈"),
-    "축산" to listOf("국내산 육우", "한우", "수입쇠고기", "돼지고기", "닭고기", "오리고기")
+    1L to listOf(3L, 4L, 5L),
+    2L to listOf(6L)
 )
 
-fun buildBasicProductCategoryLevel1(
-    keyId: Int = 1,
-    keyName: String = "농산",
-): Code {
-    return Code(
-        groupId = basicProductCategoryLevel1GroupId,
-        groupName = "basic_product_category.level_1_category",
-        keyId = keyId,
-        textKey = "level1_$keyId",
-        keyName = keyName
-    )
+fun buildBasicProductCategory(): List<BasicProductCategory> {
+    val result = mutableListOf<BasicProductCategory>()
+    BasicProductCategories.keys.map { level1Id ->
+        val level1Category = BasicProductCategoryCodes.fromId(level1Id)
+        result.addAll(
+            BasicProductCategories[level1Id]!!.map {
+                BasicProductCategory(
+                    level1Category = level1Category,
+                    level2Category = BasicProductCategoryCodes.fromId(it)
+                )
+            }
+        )
+    }
+    return result
 }
-
-fun buildBasicProductCategoryLevel2(
-    keyId: Int = 1,
-    keyName: String = BasicProductCategories["농산"]?.get(0)!!,
-) = Code(
-    groupId = basicProductCategoryLevel2GroupId,
-    groupName = "basic_product_category.level_2_category",
-    keyId = keyId,
-    textKey = "level2_$keyId",
-    keyName = keyName
-)
