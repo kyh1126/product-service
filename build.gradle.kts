@@ -83,4 +83,5 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+	exclude("**/playground/**")
 }

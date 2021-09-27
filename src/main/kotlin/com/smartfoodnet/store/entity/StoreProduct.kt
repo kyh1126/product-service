@@ -23,8 +23,8 @@ class StoreProduct (
     @Column(name = "store_product_code")
     var storeProductCode: String?,
 
-    @Column(name = "optional")
-    var optional: String? = null,
+    @Column(name = "option_name")
+    var optionName: String? = null,
 
     @Column(name = "option_code")
     var optionCode: String? = null,
