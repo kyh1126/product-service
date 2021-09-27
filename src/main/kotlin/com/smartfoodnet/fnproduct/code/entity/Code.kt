@@ -1,6 +1,6 @@
 package com.smartfoodnet.fnproduct.code.entity
 
-import java.time.Instant
+import java.time.LocalDateTime
 import javax.persistence.*
 
 @Entity
@@ -30,5 +30,5 @@ class Code(
     var description: String? = null,
 
     @Column(name = "deleted_at")
-    var deletedAt: Instant? = null,
+    var deletedAt: LocalDateTime? = null,
 )

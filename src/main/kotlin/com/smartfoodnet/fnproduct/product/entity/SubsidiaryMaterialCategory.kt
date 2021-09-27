@@ -3,7 +3,7 @@ package com.smartfoodnet.fnproduct.product.entity
 import com.smartfoodnet.fnproduct.code.entity.Code
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
-import java.time.Instant
+import java.time.LocalDateTime
 import javax.persistence.*
 
 @Entity
@@ -29,13 +29,13 @@ class SubsidiaryMaterialCategory(
     var order: Int? = null,
 
     @Column(name = "deleted_at")
-    var deletedAt: Instant? = null,
+    var deletedAt: LocalDateTime? = null,
 
     @CreationTimestamp
     @Column(name = "created_at")
-    var createdAt: Instant? = null,
+    var createdAt: LocalDateTime? = null,
 
     @UpdateTimestamp
     @Column(name = "updated_at")
-    var updatedAt: Instant? = null,
+    var updatedAt: LocalDateTime? = null,
 )

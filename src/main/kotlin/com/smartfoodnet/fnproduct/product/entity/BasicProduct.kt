@@ -6,7 +6,7 @@ import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
 import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureTypeConverter
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
-import java.time.Instant
+import java.time.LocalDateTime
 import javax.persistence.*
 
 @Entity
@@ -74,13 +74,13 @@ class BasicProduct(
     var activeYn: String = "N",
 
     @Column(name = "deleted_at")
-    var deletedAt: Instant? = null,
+    var deletedAt: LocalDateTime? = null,
 
     @CreationTimestamp
     @Column(name = "created_at")
-    var createdAt: Instant? = null,
+    var createdAt: LocalDateTime? = null,
 
     @UpdateTimestamp
     @Column(name = "updated_at")
-    var updatedAt: Instant? = null,
+    var updatedAt: LocalDateTime? = null,
 )
