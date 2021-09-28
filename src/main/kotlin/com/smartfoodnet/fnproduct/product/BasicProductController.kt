@@ -1,5 +1,6 @@
 package com.smartfoodnet.fnproduct.product
 
+import com.smartfoodnet.fnproduct.product.model.response.BasicProductDetailModel
 import com.smartfoodnet.fnproduct.product.model.response.BasicProductModel
 import com.smartfoodnet.fnproduct.product.model.response.CategoryByLevelModel
 import io.swagger.v3.oas.annotations.Operation
@@ -17,6 +18,15 @@ class BasicProductController(private val basicProductService: BasicProductServic
         @PathVariable partnerId: Long,
     ): List<BasicProductModel> {
         return basicProductService.getBasicProducts(partnerId)
+    }
+
+    @Operation(summary = "기본상품 상세 조회")
+    @GetMapping("{productId}")
+    fun getBasicProduct(
+        @Parameter(description = "상품 ID", required = true)
+        @PathVariable productId: Long,
+    ): BasicProductDetailModel {
+        return basicProductService.getBasicProduct(productId)
     }
 
     @Operation(summary = "기본상품 카테고리 조회")

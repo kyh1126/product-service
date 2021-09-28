@@ -1,6 +1,7 @@
 package com.smartfoodnet.fnproduct.product
 
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
+import com.smartfoodnet.fnproduct.product.model.response.BasicProductDetailModel
 import com.smartfoodnet.fnproduct.product.model.response.BasicProductModel
 import com.smartfoodnet.fnproduct.product.model.response.CategoryByLevelModel
 import org.springframework.stereotype.Service
@@ -16,6 +17,12 @@ class BasicProductService(
 
     fun getBasicProducts(partnerId: Long): List<BasicProductModel> {
         return basicProductRepository.findByPartnerId(partnerId).map { toBasicProductModel(it) }
+    }
+
+    fun getBasicProduct(productId: Long): BasicProductDetailModel {
+        return basicProductRepository.findById(productId).get().run {
+            toBasicProductDetailModel(this)
+        }
     }
 
     fun getBasicProductCategories(level1CategoryId: Long?, level2CategoryId: Long?): List<CategoryByLevelModel> {
@@ -38,4 +45,7 @@ class BasicProductService(
         return BasicProductModel.fromEntity(basicProduct)
     }
 
+    private fun toBasicProductDetailModel(basicProduct: BasicProduct): BasicProductDetailModel {
+        return BasicProductDetailModel.fromEntity(basicProduct)
+    }
 }
