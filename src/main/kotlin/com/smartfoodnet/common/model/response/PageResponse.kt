@@ -15,12 +15,7 @@ class PageResponse<T>(
     companion object {
         fun <T> of(target: Page<T>): PageResponse<T> {
             return target.run {
-                PageResponse(
-                    contents = content,
-                    pageRequest = target.pageable,
-                    totalCount = totalElements,
-                    isLast = isLast
-                )
+                PageResponse(content, pageable, totalElements, isLast)
             }
         }
 
