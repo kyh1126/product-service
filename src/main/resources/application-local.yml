@@ -10,6 +10,11 @@ logging:
           descriptor:
             sql: trace
 spring:
+  data:
+    web:
+      pageable:
+        default-page-size: 50
+        max-page-size: 1000
   web:
     locale: ko_KR
   servlet:
