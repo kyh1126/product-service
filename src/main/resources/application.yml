@@ -1,7 +1,7 @@
 server:
   port: 4008
   servlet:
-    context-path: /fresh-networks/fn-product/v1
+    context-path: /fresh-networks/fn-product
 spring:
   jpa:
     database-platform: org.hibernate.dialect.MySQL8Dialect
