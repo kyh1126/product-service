@@ -8,10 +8,10 @@ open class BaseRuntimeException(
     val errorMessage: String,
 ) : RuntimeException()
 
-enum class ErrorCode(val value: Int) {
-    USER_BAD_REQUEST_DEFAULT(1),
-    JWT_TOKEN_ERROR(2),
-    VALIDATE_ERROR(3),
-    NO_ELEMENT(4),
-    NOT_CHANGE(5),
+enum class ErrorCode(val value: Int, val errorCode:  String, val errorMessage: String) {
+    USER_BAD_REQUEST_DEFAULT(1, "", ""),
+    JWT_TOKEN_ERROR(2, "", ""),
+    VALIDATE_ERROR(3, "", ""),
+    NO_ELEMENT(4, "", ""),
+    NOT_CHANGE(5, "", ""),
 }
