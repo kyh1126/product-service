@@ -6,19 +6,18 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 
 class PageResponse<T>(
-    val contents: Collection<T> = listOf(),
-    val pageRequest: Pageable,
-    val totalCount: Long,
-    val isLast: Boolean,
+    val payload: Collection<T> = listOf(),
+    val pagination: Pagination,
 ) {
 
     companion object {
         fun <T> of(target: Page<T>): PageResponse<T> {
             return target.run {
-                PageResponse(content, pageable, totalElements, isLast)
+                PageResponse(content, Pagination(totalElements, isLast, pageable))
             }
         }
 
+        // Collection 으로 보낼 경우, count 쿼리를 날려 totalCount 책임 지기
         fun <T> of(
             contents: Collection<T>,
             totalCount: Long,
@@ -31,11 +30,19 @@ class PageResponse<T>(
 
         fun <T> of(contents: Collection<T>, totalCount: Long, pageRequest: Pageable): PageResponse<T> {
             return PageResponse(
-                contents = contents,
-                pageRequest = pageRequest,
-                totalCount = totalCount,
-                isLast = totalCount <= (pageRequest.pageNumber + 1) * pageRequest.pageSize
+                payload = contents,
+                pagination = Pagination(
+                    totalCount = totalCount,
+                    isLast = totalCount <= (pageRequest.pageNumber + 1) * pageRequest.pageSize,
+                    pageRequest = pageRequest
+                )
             )
         }
     }
 }
+
+data class Pagination(
+    val totalCount: Long,
+    val isLast: Boolean,
+    val pageRequest: Pageable,
+)
