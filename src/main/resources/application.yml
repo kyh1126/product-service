@@ -1,8 +1,13 @@
 server:
   port: 4008
   servlet:
-    context-path: /fresh-networks/fn-product/v1
+    context-path: /fresh-networks/fn-product
 spring:
+  data:
+    web:
+      pageable:
+        default-page-size: 50
+        max-page-size: 1000
   web:
     locale: ko_KR
   servlet:
