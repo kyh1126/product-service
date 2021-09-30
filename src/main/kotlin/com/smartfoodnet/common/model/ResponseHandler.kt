@@ -25,11 +25,11 @@ class ResponseHandler : ResponseBodyAdvice<Any> {
         request: ServerHttpRequest,
         response: ServerHttpResponse,
     ): Any? {
-        return if (
-            body!! is ExceptionResponse
-            || body is PageResponse<*>
-            || request.uri.path.contains("swagger")
-            || request.uri.path.contains("api-docs")
+        return if (body != null
+            && (body is ExceptionResponse
+                    || body is PageResponse<*>
+                    || request.uri.path.contains("swagger")
+                    || request.uri.path.contains("api-docs"))
         ) {
             body
         } else {
