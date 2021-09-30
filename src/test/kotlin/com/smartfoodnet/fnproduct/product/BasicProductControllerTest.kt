@@ -6,8 +6,10 @@ import com.smartfoodnet.fnproduct.code.CodeRepository
 import com.smartfoodnet.fnproduct.product.entity.BasicProductCategory
 import com.smartfoodnet.fnproduct.product.entity.SubsidiaryMaterialCategory
 import com.smartfoodnet.fnproduct.product.model.response.CategoryByLevelModel
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
@@ -19,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional
 @SpringBootTest
 @ActiveProfiles("test")
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @UTF8AutoConfigureMockMvc
 internal class BasicProductControllerTest(
     private val basicProductCategoryRepository: BasicProductCategoryRepository,
@@ -28,6 +31,11 @@ internal class BasicProductControllerTest(
     private val mockMvc: MockMvc,
 ) : AbstractTest() {
     private val basicProductControllerPath = "/basic-products"
+
+    @BeforeAll  // Testcontainers 가 static 으로 떠있기 때문에, DB 저장도 한 번만 실행되어야 한다.
+    fun given() {
+        codeRepository.saveAll(listOf(BasicProductCategoryCodes, SubsidiaryMaterialCategoryCodes).flatten())
+    }
 
     @Test
     @DisplayName("기본상품 카테고리 조회 api 정상적으로 조회된다")
@@ -42,7 +50,6 @@ internal class BasicProductControllerTest(
         val response = categories.groupBy({ it.level1Category }, { it.level2Category })
             .map { CategoryByLevelModel.fromEntity(it.key, it.value) }
 
-        codeRepository.saveAll(BasicProductCategoryCodes)
         basicProductCategoryRepository.saveAll(categories)
 
         // when & then
@@ -77,7 +84,6 @@ internal class BasicProductControllerTest(
         val response = categories.groupBy({ it.level1Category }, { it.level2Category })
             .map { CategoryByLevelModel.fromEntity(it.key, it.value) }
 
-        codeRepository.saveAll(listOf(BasicProductCategoryCodes, SubsidiaryMaterialCategoryCodes).flatten())
         subsidiaryMaterialCategoryRepository.saveAll(categories)
 
         // when & then
