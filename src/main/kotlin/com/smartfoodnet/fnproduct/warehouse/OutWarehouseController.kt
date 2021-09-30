@@ -1,11 +1,12 @@
 package com.smartfoodnet.fnproduct.warehouse
 
+import com.smartfoodnet.fnproduct.warehouse.entity.OutWarehouse
+import com.smartfoodnet.fnproduct.warehouse.model.dto.OutWarehouseDto
+import com.smartfoodnet.fnproduct.warehouse.model.dto.OutWarehouseUpdateDto
 import com.smartfoodnet.fnproduct.warehouse.model.response.OutWarehouseModel
 import io.swagger.v3.oas.annotations.Operation
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import io.swagger.v3.oas.annotations.Parameter
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("out-warehouse")
@@ -15,5 +16,24 @@ class OutWarehouseController(private val outWarehouseService : OutWarehouseServi
     @GetMapping("partners/{partnerId}")
     fun getOutWarehouses(@PathVariable partnerId : Long) : List<OutWarehouseModel>{
         return outWarehouseService.getOutWarehouses(partnerId)
+    }
+
+    @Operation(summary = "화주 출고처 등록")
+    @PostMapping("partners/{partnerId}")
+    fun saveOutWarehouse(
+        @PathVariable partnerId: Long,
+        @RequestBody outWarehouseDto: OutWarehouseDto
+    ) {
+        outWarehouseService.saveOutWarehouse(partnerId, outWarehouseDto)
+    }
+
+    @Operation(summary = "화주 출고처 수정")
+    @PutMapping("/{id}")
+    fun updateOutWarehouse(
+        @Parameter(description = "출고처 고유 ID") @PathVariable id : Long,
+        @RequestBody updateDto: OutWarehouseUpdateDto
+    ) {
+        println(updateDto)
+        outWarehouseService.updateOutWarehouse(id, updateDto)
     }
 }
