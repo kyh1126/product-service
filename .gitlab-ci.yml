@@ -19,7 +19,7 @@ build:
     - ./gradlew clean && ./gradlew bootJar
   artifacts:
     paths:
-      - build/libs/*.jar
+      - build/libs/app.jar
     expire_in: 1 hour
   allow_failure: false
 
@@ -32,7 +32,7 @@ test:
   stage: test
   artifacts:
     paths:
-      - build/libs/*.jar
+      - build/libs/app.jar
   script:
     - ./gradlew test
   allow_failure: false
