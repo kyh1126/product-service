@@ -2,6 +2,7 @@ package com.smartfoodnet.common.model
 
 import com.smartfoodnet.common.error.ExceptionResponse
 import com.smartfoodnet.common.model.response.CommonResponse
+import com.smartfoodnet.common.model.response.PageResponse
 import org.springframework.core.MethodParameter
 import org.springframework.http.MediaType
 import org.springframework.http.converter.HttpMessageConverter
@@ -24,7 +25,12 @@ class ResponseHandler : ResponseBodyAdvice<Any> {
         request: ServerHttpRequest,
         response: ServerHttpResponse,
     ): Any? {
-        return if (body!! is ExceptionResponse || request.uri.path.contains("swagger") || request.uri.path.contains("api-docs")) {
+        return if (
+            body!! is ExceptionResponse
+            || body is PageResponse<*>
+            || request.uri.path.contains("swagger")
+            || request.uri.path.contains("api-docs")
+        ) {
             body
         } else {
             CommonResponse(payload = body)

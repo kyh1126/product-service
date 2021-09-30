@@ -1,5 +1,6 @@
 package com.smartfoodnet.fnproduct.product.entity
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import java.time.LocalDateTime
@@ -13,8 +14,10 @@ class ExpirationDateInfo(
     @Column(name = "id")
     var id: Long? = null,
 
-    @Column(name = "basic_product_id")
-    var basicProductId: Long,
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "basic_product_id")
+    @JsonIgnore
+    var basicProduct: BasicProduct,
 
     @Column(name = "manufacture_date_write_yn")
     var manufactureDateWriteYn: String = "N",

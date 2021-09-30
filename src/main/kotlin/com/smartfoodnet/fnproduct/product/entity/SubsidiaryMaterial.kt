@@ -1,5 +1,6 @@
 package com.smartfoodnet.fnproduct.product.entity
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.smartfoodnet.fnproduct.product.model.vo.SeasonalOption
 import com.smartfoodnet.fnproduct.product.model.vo.SeasonalOptionConverter
 import org.hibernate.annotations.CreationTimestamp
@@ -15,11 +16,15 @@ class SubsidiaryMaterial(
     @Column(name = "id")
     var id: Long? = null,
 
-    @Column(name = "basic_product_id")
-    var basicProductId: Long,
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "basic_product_id")
+    @JsonIgnore
+    var basicProduct: BasicProduct,
 
-    @Column(name = "subsidiary_material_id")
-    var subsidiaryMaterialId: Long?,
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "subsidiary_material_id")
+    @JsonIgnore
+    var subsidiaryMaterial: BasicProduct,
 
     @Column(name = "seasonal_option")
     @Convert(converter = SeasonalOptionConverter::class)

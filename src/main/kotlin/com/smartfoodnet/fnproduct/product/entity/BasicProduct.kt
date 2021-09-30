@@ -25,7 +25,7 @@ class BasicProduct(
     var partnerId: Long? = null,
 
     @Column(name = "name")
-    var name: String?,
+    var name: String? = null,
 
     @Column(name = "code")
     var code: String? = null,
@@ -70,6 +70,12 @@ class BasicProduct(
     @Column(name = "image_url")
     var imageUrl: String? = null,
 
+    @OneToOne(mappedBy = "basicProduct", cascade = [CascadeType.PERSIST])
+    var expirationDateInfo: ExpirationDateInfo? = null,
+
+    @OneToMany(mappedBy = "basicProduct", cascade = [CascadeType.PERSIST])
+    var subsidiaryMaterials: MutableList<SubsidiaryMaterial> = mutableListOf(),
+
     @Column(name = "active_yn")
     var activeYn: String = "N",
 
@@ -83,4 +89,9 @@ class BasicProduct(
     @UpdateTimestamp
     @Column(name = "updated_at")
     var updatedAt: LocalDateTime? = null,
-)
+) {
+    fun addSubsidiaryMaterials(subsidiaryMaterial: SubsidiaryMaterial) {
+        subsidiaryMaterials.add(subsidiaryMaterial)
+        subsidiaryMaterial.basicProduct = this
+    }
+}
