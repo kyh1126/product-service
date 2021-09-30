@@ -24,5 +24,4 @@ class StoreProductController(private val storeProductService: StoreProductServic
     fun create(@Valid @RequestBody storeProductModel: StoreProductModel): StoreProductModel {
         return storeProductService.createStoreProduct(storeProductModel);
     }
-
 }
