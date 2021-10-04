@@ -7,4 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface BasicProductRepository : JpaRepository<BasicProduct, Long> {
     fun findByPartnerId(partnerId: Long, page: Pageable): Page<BasicProduct>
+    fun findByCode(code: String): BasicProduct?
 }

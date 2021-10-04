@@ -28,5 +28,4 @@ class StoreProductService(var storeProductRepository: StoreProductRepository, va
 
         return StoreProductModel.from(storeProductRepository.save(storeProduct))
     }
-
 }

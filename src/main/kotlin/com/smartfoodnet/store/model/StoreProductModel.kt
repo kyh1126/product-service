@@ -5,12 +5,16 @@ import java.time.Instant
 
 data class StoreProductModel(
     var id: Long? = null,
-    var partnerId: Long? = null,
-    var name: String? = null,
+    var storeCode: String,
+    var storeName: String,
+    var partnerId: Long,
+    var name: String,
     var storeProductCode: String? = null,
     var optionName: String? = null,
     var optionCode: String? = null,
     var basicProductId: Long? = null,
+    var basicProductCode: String? = null,
+    var basicProductName: String? = null,
     var deletedAt: Instant? = null,
     var createdAt: Instant? = null,
     var updatedAt: Instant? = null,
@@ -18,6 +22,8 @@ data class StoreProductModel(
     fun toEntity(): StoreProduct {
         return StoreProduct(
             id = id,
+            storeCode = storeCode,
+            storeName = storeName,
             partnerId = partnerId,
             name = name,
             storeProductCode = storeProductCode,
@@ -34,6 +40,8 @@ data class StoreProductModel(
             return storeProduct.run {
                 StoreProductModel(
                     id = id,
+                    storeCode = storeCode,
+                    storeName = storeName,
                     partnerId = partnerId,
                     name = name,
                     storeProductCode = storeProductCode,

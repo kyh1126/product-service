@@ -14,11 +14,17 @@ class StoreProduct (
     @Column(name = "id")
     var id: Long? = null,
 
+    @Column(name = "store_code")
+    var storeCode: String,
+
+    @Column(name = "store_name")
+    var storeName: String,
+
     @Column(name = "partner_id")
-    var partnerId: Long? = null,
+    var partnerId: Long,
 
     @Column(name = "name")
-    var name: String?,
+    var name: String,
 
     @Column(name = "store_product_code")
     var storeProductCode: String?,
