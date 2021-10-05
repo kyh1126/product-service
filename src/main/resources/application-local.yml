@@ -44,9 +44,9 @@ spring:
     hikari:
       maximumPoolSize: 10
       poolName: HikariCP
-    url: ${SPRING_DATASOURCE_BASE_URL:jdbc:mysql://localhost:3306}/fn_products?serverTimezone=UTC&useCursors=false&sendStringParametersAsUnicode=false&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useSSL=false
+    url: ${SPRING_DATASOURCE_BASE_URL:jdbc:mysql://localhost:3306}/fn_products?serverTimezone=UTC&useCursors=false&sendStringParametersAsUnicode=false&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true
     username: root
-    password: root
+    password:
     driver-class-name: com.mysql.cj.jdbc.Driver
   mvc:
     format:
