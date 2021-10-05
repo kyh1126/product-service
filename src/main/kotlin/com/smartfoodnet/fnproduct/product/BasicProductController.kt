@@ -1,6 +1,5 @@
 package com.smartfoodnet.fnproduct.product
 
-import com.smartfoodnet.common.model.PageableApi
 import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.fnproduct.product.model.response.BasicProductDetailModel
 import com.smartfoodnet.fnproduct.product.model.response.BasicProductModel
@@ -15,15 +14,13 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("basic-products")
 class BasicProductController(private val basicProductService: BasicProductService) {
-    @PageableApi
+
     @Operation(summary = "특정 화주(고객사) ID 의 기본상품 리스트 조회")
     @GetMapping("partners/{partnerId}")
     fun getBasicProducts(
         @Parameter(description = "화주(고객사) ID", required = true)
         @PathVariable partnerId: Long,
-        @Parameter(hidden = true)
-        @PageableDefault(size = 50, sort = ["id"], direction = Sort.Direction.DESC)
-        page: Pageable,
+        @PageableDefault(size = 50, sort = ["id"], direction = Sort.Direction.DESC) page: Pageable,
     ): PageResponse<BasicProductModel> {
         return basicProductService.getBasicProducts(partnerId, page)
     }

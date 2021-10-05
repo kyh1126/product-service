@@ -54,3 +54,5 @@ spring:
 sfn:
   swagger:
     host: localhost:4008
+    size:
+      value: "페이지 크기 (default: ${spring.data.web.pageable.default-page-size})"
