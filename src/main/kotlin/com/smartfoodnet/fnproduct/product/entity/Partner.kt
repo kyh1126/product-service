@@ -10,7 +10,7 @@ import javax.persistence.*
 class Partner(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "id", columnDefinition = "UNSIGNED BIGINT")
     var id: Long? = null,
 
     @Column(name = "name")

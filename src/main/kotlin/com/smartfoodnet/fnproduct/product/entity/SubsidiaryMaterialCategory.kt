@@ -11,7 +11,7 @@ import javax.persistence.*
 class SubsidiaryMaterialCategory(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "id", columnDefinition = "UNSIGNED BIGINT")
     var id: Long? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
