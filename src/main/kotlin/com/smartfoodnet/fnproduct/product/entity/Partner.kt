@@ -16,6 +16,9 @@ class Partner(
     @Column(name = "name")
     var name: String,
 
+    @Column(name = "customer_number")
+    var customerNumber: String = String.format("%04d", id),
+
     @Column(name = "deleted_at")
     var deletedAt: LocalDateTime? = null,
 
