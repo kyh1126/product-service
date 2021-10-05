@@ -18,6 +18,7 @@ import javax.persistence.*
 @DynamicUpdate
 class OutWarehouse (
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(columnDefinition = "BIGINT UNSIGNED")
     var id : Long? = null,
 
     @Column(name = "partner_id")

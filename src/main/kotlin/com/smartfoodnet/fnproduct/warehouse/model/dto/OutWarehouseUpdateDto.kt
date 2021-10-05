@@ -6,7 +6,7 @@ import com.smartfoodnet.fnproduct.warehouse.entity.OutWarehouse
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
 
-@ApiModel
+@ApiModel(value = "화주 출고처 업데이트 모델")
 data class OutWarehouseUpdateDto (
     @ApiModelProperty(value = "출고처 이름", example = "출고처")
     var name : String? = null,

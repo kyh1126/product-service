@@ -14,15 +14,18 @@ class OutWarehouseController(private val outWarehouseService : OutWarehouseServi
 
     @Operation(summary = "특정화주의 출고처 목록")
     @GetMapping("partners/{partnerId}")
-    fun getOutWarehouses(@PathVariable partnerId : Long) : List<OutWarehouseModel>{
+    fun getOutWarehouses(
+        @Parameter(description = "화주(고객사) ID") @PathVariable partnerId : Long
+    ) : List<OutWarehouseModel>
+    {
         return outWarehouseService.getOutWarehouses(partnerId)
     }
 
     @Operation(summary = "화주 출고처 등록")
     @PostMapping("partners/{partnerId}")
     fun saveOutWarehouse(
-        @PathVariable partnerId: Long,
-        @RequestBody outWarehouseDto: OutWarehouseDto
+        @Parameter(description = "화주(고객사) ID") @PathVariable partnerId: Long,
+        @Parameter(description = "출고처 등록 데이터 모델") @RequestBody outWarehouseDto: OutWarehouseDto
     ) {
         outWarehouseService.saveOutWarehouse(partnerId, outWarehouseDto)
     }
@@ -31,7 +34,7 @@ class OutWarehouseController(private val outWarehouseService : OutWarehouseServi
     @PutMapping("/{id}")
     fun updateOutWarehouse(
         @Parameter(description = "출고처 고유 ID") @PathVariable id : Long,
-        @RequestBody updateDto: OutWarehouseUpdateDto
+        @Parameter(description = "출고처 업데이트 모델") @RequestBody updateDto: OutWarehouseUpdateDto
     ) {
         println(updateDto)
         outWarehouseService.updateOutWarehouse(id, updateDto)

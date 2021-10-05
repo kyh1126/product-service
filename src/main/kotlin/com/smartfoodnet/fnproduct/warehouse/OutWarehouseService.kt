@@ -11,14 +11,13 @@ class OutWarehouseService(
     private val outWarehouseRepository: OutWarehouseRepository
 ) {
     fun getOutWarehouses(partnerId : Long) : List<OutWarehouseModel>{
-        return outWarehouseRepository.findAll().map { OutWarehouseModel.fromEntity(it) }
+        return outWarehouseRepository.findByPartnerId(partnerId).map { OutWarehouseModel.fromEntity(it) }
     }
-ㅇ
+
     fun saveOutWarehouse(partnerId: Long, outWarehouseDto: OutWarehouseDto)  {
         outWarehouseRepository.save(outWarehouseDto.toEntity(partnerId))
     }
 
-    // TODO 출고처 수정 구현 예정
     fun updateOutWarehouse(warehouseId: Long, updateDto: OutWarehouseUpdateDto) {
         var outWarehouse = outWarehouseRepository.findById(warehouseId).get();
 
