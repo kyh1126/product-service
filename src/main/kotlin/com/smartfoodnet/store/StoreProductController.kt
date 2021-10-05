@@ -26,11 +26,11 @@ class StoreProductController(
     @Operation(summary = "쇼핑몰상품 생성")
     @PostMapping("")
     fun create(@Valid @RequestBody storeProductModel: StoreProductModel): StoreProductModel {
-        return storeProductService.createStoreProduct(storeProductModel);
+        return storeProductService.createStoreProduct(storeProductModel)
     }
 
     @Operation(summary = "쇼핑몰상품 생성")
-    @PostMapping("")
+    @PostMapping("/bulk")
     fun bulkCreateByExcel(file: MultipartFile, partnerId: Long): List<StoreProductModel> {
         return storeProductExcelService.createBulkByExcelFile(file, partnerId)
     }
