@@ -11,11 +11,11 @@ import javax.persistence.*
 class ExpirationDateInfo(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", columnDefinition = "UNSIGNED BIGINT")
+    @Column(name = "id", columnDefinition = "BIGINT UNSIGNED")
     var id: Long? = null,
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "basic_product_id", columnDefinition = "UNSIGNED BIGINT")
+    @JoinColumn(name = "basic_product_id", columnDefinition = "BIGINT UNSIGNED")
     @JsonIgnore
     var basicProduct: BasicProduct,
 

@@ -10,10 +10,10 @@ import javax.persistence.*
 class Warehouse(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", columnDefinition = "UNSIGNED BIGINT")
+    @Column(name = "id", columnDefinition = "BIGINT UNSIGNED")
     var id: Long? = null,
 
-    @Column(name = "partner_id", columnDefinition = "UNSIGNED BIGINT")
+    @Column(name = "partner_id", columnDefinition = "BIGINT UNSIGNED")
     var partnerId: Long,
 
     @Column(name = "code")

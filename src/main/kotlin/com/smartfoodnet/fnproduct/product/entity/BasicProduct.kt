@@ -14,14 +14,14 @@ import javax.persistence.*
 class BasicProduct(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", columnDefinition = "UNSIGNED BIGINT")
+    @Column(name = "id", columnDefinition = "BIGINT UNSIGNED")
     var id: Long? = null,
 
     @Column(name = "type")
     @Convert(converter = BasicProductTypeConverter::class)
     var type: BasicProductType,
 
-    @Column(name = "partner_id", columnDefinition = "UNSIGNED BIGINT")
+    @Column(name = "partner_id", columnDefinition = "BIGINT UNSIGNED")
     var partnerId: Long? = null,
 
     @Column(name = "name")
@@ -37,11 +37,11 @@ class BasicProduct(
     var barcode: String,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "basic_product_category_id", columnDefinition = "UNSIGNED BIGINT")
+    @JoinColumn(name = "basic_product_category_id", columnDefinition = "BIGINT UNSIGNED")
     var basicProductCategory: BasicProductCategory? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "subsidiary_material_category_id", columnDefinition = "UNSIGNED BIGINT")
+    @JoinColumn(name = "subsidiary_material_category_id", columnDefinition = "BIGINT UNSIGNED")
     var subsidiaryMaterialCategory: SubsidiaryMaterialCategory? = null,
 
     @Column(name = "handling_temperature")
@@ -49,7 +49,7 @@ class BasicProduct(
     var handlingTemperature: HandlingTemperatureType? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "warehouse_id", columnDefinition = "UNSIGNED BIGINT")
+    @JoinColumn(name = "warehouse_id", columnDefinition = "BIGINT UNSIGNED")
     var warehouse: Warehouse? = null,
 
     @Column(name = "supply_price")
