@@ -14,14 +14,14 @@ import javax.persistence.*
 class BasicProduct(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "id", columnDefinition = "UNSIGNED BIGINT")
     var id: Long? = null,
 
     @Column(name = "type")
     @Convert(converter = BasicProductTypeConverter::class)
     var type: BasicProductType,
 
-    @Column(name = "partner_id")
+    @Column(name = "partner_id", columnDefinition = "UNSIGNED BIGINT")
     var partnerId: Long? = null,
 
     @Column(name = "name")
@@ -37,11 +37,11 @@ class BasicProduct(
     var barcode: String,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "basic_product_category_id")
+    @JoinColumn(name = "basic_product_category_id", columnDefinition = "UNSIGNED BIGINT")
     var basicProductCategory: BasicProductCategory? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "subsidiary_material_category_id")
+    @JoinColumn(name = "subsidiary_material_category_id", columnDefinition = "UNSIGNED BIGINT")
     var subsidiaryMaterialCategory: SubsidiaryMaterialCategory? = null,
 
     @Column(name = "handling_temperature")
@@ -49,7 +49,7 @@ class BasicProduct(
     var handlingTemperature: HandlingTemperatureType? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "warehouse_id")
+    @JoinColumn(name = "warehouse_id", columnDefinition = "UNSIGNED BIGINT")
     var warehouse: Warehouse? = null,
 
     @Column(name = "supply_price")
