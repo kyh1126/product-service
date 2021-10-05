@@ -1,9 +1,12 @@
 package com.smartfoodnet.fnproduct.product.model.response
 
+import com.fasterxml.jackson.annotation.JsonFormat
+import com.smartfoodnet.common.Constants
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
 import io.swagger.annotations.ApiModelProperty
+import java.time.LocalDateTime
 
 data class BasicProductModel(
     @ApiModelProperty(value = "id")
@@ -63,6 +66,14 @@ data class BasicProductModel(
 
     @ApiModelProperty(value = "활성화여부 (default: N)", allowableValues = "Y,N")
     val activeYn: String,
+
+    @ApiModelProperty(value = "생성시간")
+    @JsonFormat(pattern = Constants.TIMESTAMP_FORMAT)
+    val createdAt: LocalDateTime? = null,
+
+    @ApiModelProperty(value = "업데이트시간")
+    @JsonFormat(pattern = Constants.TIMESTAMP_FORMAT)
+    val updatedAt: LocalDateTime? = null,
 ) {
 
     companion object {
@@ -93,7 +104,9 @@ data class BasicProductModel(
                     piecesPerBox = piecesPerBox,
                     boxesPerPalette = boxesPerPalette,
                     imageUrl = imageUrl,
-                    activeYn = activeYn
+                    activeYn = activeYn,
+                    createdAt = createdAt,
+                    updatedAt = updatedAt
                 )
             }
         }
