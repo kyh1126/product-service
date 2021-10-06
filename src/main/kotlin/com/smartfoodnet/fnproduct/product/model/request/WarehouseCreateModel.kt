@@ -9,9 +9,6 @@ data class WarehouseCreateModel(
     @ApiModelProperty(value = "화주(고객사) ID")
     val partnerId: Long,
 
-    @ApiModelProperty(value = "입고처코드")
-    var code: Int,
-
     @ApiModelProperty(value = "입고처이름")
-    var name: String,
+    val name: String,
 )

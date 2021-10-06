@@ -10,9 +10,6 @@ data class WarehouseModel(
     @ApiModelProperty(value = "화주(고객사) ID")
     val partnerId: Long,
 
-    @ApiModelProperty(value = "입고처코드")
-    var code: Int,
-
     @ApiModelProperty(value = "입고처이름")
     var name: String,
 ) {
@@ -23,7 +20,6 @@ data class WarehouseModel(
                 WarehouseModel(
                     id = id,
                     partnerId = partnerId,
-                    code = code,
                     name = name
                 )
             }
