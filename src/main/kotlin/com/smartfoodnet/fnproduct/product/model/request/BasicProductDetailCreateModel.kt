@@ -5,12 +5,12 @@ import com.smartfoodnet.fnproduct.product.entity.*
 import io.swagger.annotations.ApiModelProperty
 
 data class BasicProductDetailCreateModel(
-    @JsonUnwrapped
-    var basicProductModel: BasicProductCreateModel,
-
     @ApiModelProperty(value = "부자재정보")
     var subsidiaryMaterialModels: List<SubsidiaryMaterialCreateModel> = mutableListOf(),
 ) {
+    @JsonUnwrapped
+    lateinit var basicProductModel: BasicProductCreateModel
+
     fun toEntity(
         code: String,
         basicProductCategory: BasicProductCategory?,
