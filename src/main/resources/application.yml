@@ -48,3 +48,5 @@ spring:
 sfn:
   swagger:
     host: s-api-dev.smartfoodnet.com
+    size:
+      value: "페이지 크기 (default: ${spring.data.web.pageable.default-page-size})"

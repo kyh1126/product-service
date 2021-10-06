@@ -1,15 +1,19 @@
 package com.smartfoodnet.fnproduct.product.model.response
 
+import com.fasterxml.jackson.annotation.JsonFormat
+import com.smartfoodnet.common.Constants
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
 import io.swagger.annotations.ApiModelProperty
+import java.time.LocalDateTime
 
 data class BasicProductModel(
     @ApiModelProperty(value = "id")
     val id: Long? = null,
 
-    @ApiModelProperty(value = "구분 (BASIC:기본상품/CUSTOM_SUB:고객전용부자재/SUB:공통부자재/PACKAGE:모음상품)", allowableValues = "BASIC,CUSTOM_SUB,SUB,PACKAGE")
+    @ApiModelProperty(value = "구분 (BASIC:기본상품/CUSTOM_SUB:고객전용부자재/SUB:공통부자재/PACKAGE:모음상품)",
+        allowableValues = "BASIC,CUSTOM_SUB,SUB,PACKAGE")
     var type: BasicProductType,
 
     @ApiModelProperty(value = "화주(고객사) ID")
@@ -48,6 +52,9 @@ data class BasicProductModel(
     @ApiModelProperty(value = "유통기한관리여부 (default: N)", allowableValues = "Y,N")
     var expirationDateManagementYn: String,
 
+    @ApiModelProperty(value = "유통기한정보")
+    var expirationDateInfoModel: ExpirationDateInfoModel? = null,
+
     @ApiModelProperty(value = "박스입수")
     var piecesPerBox: Int? = null,
 
@@ -59,6 +66,14 @@ data class BasicProductModel(
 
     @ApiModelProperty(value = "활성화여부 (default: N)", allowableValues = "Y,N")
     val activeYn: String,
+
+    @ApiModelProperty(value = "생성시간")
+    @JsonFormat(pattern = Constants.TIMESTAMP_FORMAT)
+    val createdAt: LocalDateTime? = null,
+
+    @ApiModelProperty(value = "업데이트시간")
+    @JsonFormat(pattern = Constants.TIMESTAMP_FORMAT)
+    val updatedAt: LocalDateTime? = null,
 ) {
 
     companion object {
@@ -83,10 +98,15 @@ data class BasicProductModel(
                     supplyPrice = supplyPrice,
                     singlePackagingYn = singlePackagingYn,
                     expirationDateManagementYn = expirationDateManagementYn,
+                    expirationDateInfoModel = expirationDateInfo?.let {
+                        ExpirationDateInfoModel.fromEntity(it)
+                    },
                     piecesPerBox = piecesPerBox,
                     boxesPerPalette = boxesPerPalette,
                     imageUrl = imageUrl,
-                    activeYn = activeYn
+                    activeYn = activeYn,
+                    createdAt = createdAt,
+                    updatedAt = updatedAt
                 )
             }
         }

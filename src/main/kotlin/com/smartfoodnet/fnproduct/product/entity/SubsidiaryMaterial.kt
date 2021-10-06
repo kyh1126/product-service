@@ -13,16 +13,16 @@ import javax.persistence.*
 class SubsidiaryMaterial(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "id", columnDefinition = "BIGINT UNSIGNED")
     var id: Long? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "basic_product_id")
+    @JoinColumn(name = "basic_product_id", columnDefinition = "BIGINT UNSIGNED")
     @JsonIgnore
     var basicProduct: BasicProduct,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "subsidiary_material_id")
+    @JoinColumn(name = "subsidiary_material_id", columnDefinition = "BIGINT UNSIGNED")
     @JsonIgnore
     var subsidiaryMaterial: BasicProduct,
 
