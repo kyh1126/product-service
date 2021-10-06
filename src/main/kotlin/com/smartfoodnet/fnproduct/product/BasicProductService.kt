@@ -84,8 +84,11 @@ class BasicProductService(
     ): String {
         val customerNumber = partnerId
             ?.let { partnerService.getPartner(it) }?.customerNumber
-        val totalProductCount = basicProductRepository.countByPartnerIdAndType(partnerId, BasicProductType.BASIC)
-            .run { String.format("%05d", this) }
+        val basicProductCodeTypes = setOf(BasicProductType.BASIC, BasicProductType.PACKAGE)
+
+        // 00001 부터 시작
+        val totalProductCount = basicProductRepository.countByPartnerIdAndTypeIn(partnerId, basicProductCodeTypes)
+            .run { String.format("%05d", this + 1) }
 
         return customerNumber + typeCode + temperatureCode + totalProductCount
     }

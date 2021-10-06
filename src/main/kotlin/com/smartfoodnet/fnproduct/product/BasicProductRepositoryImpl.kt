@@ -16,9 +16,9 @@ class BasicProductRepositoryImpl : Querydsl4RepositorySupport(BasicProduct::clas
         }
     }
 
-    override fun countByPartnerIdAndType(partnerId: Long?, type: BasicProductType): Long {
+    override fun countByPartnerIdAndTypeIn(partnerId: Long?, types: Collection<BasicProductType>): Long {
         return selectFrom(basicProduct)
-            .where(eqPartnerId(partnerId), eqType(type))
+            .where(eqPartnerId(partnerId), inType(types))
             .fetchCount()
     }
 
@@ -26,4 +26,5 @@ class BasicProductRepositoryImpl : Querydsl4RepositorySupport(BasicProduct::clas
 
     private fun eqType(type: BasicProductType?) = if (type == null) null else basicProduct.type.eq(type)
 
+    private fun inType(types: Collection<BasicProductType>) = basicProduct.type.`in`(types)
 }

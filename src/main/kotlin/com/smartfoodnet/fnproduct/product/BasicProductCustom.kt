@@ -8,5 +8,5 @@ import org.springframework.data.domain.Pageable
 interface BasicProductCustom {
     fun findByPartnerIdAndType(partnerId: Long, type: BasicProductType?, page: Pageable): Page<BasicProduct>
 
-    fun countByPartnerIdAndType(partnerId: Long?, type: BasicProductType): Long
+    fun countByPartnerIdAndTypeIn(partnerId: Long?, types: Collection<BasicProductType>): Long
 }
