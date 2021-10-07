@@ -34,7 +34,7 @@ class BasicProduct(
     var barcodeYn: String = "N",
 
     @Column(name = "barcode")
-    var barcode: String,
+    var barcode: String? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "basic_product_category_id", columnDefinition = "BIGINT UNSIGNED")

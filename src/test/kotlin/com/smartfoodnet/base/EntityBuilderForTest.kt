@@ -2,6 +2,7 @@ package com.smartfoodnet.base
 
 import com.smartfoodnet.fnproduct.code.entity.Code
 import com.smartfoodnet.fnproduct.product.entity.BasicProductCategory
+import com.smartfoodnet.fnproduct.product.entity.Partner
 import com.smartfoodnet.fnproduct.product.entity.SubsidiaryMaterialCategory
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -85,3 +86,8 @@ fun buildSubsidiaryMaterialCategory(): List<SubsidiaryMaterialCategory> {
     }
     return result
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+// -- Partner
+// ---------------------------------------------------------------------------------------------------------------------
+fun buildPartner(): Partner = Partner(name = "(주)대호", customerNumber = "0001")
