@@ -16,7 +16,7 @@ import sfn.excel.module.workbook.read.models.SimpleWorkbookModels
 class StoreProductExcelService(var storeProductRepository: StoreProductRepository, var basicProductRepository: BasicProductRepository) {
     private final val HEADER_ROW_INDEX: Int = 1
     private final val WORKSHEET_INDEX: Int = 0
-    private final val DATA_STARTING_ROW_INDEX: Int = 1
+    private final val DATA_STARTING_ROW_INDEX: Int = 3
 
     fun createBulkByExcelFile(file: MultipartFile, partnerId: Long): List<StoreProductModel> {
         val workbook = ExcelReadUtils.extractSimple(file.originalFilename, file.inputStream)
@@ -37,28 +37,34 @@ class StoreProductExcelService(var storeProductRepository: StoreProductRepositor
     }
 
     private fun buildStoreProductModels(worksheet: SimpleWorkbookModels.Worksheet, partnerId: Long): List<StoreProductModel>{
+        val indexMap = StoreProductHeaderIndexMap.from(worksheet.rows[HEADER_ROW_INDEX])
         val rows = worksheet.rows.subList(DATA_STARTING_ROW_INDEX, worksheet.rows.size)
-        val indexMap = StoreProductHeaderIndexMap.from(rows[HEADER_ROW_INDEX])
         val storeProductModels = Lists.newArrayList<StoreProductModel>()
-        rows.forEach{
-            storeProductModels.add(buildModelFromRow(it, indexMap, partnerId))
+
+        rows.forEach{ row ->
+            buildModelFromRow(row, indexMap, partnerId)?.let {
+                storeProductModels.add(it)
+            }
         }
 
         return storeProductModels
     }
 
-    private fun buildModelFromRow(row: List<String>, map: Map<StoreProductHeader, Int>, partnerId: Long): StoreProductModel {
+    private fun buildModelFromRow(row: List<String>, map: Map<StoreProductHeader, Int>, partnerId: Long): StoreProductModel? {
+        if(row[map[NAME]!!] == "") {
+            return null
+        }
+
         return StoreProductModel(
-            storeName = row[map[STORE_NAME]?: 0],
-            storeCode = row[map[STORE_CODE]?: 0],
-            storeProductCode = row[map[STORE_PRODUCT_CODE]?: 0],
-            name = row[map[NAME]?: 0],
-            optionCode = row[map[OPTION_CODE]?: 0],
-            optionName = row[map[OPTION_NAME]?: 0],
-            basicProductCode = row[map[BASIC_PRODUCT_CODE]?: 0],
-            basicProductName = row[map[BASIC_PRODUCT_NAME]?: 0],
+            storeName = "naver",
+            storeCode = "code",
+            storeProductCode = row[map[STORE_PRODUCT_CODE]!!],
+            name = row[map[NAME]!!],
+            optionCode = row[map[OPTION_CODE]!!],
+            optionName = row[map[OPTION_NAME]!!],
+            basicProductCode = row[map[BASIC_PRODUCT_CODE]!!],
+            basicProductName = row[map[BASIC_PRODUCT_NAME]!!],
             partnerId = partnerId
         )
     }
-
 }

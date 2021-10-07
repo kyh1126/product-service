@@ -3,11 +3,13 @@ package com.smartfoodnet.store.entity
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
+import org.hibernate.annotations.Where
 import java.time.Instant
 import javax.persistence.*
 
 @Entity
 @Table(name = "store_product")
+@Where(clause = "deletedAt is not null")
 class StoreProduct (
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
