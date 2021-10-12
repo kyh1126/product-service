@@ -5,17 +5,17 @@ import com.smartfoodnet.fnproduct.product.entity.SubsidiaryMaterial
 import com.smartfoodnet.fnproduct.product.model.vo.SeasonalOption
 
 data class SubsidiaryMaterialCreateModel(
-    var id: Long? = null,
+    val id: Long? = null,
 
-    var basicProductId: Long,
+    val basicProductId: Long?,
 
-    var subsidiaryMaterialId: Long,
+    val subsidiaryMaterialId: Long,
 
-    var seasonalOption: SeasonalOption,
+    val seasonalOption: SeasonalOption,
 
-    var name: String,
+    val name: String,
 
-    var quantity: Int,
+    val quantity: Int,
 ) {
     fun toEntity(basicProduct: BasicProduct, subsidiaryMaterial: BasicProduct): SubsidiaryMaterial {
         return SubsidiaryMaterial(

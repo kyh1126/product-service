@@ -9,14 +9,14 @@ data class BasicProductCategoryCreateModel(
     val id: Long? = null,
 
     @JsonIgnore
-    var level1Category: Code,
+    val level1Category: Code? = null,
 
     @JsonIgnore
-    var level2Category: Code? = null,
+    val level2Category: Code? = null,
 
     @ApiModelProperty(value = "대분류")
-    var level1: String = level1Category.keyName,
+    val level1: String? = level1Category?.keyName,
 
     @ApiModelProperty(value = "중분류")
-    var level2: String? = level2Category?.keyName,
+    val level2: String? = level2Category?.keyName,
 )

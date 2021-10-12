@@ -10,22 +10,19 @@ data class SubsidiaryMaterialCategoryModel(
     val id: Long? = null,
 
     @JsonIgnore
-    var level1Category: Code,
+    val level1Category: Code,
 
     @JsonIgnore
-    var level2Category: Code? = null,
-
-    @JsonIgnore
-    var level3Category: Code? = null,
+    val level2Category: Code? = null,
 
     @ApiModelProperty(value = "대분류")
-    var level1: String = level1Category.keyName,
+    val level1: String = level1Category.keyName,
 
     @ApiModelProperty(value = "소분류")
-    var level2: String? = level2Category?.keyName,
+    val level2: String? = level2Category?.keyName,
 
     @ApiModelProperty(value = "수량적용여부")
-    var quantityApplyYn: String,
+    val quantityApplyYn: String,
 ) {
 
     companion object {

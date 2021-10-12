@@ -6,7 +6,7 @@ import io.swagger.annotations.ApiModelProperty
 
 data class BasicProductDetailCreateModel(
     @ApiModelProperty(value = "부자재정보")
-    var subsidiaryMaterialModels: List<SubsidiaryMaterialCreateModel> = mutableListOf(),
+    val subsidiaryMaterialModels: MutableList<SubsidiaryMaterialCreateModel> = mutableListOf(),
 ) {
     @JsonUnwrapped
     lateinit var basicProductModel: BasicProductCreateModel
