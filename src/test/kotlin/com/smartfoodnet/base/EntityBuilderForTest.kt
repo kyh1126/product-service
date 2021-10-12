@@ -1,9 +1,11 @@
 package com.smartfoodnet.base
 
 import com.smartfoodnet.fnproduct.code.entity.Code
+import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.product.entity.BasicProductCategory
 import com.smartfoodnet.fnproduct.product.entity.Partner
 import com.smartfoodnet.fnproduct.product.entity.SubsidiaryMaterialCategory
+import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 
 // ---------------------------------------------------------------------------------------------------------------------
 // -- Code
@@ -91,3 +93,21 @@ fun buildSubsidiaryMaterialCategory(): List<SubsidiaryMaterialCategory> {
 // -- Partner
 // ---------------------------------------------------------------------------------------------------------------------
 fun buildPartner(): Partner = Partner(name = "(주)대호", customerNumber = "0001")
+
+// ---------------------------------------------------------------------------------------------------------------------
+// -- BasicProduct
+// ---------------------------------------------------------------------------------------------------------------------
+fun buildBasicProduct_SUB(
+    partnerId: Long = 1,
+    name: String = "테스트 공통부자재 소분류",
+    subsidiaryMaterialCategory: SubsidiaryMaterialCategory,
+): BasicProduct {
+    return BasicProduct(
+        type = BasicProductType.SUB,
+        partnerId = partnerId,
+        name = name,
+        subsidiaryMaterialCategory = subsidiaryMaterialCategory,
+        supplyPrice = 120,
+        activeYn = "Y"
+    )
+}
