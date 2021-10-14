@@ -3,7 +3,7 @@ package com.smartfoodnet.fnproduct.product
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.smartfoodnet.base.*
 import com.smartfoodnet.common.model.response.PageResponse
-import com.smartfoodnet.fnproduct.code.CodeRepository
+import com.smartfoodnet.fnproduct.code.CodeService
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.product.entity.BasicProductCategory
 import com.smartfoodnet.fnproduct.product.entity.Partner
@@ -13,7 +13,6 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -24,24 +23,23 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.transaction.annotation.Transactional
 
-@SpringBootTest
 @ActiveProfiles("test")
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @UTF8AutoConfigureMockMvc
 internal class BasicProductControllerTest(
+    private val codeService: CodeService,
     private val partnerRepository: PartnerRepository,
     private val basicProductCategoryRepository: BasicProductCategoryRepository,
     private val subsidiaryMaterialCategoryRepository: SubsidiaryMaterialCategoryRepository,
-    private val codeRepository: CodeRepository,
     private val objectMapper: ObjectMapper,
     private val mockMvc: MockMvc,
 ) : AbstractTest() {
     private val basicProductControllerPath = "/basic-products"
 
     @BeforeAll  // Testcontainers 가 static 으로 떠있기 때문에, DB 저장도 한 번만 실행되어야 한다.
-    fun given() {
-        codeRepository.saveAll(listOf(BasicProductCategoryCodes, SubsidiaryMaterialCategoryCodes).flatten())
+    fun init() {
+        codeService.createCodes(listOf(BasicProductCategoryCodes, SubsidiaryMaterialCategoryCodes).flatten())
     }
 
     @Test
