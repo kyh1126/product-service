@@ -90,6 +90,11 @@ class BasicProduct(
     @Column(name = "updated_at")
     var updatedAt: LocalDateTime? = null,
 ) {
+    fun addExpirationDateInfo(expirationDateInfo: ExpirationDateInfo) {
+        this.expirationDateInfo = expirationDateInfo
+        expirationDateInfo.basicProduct = this
+    }
+
     fun addSubsidiaryMaterials(subsidiaryMaterial: SubsidiaryMaterial) {
         subsidiaryMaterials.add(subsidiaryMaterial)
         subsidiaryMaterial.basicProduct = this
