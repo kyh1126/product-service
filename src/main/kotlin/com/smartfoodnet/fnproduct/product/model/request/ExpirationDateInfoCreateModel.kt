@@ -1,6 +1,5 @@
 package com.smartfoodnet.fnproduct.product.model.request
 
-import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.product.entity.ExpirationDateInfo
 import io.swagger.annotations.ApiModelProperty
 
@@ -20,9 +19,8 @@ data class ExpirationDateInfoCreateModel(
     @ApiModelProperty(value = "유통기한(제조일+X일)")
     var expirationDate: Int,
 ) {
-    fun toEntity(basicProduct: BasicProduct): ExpirationDateInfo {
+    fun toEntity(): ExpirationDateInfo {
         return ExpirationDateInfo(
-            basicProduct = basicProduct,
             manufactureDateWriteYn = manufactureDateWriteYn,
             expirationDateWriteYn = expirationDateWriteYn,
             expirationDate = expirationDate

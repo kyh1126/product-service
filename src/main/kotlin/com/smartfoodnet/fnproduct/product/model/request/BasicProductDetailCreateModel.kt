@@ -12,18 +12,20 @@ data class BasicProductDetailCreateModel(
     lateinit var basicProductModel: BasicProductCreateModel
 
     fun toEntity(
-        code: String,
-        basicProductCategory: BasicProductCategory?,
-        subsidiaryMaterialCategory: SubsidiaryMaterialCategory?,
-        subsidiaryMaterial: SubsidiaryMaterial,
+        code: String? = null,
+        basicProductCategory: BasicProductCategory? = null,
+        subsidiaryMaterialCategory: SubsidiaryMaterialCategory? = null,
+        expirationDateInfo: ExpirationDateInfo? = null,
+        subsidiaryMaterials: MutableList<SubsidiaryMaterial> = mutableListOf(),
         warehouse: Warehouse,
     ): BasicProduct {
-
-
-        return basicProductModel.toEntity(code, basicProductCategory, subsidiaryMaterialCategory, warehouse)
-//            .apply {
-//                subsidiaryMaterialModels.map { it.toEntity(this, subsidiaryMaterial) }
-//                    .forEach { addSubsidiaryMaterials(it) }
-//            }// TODO: 부자재 매핑정보 추가 필요
+        val basicProduct = basicProductModel.toEntity(
+            code,
+            basicProductCategory,
+            subsidiaryMaterialCategory,
+            expirationDateInfo,
+            warehouse
+        )
+        return basicProduct.apply { subsidiaryMaterials.forEach(this::addSubsidiaryMaterials) }
     }
 }

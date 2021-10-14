@@ -17,15 +17,13 @@ data class SubsidiaryMaterialCreateModel(
 
     val quantity: Int,
 ) {
-    fun toEntity(basicProduct: BasicProduct, subsidiaryMaterial: BasicProduct): SubsidiaryMaterial {
+    fun toEntity(subsidiaryMaterial: BasicProduct): SubsidiaryMaterial {
         return SubsidiaryMaterial(
-            basicProduct = basicProduct,
             subsidiaryMaterial = subsidiaryMaterial,
             seasonalOption = seasonalOption,
             name = name,
             quantity = quantity
         )
     }
-
 }
 

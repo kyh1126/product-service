@@ -1,9 +1,6 @@
 package com.smartfoodnet.fnproduct.product.model.request
 
-import com.smartfoodnet.fnproduct.product.entity.BasicProduct
-import com.smartfoodnet.fnproduct.product.entity.BasicProductCategory
-import com.smartfoodnet.fnproduct.product.entity.SubsidiaryMaterialCategory
-import com.smartfoodnet.fnproduct.product.entity.Warehouse
+import com.smartfoodnet.fnproduct.product.entity.*
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
 import io.swagger.annotations.ApiModelProperty
@@ -68,9 +65,10 @@ data class BasicProductCreateModel(
     val activeYn: String = "N",
 ) {
     fun toEntity(
-        code: String,
+        code: String?,
         basicProductCategory: BasicProductCategory?,
         subsidiaryMaterialCategory: SubsidiaryMaterialCategory?,
+        expirationDateInfo: ExpirationDateInfo?,
         warehouse: Warehouse,
     ): BasicProduct {
         return BasicProduct(
@@ -91,8 +89,6 @@ data class BasicProductCreateModel(
             boxesPerPalette = boxesPerPalette,
             imageUrl = imageUrl,
             activeYn = activeYn
-        ).apply {
-            expirationDateInfo = expirationDateInfoModel?.toEntity(this)
-        }
+        ).apply { expirationDateInfo?.let(this::addExpirationDateInfo) }
     }
 }

@@ -25,7 +25,7 @@ data class ExpirationDateInfoModel(
             return expirationDateInfo.run {
                 ExpirationDateInfoModel(
                     id = id,
-                    basicProductId = basicProduct.id!!,
+                    basicProductId = basicProduct!!.id!!,
                     manufactureDateWriteYn = manufactureDateWriteYn,
                     expirationDateWriteYn = expirationDateWriteYn,
                     expirationDate = expirationDate

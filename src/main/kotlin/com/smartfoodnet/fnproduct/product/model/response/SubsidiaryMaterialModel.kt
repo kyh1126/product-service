@@ -22,7 +22,7 @@ data class SubsidiaryMaterialModel(
             return subsidiaryMaterial.run {
                 SubsidiaryMaterialModel(
                     id = id,
-                    basicProductId = basicProduct.id!!,
+                    basicProductId = basicProduct!!.id!!,
                     subsidiaryMaterialId = subsidiaryMaterial.id!!,
                     seasonalOption = seasonalOption,
                     name = name,
