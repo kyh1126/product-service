@@ -17,7 +17,7 @@ class ExpirationDateInfo(
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "basic_product_id", columnDefinition = "BIGINT UNSIGNED")
     @JsonIgnore
-    var basicProduct: BasicProduct,
+    var basicProduct: BasicProduct? = null,
 
     @Column(name = "manufacture_date_write_yn")
     var manufactureDateWriteYn: String = "N",
