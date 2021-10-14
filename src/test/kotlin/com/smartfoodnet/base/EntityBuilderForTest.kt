@@ -1,11 +1,9 @@
 package com.smartfoodnet.base
 
 import com.smartfoodnet.fnproduct.code.entity.Code
-import com.smartfoodnet.fnproduct.product.entity.BasicProduct
-import com.smartfoodnet.fnproduct.product.entity.BasicProductCategory
-import com.smartfoodnet.fnproduct.product.entity.Partner
-import com.smartfoodnet.fnproduct.product.entity.SubsidiaryMaterialCategory
+import com.smartfoodnet.fnproduct.product.entity.*
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
+import kotlin.random.Random
 
 // ---------------------------------------------------------------------------------------------------------------------
 // -- Code
@@ -51,11 +49,13 @@ internal val BasicProductCategories = mapOf(
 
 fun buildBasicProductCategory(): List<BasicProductCategory> {
     val result = mutableListOf<BasicProductCategory>()
+    var tmpId: Long = 1
     BasicProductCategories.keys.map { level1Id ->
         val level1Category = BasicProductCategoryCodes.fromId(level1Id)
         result.addAll(
             BasicProductCategories[level1Id]!!.map {
                 BasicProductCategory(
+                    id = tmpId++,
                     level1Category = level1Category,
                     level2Category = BasicProductCategoryCodes.fromId(it)
                 )
@@ -75,11 +75,13 @@ internal val SubsidiaryMaterialCategories = mapOf(
 
 fun buildSubsidiaryMaterialCategory(): List<SubsidiaryMaterialCategory> {
     val result = mutableListOf<SubsidiaryMaterialCategory>()
+    var tmpId: Long = 1
     SubsidiaryMaterialCategories.keys.map { level1Id ->
         val level1Category = SubsidiaryMaterialCategoryCodes.fromId(level1Id)
         result.addAll(
             SubsidiaryMaterialCategories[level1Id]!!.map {
                 SubsidiaryMaterialCategory(
+                    id = tmpId++,
                     level1Category = level1Category,
                     level2Category = SubsidiaryMaterialCategoryCodes.fromId(it)
                 )
@@ -92,7 +94,13 @@ fun buildSubsidiaryMaterialCategory(): List<SubsidiaryMaterialCategory> {
 // ---------------------------------------------------------------------------------------------------------------------
 // -- Partner
 // ---------------------------------------------------------------------------------------------------------------------
-fun buildPartner(): Partner = Partner(name = "(주)대호", customerNumber = "0001")
+fun buildPartner() = Partner(id = Random.nextLong(0, Long.MAX_VALUE), name = "(주)대호", customerNumber = "0001")
+
+// ---------------------------------------------------------------------------------------------------------------------
+// -- Warehouse
+// ---------------------------------------------------------------------------------------------------------------------
+fun buildWarehouse(partner: Partner) =
+    Warehouse(id = Random.nextLong(0, Long.MAX_VALUE), name = "입고처(주)파이", partnerId = partner.id!!)
 
 // ---------------------------------------------------------------------------------------------------------------------
 // -- BasicProduct
@@ -103,6 +111,7 @@ fun buildBasicProduct_SUB(
     subsidiaryMaterialCategory: SubsidiaryMaterialCategory,
 ): BasicProduct {
     return BasicProduct(
+        id = Random.nextLong(0, Long.MAX_VALUE),
         type = BasicProductType.SUB,
         partnerId = partnerId,
         name = name,
