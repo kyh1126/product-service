@@ -9,15 +9,14 @@ enum class HandlingTemperatureType(val desc: String, val code: String) {
     FREEZE("냉동", "B");
 
     companion object {
-        fun fromName(name: String): HandlingTemperatureType {
+        fun fromName(name: String?): HandlingTemperatureType? {
             return values().firstOrNull { it.name == name }
-                ?: throw IllegalArgumentException("Format $name is illegal")
         }
     }
 }
 
 @Converter
 class HandlingTemperatureTypeConverter : AttributeConverter<HandlingTemperatureType, String> {
-    override fun convertToDatabaseColumn(attribute: HandlingTemperatureType) = attribute.name
-    override fun convertToEntityAttribute(dbData: String) = HandlingTemperatureType.fromName(dbData)
+    override fun convertToDatabaseColumn(attribute: HandlingTemperatureType?) = attribute?.name
+    override fun convertToEntityAttribute(dbData: String?) = HandlingTemperatureType.fromName(dbData)
 }
