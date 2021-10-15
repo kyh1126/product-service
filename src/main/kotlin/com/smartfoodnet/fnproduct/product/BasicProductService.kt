@@ -21,11 +21,9 @@ import org.springframework.transaction.annotation.Transactional
 class BasicProductService(
     private val warehouseService: WarehouseService,
     private val basicProductRepository: BasicProductRepository,
-    private val subsidiaryMaterialRepository: SubsidiaryMaterialRepository,
-    private val subsidiaryMaterialCategoryRepository: SubsidiaryMaterialCategoryRepository,
     private val basicProductDetailCreateModelValidator: BasicProductDetailCreateModelValidator,
-    private val subsidiaryMaterialCategoryFinder: SubsidiaryMaterialCategoryFinder,
     private val basicProductCategoryFinder: BasicProductCategoryFinder,
+    private val subsidiaryMaterialCategoryFinder: SubsidiaryMaterialCategoryFinder,
     private val basicProductCodeGenerator: BasicProductCodeGenerator,
 ) {
 
