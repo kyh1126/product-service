@@ -14,7 +14,7 @@ import javax.persistence.*
  * 출고처 엔티티
  */
 @Entity
-@Table(name = "In_warehouse")
+@Table(name = "in_warehouse")
 @DynamicUpdate
 class InWarehouse (
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

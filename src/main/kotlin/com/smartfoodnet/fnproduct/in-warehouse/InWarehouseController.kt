@@ -17,7 +17,7 @@ class InWarehouseController(private val inWarehouseService : InWarehouseService)
         @Parameter(description = "화주(고객사) ID") @PathVariable partnerId : Long
     ) : List<InWarehouseModel>
     {
-        return inWarehouseService.getOutWarehouses(partnerId)
+        return inWarehouseService.getInWarehouses(partnerId)
     }
 
     @Operation(summary = "화주 입고처 등록")
@@ -26,7 +26,7 @@ class InWarehouseController(private val inWarehouseService : InWarehouseService)
         @Parameter(description = "화주(고객사) ID") @PathVariable partnerId: Long,
         @Parameter(description = "입고처 등록 데이터 모델") @RequestBody outWarehouseDto: InWarehouseDto
     ) {
-        inWarehouseService.saveOutWarehouse(partnerId, outWarehouseDto)
+        inWarehouseService.saveInWarehouse(partnerId, outWarehouseDto)
     }
 
     @Operation(summary = "화주 입고처 수정")
@@ -36,6 +36,6 @@ class InWarehouseController(private val inWarehouseService : InWarehouseService)
         @Parameter(description = "입고처 업데이트 모델") @RequestBody updateDto: InWarehouseUpdateDto
     ) {
         println(updateDto)
-        inWarehouseService.updateOutWarehouse(id, updateDto)
+        inWarehouseService.updateInWarehouse(id, updateDto)
     }
 }

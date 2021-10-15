@@ -10,15 +10,15 @@ import org.springframework.stereotype.Service
 class InWarehouseService(
     private val inWarehouseRepository: InWarehouseRepository
 ) {
-    fun getOutWarehouses(partnerId : Long) : List<InWarehouseModel>{
+    fun getInWarehouses(partnerId : Long) : List<InWarehouseModel>{
         return inWarehouseRepository.findByPartnerId(partnerId).map { InWarehouseModel.fromEntity(it) }
     }
 
-    fun saveOutWarehouse(partnerId: Long, outWarehouseDto: InWarehouseDto)  {
+    fun saveInWarehouse(partnerId: Long, outWarehouseDto: InWarehouseDto)  {
         inWarehouseRepository.save(outWarehouseDto.toEntity(partnerId))
     }
 
-    fun updateOutWarehouse(warehouseId: Long, updateDto: InWarehouseUpdateDto) {
+    fun updateInWarehouse(warehouseId: Long, updateDto: InWarehouseUpdateDto) {
         var inWarehouse = inWarehouseRepository.findById(warehouseId).get();
 
         copyNonNullProperty(updateDto, inWarehouse)
