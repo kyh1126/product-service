@@ -74,7 +74,7 @@ fun buildBasicProductCreateModel(
     basicProductCategory: BasicProductCategoryCreateModel? = buildBasicProductCategoryCreateModel(),
     subsidiaryMaterialCategory: SubsidiaryMaterialCategoryCreateModel? = null,
     handlingTemperature: HandlingTemperatureType? = null,
-    warehouse: WarehouseCreateModel? = buildWarehouseCreateModel(partnerId),
+    warehouse: WarehouseCreateModel = buildWarehouseCreateModel(partnerId),
 ) = BasicProductCreateModel(
     type = type,
     partnerId = partnerId,
@@ -94,7 +94,7 @@ fun buildBasicProductSubCreateModel(
     basicProductCategory: BasicProductCategoryCreateModel? = null,
     subsidiaryMaterialCategory: SubsidiaryMaterialCategoryCreateModel? = buildSubsidiaryMaterialCategoryCreateModel(),
     handlingTemperature: HandlingTemperatureType? = null,
-    warehouse: WarehouseCreateModel? = buildWarehouseCreateModel(partnerId),
+    warehouse: WarehouseCreateModel = buildWarehouseCreateModel(partnerId),
 ) = BasicProductCreateModel(
     id = id,
     type = type,

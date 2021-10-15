@@ -82,7 +82,7 @@ class BasicProductService(
             subsidiaryMaterialCategoryFinder.getSubsidiaryMaterialCategoryByKeyName(it.level1!!, it.level2!!)
         }
         // 입고처 조회
-        val warehouse = warehouseService.getWarehouse(basicProductCreateModel.warehouse!!.id!!)
+        val warehouse = warehouseService.getWarehouse(basicProductCreateModel.warehouse.id!!)
         // 기본상품-부자재 매핑을 위한 부자재(BasicProduct) 조회
         val subsidiaryMaterialById =
             getBasicProducts(createModel.subsidiaryMaterialModels.map { it.subsidiaryMaterial.id!! })

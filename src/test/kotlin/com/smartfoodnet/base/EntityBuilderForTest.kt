@@ -116,6 +116,7 @@ fun buildBasicProduct_SUB(
         partnerId = partnerId,
         name = name,
         subsidiaryMaterialCategory = subsidiaryMaterialCategory,
+        warehouse = buildWarehouse(buildPartner()),
         supplyPrice = 120,
         activeYn = "Y"
     )
