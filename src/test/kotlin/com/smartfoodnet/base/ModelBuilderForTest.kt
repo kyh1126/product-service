@@ -38,15 +38,13 @@ fun buildSubsidiaryMaterialCategoryCreateModel(
 
 fun buildSubsidiaryMaterialCreateModel(
     basicProductId: Long? = null,
-    subsidiaryMaterialId: Long,
+    subsidiaryMaterial: BasicProductCreateModel = buildBasicProductSubCreateModel(),
     seasonalOption: SeasonalOption = SeasonalOption.ALL,
-    name: String = "종이박스",
     quantity: Int = 1,
 ) = SubsidiaryMaterialCreateModel(
     basicProductId = basicProductId,
-    subsidiaryMaterialId = subsidiaryMaterialId,
+    subsidiaryMaterial = subsidiaryMaterial,
     seasonalOption = seasonalOption,
-    name = name,
     quantity = quantity
 )
 
@@ -78,6 +76,27 @@ fun buildBasicProductCreateModel(
     handlingTemperature: HandlingTemperatureType? = null,
     warehouse: WarehouseCreateModel? = buildWarehouseCreateModel(partnerId),
 ) = BasicProductCreateModel(
+    type = type,
+    partnerId = partnerId,
+    name = name,
+    basicProductCategory = basicProductCategory,
+    subsidiaryMaterialCategory = subsidiaryMaterialCategory,
+    handlingTemperature = handlingTemperature,
+    warehouse = warehouse,
+    activeYn = "Y"
+)
+
+fun buildBasicProductSubCreateModel(
+    id: Long? = 2,
+    type: BasicProductType = BasicProductType.SUB,
+    partnerId: Long? = 1,
+    name: String? = "종이박스",
+    basicProductCategory: BasicProductCategoryCreateModel? = null,
+    subsidiaryMaterialCategory: SubsidiaryMaterialCategoryCreateModel? = buildSubsidiaryMaterialCategoryCreateModel(),
+    handlingTemperature: HandlingTemperatureType? = null,
+    warehouse: WarehouseCreateModel? = buildWarehouseCreateModel(partnerId),
+) = BasicProductCreateModel(
+    id = id,
     type = type,
     partnerId = partnerId,
     name = name,

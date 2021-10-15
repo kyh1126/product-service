@@ -30,9 +30,6 @@ class SubsidiaryMaterial(
     @Convert(converter = SeasonalOptionConverter::class)
     var seasonalOption: SeasonalOption,
 
-    @Column(name = "name")
-    var name: String,
-
     @Column(name = "quantity")
     var quantity: Int,
 

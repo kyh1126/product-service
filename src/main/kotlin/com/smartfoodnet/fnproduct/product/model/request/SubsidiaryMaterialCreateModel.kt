@@ -9,11 +9,9 @@ data class SubsidiaryMaterialCreateModel(
 
     val basicProductId: Long?,
 
-    val subsidiaryMaterialId: Long,
+    val subsidiaryMaterial: BasicProductCreateModel,
 
     val seasonalOption: SeasonalOption,
-
-    val name: String,
 
     val quantity: Int,
 ) {
@@ -21,7 +19,6 @@ data class SubsidiaryMaterialCreateModel(
         return SubsidiaryMaterial(
             subsidiaryMaterial = subsidiaryMaterial,
             seasonalOption = seasonalOption,
-            name = name,
             quantity = quantity
         )
     }

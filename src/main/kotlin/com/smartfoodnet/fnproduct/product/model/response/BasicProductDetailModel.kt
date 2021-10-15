@@ -13,12 +13,17 @@ data class BasicProductDetailModel(
 ) {
 
     companion object {
-        fun fromEntity(basicProduct: BasicProduct): BasicProductDetailModel {
+        fun fromEntity(
+            basicProduct: BasicProduct,
+            subsidiaryMaterialById: Map<Long?, BasicProduct>,
+        ): BasicProductDetailModel {
             return basicProduct.run {
                 BasicProductDetailModel(
                     basicProductModel = BasicProductModel.fromEntity(this),
                     subsidiaryMaterialModels = subsidiaryMaterials.map {
-                        SubsidiaryMaterialModel.fromEntity(it)
+                        val basicProductSub =
+                            BasicProductModel.fromEntity(subsidiaryMaterialById[it.subsidiaryMaterial.id]!!)
+                        SubsidiaryMaterialModel.fromEntity(it, basicProductSub)
                     },
                 )
             }

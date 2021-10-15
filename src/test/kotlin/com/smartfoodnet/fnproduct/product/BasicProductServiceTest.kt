@@ -100,9 +100,9 @@ internal class BasicProductServiceTest(
     fun createBasicProduct_BASIC_ValidInput_ThenSuccess() {
         // given
         val firstSubBasicProduct = basicproductsSub.first()
-        val buildSubsidiaryMaterialCreateModel = with(firstSubBasicProduct) {
-            buildSubsidiaryMaterialCreateModel(subsidiaryMaterialId = id!!, name = name!!)
-        }
+        val buildSubsidiaryMaterialCreateModel =
+            buildSubsidiaryMaterialCreateModel(subsidiaryMaterial = buildBasicProductSubCreateModel(id = firstSubBasicProduct.id))
+
         val mockCreateModel = buildBasicProductDetailCreateModel(
             basicProductModel = buildBasicProductCreateModel(
                 type = BasicProductType.BASIC,
@@ -128,15 +128,15 @@ internal class BasicProductServiceTest(
         val warehouse = warehouseService.getWarehouse(basicProductCreateModel.warehouse!!.id!!)
         // subsidiaryMaterial: (BasicProduct) 조회해서 넘겨야함
         val subsidiaryMaterialById =
-            basicProductService.getBasicProducts(mockCreateModel.subsidiaryMaterialModels.map { it.subsidiaryMaterialId })
+            basicProductService.getBasicProducts(mockCreateModel.subsidiaryMaterialModels.map { it.subsidiaryMaterial.id!! })
                 .associateBy { it.id }
 
         // ExpirationDateInfo 저장
         val expirationDateInfo = basicProductCreateModel.expirationDateInfoModel?.toEntity()
         // 기본상품-부자재 매핑 저장 - MutableList<SubsidiaryMaterial>
         val subsidiaryMaterials = mockCreateModel.subsidiaryMaterialModels.mapNotNull {
-            if (!subsidiaryMaterialById.containsKey(it.subsidiaryMaterialId)) null
-            else it.toEntity(subsidiaryMaterialById[it.subsidiaryMaterialId]!!)
+            if (!subsidiaryMaterialById.containsKey(it.subsidiaryMaterial.id)) null
+            else it.toEntity(subsidiaryMaterialById[it.subsidiaryMaterial.id]!!)
         }.toMutableList()
 
         val mockBasicProduct = mockCreateModel.toEntity(
@@ -147,7 +147,7 @@ internal class BasicProductServiceTest(
             subsidiaryMaterials = subsidiaryMaterials,
             warehouse = warehouse
         )
-        given(basicProductRepository.save(any())).willReturn(mockBasicProduct);
+        given(basicProductRepository.save(any())).willReturn(mockBasicProduct)
         given(basicProductRepository.findById(anyLong())).willReturn(Optional.of(mockBasicProduct))
 
         // when
@@ -157,7 +157,8 @@ internal class BasicProductServiceTest(
         assertNotNull(BasicProductDetailModel)
 
         verify(basicProductRepository, times(1)).save(any())
-        assertEquals(BasicProductDetailModel.fromEntity(mockBasicProduct), actualBasicProductDetailModel)
+        assertEquals(BasicProductDetailModel.fromEntity(mockBasicProduct, subsidiaryMaterialById),
+            actualBasicProductDetailModel)
     }
 
 }

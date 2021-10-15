@@ -8,24 +8,24 @@ data class SubsidiaryMaterialModel(
 
     var basicProductId: Long,
 
-    var subsidiaryMaterialId: Long,
+    var subsidiaryMaterial: BasicProductModel,
 
     var seasonalOption: SeasonalOption,
-
-    var name: String,
 
     var quantity: Int,
 ) {
 
     companion object {
-        fun fromEntity(subsidiaryMaterial: SubsidiaryMaterial): SubsidiaryMaterialModel {
+        fun fromEntity(
+            subsidiaryMaterial: SubsidiaryMaterial,
+            basicProductSub: BasicProductModel,
+        ): SubsidiaryMaterialModel {
             return subsidiaryMaterial.run {
                 SubsidiaryMaterialModel(
                     id = id,
                     basicProductId = basicProduct!!.id!!,
-                    subsidiaryMaterialId = subsidiaryMaterial.id!!,
+                    subsidiaryMaterial = basicProductSub,
                     seasonalOption = seasonalOption,
-                    name = name,
                     quantity = quantity
                 )
             }

@@ -42,8 +42,14 @@ class BasicProductService(
     }
 
     fun getBasicProduct(productId: Long): BasicProductDetailModel {
-        return basicProductRepository.findById(productId).get().run {
-            toBasicProductDetailModel(this)
+        val basicProduct = basicProductRepository.findById(productId).get()
+        // 기본상품-부자재 매핑을 위한 부자재(BasicProduct) 조회
+        val subsidiaryMaterialById =
+            getBasicProducts(basicProduct.subsidiaryMaterials.map { it.subsidiaryMaterial.id!! })
+                .associateBy { it.id }
+
+        return basicProduct.run {
+            toBasicProductDetailModel(this, subsidiaryMaterialById)
         }
     }
 
@@ -79,15 +85,15 @@ class BasicProductService(
         val warehouse = warehouseService.getWarehouse(basicProductCreateModel.warehouse!!.id!!)
         // 기본상품-부자재 매핑을 위한 부자재(BasicProduct) 조회
         val subsidiaryMaterialById =
-            getBasicProducts(createModel.subsidiaryMaterialModels.map { it.subsidiaryMaterialId })
+            getBasicProducts(createModel.subsidiaryMaterialModels.map { it.subsidiaryMaterial.id!! })
                 .associateBy { it.id }
 
-        // ExpirationDateInfo 저장
+        // 유통기한정보 저장
         val expirationDateInfo = basicProductCreateModel.expirationDateInfoModel?.toEntity()
         // 기본상품-부자재 매핑 저장
         val subsidiaryMaterials = createModel.subsidiaryMaterialModels.mapNotNull {
-            if (!subsidiaryMaterialById.containsKey(it.subsidiaryMaterialId)) null
-            else it.toEntity(subsidiaryMaterialById[it.subsidiaryMaterialId]!!)
+            if (!subsidiaryMaterialById.containsKey(it.subsidiaryMaterial.id)) null
+            else it.toEntity(subsidiaryMaterialById[it.subsidiaryMaterial.id]!!)
         }.toMutableList()
 
         val basicProduct = createModel.toEntity(
@@ -100,11 +106,14 @@ class BasicProductService(
         )
         basicProductRepository.save(basicProduct)
 
-        return toBasicProductDetailModel(basicProduct)
+        return toBasicProductDetailModel(basicProduct, subsidiaryMaterialById)
     }
 
-    private fun toBasicProductDetailModel(basicProduct: BasicProduct): BasicProductDetailModel {
-        return BasicProductDetailModel.fromEntity(basicProduct)
+    private fun toBasicProductDetailModel(
+        basicProduct: BasicProduct,
+        subsidiaryMaterialById: Map<Long?, BasicProduct>,
+    ): BasicProductDetailModel {
+        return BasicProductDetailModel.fromEntity(basicProduct, subsidiaryMaterialById)
     }
 
 }
