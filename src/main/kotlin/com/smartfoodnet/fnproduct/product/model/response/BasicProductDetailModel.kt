@@ -8,7 +8,7 @@ data class BasicProductDetailModel(
     @JsonUnwrapped
     var basicProductModel: BasicProductModel,
 
-    @ApiModelProperty(value = "부자재정보")
+    @ApiModelProperty(value = "부자재(매핑)정보")
     var subsidiaryMaterialModels: List<SubsidiaryMaterialModel> = mutableListOf(),
 ) {
 

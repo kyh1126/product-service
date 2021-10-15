@@ -5,7 +5,7 @@ import com.smartfoodnet.fnproduct.product.entity.*
 import io.swagger.annotations.ApiModelProperty
 
 data class BasicProductDetailCreateModel(
-    @ApiModelProperty(value = "부자재정보")
+    @ApiModelProperty(value = "부자재(매핑)정보")
     val subsidiaryMaterialModels: MutableList<SubsidiaryMaterialCreateModel> = mutableListOf(),
 ) {
     @JsonUnwrapped
