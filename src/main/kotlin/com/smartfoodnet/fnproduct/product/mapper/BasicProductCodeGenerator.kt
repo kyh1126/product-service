@@ -20,11 +20,11 @@ class BasicProductCodeGenerator(
     private val basicProductCodeTypes = setOf(BasicProductType.BASIC, BasicProductType.PACKAGE)
 
     fun getBasicProductCode(
-        partnerId: Long,
+        partnerId: Long?,
         type: BasicProductType,
         temperatureCode: String?,
     ): String? {
-        if (validateNotAvailableType(type)) return null
+        if (partnerId == null || temperatureCode == null || validateNotAvailableType(type)) return null
 
         val customerNumber = partnerService.getPartner(partnerId).customerNumber
         // 00001 부터 시작
@@ -34,5 +34,7 @@ class BasicProductCodeGenerator(
         return customerNumber + type.code + temperatureCode + totalProductCount
     }
 
-    private fun validateNotAvailableType(type: BasicProductType?) = type !in basicProductCodeTypes
+    private fun validateNotAvailableType(type: BasicProductType?): Boolean {
+        return type !in basicProductCodeTypes
+    }
 }
