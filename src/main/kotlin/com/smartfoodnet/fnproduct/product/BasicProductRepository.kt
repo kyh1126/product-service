@@ -5,4 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface BasicProductRepository : JpaRepository<BasicProduct, Long>, BasicProductCustom {
     fun findByCode(code: String): BasicProduct?
+    fun findByPartnerIdAndBarcode(partnerId: Long, barcode: String): BasicProduct?
 }

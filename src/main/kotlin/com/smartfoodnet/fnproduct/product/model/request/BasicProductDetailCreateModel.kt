@@ -3,11 +3,16 @@ package com.smartfoodnet.fnproduct.product.model.request
 import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.smartfoodnet.fnproduct.product.entity.*
 import io.swagger.annotations.ApiModelProperty
+import javax.validation.Valid
+import javax.validation.constraints.NotNull
 
 data class BasicProductDetailCreateModel(
+    @Valid
     @ApiModelProperty(value = "부자재(매핑)정보")
     val subsidiaryMaterialModels: MutableList<SubsidiaryMaterialCreateModel> = mutableListOf(),
 ) {
+    @NotNull
+    @Valid
     @JsonUnwrapped
     lateinit var basicProductModel: BasicProductCreateModel
 

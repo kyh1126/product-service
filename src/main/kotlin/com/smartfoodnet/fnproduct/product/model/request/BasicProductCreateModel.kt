@@ -4,11 +4,13 @@ import com.smartfoodnet.fnproduct.product.entity.*
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
 import io.swagger.annotations.ApiModelProperty
+import javax.validation.constraints.NotNull
 
 data class BasicProductCreateModel(
     @ApiModelProperty(value = "id")
     val id: Long? = null,
 
+    @NotNull
     @ApiModelProperty(value = "구분 (BASIC:기본상품/CUSTOM_SUB:고객전용부자재/SUB:공통부자재/PACKAGE:모음상품)",
         allowableValues = "BASIC,CUSTOM_SUB,SUB,PACKAGE", dataType = "Enum", example = "BASIC")
     val type: BasicProductType = BasicProductType.BASIC,
@@ -37,8 +39,9 @@ data class BasicProductCreateModel(
     @ApiModelProperty(value = "취급온도 (ROOM:상온/REFRIGERATE:냉장/FREEZE:냉동)", allowableValues = "ROOM,REFRIGERATE,FREEZE")
     val handlingTemperature: HandlingTemperatureType? = null,
 
+    @NotNull
     @ApiModelProperty(value = "입고처")
-    val warehouse: WarehouseCreateModel? = null,
+    val warehouse: WarehouseCreateModel,
 
     @ApiModelProperty(value = "공급가")
     val supplyPrice: Int? = null,

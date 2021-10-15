@@ -26,7 +26,7 @@ class ExpirationDateInfo(
     var expirationDateWriteYn: String = "N",
 
     @Column(name = "expiration_date")
-    var expirationDate: Int,
+    var expirationDate: Int?,
 
     @Column(name = "deleted_at")
     var deletedAt: LocalDateTime? = null,
