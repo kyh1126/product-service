@@ -9,5 +9,4 @@ class ProductApplication
 
 fun main(args: Array<String>) {
 	runApplication<ProductApplication>(*args)
-	println(SampleJavaClass().sampleHello)
 }

@@ -34,7 +34,7 @@ class BasicProduct(
     var barcodeYn: String = "N",
 
     @Column(name = "barcode")
-    var barcode: String,
+    var barcode: String? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "basic_product_category_id", columnDefinition = "BIGINT UNSIGNED")
@@ -50,7 +50,7 @@ class BasicProduct(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "warehouse_id", columnDefinition = "BIGINT UNSIGNED")
-    var warehouse: Warehouse? = null,
+    var warehouse: Warehouse,
 
     @Column(name = "supply_price")
     var supplyPrice: Int? = null,
@@ -90,6 +90,11 @@ class BasicProduct(
     @Column(name = "updated_at")
     var updatedAt: LocalDateTime? = null,
 ) {
+    fun addExpirationDateInfo(expirationDateInfo: ExpirationDateInfo) {
+        this.expirationDateInfo = expirationDateInfo
+        expirationDateInfo.basicProduct = this
+    }
+
     fun addSubsidiaryMaterials(subsidiaryMaterial: SubsidiaryMaterial) {
         subsidiaryMaterials.add(subsidiaryMaterial)
         subsidiaryMaterial.basicProduct = this

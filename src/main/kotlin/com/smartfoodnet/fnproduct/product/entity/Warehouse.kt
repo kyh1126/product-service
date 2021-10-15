@@ -16,9 +16,6 @@ class Warehouse(
     @Column(name = "partner_id", columnDefinition = "BIGINT UNSIGNED")
     var partnerId: Long,
 
-    @Column(name = "code")
-    var code: Int,
-
     @Column(name = "name")
     var name: String,
 

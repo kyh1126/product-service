@@ -19,7 +19,7 @@ class SubsidiaryMaterial(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "basic_product_id", columnDefinition = "BIGINT UNSIGNED")
     @JsonIgnore
-    var basicProduct: BasicProduct,
+    var basicProduct: BasicProduct? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "subsidiary_material_id", columnDefinition = "BIGINT UNSIGNED")
@@ -29,9 +29,6 @@ class SubsidiaryMaterial(
     @Column(name = "seasonal_option")
     @Convert(converter = SeasonalOptionConverter::class)
     var seasonalOption: SeasonalOption,
-
-    @Column(name = "name")
-    var name: String,
 
     @Column(name = "quantity")
     var quantity: Int,
