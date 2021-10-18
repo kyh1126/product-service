@@ -24,7 +24,7 @@ import javax.validation.ConstraintViolationException
 
 @RestControllerAdvice
 class DefaultExceptionHandler {
-    val errorCodePrefix = "FP"
+    val serviceCode = "FN-PRODUCT"
 
     @Autowired
     lateinit var environment: Environment
@@ -37,8 +37,8 @@ class DefaultExceptionHandler {
         ex.printStackTrace()
         val prefix = "필수파라미터가 없습니다. "
         return ExceptionResponse(
-            serviceCode = errorCodePrefix,
-            errorCode = ErrorCode.USER_BAD_REQUEST_DEFAULT.value,
+            serviceCode = serviceCode,
+            errorCode = ErrorCode.USER_BAD_REQUEST_DEFAULT.code,
             errorMessage = prefix + ex.message
         )
     }
@@ -53,8 +53,8 @@ class DefaultExceptionHandler {
             ex.allErrors
                 .map { "${it.codes?.get(0)?.split(".")?.last()}: ${it.defaultMessage}" }
         return ExceptionResponse(
-            serviceCode = errorCodePrefix,
-            errorCode = ErrorCode.VALIDATE_ERROR.value,
+            serviceCode = serviceCode,
+            errorCode = ErrorCode.VALIDATE_ERROR.code,
             errorMessage = messages.joinToString()
         )
     }
@@ -67,8 +67,8 @@ class DefaultExceptionHandler {
         ex.printStackTrace()
         val prefix = "요청 메세지를 읽을수 없습니다. "
         return ExceptionResponse(
-            serviceCode = errorCodePrefix,
-            errorCode = ErrorCode.USER_BAD_REQUEST_DEFAULT.value,
+            serviceCode = serviceCode,
+            errorCode = ErrorCode.USER_BAD_REQUEST_DEFAULT.code,
             errorMessage = prefix + ex.message
 
         )
@@ -82,8 +82,8 @@ class DefaultExceptionHandler {
     ): ExceptionResponse {
         ex.printStackTrace()
         return ExceptionResponse(
-            serviceCode = errorCodePrefix,
-            errorCode = ErrorCode.USER_BAD_REQUEST_DEFAULT.value,
+            serviceCode = serviceCode,
+            errorCode = ErrorCode.USER_BAD_REQUEST_DEFAULT.code,
             errorMessage = ex.rootCause?.message ?: ex.localizedMessage
         )
     }
@@ -96,8 +96,8 @@ class DefaultExceptionHandler {
         ex.printStackTrace()
         val prefix = "요청 타입이 다릅니다. "
         return ExceptionResponse(
-            serviceCode = errorCodePrefix,
-            errorCode = ErrorCode.USER_BAD_REQUEST_DEFAULT.value,
+            serviceCode = serviceCode,
+            errorCode = ErrorCode.USER_BAD_REQUEST_DEFAULT.code,
             errorMessage = prefix + "${ex.name}:${ex.value} >> ${ex.requiredType} 타입이 아닙니다"
         )
     }
@@ -109,8 +109,8 @@ class DefaultExceptionHandler {
     ): ExceptionResponse {
         ex.printStackTrace()
         return ExceptionResponse(
-            serviceCode = errorCodePrefix,
-            errorCode = ErrorCode.USER_BAD_REQUEST_DEFAULT.value,
+            serviceCode = serviceCode,
+            errorCode = ErrorCode.USER_BAD_REQUEST_DEFAULT.code,
             errorMessage = "요청한 데이터를 읽을수 없습니다. 삭제되었거나 없는 데이터입니다. ${ex.message}"
         )
     }
@@ -122,8 +122,8 @@ class DefaultExceptionHandler {
     ): ExceptionResponse {
         ex.printStackTrace()
         return ExceptionResponse(
-            serviceCode = errorCodePrefix,
-            errorCode = ErrorCode.USER_BAD_REQUEST_DEFAULT.value,
+            serviceCode = serviceCode,
+            errorCode = ErrorCode.USER_BAD_REQUEST_DEFAULT.code,
             errorMessage = ex.message ?: ""
         )
     }
@@ -133,8 +133,8 @@ class DefaultExceptionHandler {
     fun handleNoSuchElementException(ex: NoSuchElementException): ExceptionResponse {
         ex.printStackTrace()
         return ExceptionResponse(
-            serviceCode = errorCodePrefix,
-            errorCode = ErrorCode.NO_ELEMENT.value,
+            serviceCode = serviceCode,
+            errorCode = ErrorCode.NO_ELEMENT.code,
             errorMessage = "요청 리소스를 찾을수 없습니다. " + ex.message
         )
     }
@@ -144,9 +144,9 @@ class DefaultExceptionHandler {
         ex.printStackTrace()
         return ResponseEntity<ExceptionResponse>(
             ExceptionResponse(
-                serviceCode = errorCodePrefix,
-                errorCode = ex.errorCode.value,
-                errorMessage = ex.errorMessage
+                serviceCode = serviceCode,
+                errorCode = ex.errorCode.code,
+                errorMessage = ex.errorMessage ?: ex.errorCode.errorMessage
             ),
             ex.httpStatus
         )
@@ -156,9 +156,9 @@ class DefaultExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     fun handleConstraintViolationException(ex: ConstraintViolationException): ExceptionResponse {
         return ExceptionResponse(
-            serviceCode = errorCodePrefix,
-            errorCode = ErrorCode.USER_BAD_REQUEST_DEFAULT.value,
-            errorMessage = ex.message ?: "unknown"
+            serviceCode = serviceCode,
+            errorCode = ErrorCode.USER_BAD_REQUEST_DEFAULT.code,
+            errorMessage = ex.message ?: ErrorCode.USER_BAD_REQUEST_DEFAULT.errorMessage
         )
     }
 
@@ -166,9 +166,9 @@ class DefaultExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     fun handleTransactionSystemException(ex: TransactionSystemException): ExceptionResponse {
         return ExceptionResponse(
-            serviceCode = errorCodePrefix,
-            errorCode = ErrorCode.USER_BAD_REQUEST_DEFAULT.value,
-            errorMessage = ex.cause?.cause?.message ?: "unknown"
+            serviceCode = serviceCode,
+            errorCode = ErrorCode.USER_BAD_REQUEST_DEFAULT.code,
+            errorMessage = ex.cause?.cause?.message ?: ErrorCode.USER_BAD_REQUEST_DEFAULT.errorMessage
         )
     }
 
@@ -178,9 +178,9 @@ class DefaultExceptionHandler {
         e.printStackTrace()
 
         return ExceptionResponse(
-            serviceCode = errorCodePrefix,
-            errorCode = 99999,
-            errorMessage = e.message ?: "unknown"
+            serviceCode = serviceCode,
+            errorCode = ErrorCode.INTERNAL_SERVER_ERROR.code,
+            errorMessage = ErrorCode.INTERNAL_SERVER_ERROR.errorMessage
         )
     }
 }
