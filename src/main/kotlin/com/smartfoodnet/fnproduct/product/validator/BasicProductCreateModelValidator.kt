@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component
 import org.springframework.validation.Errors
 
 @Component
-class BasicProductCreateModelValidator() : CreateModelValidator<BasicProductCreateModel> {
+class BasicProductCreateModelValidator : CreateModelValidator<BasicProductCreateModel> {
     override fun supports(clazz: Class<*>): Boolean = clazz.isAssignableFrom(BasicProductCreateModel::class.java)
 
     override fun validate(saveState: SaveState, target: BasicProductCreateModel, errors: Errors) {

@@ -71,18 +71,28 @@ fun buildBasicProductCreateModel(
     type: BasicProductType = BasicProductType.BASIC,
     partnerId: Long? = 1,
     name: String? = "테스트 기본상품",
+    barcodeYn: String = "N",
     basicProductCategory: BasicProductCategoryCreateModel? = buildBasicProductCategoryCreateModel(),
     subsidiaryMaterialCategory: SubsidiaryMaterialCategoryCreateModel? = null,
     handlingTemperature: HandlingTemperatureType? = null,
     warehouse: WarehouseCreateModel = buildWarehouseCreateModel(partnerId),
+    singlePackagingYn: String = "N",
+    expirationDateManagementYn: String = "N",
+    piecesPerBox: Int? = 2,
+    boxesPerPalette: Int? = 1,
 ) = BasicProductCreateModel(
     type = type,
     partnerId = partnerId,
     name = name,
+    barcodeYn = barcodeYn,
     basicProductCategory = basicProductCategory,
     subsidiaryMaterialCategory = subsidiaryMaterialCategory,
     handlingTemperature = handlingTemperature,
     warehouse = warehouse,
+    singlePackagingYn = singlePackagingYn,
+    expirationDateManagementYn = expirationDateManagementYn,
+    piecesPerBox = piecesPerBox,
+    boxesPerPalette = boxesPerPalette,
     activeYn = "Y"
 )
 
