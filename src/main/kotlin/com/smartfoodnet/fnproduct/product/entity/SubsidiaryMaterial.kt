@@ -1,6 +1,7 @@
 package com.smartfoodnet.fnproduct.product.entity
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.smartfoodnet.fnproduct.product.model.request.SubsidiaryMaterialCreateModel
 import com.smartfoodnet.fnproduct.product.model.vo.SeasonalOption
 import com.smartfoodnet.fnproduct.product.model.vo.SeasonalOptionConverter
 import org.hibernate.annotations.CreationTimestamp
@@ -43,4 +44,10 @@ class SubsidiaryMaterial(
     @UpdateTimestamp
     @Column(name = "updated_at")
     var updatedAt: LocalDateTime? = null,
-)
+) {
+    fun update(request: SubsidiaryMaterialCreateModel, basicProductSub: BasicProduct) {
+        subsidiaryMaterial = basicProductSub
+        seasonalOption = request.seasonalOption
+        quantity = request.quantity
+    }
+}

@@ -1,6 +1,7 @@
 package com.smartfoodnet.fnproduct.product.entity
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.smartfoodnet.fnproduct.product.model.request.ExpirationDateInfoCreateModel
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import java.time.LocalDateTime
@@ -38,4 +39,10 @@ class ExpirationDateInfo(
     @UpdateTimestamp
     @Column(name = "updated_at")
     var updatedAt: LocalDateTime? = null,
-)
+) {
+    fun update(request: ExpirationDateInfoCreateModel) {
+        manufactureDateWriteYn = request.manufactureDateWriteYn
+        expirationDateWriteYn = request.expirationDateWriteYn
+        expirationDate = request.expirationDate
+    }
+}

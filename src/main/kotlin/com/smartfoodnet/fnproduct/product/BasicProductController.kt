@@ -63,4 +63,14 @@ class BasicProductController(private val basicProductService: BasicProductServic
         return basicProductService.createBasicProduct(basicProductDetailCreateModel)
     }
 
+    @Operation(summary = "기본상품 수정")
+    @PutMapping("{productId}")
+    fun updateBasicProduct(
+        @Parameter(description = "상품 ID", required = true)
+        @PathVariable productId: Long,
+        @Valid @RequestBody basicProductDetailCreateModel: BasicProductDetailCreateModel,
+    ): BasicProductDetailModel {
+        return basicProductService.updateBasicProduct(productId, basicProductDetailCreateModel)
+    }
+
 }
