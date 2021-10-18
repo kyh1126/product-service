@@ -125,7 +125,7 @@ internal class BasicProductServiceTest(
             subsidiaryMaterialCategoryFinder.getSubsidiaryMaterialCategoryByKeyName(it.level1!!, it.level2!!)
         }
         // Warehouse: 있는거 조회해서 넘겨야함
-        val warehouse = warehouseService.getWarehouse(basicProductCreateModel.warehouse!!.id!!)
+        val warehouse = warehouseService.getWarehouse(basicProductCreateModel.warehouse.id!!)
         // subsidiaryMaterial: (BasicProduct) 조회해서 넘겨야함
         val subsidiaryMaterialById =
             basicProductService.getBasicProducts(mockCreateModel.subsidiaryMaterialModels.map { it.subsidiaryMaterial.id!! })
@@ -151,15 +151,13 @@ internal class BasicProductServiceTest(
         given(basicProductRepository.findById(anyLong())).willReturn(Optional.of(mockBasicProduct))
 
         // when
-        // TODO: validator 추가에 따라 깨지는 테스트 돌아가게 수정하기
-//        val actualBasicProductDetailModel = basicProductService.createBasicProduct(mockCreateModel)
+        val actualBasicProductDetailModel = basicProductService.createBasicProduct(mockCreateModel)
 
         // then
         assertNotNull(BasicProductDetailModel)
-
-//        verify(basicProductRepository, times(1)).save(any())
-//        assertEquals(BasicProductDetailModel.fromEntity(mockBasicProduct, subsidiaryMaterialById),
-//            actualBasicProductDetailModel)
+        verify(basicProductRepository, times(1)).save(any())
+        assertEquals(BasicProductDetailModel.fromEntity(mockBasicProduct, subsidiaryMaterialById),
+            actualBasicProductDetailModel)
     }
 
 }
