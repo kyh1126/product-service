@@ -1,6 +1,8 @@
 package com.smartfoodnet.fnproduct.product
 
 import com.smartfoodnet.base.*
+import com.smartfoodnet.common.error.exception.BaseRuntimeException
+import com.smartfoodnet.common.error.exception.ErrorCode
 import com.smartfoodnet.fnproduct.code.CodeService
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.product.entity.Partner
@@ -100,6 +102,9 @@ internal class BasicProductServiceTest(
     fun createBasicProduct_BASIC_ValidInput_ThenSuccess() {
         // given
         val firstSubBasicProduct = basicproductsSub.first()
+        given(basicProductRepository.findAllById(listOf(firstSubBasicProduct.id)))
+            .willReturn(listOf(firstSubBasicProduct))
+
         val buildSubsidiaryMaterialCreateModel =
             buildSubsidiaryMaterialCreateModel(subsidiaryMaterial = buildBasicProductSubCreateModel(id = firstSubBasicProduct.id))
 
@@ -133,10 +138,11 @@ internal class BasicProductServiceTest(
 
         // ExpirationDateInfo 저장
         val expirationDateInfo = basicProductCreateModel.expirationDateInfoModel?.toEntity()
-        // 기본상품-부자재 매핑 저장 - MutableList<SubsidiaryMaterial>
-        val subsidiaryMaterials = mockCreateModel.subsidiaryMaterialModels.mapNotNull {
-            if (!subsidiaryMaterialById.containsKey(it.subsidiaryMaterial.id)) null
-            else it.toEntity(subsidiaryMaterialById[it.subsidiaryMaterial.id]!!)
+        // 기본상품-부자재 매핑 저장
+        val subsidiaryMaterials = mockCreateModel.subsidiaryMaterialModels.map {
+            val basicProductSub = subsidiaryMaterialById[it.subsidiaryMaterial.id]
+                ?: throw BaseRuntimeException(errorCode = ErrorCode.NO_ELEMENT)
+            it.toEntity(basicProductSub)
         }.toMutableList()
 
         val mockBasicProduct = mockCreateModel.toEntity(

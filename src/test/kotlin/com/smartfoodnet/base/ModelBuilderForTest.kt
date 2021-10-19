@@ -62,9 +62,8 @@ fun buildBasicProductDetailCreateModel(
     basicProductModel: BasicProductCreateModel = buildBasicProductCreateModel(),
     subsidiaryMaterialModels: MutableList<SubsidiaryMaterialCreateModel> = mutableListOf(),
 ): BasicProductDetailCreateModel {
-    return BasicProductDetailCreateModel(
-        subsidiaryMaterialModels = subsidiaryMaterialModels,
-    ).apply { this.basicProductModel = basicProductModel }
+    return BasicProductDetailCreateModel(subsidiaryMaterialModels = subsidiaryMaterialModels)
+        .apply { this.basicProductModel = basicProductModel }
 }
 
 fun buildBasicProductCreateModel(

@@ -9,7 +9,7 @@ data class SubsidiaryMaterialModel(
     var id: Long? = null,
 
     @ApiModelProperty(value = "기본상품 ID")
-    var basicProductId: Long,
+    var basicProductId: Long? = null,
 
     @ApiModelProperty(value = "부자재(기본상품) 정보")
     var subsidiaryMaterial: BasicProductModel,
@@ -29,7 +29,7 @@ data class SubsidiaryMaterialModel(
             return subsidiaryMaterial.run {
                 SubsidiaryMaterialModel(
                     id = id,
-                    basicProductId = basicProduct!!.id!!,
+                    basicProductId = basicProduct?.id,
                     subsidiaryMaterial = basicProductSub,
                     seasonalOption = seasonalOption,
                     quantity = quantity
