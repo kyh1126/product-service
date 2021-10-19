@@ -34,7 +34,7 @@ class BasicProductService(
 ) {
 
     fun getBasicProducts(
-        partnerId: Long,
+        partnerId: Long? = null,
         type: BasicProductType? = null,
         page: Pageable,
     ): PageResponse<BasicProductModel> {

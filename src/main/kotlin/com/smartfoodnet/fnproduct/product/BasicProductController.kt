@@ -23,11 +23,19 @@ class BasicProductController(private val basicProductService: BasicProductServic
     fun getBasicProducts(
         @Parameter(description = "화주(고객사) ID", required = true)
         @PathVariable partnerId: Long,
-        @Parameter(description = "구분 (BASIC:기본상품/CUSTOM_SUB:고객전용부자재/SUB:공통부자재/PACKAGE:모음상품)")
+        @Parameter(description = "구분 (BASIC:기본상품/CUSTOM_SUB:고객전용부자재/PACKAGE:모음상품)")
         @RequestParam(required = false) type: BasicProductType?,
         @PageableDefault(size = 50, sort = ["id"], direction = Sort.Direction.DESC) page: Pageable,
     ): PageResponse<BasicProductModel> {
         return basicProductService.getBasicProducts(partnerId, type, page)
+    }
+
+    @Operation(summary = "공통 부자재 리스트 조회")
+    @GetMapping("sub")
+    fun getBasicProductsSub(
+        @PageableDefault(size = 50, sort = ["id"], direction = Sort.Direction.DESC) page: Pageable,
+    ): PageResponse<BasicProductModel> {
+        return basicProductService.getBasicProducts(type = BasicProductType.SUB, page = page)
     }
 
     @Operation(summary = "기본상품 상세 조회")
