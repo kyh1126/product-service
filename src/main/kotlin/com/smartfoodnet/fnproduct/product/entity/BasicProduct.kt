@@ -1,5 +1,6 @@
 package com.smartfoodnet.fnproduct.product.entity
 
+import com.smartfoodnet.fnproduct.product.model.request.BasicProductCreateModel
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductTypeConverter
 import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
@@ -90,13 +91,42 @@ class BasicProduct(
     @Column(name = "updated_at")
     var updatedAt: LocalDateTime? = null,
 ) {
-    fun addExpirationDateInfo(expirationDateInfo: ExpirationDateInfo) {
-        this.expirationDateInfo = expirationDateInfo
-        expirationDateInfo.basicProduct = this
+    fun addExpirationDateInfo(expirationDateInfoRequest: ExpirationDateInfo) {
+        expirationDateInfo = expirationDateInfoRequest
+        expirationDateInfoRequest.basicProduct = this
     }
 
     fun addSubsidiaryMaterials(subsidiaryMaterial: SubsidiaryMaterial) {
         subsidiaryMaterials.add(subsidiaryMaterial)
         subsidiaryMaterial.basicProduct = this
+    }
+
+    fun update(
+        request: BasicProductCreateModel,
+        basicProductCategoryRequest: BasicProductCategory?,
+        subsidiaryMaterialCategoryRequest: SubsidiaryMaterialCategory?,
+        expirationDateInfoRequest: ExpirationDateInfo?,
+        subsidiaryMaterialRequests: List<SubsidiaryMaterial>,
+        warehouseRequest: Warehouse,
+    ) {
+        name = request.name
+        supplyPrice = request.supplyPrice
+        singlePackagingYn = request.singlePackagingYn
+        expirationDateManagementYn = request.expirationDateManagementYn
+        piecesPerBox = request.piecesPerBox
+        boxesPerPalette = request.boxesPerPalette
+        imageUrl = request.imageUrl
+
+        // 단방향
+        basicProductCategory = basicProductCategoryRequest
+        subsidiaryMaterialCategory = subsidiaryMaterialCategoryRequest
+        warehouse = warehouseRequest
+
+        // 양방향
+        expirationDateInfo = null
+        expirationDateInfoRequest?.let { addExpirationDateInfo(it) }
+
+        subsidiaryMaterials.clear()
+        subsidiaryMaterialRequests.forEach { addSubsidiaryMaterials(it) }
     }
 }

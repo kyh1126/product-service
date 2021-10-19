@@ -21,7 +21,7 @@ data class BasicProductDetailCreateModel(
         basicProductCategory: BasicProductCategory? = null,
         subsidiaryMaterialCategory: SubsidiaryMaterialCategory? = null,
         expirationDateInfo: ExpirationDateInfo? = null,
-        subsidiaryMaterials: MutableList<SubsidiaryMaterial> = mutableListOf(),
+        subsidiaryMaterials: List<SubsidiaryMaterial> = listOf(),
         warehouse: Warehouse,
     ): BasicProduct {
         val basicProduct = basicProductModel.toEntity(

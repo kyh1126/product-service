@@ -6,7 +6,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 
 interface BasicProductCustom {
-    fun findByPartnerIdAndType(partnerId: Long, type: BasicProductType?, page: Pageable): Page<BasicProduct>
+    fun findByPartnerIdAndType(partnerId: Long?, type: BasicProductType?, page: Pageable): Page<BasicProduct>
 
     fun countByPartnerIdAndTypeIn(partnerId: Long?, types: Collection<BasicProductType>): Long
 }

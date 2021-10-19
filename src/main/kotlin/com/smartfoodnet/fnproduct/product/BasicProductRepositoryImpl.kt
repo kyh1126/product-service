@@ -9,7 +9,7 @@ import org.springframework.data.domain.Pageable
 
 class BasicProductRepositoryImpl : Querydsl4RepositorySupport(BasicProduct::class.java), BasicProductCustom {
 
-    override fun findByPartnerIdAndType(partnerId: Long, type: BasicProductType?, page: Pageable): Page<BasicProduct> {
+    override fun findByPartnerIdAndType(partnerId: Long?, type: BasicProductType?, page: Pageable): Page<BasicProduct> {
         return applyPagination(page) {
             it.selectFrom(basicProduct)
                 .where(eqPartnerId(partnerId), eqType(type))

@@ -22,12 +22,14 @@ class BasicProductDetailCreateModelValidator(
             else -> Unit
         }
 
-        checkBarcode(target, errors)
+        checkBarcode(saveState, target, errors)
 
         checkExpirationDate(target, errors)
     }
 
-    private fun checkBarcode(target: BasicProductDetailCreateModel, errors: Errors) {
+    private fun checkBarcode(saveState: SaveState, target: BasicProductDetailCreateModel, errors: Errors) {
+        if (saveState == SaveState.UPDATE) return
+
         with(target.basicProductModel) {
             if (barcodeYn.isNotEmpty() && barcodeYn == "Y") {
                 validateEmpty(errors, "basicProductModel.barcode", "상품바코드", barcode)
@@ -66,7 +68,6 @@ class BasicProductDetailCreateModelValidator(
                     }
                 }
             }
-
         }
     }
 
@@ -132,7 +133,6 @@ class BasicProductDetailCreateModelValidator(
             validateEmpty(errors, "basicProductModel.partnerId", "화주(고객사) ID", partnerId)
             validateEmpty(errors, "basicProductModel.name", "상품명", name)
             validateEmpty(errors, "basicProductModel.barcodeYn", "상품바코드기재여부", barcodeYn)
-            validateEmpty(errors, "basicProductModel.subsidiaryMaterialCategory", "부자재카테고리", subsidiaryMaterialCategory)
             validateEmpty(errors, "basicProductModel.piecesPerBox", "박스입수", piecesPerBox)
             validateEmpty(errors, "basicProductModel.boxesPerPalette", "파레트입수", boxesPerPalette)
         }
