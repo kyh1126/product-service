@@ -4,22 +4,19 @@ import com.smartfoodnet.base.*
 import com.smartfoodnet.common.error.exception.BaseRuntimeException
 import com.smartfoodnet.common.error.exception.ErrorCode
 import com.smartfoodnet.fnproduct.code.CodeService
-import com.smartfoodnet.fnproduct.product.entity.BasicProduct
-import com.smartfoodnet.fnproduct.product.entity.Partner
-import com.smartfoodnet.fnproduct.product.entity.SubsidiaryMaterialCategory
-import com.smartfoodnet.fnproduct.product.entity.Warehouse
+import com.smartfoodnet.fnproduct.product.entity.*
 import com.smartfoodnet.fnproduct.product.mapper.BasicProductCategoryFinder
 import com.smartfoodnet.fnproduct.product.mapper.BasicProductCodeGenerator
 import com.smartfoodnet.fnproduct.product.mapper.SubsidiaryMaterialCategoryFinder
+import com.smartfoodnet.fnproduct.product.model.request.BasicProductCreateModel
+import com.smartfoodnet.fnproduct.product.model.request.BasicProductDetailCreateModel
+import com.smartfoodnet.fnproduct.product.model.request.SubsidiaryMaterialCreateModel
 import com.smartfoodnet.fnproduct.product.model.response.BasicProductDetailModel
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
+import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchers.anyLong
 import org.mockito.BDDMockito.given
@@ -96,73 +93,119 @@ internal class BasicProductServiceTest(
         basicproductsSub.forEach { given(basicProductRepository.findById(it.id!!)).willReturn(Optional.of(it)) }
     }
 
-    @Test
-    @DisplayName("기본상품(type=BASIC) 추가 성공한다")
-    fun createBasicProduct_BASIC_ValidInput_ThenSuccess() {
-        // given
-        val firstSubBasicProduct = basicproductsSub.first()
-        given(basicProductRepository.findAllById(listOf(firstSubBasicProduct.id)))
-            .willReturn(listOf(firstSubBasicProduct))
+    @Nested
+    @DisplayName("기본상품(type=BASIC) ")
+    inner class BasicProductBasicType {
+        @Test
+        @DisplayName("추가 성공한다")
+        fun createBasicProduct_ValidInput_ThenSuccess() {
+            // given
+            val firstSubBasicProduct = basicproductsSub.first()
+            given(basicProductRepository.findAllById(listOf(firstSubBasicProduct.id)))
+                .willReturn(listOf(firstSubBasicProduct))
 
-        val buildSubsidiaryMaterialCreateModel =
-            buildSubsidiaryMaterialCreateModel(subsidiaryMaterial = buildBasicProductSubCreateModel(id = firstSubBasicProduct.id))
+            val buildSubsidiaryMaterialCreateModel =
+                buildSubsidiaryMaterialCreateModel(subsidiaryMaterial = buildBasicProductSubCreateModel(id = firstSubBasicProduct.id))
 
-        val mockCreateModel = buildBasicProductDetailCreateModel(
-            basicProductModel = buildBasicProductCreateModel(
-                type = BasicProductType.BASIC,
-                partnerId = partner.id,
-                handlingTemperature = HandlingTemperatureType.FREEZE,
+            val mockCreateModel = buildBasicProductDetailCreateModel(
+                basicProductModel = buildBasicProductCreateModel(
+                    type = BasicProductType.BASIC,
+                    partnerId = partner.id,
+                    handlingTemperature = HandlingTemperatureType.FREEZE,
+                )
+            ).apply { subsidiaryMaterialModels.add(buildSubsidiaryMaterialCreateModel) }
+
+            // 저장 가능한 Entity 로 변환
+            val basicProductCreateModel = mockCreateModel.basicProductModel
+            val basicProductCode = with(basicProductCreateModel) {
+                basicProductCodeGenerator.getBasicProductCode(partnerId!!, type, handlingTemperature?.code)
+            }
+            // BasicProductCategory: 있는거 조회해서 넘겨야함
+            val basicProductCategory = getBasicProductCategory(basicProductCreateModel)
+            // SubsidiaryMaterialCategory: 있는거 조회해서 넘겨야함
+            val subsidiaryMaterialCategory = getSubsidiaryMaterialCategory(basicProductCreateModel)
+            // Warehouse: 있는거 조회해서 넘겨야함
+            val warehouse = getWarehouse(basicProductCreateModel)
+            // subsidiaryMaterial: (BasicProduct) 조회해서 넘겨야함
+            val subsidiaryMaterialById = getSubsidiaryMaterialById(mockCreateModel)
+
+            // ExpirationDateInfo 저장
+            val expirationDateInfo = createOrUpdateExpirationDateInfo(basicProductCreateModel)
+            // 기본상품-부자재 매핑 저장
+            val subsidiaryMaterials = createOrUpdateSubsidiaryMaterials(
+                subsidiaryMaterialModels = mockCreateModel.subsidiaryMaterialModels,
+                subsidiaryMaterialById = subsidiaryMaterialById
             )
-        ).apply { subsidiaryMaterialModels.add(buildSubsidiaryMaterialCreateModel) }
 
-        // 저장 가능한 Entity 로 변환
-        val basicProductCreateModel = mockCreateModel.basicProductModel
-        val basicProductCode = with(basicProductCreateModel) {
-            basicProductCodeGenerator.getBasicProductCode(partnerId!!, type, handlingTemperature?.code)
+            val mockBasicProduct = mockCreateModel.toEntity(
+                code = basicProductCode,
+                basicProductCategory = basicProductCategory,
+                subsidiaryMaterialCategory = subsidiaryMaterialCategory,
+                expirationDateInfo = expirationDateInfo,
+                subsidiaryMaterials = subsidiaryMaterials,
+                warehouse = warehouse
+            ).apply { id = Random.nextLong(0, Long.MAX_VALUE) }
+            given(basicProductRepository.save(any())).willReturn(mockBasicProduct)
+            given(basicProductRepository.findById(mockBasicProduct.id!!)).willReturn(Optional.of(mockBasicProduct))
+
+            // when
+            val actualBasicProductDetailModel = basicProductService.createBasicProduct(mockCreateModel)
+
+            // then
+            assertNotNull(BasicProductDetailModel)
+            verify(basicProductRepository, times(1)).save(any())
+            assertEquals(BasicProductDetailModel.fromEntity(mockBasicProduct, subsidiaryMaterialById),
+                actualBasicProductDetailModel)
         }
-        // BasicProductCategory: 있는거 조회해서 넘겨야함
-        val basicProductCategory = (basicProductCreateModel.basicProductCategory)?.let {
-            basicProductCategoryFinder.getBasicProductCategoryByKeyName(it.level1!!, it.level2!!)
-        }
-        // SubsidiaryMaterialCategory: 있는거 조회해서 넘겨야함
-        val subsidiaryMaterialCategory = (basicProductCreateModel.subsidiaryMaterialCategory)?.let {
-            subsidiaryMaterialCategoryFinder.getSubsidiaryMaterialCategoryByKeyName(it.level1!!, it.level2!!)
-        }
-        // Warehouse: 있는거 조회해서 넘겨야함
-        val warehouse = warehouseService.getWarehouse(basicProductCreateModel.warehouse.id!!)
-        // subsidiaryMaterial: (BasicProduct) 조회해서 넘겨야함
-        val subsidiaryMaterialById =
-            basicProductService.getBasicProducts(mockCreateModel.subsidiaryMaterialModels.map { it.subsidiaryMaterial.id!! })
-                .associateBy { it.id }
-
-        // ExpirationDateInfo 저장
-        val expirationDateInfo = basicProductCreateModel.expirationDateInfoModel?.toEntity()
-        // 기본상품-부자재 매핑 저장
-        val subsidiaryMaterials = mockCreateModel.subsidiaryMaterialModels.map {
-            val basicProductSub = subsidiaryMaterialById[it.subsidiaryMaterial.id]
-                ?: throw BaseRuntimeException(errorCode = ErrorCode.NO_ELEMENT)
-            it.toEntity(basicProductSub)
-        }.toMutableList()
-
-        val mockBasicProduct = mockCreateModel.toEntity(
-            code = basicProductCode,
-            basicProductCategory = basicProductCategory,
-            subsidiaryMaterialCategory = subsidiaryMaterialCategory,
-            expirationDateInfo = expirationDateInfo,
-            subsidiaryMaterials = subsidiaryMaterials,
-            warehouse = warehouse
-        ).apply { id = Random.nextLong(0, Long.MAX_VALUE) }
-        given(basicProductRepository.save(any())).willReturn(mockBasicProduct)
-        given(basicProductRepository.findById(mockBasicProduct.id!!)).willReturn(Optional.of(mockBasicProduct))
-
-        // when
-        val actualBasicProductDetailModel = basicProductService.createBasicProduct(mockCreateModel)
-
-        // then
-        assertNotNull(BasicProductDetailModel)
-        verify(basicProductRepository, times(1)).save(any())
-        assertEquals(BasicProductDetailModel.fromEntity(mockBasicProduct, subsidiaryMaterialById),
-            actualBasicProductDetailModel)
     }
 
+    private fun getBasicProductCategory(basicProductCreateModel: BasicProductCreateModel): BasicProductCategory? {
+        return (basicProductCreateModel.basicProductCategory)?.let {
+            basicProductCategoryFinder.getBasicProductCategoryByKeyName(it.level1!!, it.level2!!)
+        }
+    }
+
+    private fun getSubsidiaryMaterialCategory(basicProductCreateModel: BasicProductCreateModel): SubsidiaryMaterialCategory? {
+        return (basicProductCreateModel.subsidiaryMaterialCategory)?.let {
+            subsidiaryMaterialCategoryFinder.getSubsidiaryMaterialCategoryByKeyName(it.level1!!, it.level2!!)
+        }
+    }
+
+    private fun getWarehouse(basicProductCreateModel: BasicProductCreateModel) =
+        warehouseService.getWarehouse(basicProductCreateModel.warehouse.id!!)
+
+    private fun getSubsidiaryMaterialById(createModel: BasicProductDetailCreateModel) =
+        basicProductService.getBasicProducts(createModel.subsidiaryMaterialModels.map { it.subsidiaryMaterial.id!! })
+            .associateBy { it.id }
+
+    private fun createOrUpdateExpirationDateInfo(
+        basicProductCreateModel: BasicProductCreateModel,
+        entity: ExpirationDateInfo? = null,
+    ): ExpirationDateInfo? {
+        return (basicProductCreateModel.expirationDateInfoModel)?.let {
+            if (it.id == null) it.toEntity()
+            else {
+                entity!!.update(it)
+                entity
+            }
+        }
+    }
+
+    private fun createOrUpdateSubsidiaryMaterials(
+        subsidiaryMaterialModels: List<SubsidiaryMaterialCreateModel>,
+        entityById: Map<Long?, SubsidiaryMaterial> = emptyMap(),
+        subsidiaryMaterialById: Map<Long?, BasicProduct>,
+    ): List<SubsidiaryMaterial> {
+        val subsidiaryMaterials = subsidiaryMaterialModels.map {
+            val basicProductSub = subsidiaryMaterialById[it.subsidiaryMaterial.id]
+                ?: throw BaseRuntimeException(errorCode = ErrorCode.NO_ELEMENT)
+            if (it.id == null) it.toEntity(basicProductSub)
+            else {
+                val entity = entityById[it.id]
+                entity!!.update(it, basicProductSub)
+                entity
+            }
+        }.toMutableList()
+        return subsidiaryMaterials
+    }
 }
