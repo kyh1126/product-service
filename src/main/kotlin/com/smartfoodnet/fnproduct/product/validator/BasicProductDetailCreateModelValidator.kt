@@ -133,7 +133,6 @@ class BasicProductDetailCreateModelValidator(
             validateEmpty(errors, "basicProductModel.partnerId", "화주(고객사) ID", partnerId)
             validateEmpty(errors, "basicProductModel.name", "상품명", name)
             validateEmpty(errors, "basicProductModel.barcodeYn", "상품바코드기재여부", barcodeYn)
-            validateEmpty(errors, "basicProductModel.subsidiaryMaterialCategory", "부자재카테고리", subsidiaryMaterialCategory)
             validateEmpty(errors, "basicProductModel.piecesPerBox", "박스입수", piecesPerBox)
             validateEmpty(errors, "basicProductModel.boxesPerPalette", "파레트입수", boxesPerPalette)
         }
