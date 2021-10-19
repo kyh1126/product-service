@@ -1,5 +1,6 @@
 package com.smartfoodnet.fnproduct.product
 
+import com.smartfoodnet.common.error.SaveState
 import com.smartfoodnet.common.error.ValidatorUtils
 import com.smartfoodnet.common.error.exception.BaseRuntimeException
 import com.smartfoodnet.common.error.exception.ErrorCode
@@ -110,7 +111,7 @@ class BasicProductService(
 
     @Transactional
     fun updateBasicProduct(productId: Long, updateModel: BasicProductDetailCreateModel): BasicProductDetailModel {
-        ValidatorUtils.validateAndThrow(basicProductDetailCreateModelValidator, updateModel)
+        ValidatorUtils.validateAndThrow(SaveState.UPDATE, basicProductDetailCreateModelValidator, updateModel)
 
         val basicProductCreateModel = updateModel.basicProductModel
 
