@@ -22,12 +22,14 @@ class BasicProductDetailCreateModelValidator(
             else -> Unit
         }
 
-        checkBarcode(target, errors)
+        checkBarcode(saveState, target, errors)
 
         checkExpirationDate(target, errors)
     }
 
-    private fun checkBarcode(target: BasicProductDetailCreateModel, errors: Errors) {
+    private fun checkBarcode(saveState: SaveState, target: BasicProductDetailCreateModel, errors: Errors) {
+        if (saveState == SaveState.UPDATE) return
+
         with(target.basicProductModel) {
             if (barcodeYn.isNotEmpty() && barcodeYn == "Y") {
                 validateEmpty(errors, "basicProductModel.barcode", "상품바코드", barcode)
@@ -66,7 +68,6 @@ class BasicProductDetailCreateModelValidator(
                     }
                 }
             }
-
         }
     }
 
