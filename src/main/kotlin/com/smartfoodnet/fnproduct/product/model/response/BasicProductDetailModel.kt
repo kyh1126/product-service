@@ -9,7 +9,7 @@ data class BasicProductDetailModel(
     var basicProductModel: BasicProductModel,
 
     @ApiModelProperty(value = "부자재(매핑)정보")
-    var subsidiaryMaterialModels: List<SubsidiaryMaterialModel> = mutableListOf(),
+    var subsidiaryMaterialModels: MutableList<SubsidiaryMaterialModel> = mutableListOf(),
 ) {
 
     companion object {
@@ -24,7 +24,7 @@ data class BasicProductDetailModel(
                         val basicProductSub =
                             BasicProductModel.fromEntity(subsidiaryMaterialById[it.subsidiaryMaterial.id]!!)
                         SubsidiaryMaterialModel.fromEntity(it, basicProductSub)
-                    },
+                    }.toMutableList()
                 )
             }
         }
