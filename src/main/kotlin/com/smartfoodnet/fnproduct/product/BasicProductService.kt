@@ -104,9 +104,8 @@ class BasicProductService(
             subsidiaryMaterials = subsidiaryMaterials,
             warehouse = warehouse
         )
-        basicProductRepository.save(basicProduct)
-
-        return toBasicProductDetailModel(basicProduct, subsidiaryMaterialById)
+        return basicProductRepository.save(basicProduct)
+            .run { toBasicProductDetailModel(this, subsidiaryMaterialById) }
     }
 
     @Transactional

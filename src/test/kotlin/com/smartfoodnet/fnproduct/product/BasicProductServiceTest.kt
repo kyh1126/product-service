@@ -29,8 +29,8 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestConstructor
-import org.springframework.transaction.annotation.Transactional
 import java.util.*
+import kotlin.random.Random
 
 @ActiveProfiles("test")
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
@@ -98,7 +98,6 @@ internal class BasicProductServiceTest(
 
     @Test
     @DisplayName("기본상품(type=BASIC) 추가 성공한다")
-    @Transactional
     fun createBasicProduct_BASIC_ValidInput_ThenSuccess() {
         // given
         val firstSubBasicProduct = basicproductsSub.first()
@@ -152,9 +151,9 @@ internal class BasicProductServiceTest(
             expirationDateInfo = expirationDateInfo,
             subsidiaryMaterials = subsidiaryMaterials,
             warehouse = warehouse
-        )
+        ).apply { id = Random.nextLong(0, Long.MAX_VALUE) }
         given(basicProductRepository.save(any())).willReturn(mockBasicProduct)
-        given(basicProductRepository.findById(anyLong())).willReturn(Optional.of(mockBasicProduct))
+        given(basicProductRepository.findById(mockBasicProduct.id!!)).willReturn(Optional.of(mockBasicProduct))
 
         // when
         val actualBasicProductDetailModel = basicProductService.createBasicProduct(mockCreateModel)
