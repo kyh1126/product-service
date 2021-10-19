@@ -26,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional
 class BasicProductService(
     private val warehouseService: WarehouseService,
     private val basicProductRepository: BasicProductRepository,
-    private val expirationDateInfoRepository: ExpirationDateInfoRepository,
     private val basicProductDetailCreateModelValidator: BasicProductDetailCreateModelValidator,
     private val basicProductCategoryFinder: BasicProductCategoryFinder,
     private val subsidiaryMaterialCategoryFinder: SubsidiaryMaterialCategoryFinder,
