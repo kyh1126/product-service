@@ -7,7 +7,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "store_product")
-@Where(clause = "deleted_at is not null")
+@Where(clause = "deleted_at is null")
 class StoreProduct(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
