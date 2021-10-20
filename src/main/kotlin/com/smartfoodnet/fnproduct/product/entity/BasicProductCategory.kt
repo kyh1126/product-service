@@ -2,7 +2,6 @@ package com.smartfoodnet.fnproduct.product.entity
 
 import com.smartfoodnet.common.entity.BaseEntity
 import com.smartfoodnet.fnproduct.code.entity.Code
-import java.time.LocalDateTime
 import javax.persistence.*
 
 @Entity
@@ -23,7 +22,4 @@ class BasicProductCategory(
 
     @Column(name = "sort_order")
     var order: Int? = null,
-
-    @Column(name = "deleted_at")
-    var deletedAt: LocalDateTime? = null,
 ) : BaseEntity()

@@ -1,7 +1,6 @@
 package com.smartfoodnet.store.model
 
 import com.smartfoodnet.store.entity.StoreProduct
-import java.time.Instant
 
 data class StoreProductModel(
     var id: Long? = null,
@@ -15,9 +14,6 @@ data class StoreProductModel(
     var basicProductId: Long? = null,
     var basicProductCode: String? = null,
     var basicProductName: String? = null,
-    var deletedAt: Instant? = null,
-    var createdAt: Instant? = null,
-    var updatedAt: Instant? = null,
 ) {
     fun toEntity(): StoreProduct {
         return StoreProduct(
@@ -29,9 +25,6 @@ data class StoreProductModel(
             storeProductCode = storeProductCode,
             optionName = optionName,
             optionCode = optionCode,
-            deletedAt = deletedAt,
-            createdAt = createdAt,
-            updatedAt = updatedAt
         )
     }
 
@@ -48,9 +41,6 @@ data class StoreProductModel(
                     optionName = optionName,
                     optionCode = optionCode,
                     basicProductId = basicProduct?.id,
-                    deletedAt = deletedAt,
-                    createdAt = createdAt,
-                    updatedAt = updatedAt
                 )
             }
         }

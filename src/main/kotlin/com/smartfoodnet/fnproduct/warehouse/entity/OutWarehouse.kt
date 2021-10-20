@@ -4,7 +4,6 @@ import com.smartfoodnet.common.entity.BaseEntity
 import com.smartfoodnet.fnproduct.product.model.vo.DropType
 import com.smartfoodnet.fnproduct.product.model.vo.InspectionType
 import org.hibernate.annotations.DynamicUpdate
-import java.time.LocalDateTime
 import javax.persistence.*
 
 /**
@@ -61,7 +60,4 @@ class OutWarehouse(
 
     @Column(name = "manager_email", length = 70)
     var managerEmail: String?,
-
-    @Column(name = "deleted_at")
-    var deletedAt: LocalDateTime? = null,
 ) : BaseEntity()

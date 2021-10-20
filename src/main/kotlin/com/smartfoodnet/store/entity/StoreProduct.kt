@@ -3,7 +3,6 @@ package com.smartfoodnet.store.entity
 import com.smartfoodnet.common.entity.BaseEntity
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import org.hibernate.annotations.Where
-import java.time.Instant
 import javax.persistence.*
 
 @Entity
@@ -39,7 +38,4 @@ class StoreProduct(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "basic_product_id")
     var basicProduct: BasicProduct? = null,
-
-    @Column(name = "deleted_at")
-    var deletedAt: Instant? = null,
 ) : BaseEntity()

@@ -3,7 +3,6 @@ package com.smartfoodnet.fnproduct.product.entity
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.smartfoodnet.common.entity.BaseEntity
 import com.smartfoodnet.fnproduct.product.model.request.ExpirationDateInfoCreateModel
-import java.time.LocalDateTime
 import javax.persistence.*
 
 @Entity
@@ -15,7 +14,7 @@ class ExpirationDateInfo(
     var id: Long? = null,
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "basic_product_id", columnDefinition = "BIGINT UNSIGNED", nullable = false)
+    @JoinColumn(name = "basic_product_id", columnDefinition = "BIGINT UNSIGNED")
     @JsonIgnore
     var basicProduct: BasicProduct? = null,
 
@@ -27,9 +26,6 @@ class ExpirationDateInfo(
 
     @Column(name = "expiration_date")
     var expirationDate: Int?,
-
-    @Column(name = "deleted_at")
-    var deletedAt: LocalDateTime? = null,
 ) : BaseEntity() {
     fun update(request: ExpirationDateInfoCreateModel) {
         manufactureDateWriteYn = request.manufactureDateWriteYn

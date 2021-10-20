@@ -6,7 +6,6 @@ import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductTypeConverter
 import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
 import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureTypeConverter
-import java.time.LocalDateTime
 import javax.persistence.*
 
 @Entity
@@ -78,9 +77,6 @@ class BasicProduct(
 
     @Column(name = "active_yn")
     var activeYn: String = "N",
-
-    @Column(name = "deleted_at")
-    var deletedAt: LocalDateTime? = null,
 ) : BaseEntity() {
     fun addExpirationDateInfo(expirationDateInfoRequest: ExpirationDateInfo) {
         expirationDateInfo = expirationDateInfoRequest

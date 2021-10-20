@@ -5,7 +5,6 @@ import com.smartfoodnet.common.entity.BaseEntity
 import com.smartfoodnet.fnproduct.product.model.request.SubsidiaryMaterialCreateModel
 import com.smartfoodnet.fnproduct.product.model.vo.SeasonalOption
 import com.smartfoodnet.fnproduct.product.model.vo.SeasonalOptionConverter
-import java.time.LocalDateTime
 import javax.persistence.*
 
 @Entity
@@ -32,9 +31,6 @@ class SubsidiaryMaterial(
 
     @Column(name = "quantity")
     var quantity: Int,
-
-    @Column(name = "deleted_at")
-    var deletedAt: LocalDateTime? = null,
 ) : BaseEntity() {
     fun update(request: SubsidiaryMaterialCreateModel, basicProductSub: BasicProduct) {
         subsidiaryMaterial = basicProductSub

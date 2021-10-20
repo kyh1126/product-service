@@ -1,7 +1,6 @@
 package com.smartfoodnet.fnproduct.product.entity
 
 import com.smartfoodnet.common.entity.BaseEntity
-import java.time.LocalDateTime
 import javax.persistence.*
 
 @Entity
@@ -17,7 +16,4 @@ class Partner(
 
     @Column(name = "customer_number")
     var customerNumber: String = String.format("%04d", id),
-
-    @Column(name = "deleted_at")
-    var deletedAt: LocalDateTime? = null,
 ) : BaseEntity()

@@ -8,6 +8,9 @@ import javax.persistence.MappedSuperclass
 
 @MappedSuperclass
 abstract class BaseEntity {
+    @Column(name = "deleted_at")
+    var deletedAt: LocalDateTime? = null
+
     @CreationTimestamp
     @Column(name = "created_at")
     var createdAt: LocalDateTime? = null
