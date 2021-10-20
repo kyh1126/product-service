@@ -70,7 +70,7 @@ class BasicProduct(
     @Column(name = "image_url")
     var imageUrl: String? = null,
 
-    @OneToOne(mappedBy = "basicProduct", cascade = [CascadeType.PERSIST])//TODO: @MappedSuperclass 적용
+    @OneToOne(mappedBy = "basicProduct", cascade = [CascadeType.PERSIST])
     var expirationDateInfo: ExpirationDateInfo? = null,
 
     @OneToMany(mappedBy = "basicProduct", cascade = [CascadeType.PERSIST])
