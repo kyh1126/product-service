@@ -6,7 +6,7 @@ open class BaseRuntimeException(
     val httpStatus: HttpStatus = HttpStatus.BAD_REQUEST,
     val errorCode: ErrorCode = ErrorCode.USER_BAD_REQUEST_DEFAULT,
     val errorMessage: String? = null,
-) : RuntimeException(message = errorMessage)
+) : RuntimeException(errorMessage)
 
 enum class ErrorCode(val value: Int, val code: String, val errorMessage: String) {
     USER_BAD_REQUEST_DEFAULT(1, "E001", "잘못된 호출입니다."),
