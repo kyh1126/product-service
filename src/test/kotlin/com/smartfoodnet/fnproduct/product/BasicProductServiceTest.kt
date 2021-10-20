@@ -262,7 +262,7 @@ internal class BasicProductServiceTest(
         subsidiaryMaterialModels: List<SubsidiaryMaterialCreateModel>,
         entityById: Map<Long?, SubsidiaryMaterial> = emptyMap(),
         subsidiaryMaterialById: Map<Long?, BasicProduct>,
-    ): List<SubsidiaryMaterial> {
+    ): Set<SubsidiaryMaterial> {
         val subsidiaryMaterials = subsidiaryMaterialModels.map {
             val basicProductSub = subsidiaryMaterialById[it.subsidiaryMaterial.id]
                 ?: throw BaseRuntimeException(errorCode = ErrorCode.NO_ELEMENT)
@@ -272,7 +272,12 @@ internal class BasicProductServiceTest(
                 entity!!.update(it, basicProductSub)
                 entity
             }
-        }.toMutableList()
+        }.run { LinkedHashSet(this) }
+
+        // 연관관계 끊긴 entity 삭제처리
+        entityById.values.toSet().minus(subsidiaryMaterials)
+            .forEach(SubsidiaryMaterial::delete)
+
         return subsidiaryMaterials
     }
 }
