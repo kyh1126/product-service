@@ -5,10 +5,13 @@ import com.smartfoodnet.common.entity.BaseEntity
 import com.smartfoodnet.fnproduct.product.model.request.SubsidiaryMaterialCreateModel
 import com.smartfoodnet.fnproduct.product.model.vo.SeasonalOption
 import com.smartfoodnet.fnproduct.product.model.vo.SeasonalOptionConverter
+import org.hibernate.annotations.Where
+import java.time.LocalDateTime
 import javax.persistence.*
 
 @Entity
 @Table(name = "subsidiary_material")
+@Where(clause = "deleted_at is NULL")
 class SubsidiaryMaterial(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,5 +39,9 @@ class SubsidiaryMaterial(
         subsidiaryMaterial = basicProductSub
         seasonalOption = request.seasonalOption
         quantity = request.quantity
+    }
+
+    fun delete() {
+        deletedAt = LocalDateTime.now()
     }
 }

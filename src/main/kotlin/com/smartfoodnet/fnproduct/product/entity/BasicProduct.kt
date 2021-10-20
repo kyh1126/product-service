@@ -73,7 +73,7 @@ class BasicProduct(
     var expirationDateInfo: ExpirationDateInfo? = null,
 
     @OneToMany(mappedBy = "basicProduct", cascade = [CascadeType.PERSIST])
-    var subsidiaryMaterials: MutableList<SubsidiaryMaterial> = mutableListOf(),
+    var subsidiaryMaterials: MutableSet<SubsidiaryMaterial> = LinkedHashSet(),
 
     @Column(name = "active_yn")
     var activeYn: String = "N",
@@ -93,7 +93,7 @@ class BasicProduct(
         basicProductCategoryRequest: BasicProductCategory?,
         subsidiaryMaterialCategoryRequest: SubsidiaryMaterialCategory?,
         expirationDateInfoRequest: ExpirationDateInfo?,
-        subsidiaryMaterialRequests: List<SubsidiaryMaterial>,
+        subsidiaryMaterialRequests: Set<SubsidiaryMaterial>,
         warehouseRequest: Warehouse,
     ) {
         name = request.name
