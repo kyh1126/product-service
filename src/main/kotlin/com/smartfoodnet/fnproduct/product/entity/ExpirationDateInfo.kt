@@ -14,7 +14,7 @@ class ExpirationDateInfo(
     @Column(name = "id", columnDefinition = "BIGINT UNSIGNED")
     var id: Long? = null,
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "basic_product_id", columnDefinition = "BIGINT UNSIGNED", nullable = false)
     @JsonIgnore
     var basicProduct: BasicProduct? = null,
