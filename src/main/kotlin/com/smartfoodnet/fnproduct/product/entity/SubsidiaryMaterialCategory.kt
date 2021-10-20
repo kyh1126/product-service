@@ -14,11 +14,11 @@ class SubsidiaryMaterialCategory(
     @Column(name = "id", columnDefinition = "BIGINT UNSIGNED")
     var id: Long? = null,
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "level_1_category")
+    @ManyToOne
+    @JoinColumn(name = "level_1_category", nullable = false)
     var level1Category: Code,
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "level_2_category")
     var level2Category: Code? = null,
 
