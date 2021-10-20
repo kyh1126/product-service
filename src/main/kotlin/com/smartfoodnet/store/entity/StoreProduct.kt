@@ -1,8 +1,7 @@
 package com.smartfoodnet.store.entity
 
+import com.smartfoodnet.common.entity.BaseEntity
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
-import org.hibernate.annotations.CreationTimestamp
-import org.hibernate.annotations.UpdateTimestamp
 import org.hibernate.annotations.Where
 import java.time.Instant
 import javax.persistence.*
@@ -10,7 +9,7 @@ import javax.persistence.*
 @Entity
 @Table(name = "store_product")
 @Where(clause = "deletedAt is not null")
-class StoreProduct (
+class StoreProduct(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -43,14 +42,4 @@ class StoreProduct (
 
     @Column(name = "deleted_at")
     var deletedAt: Instant? = null,
-
-    @CreationTimestamp
-    @Column(name = "created_at")
-    var createdAt: Instant? = null,
-
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    var updatedAt: Instant? = null,
-) {
-
-}
+) : BaseEntity()

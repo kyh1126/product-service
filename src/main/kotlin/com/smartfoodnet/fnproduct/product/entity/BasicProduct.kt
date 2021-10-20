@@ -1,12 +1,11 @@
 package com.smartfoodnet.fnproduct.product.entity
 
+import com.smartfoodnet.common.entity.BaseEntity
 import com.smartfoodnet.fnproduct.product.model.request.BasicProductCreateModel
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductTypeConverter
 import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
 import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureTypeConverter
-import org.hibernate.annotations.CreationTimestamp
-import org.hibernate.annotations.UpdateTimestamp
 import java.time.LocalDateTime
 import javax.persistence.*
 
@@ -71,7 +70,7 @@ class BasicProduct(
     @Column(name = "image_url")
     var imageUrl: String? = null,
 
-    @OneToOne(mappedBy = "basicProduct", cascade = [CascadeType.PERSIST])
+    @OneToOne(mappedBy = "basicProduct", cascade = [CascadeType.PERSIST])//TODO: @MappedSuperclass 적용
     var expirationDateInfo: ExpirationDateInfo? = null,
 
     @OneToMany(mappedBy = "basicProduct", cascade = [CascadeType.PERSIST])
@@ -82,15 +81,7 @@ class BasicProduct(
 
     @Column(name = "deleted_at")
     var deletedAt: LocalDateTime? = null,
-
-    @CreationTimestamp
-    @Column(name = "created_at")
-    var createdAt: LocalDateTime? = null,
-
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    var updatedAt: LocalDateTime? = null,
-) {
+) : BaseEntity() {
     fun addExpirationDateInfo(expirationDateInfoRequest: ExpirationDateInfo) {
         expirationDateInfo = expirationDateInfoRequest
         expirationDateInfoRequest.basicProduct = this

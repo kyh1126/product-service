@@ -1,7 +1,6 @@
 package com.smartfoodnet.fnproduct.product.entity
 
-import org.hibernate.annotations.CreationTimestamp
-import org.hibernate.annotations.UpdateTimestamp
+import com.smartfoodnet.common.entity.BaseEntity
 import java.time.LocalDateTime
 import javax.persistence.*
 
@@ -21,12 +20,4 @@ class Partner(
 
     @Column(name = "deleted_at")
     var deletedAt: LocalDateTime? = null,
-
-    @CreationTimestamp
-    @Column(name = "created_at")
-    var createdAt: LocalDateTime? = null,
-
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    var updatedAt: LocalDateTime? = null,
-)
+) : BaseEntity()
