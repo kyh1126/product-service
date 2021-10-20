@@ -29,9 +29,20 @@ class StoreProductController(
         return storeProductService.createStoreProduct(storeProductModel)
     }
 
+    @Operation(summary = "쇼핑몰상품 기본상품 매핑")
+    @PostMapping("/map-basic-product")
+    fun mapBasicProduct(@Valid @RequestBody params: MapStoreProductToBasicProductRequestParam): StoreProductModel {
+        return storeProductService.mapBasicProduct(params.storeProductId, params.basicProductId)
+    }
+
     @Operation(summary = "쇼핑몰상품 excel 파일로 생성")
     @PostMapping("/bulk")
     fun bulkCreateByExcel(file: MultipartFile, partnerId: Long): List<StoreProductModel> {
         return storeProductExcelService.createBulkByExcelFile(file, partnerId)
     }
 }
+
+data class MapStoreProductToBasicProductRequestParam(
+    var basicProductId: Long,
+    var storeProductId: Long
+)

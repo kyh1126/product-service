@@ -8,16 +8,19 @@ import com.smartfoodnet.store.support.StoreProductHeader.*
 import com.smartfoodnet.store.support.StoreProductHeaderIndexMap
 import com.smartfoodnet.store.support.StoreProductRepository
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import sfn.excel.module.workbook.read.ExcelReadUtils
 import sfn.excel.module.workbook.read.models.SimpleWorkbookModels
 
 @Service
+@Transactional(readOnly = true)
 class StoreProductExcelService(var storeProductRepository: StoreProductRepository, var basicProductRepository: BasicProductRepository) {
-    private final val HEADER_ROW_INDEX: Int = 1
-    private final val WORKSHEET_INDEX: Int = 0
-    private final val DATA_STARTING_ROW_INDEX: Int = 3
+    private val HEADER_ROW_INDEX: Int = 1
+    private val WORKSHEET_INDEX: Int = 0
+    private val DATA_STARTING_ROW_INDEX: Int = 3
 
+    @Transactional
     fun createBulkByExcelFile(file: MultipartFile, partnerId: Long): List<StoreProductModel> {
         val workbook = ExcelReadUtils.extractSimple(file.originalFilename, file.inputStream)
         val worksheet = workbook.worksheets[WORKSHEET_INDEX]
