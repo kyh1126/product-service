@@ -31,8 +31,8 @@ fun buildSubsidiaryMaterialCategoryCreateModel(
     id = id,
     level1Category = level1Category,
     level2Category = level2Category,
-    level1 = if (level1Category == null) null else level1,
-    level2 = if (level2Category == null) null else level2,
+    level1 = level1Category?.let { level1 },
+    level2 = level2Category?.let { level2 },
     quantityApplyYn = quantityApplyYn
 )
 

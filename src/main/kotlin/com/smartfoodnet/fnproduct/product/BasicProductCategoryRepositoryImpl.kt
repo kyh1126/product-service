@@ -20,8 +20,8 @@ class BasicProductCategoryRepositoryImpl
     }
 
     private fun eqLevel1CategoryId(level1CategoryId: Long?) =
-        if (level1CategoryId == null) null else basicProductCategory.level1Category.id.eq(level1CategoryId)
+        level1CategoryId?.let { basicProductCategory.level1Category.id.eq(it) }
 
     private fun eqLevel2CategoryId(level2CategoryId: Long?) =
-        if (level2CategoryId == null) null else basicProductCategory.level2Category.id.eq(level2CategoryId)
+        level2CategoryId?.let { basicProductCategory.level2Category.id.eq(it) }
 }

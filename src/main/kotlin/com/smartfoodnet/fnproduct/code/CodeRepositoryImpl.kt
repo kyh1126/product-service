@@ -12,7 +12,7 @@ class CodeRepositoryImpl : Querydsl4RepositorySupport(Code::class.java), CodeCus
             .fetch()
     }
 
-    private fun eqGroupName(groupName: String?) = if (groupName == null) null else code.groupName.eq(groupName)
+    private fun eqGroupName(groupName: String?) = groupName?.let { code.groupName.eq(it) }
 
-    private fun eqKeyName(keyName: String?) = if (keyName == null) null else code.keyName.eq(keyName)
+    private fun eqKeyName(keyName: String?) = keyName?.let { code.keyName.eq(it) }
 }
