@@ -11,11 +11,11 @@ import com.smartfoodnet.fnproduct.product.mapper.BasicProductCodeGenerator
 import com.smartfoodnet.fnproduct.product.mapper.SubsidiaryMaterialCategoryFinder
 import com.smartfoodnet.fnproduct.product.model.request.BasicProductCreateModel
 import com.smartfoodnet.fnproduct.product.model.request.BasicProductDetailCreateModel
+import com.smartfoodnet.fnproduct.product.model.request.BasicProductSearchCondition
 import com.smartfoodnet.fnproduct.product.model.request.SubsidiaryMaterialCreateModel
 import com.smartfoodnet.fnproduct.product.model.response.BasicProductDetailModel
 import com.smartfoodnet.fnproduct.product.model.response.BasicProductModel
 import com.smartfoodnet.fnproduct.product.model.response.CategoryByLevelModel
-import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import com.smartfoodnet.fnproduct.product.validator.BasicProductDetailCreateModelValidator
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -32,12 +32,8 @@ class BasicProductService(
     private val basicProductCodeGenerator: BasicProductCodeGenerator,
 ) {
 
-    fun getBasicProducts(
-        partnerId: Long? = null,
-        type: BasicProductType? = null,
-        page: Pageable,
-    ): PageResponse<BasicProductModel> {
-        return basicProductRepository.findByPartnerIdAndType(partnerId, type, page)
+    fun getBasicProducts(condition: BasicProductSearchCondition, page: Pageable): PageResponse<BasicProductModel> {
+        return basicProductRepository.findAll(condition.toPredicate(), page)
             .map(BasicProductModel::fromEntity)
             .run { PageResponse.of(this) }
     }
