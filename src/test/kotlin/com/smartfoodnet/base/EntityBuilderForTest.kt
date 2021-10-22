@@ -94,7 +94,8 @@ fun buildSubsidiaryMaterialCategory(): List<SubsidiaryMaterialCategory> {
 // ---------------------------------------------------------------------------------------------------------------------
 // -- Partner
 // ---------------------------------------------------------------------------------------------------------------------
-fun buildPartner() = Partner(id = Random.nextLong(0, Long.MAX_VALUE), name = "(주)대호", customerNumber = "0001")
+fun buildPartner() =
+    Partner(id = Random.nextLong(0, Long.MAX_VALUE), name = "(주)대호", customerNumber = "0001")
 
 // ---------------------------------------------------------------------------------------------------------------------
 // -- Warehouse

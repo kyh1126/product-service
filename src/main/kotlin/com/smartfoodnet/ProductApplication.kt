@@ -1,6 +1,5 @@
 package com.smartfoodnet
 
-import com.smartfoodnet.sample.SampleJavaClass
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
@@ -8,5 +7,5 @@ import org.springframework.boot.runApplication
 class ProductApplication
 
 fun main(args: Array<String>) {
-	runApplication<ProductApplication>(*args)
+    runApplication<ProductApplication>(*args)
 }

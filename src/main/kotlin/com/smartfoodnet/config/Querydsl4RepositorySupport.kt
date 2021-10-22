@@ -30,8 +30,10 @@ open class Querydsl4RepositorySupport(private val domainClass: Class<*>) {
     protected fun setEntityManager(entityManager: EntityManager) {
         Assert.notNull(entityManager, "EntityManager must not be null!")
 
-        val entityInformation = JpaEntityInformationSupport.getEntityInformation(domainClass, entityManager)
-        val path: EntityPath<*> = SimpleEntityPathResolver.INSTANCE.createPath(entityInformation.javaType)
+        val entityInformation =
+            JpaEntityInformationSupport.getEntityInformation(domainClass, entityManager)
+        val path: EntityPath<*> =
+            SimpleEntityPathResolver.INSTANCE.createPath(entityInformation.javaType)
 
         this.entityManager = entityManager
         querydsl = Querydsl(entityManager, PathBuilder(path.type, path.metadata))
@@ -69,7 +71,8 @@ open class Querydsl4RepositorySupport(private val domainClass: Class<*>) {
         countQuery: Function<JPAQueryFactory, JPAQuery<*>>,
     ): Page<T> {
         val jpaContentQuery: JPAQuery<*> = contentQuery.apply(queryFactory)
-        val content: List<T> = querydsl.applyPagination(pageable, jpaContentQuery).fetch() as List<T>
+        val content: List<T> =
+            querydsl.applyPagination(pageable, jpaContentQuery).fetch() as List<T>
         val countResult: JPAQuery<*> = countQuery.apply(queryFactory)
         return PageableExecutionUtils.getPage(content, pageable) { countResult.fetchCount() }
     }

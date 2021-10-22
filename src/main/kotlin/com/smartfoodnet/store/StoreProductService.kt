@@ -9,7 +9,10 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 @Transactional(readOnly = true)
-class StoreProductService(var storeProductRepository: StoreProductRepository, var basicProductRepository: BasicProductRepository) {
+class StoreProductService(
+    var storeProductRepository: StoreProductRepository,
+    var basicProductRepository: BasicProductRepository
+) {
 
     fun getStoreProducts(partnerId: Long): List<StoreProductModel> {
         val storeProducts = storeProductRepository.findAllByPartnerId(partnerId)
@@ -18,8 +21,10 @@ class StoreProductService(var storeProductRepository: StoreProductRepository, va
 
     @Transactional
     fun mapBasicProduct(storeProductId: Long, basicProductId: Long): StoreProductModel {
-        val storeProduct = storeProductRepository.findById(storeProductId).orElseThrow { ValidateError(errorMessage = "store product does not exist.") }
-        storeProduct.basicProduct = basicProductRepository.findById(basicProductId).orElseThrow { ValidateError(errorMessage = "store product does not exist") }
+        val storeProduct = storeProductRepository.findById(storeProductId)
+            .orElseThrow { ValidateError(errorMessage = "store product does not exist.") }
+        storeProduct.basicProduct = basicProductRepository.findById(basicProductId)
+            .orElseThrow { ValidateError(errorMessage = "store product does not exist") }
 
         return StoreProductModel.from(storeProductRepository.save(storeProduct))
     }
@@ -27,8 +32,10 @@ class StoreProductService(var storeProductRepository: StoreProductRepository, va
     @Transactional
     fun createStoreProduct(storeProductModel: StoreProductModel): StoreProductModel {
         val storeProduct = storeProductModel.toEntity()
-        if(storeProductModel.basicProductId != null) {
-            storeProduct.basicProduct = basicProductRepository.findById(storeProductModel.basicProductId!!).orElseThrow { ValidateError(errorMessage = "store product does not exist") }
+        if (storeProductModel.basicProductId != null) {
+            storeProduct.basicProduct =
+                basicProductRepository.findById(storeProductModel.basicProductId!!)
+                    .orElseThrow { ValidateError(errorMessage = "store product does not exist") }
         }
 
         return StoreProductModel.from(storeProductRepository.save(storeProduct))

@@ -32,7 +32,10 @@ class BasicProductService(
     private val basicProductCodeGenerator: BasicProductCodeGenerator,
 ) {
 
-    fun getBasicProducts(condition: BasicProductSearchCondition, page: Pageable): PageResponse<BasicProductModel> {
+    fun getBasicProducts(
+        condition: BasicProductSearchCondition,
+        page: Pageable
+    ): PageResponse<BasicProductModel> {
         return basicProductRepository.findAll(condition.toPredicate(), page)
             .map(BasicProductModel::fromEntity)
             .run { PageResponse.of(this) }
@@ -54,15 +57,24 @@ class BasicProductService(
         }
     }
 
-    fun getBasicProductCategories(level1CategoryId: Long?, level2CategoryId: Long?): List<CategoryByLevelModel> {
-        return basicProductCategoryFinder.getBasicProductCategories(level1CategoryId, level2CategoryId)
+    fun getBasicProductCategories(
+        level1CategoryId: Long?,
+        level2CategoryId: Long?
+    ): List<CategoryByLevelModel> {
+        return basicProductCategoryFinder.getBasicProductCategories(
+            level1CategoryId,
+            level2CategoryId
+        )
     }
 
     fun getSubsidiaryMaterialCategories(
         level1CategoryId: Long?,
         level2CategoryId: Long?,
     ): List<CategoryByLevelModel> {
-        return subsidiaryMaterialCategoryFinder.getSubsidiaryMaterialCategories(level1CategoryId, level2CategoryId)
+        return subsidiaryMaterialCategoryFinder.getSubsidiaryMaterialCategories(
+            level1CategoryId,
+            level2CategoryId
+        )
     }
 
     @Transactional
@@ -72,7 +84,11 @@ class BasicProductService(
         val basicProductCreateModel = createModel.basicProductModel
         // 상품코드 채번
         val basicProductCode = with(basicProductCreateModel) {
-            basicProductCodeGenerator.getBasicProductCode(partnerId, type, handlingTemperature?.code)
+            basicProductCodeGenerator.getBasicProductCode(
+                partnerId,
+                type,
+                handlingTemperature?.code
+            )
         }
         // 기본상품 카테고리 조회
         val basicProductCategory = getBasicProductCategory(basicProductCreateModel)
@@ -104,8 +120,15 @@ class BasicProductService(
     }
 
     @Transactional
-    fun updateBasicProduct(productId: Long, updateModel: BasicProductDetailCreateModel): BasicProductDetailModel {
-        ValidatorUtils.validateAndThrow(SaveState.UPDATE, basicProductDetailCreateModelValidator, updateModel)
+    fun updateBasicProduct(
+        productId: Long,
+        updateModel: BasicProductDetailCreateModel
+    ): BasicProductDetailModel {
+        ValidatorUtils.validateAndThrow(
+            SaveState.UPDATE,
+            basicProductDetailCreateModelValidator,
+            updateModel
+        )
 
         val basicProductCreateModel = updateModel.basicProductModel
 
@@ -122,11 +145,18 @@ class BasicProductService(
 
         // 유통기한정보 저장
         val expirationDateInfo =
-            createOrUpdateExpirationDateInfo(basicProductCreateModel, basicProduct.expirationDateInfo)
+            createOrUpdateExpirationDateInfo(
+                basicProductCreateModel,
+                basicProduct.expirationDateInfo
+            )
         // 기본상품-부자재 매핑 저장
         val entityById = basicProduct.subsidiaryMaterials.associateBy { it.id }
         val subsidiaryMaterials =
-            createOrUpdateSubsidiaryMaterials(updateModel.subsidiaryMaterialModels, entityById, subsidiaryMaterialById)
+            createOrUpdateSubsidiaryMaterials(
+                updateModel.subsidiaryMaterialModels,
+                entityById,
+                subsidiaryMaterialById
+            )
 
         basicProduct.update(
             basicProductCreateModel,
@@ -148,7 +178,10 @@ class BasicProductService(
 
     private fun getSubsidiaryMaterialCategory(basicProductCreateModel: BasicProductCreateModel): SubsidiaryMaterialCategory? {
         return (basicProductCreateModel.subsidiaryMaterialCategory)?.let {
-            subsidiaryMaterialCategoryFinder.getSubsidiaryMaterialCategoryByKeyName(it.level1!!, it.level2!!)
+            subsidiaryMaterialCategoryFinder.getSubsidiaryMaterialCategoryByKeyName(
+                it.level1!!,
+                it.level2!!
+            )
         }
     }
 

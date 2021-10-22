@@ -13,7 +13,11 @@ object ValidatorUtils {
         }
     }
 
-    fun <T> validateAndThrow(saveState: SaveState, createModelValidator: CreateModelValidator<T>, target: T) {
+    fun <T> validateAndThrow(
+        saveState: SaveState,
+        createModelValidator: CreateModelValidator<T>,
+        target: T
+    ) {
         val bindingResult = BeanPropertyBindingResult(target, target!!::class.java.simpleName)
         createModelValidator.validate(saveState, target, bindingResult)
 

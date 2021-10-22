@@ -15,7 +15,10 @@ import sfn.excel.module.workbook.read.models.SimpleWorkbookModels
 
 @Service
 @Transactional(readOnly = true)
-class StoreProductExcelService(var storeProductRepository: StoreProductRepository, var basicProductRepository: BasicProductRepository) {
+class StoreProductExcelService(
+    var storeProductRepository: StoreProductRepository,
+    var basicProductRepository: BasicProductRepository
+) {
     private val HEADER_ROW_INDEX: Int = 1
     private val WORKSHEET_INDEX: Int = 0
     private val DATA_STARTING_ROW_INDEX: Int = 3
@@ -26,7 +29,7 @@ class StoreProductExcelService(var storeProductRepository: StoreProductRepositor
         val worksheet = workbook.worksheets[WORKSHEET_INDEX]
 
         val storeProductModels = buildStoreProductModels(worksheet, partnerId)
-        val storeProducts = storeProductModels.map{
+        val storeProducts = storeProductModels.map {
             val storeProduct = it.toEntity()
             it.basicProductCode ?: run {
                 val basicProduct = basicProductRepository.findByCode(it.basicProductCode!!)
@@ -36,15 +39,18 @@ class StoreProductExcelService(var storeProductRepository: StoreProductRepositor
             storeProduct
         }
 
-        return storeProductRepository.saveAll(storeProducts).map{ StoreProductModel.from(it) }
+        return storeProductRepository.saveAll(storeProducts).map { StoreProductModel.from(it) }
     }
 
-    private fun buildStoreProductModels(worksheet: SimpleWorkbookModels.Worksheet, partnerId: Long): List<StoreProductModel>{
+    private fun buildStoreProductModels(
+        worksheet: SimpleWorkbookModels.Worksheet,
+        partnerId: Long
+    ): List<StoreProductModel> {
         val indexMap = StoreProductHeaderIndexMap.from(worksheet.rows[HEADER_ROW_INDEX])
         val rows = worksheet.rows.subList(DATA_STARTING_ROW_INDEX, worksheet.rows.size)
         val storeProductModels = Lists.newArrayList<StoreProductModel>()
 
-        rows.forEach{ row ->
+        rows.forEach { row ->
             buildModelFromRow(row, indexMap, partnerId)?.let {
                 storeProductModels.add(it)
             }
@@ -53,8 +59,12 @@ class StoreProductExcelService(var storeProductRepository: StoreProductRepositor
         return storeProductModels
     }
 
-    private fun buildModelFromRow(row: List<String>, map: Map<StoreProductHeader, Int>, partnerId: Long): StoreProductModel? {
-        if(row[map[NAME]!!] == "") {
+    private fun buildModelFromRow(
+        row: List<String>,
+        map: Map<StoreProductHeader, Int>,
+        partnerId: Long
+    ): StoreProductModel? {
+        if (row[map[NAME]!!] == "") {
             return null
         }
 

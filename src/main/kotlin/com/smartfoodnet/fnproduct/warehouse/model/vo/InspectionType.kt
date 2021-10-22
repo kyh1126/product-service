@@ -3,13 +3,14 @@ package com.smartfoodnet.fnproduct.product.model.vo
 import javax.persistence.AttributeConverter
 import javax.persistence.Converter
 
-enum class InspectionType(desc : String) {
+enum class InspectionType(desc: String) {
     ALL("전수"),
     SAMPLE("샘플");
 
     companion object {
-        fun forName(name : String) : InspectionType {
-            return values().firstOrNull { it.name == name } ?: throw IllegalArgumentException("format $name is illegal")
+        fun forName(name: String): InspectionType {
+            return values().firstOrNull { it.name == name }
+                ?: throw IllegalArgumentException("format $name is illegal")
         }
     }
 }

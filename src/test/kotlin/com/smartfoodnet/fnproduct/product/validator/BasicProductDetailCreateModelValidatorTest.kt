@@ -32,12 +32,18 @@ internal class BasicProductDetailCreateModelValidatorTest {
         val subsidiaryMaterialCategories = buildSubsidiaryMaterialCategory()
         // 공통부자재 생성
         basicproductsSub = subsidiaryMaterialCategories.map {
-            buildBasicProduct_SUB(name = it.level2Category!!.keyName, subsidiaryMaterialCategory = it)
+            buildBasicProduct_SUB(
+                name = it.level2Category!!.keyName,
+                subsidiaryMaterialCategory = it
+            )
         }
 
         basicProductCreateModelValidator = BasicProductCreateModelValidator()
         basicProductDetailCreateModelValidator =
-            BasicProductDetailCreateModelValidator(basicProductRepository, basicProductCreateModelValidator)
+            BasicProductDetailCreateModelValidator(
+                basicProductRepository,
+                basicProductCreateModelValidator
+            )
     }
 
     @Nested
@@ -64,7 +70,8 @@ internal class BasicProductDetailCreateModelValidatorTest {
                 // given
                 val mockCreateModel = getInvalidInput_checkRequiredFieldsBasicType()
 
-                val expectedMessage = listOf("CreateModelValidateErrorMessage: ",
+                val expectedMessage = listOf(
+                    "CreateModelValidateErrorMessage: ",
                     "화주(고객사) ID 값은 null 이 아닌 값을 입력해주세요.",
                     "상품명 값을 입력해주세요.",
                     "상품바코드기재여부 값을 입력해주세요.",
@@ -73,12 +80,15 @@ internal class BasicProductDetailCreateModelValidatorTest {
                     "단수(포장)여부 값을 입력해주세요.",
                     "유통기한관리여부 값을 입력해주세요.",
                     "박스입수 값은 null 이 아닌 값을 입력해주세요.",
-                    "파레트입수 값은 null 이 아닌 값을 입력해주세요.").joinToString(separator, "", separator)
+                    "파레트입수 값은 null 이 아닌 값을 입력해주세요."
+                ).joinToString(separator, "", separator)
 
                 // when & then
                 val ex = assertThrows<CreateModelValidateError> {
-                    ValidatorUtils.validateAndThrow(basicProductDetailCreateModelValidator,
-                        mockCreateModel)
+                    ValidatorUtils.validateAndThrow(
+                        basicProductDetailCreateModelValidator,
+                        mockCreateModel
+                    )
                 }
                 assertNotNull(ex.message)
                 assertTrue(ex.message!!.contains(expectedMessage))
@@ -90,14 +100,18 @@ internal class BasicProductDetailCreateModelValidatorTest {
                 // given
                 val mockCreateModel = getInvalidBasicProductCategory_checkRequiredFieldsBasicType()
 
-                val expectedMessage = listOf("CreateModelValidateErrorMessage: ",
+                val expectedMessage = listOf(
+                    "CreateModelValidateErrorMessage: ",
                     "상품카테고리(대분류) 값을 입력해주세요.",
-                    "상품카테고리(중분류) 값을 입력해주세요.").joinToString(separator, "", separator)
+                    "상품카테고리(중분류) 값을 입력해주세요."
+                ).joinToString(separator, "", separator)
 
                 // when & then
                 val ex = assertThrows<CreateModelValidateError> {
-                    ValidatorUtils.validateAndThrow(basicProductDetailCreateModelValidator,
-                        mockCreateModel)
+                    ValidatorUtils.validateAndThrow(
+                        basicProductDetailCreateModelValidator,
+                        mockCreateModel
+                    )
                 }
                 assertNotNull(ex.message)
                 assertTrue(ex.message!!.contains(expectedMessage))
@@ -142,7 +156,11 @@ internal class BasicProductDetailCreateModelValidatorTest {
     private fun getInput(basicProductModel: BasicProductCreateModel): BasicProductDetailCreateModel {
         val firstSubBasicProduct = basicproductsSub.first()
         val buildSubsidiaryMaterialCreateModel =
-            buildSubsidiaryMaterialCreateModel(subsidiaryMaterial = buildBasicProductSubCreateModel(id = firstSubBasicProduct.id))
+            buildSubsidiaryMaterialCreateModel(
+                subsidiaryMaterial = buildBasicProductSubCreateModel(
+                    id = firstSubBasicProduct.id
+                )
+            )
 
         return buildBasicProductDetailCreateModel(basicProductModel = basicProductModel)
             .apply { subsidiaryMaterialModels.add(buildSubsidiaryMaterialCreateModel) }

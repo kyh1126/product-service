@@ -16,10 +16,15 @@ abstract class AbstractTest {
          * <p>
          * @see <a href="https://www.testcontainers.org/test_framework_integration/manual_lifecycle_control/">@Container 제거한 이유</a>
          */
-        private val mySqlContainer: MySQLContainer<*> = MySQLContainer<Nothing>("mysql:latest").apply {
-            withCommand("mysqld", "--character-set-server=utf8mb4", "--collation-server=utf8mb4_0900_ai_ci")
-            start()
-        }
+        private val mySqlContainer: MySQLContainer<*> =
+            MySQLContainer<Nothing>("mysql:latest").apply {
+                withCommand(
+                    "mysqld",
+                    "--character-set-server=utf8mb4",
+                    "--collation-server=utf8mb4_0900_ai_ci"
+                )
+                start()
+            }
 
         @JvmStatic
         @DynamicPropertySource

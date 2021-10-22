@@ -4,7 +4,6 @@ import org.springframework.beans.BeanUtils
 import org.springframework.beans.BeanWrapperImpl
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.util.HashSet
 
 //// String extensions
 fun parseLocalDateOrNull(text: CharSequence, formatter: DateTimeFormatter): LocalDate? {
@@ -37,10 +36,9 @@ fun getNullPropertyNames(source: Any): Array<String> {
  * @param source 원본 객체
  * @param target 복삽받을 대상 객체
  */
-fun copyNonNullProperty(source: Any, target : Any){
+fun copyNonNullProperty(source: Any, target: Any) {
     BeanUtils.copyProperties(source, target, *getNullPropertyNames(source))
 }
-
 
 
 /**

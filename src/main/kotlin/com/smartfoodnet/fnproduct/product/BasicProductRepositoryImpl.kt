@@ -5,8 +5,12 @@ import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.product.entity.QBasicProduct.basicProduct
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 
-class BasicProductRepositoryImpl : Querydsl4RepositorySupport(BasicProduct::class.java), BasicProductCustom {
-    override fun countByPartnerIdAndTypeIn(partnerId: Long?, types: Collection<BasicProductType>): Long {
+class BasicProductRepositoryImpl : Querydsl4RepositorySupport(BasicProduct::class.java),
+    BasicProductCustom {
+    override fun countByPartnerIdAndTypeIn(
+        partnerId: Long?,
+        types: Collection<BasicProductType>
+    ): Long {
         return selectFrom(basicProduct)
             .where(eqPartnerId(partnerId), inType(types))
             .fetchCount()

@@ -66,7 +66,10 @@ class BasicProductController(private val basicProductService: BasicProductServic
         @Parameter(description = "대분류") @RequestParam(required = false) level1CategoryId: Long?,
         @Parameter(description = "소분류") @RequestParam(required = false) level2CategoryId: Long?,
     ): List<CategoryByLevelModel> {
-        return basicProductService.getSubsidiaryMaterialCategories(level1CategoryId, level2CategoryId)
+        return basicProductService.getSubsidiaryMaterialCategories(
+            level1CategoryId,
+            level2CategoryId
+        )
     }
 
     @Operation(summary = "기본상품 추가")

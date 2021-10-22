@@ -28,7 +28,7 @@ test:
     - if: $CI_COMMIT_BRANCH == "master"
     - if: $CI_COMMIT_BRANCH == "dev"
     - if: $CI_PIPELINE_SOURCE == "web"
-  needs: [build]
+  needs: [ build ]
   stage: test
   artifacts:
     paths:
@@ -58,13 +58,13 @@ deploy:
     - if: $CI_COMMIT_BRANCH == "master"
     - if: $CI_COMMIT_BRANCH == "dev"
     - if: $CI_PIPELINE_SOURCE == "web"
-  needs: [docker-build]
+  needs: [ docker-build ]
   stage: deploy
   script:
     - aws --region ap-northeast-2 ecs update-service --cluster sfn-dev --service "$SERVICE_NAME" --force-new-deployment > aws.log
 
 tag_commit:
-  needs: [deploy]
+  needs: [ deploy ]
   rules:
     - if: $CI_COMMIT_BRANCH == "master"
     - if: $CI_COMMIT_BRANCH == "dev"

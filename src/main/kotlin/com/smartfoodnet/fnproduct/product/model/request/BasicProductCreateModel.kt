@@ -11,8 +11,10 @@ data class BasicProductCreateModel(
     val id: Long? = null,
 
     @NotNull
-    @ApiModelProperty(value = "구분 (BASIC:기본상품/CUSTOM_SUB:고객전용부자재/SUB:공통부자재/PACKAGE:모음상품)",
-        allowableValues = "BASIC,CUSTOM_SUB,SUB,PACKAGE", dataType = "Enum", example = "BASIC")
+    @ApiModelProperty(
+        value = "구분 (BASIC:기본상품/CUSTOM_SUB:고객전용부자재/SUB:공통부자재/PACKAGE:모음상품)",
+        allowableValues = "BASIC,CUSTOM_SUB,SUB,PACKAGE", dataType = "Enum", example = "BASIC"
+    )
     val type: BasicProductType = BasicProductType.BASIC,
 
     @ApiModelProperty(value = "화주(고객사) ID")
@@ -36,7 +38,10 @@ data class BasicProductCreateModel(
     @ApiModelProperty(value = "부자재카테고리")
     val subsidiaryMaterialCategory: SubsidiaryMaterialCategoryCreateModel? = null,
 
-    @ApiModelProperty(value = "취급온도 (ROOM:상온/REFRIGERATE:냉장/FREEZE:냉동)", allowableValues = "ROOM,REFRIGERATE,FREEZE")
+    @ApiModelProperty(
+        value = "취급온도 (ROOM:상온/REFRIGERATE:냉장/FREEZE:냉동)",
+        allowableValues = "ROOM,REFRIGERATE,FREEZE"
+    )
     val handlingTemperature: HandlingTemperatureType? = null,
 
     @NotNull

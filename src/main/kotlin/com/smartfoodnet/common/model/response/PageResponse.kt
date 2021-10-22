@@ -28,7 +28,11 @@ class PageResponse<T>(
             return of(contents, totalCount, PageRequest.of(page, size, sort))
         }
 
-        fun <T> of(contents: Collection<T>, totalCount: Long, pageRequest: Pageable): PageResponse<T> {
+        fun <T> of(
+            contents: Collection<T>,
+            totalCount: Long,
+            pageRequest: Pageable
+        ): PageResponse<T> {
             return PageResponse(
                 payload = contents,
                 pagination = Pagination(

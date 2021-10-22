@@ -9,7 +9,8 @@ import org.springframework.validation.Errors
 
 @Component
 class BasicProductCreateModelValidator : CreateModelValidator<BasicProductCreateModel> {
-    override fun supports(clazz: Class<*>): Boolean = clazz.isAssignableFrom(BasicProductCreateModel::class.java)
+    override fun supports(clazz: Class<*>): Boolean =
+        clazz.isAssignableFrom(BasicProductCreateModel::class.java)
 
     override fun validate(saveState: SaveState, target: BasicProductCreateModel, errors: Errors) {
         checkRequiredFields(target, errors)
@@ -17,7 +18,12 @@ class BasicProductCreateModelValidator : CreateModelValidator<BasicProductCreate
 
     private fun checkRequiredFields(target: BasicProductCreateModel, errors: Errors) {
         when (target.type) {
-            BasicProductType.SUB, BasicProductType.CUSTOM_SUB -> validateNull(errors, "id", "id", target.id)
+            BasicProductType.SUB, BasicProductType.CUSTOM_SUB -> validateNull(
+                errors,
+                "id",
+                "id",
+                target.id
+            )
             else -> Unit
         }
     }

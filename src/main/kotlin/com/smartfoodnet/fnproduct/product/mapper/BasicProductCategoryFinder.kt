@@ -20,8 +20,10 @@ class BasicProductCategoryFinder(
         level1CategoryId: Long? = null,
         level2CategoryId: Long? = null,
     ): List<CategoryByLevelModel> {
-        return basicProductCategoryRepository.findByLevel1CategoryAndLevel2Category(level1CategoryId, level2CategoryId)
-            .groupBy({ it.level1Category }, { it.level2Category })
+        return basicProductCategoryRepository.findByLevel1CategoryAndLevel2Category(
+            level1CategoryId,
+            level2CategoryId
+        ).groupBy({ it.level1Category }, { it.level2Category })
             .map { CategoryByLevelModel.fromEntity(it.key, it.value) }
     }
 
@@ -29,7 +31,9 @@ class BasicProductCategoryFinder(
         val level1Code = codeService.getCodeByGroupNameKeyName(level1GroupName, level1).first()
         val level2Code = codeService.getCodeByGroupNameKeyName(level2GroupName, level2).first()
 
-        return basicProductCategoryRepository.findByLevel1CategoryAndLevel2Category(level1Code.id, level2Code.id)
-            .firstOrNull()
+        return basicProductCategoryRepository.findByLevel1CategoryAndLevel2Category(
+            level1Code.id,
+            level2Code.id
+        ).firstOrNull()
     }
 }

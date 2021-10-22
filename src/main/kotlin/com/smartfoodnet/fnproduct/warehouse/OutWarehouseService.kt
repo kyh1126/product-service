@@ -10,11 +10,12 @@ import org.springframework.stereotype.Service
 class OutWarehouseService(
     private val outWarehouseRepository: OutWarehouseRepository
 ) {
-    fun getOutWarehouses(partnerId : Long) : List<OutWarehouseModel>{
-        return outWarehouseRepository.findByPartnerId(partnerId).map { OutWarehouseModel.fromEntity(it) }
+    fun getOutWarehouses(partnerId: Long): List<OutWarehouseModel> {
+        return outWarehouseRepository.findByPartnerId(partnerId)
+            .map { OutWarehouseModel.fromEntity(it) }
     }
 
-    fun saveOutWarehouse(partnerId: Long, outWarehouseDto: OutWarehouseDto)  {
+    fun saveOutWarehouse(partnerId: Long, outWarehouseDto: OutWarehouseDto) {
         outWarehouseRepository.save(outWarehouseDto.toEntity(partnerId))
     }
 

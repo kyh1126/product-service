@@ -21,10 +21,18 @@ interface CreateModelValidator<T> : Validator {
         targets: Collection<T>,
         validator: CreateModelValidator<T>,
     ) {
-        val validationFunction = { target: T -> invokeValidator(saveState, validator, target, errors) }
+        val validationFunction =
+            { target: T -> invokeValidator(saveState, validator, target, errors) }
 
         var current = 0
-        targets.forEach { validateNested(errors, "$fieldName[${current++}]", it, validationFunction) }
+        targets.forEach {
+            validateNested(
+                errors,
+                "$fieldName[${current++}]",
+                it,
+                validationFunction
+            )
+        }
     }
 
     fun validateEmpty(errors: Errors, fieldName: String, fieldDescription: String, value: Any?) {
@@ -57,7 +65,12 @@ interface CreateModelValidator<T> : Validator {
             "$fieldDescription 값은 null 이 아닌 값을 입력해주세요."
         )
 
-    private fun <T> validateNested(errors: Errors, path: String, target: T, validationFunction: (T) -> Unit) {
+    private fun <T> validateNested(
+        errors: Errors,
+        path: String,
+        target: T,
+        validationFunction: (T) -> Unit
+    ) {
         errors.pushNestedPath(path)
         validationFunction(target)
         errors.popNestedPath()

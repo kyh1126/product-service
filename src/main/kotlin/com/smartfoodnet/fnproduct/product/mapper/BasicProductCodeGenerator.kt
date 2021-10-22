@@ -28,8 +28,9 @@ class BasicProductCodeGenerator(
 
         val customerNumber = partnerService.getPartner(partnerId).customerNumber
         // 00001 부터 시작
-        val totalProductCount = basicProductRepository.countByPartnerIdAndTypeIn(partnerId, basicProductCodeTypes)
-            .run { String.format("%05d", this + 1) }
+        val totalProductCount =
+            basicProductRepository.countByPartnerIdAndTypeIn(partnerId, basicProductCodeTypes)
+                .run { String.format("%05d", this + 1) }
 
         return customerNumber + type.code + temperatureCode + totalProductCount
     }

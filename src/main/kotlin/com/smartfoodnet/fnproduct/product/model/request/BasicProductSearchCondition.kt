@@ -14,7 +14,10 @@ class BasicProductSearchCondition(
     @JsonIgnore
     var partnerId: Long? = null,
 
-    @ApiModelProperty(value = "구분 (BASIC:기본상품/CUSTOM_SUB:고객전용부자재)", allowableValues = "BASIC,CUSTOM_SUB")
+    @ApiModelProperty(
+        value = "구분 (BASIC:기본상품/CUSTOM_SUB:고객전용부자재)",
+        allowableValues = "BASIC,CUSTOM_SUB"
+    )
     var type: BasicProductType? = null,
 
     @ApiModelProperty(value = "입고처 ID", example = "1")
@@ -31,7 +34,10 @@ class BasicProductSearchCondition(
         NAME, CODE, BARCODE
     }
 
-    @ApiModelProperty(value = "상품별검색 (NAME:기본상품명/CODE:기본상품코드/BARCODE:상품바코드)", allowableValues = "NAME,CODE,BARCODE")
+    @ApiModelProperty(
+        value = "상품별검색 (NAME:기본상품명/CODE:기본상품코드/BARCODE:상품바코드)",
+        allowableValues = "NAME,CODE,BARCODE"
+    )
     var searchType: SearchType? = null
 
     @ApiModelProperty(value = "검색 키워드")
@@ -59,7 +65,8 @@ class BasicProductSearchCondition(
 
     private fun eqType(type: BasicProductType?) = type?.let { basicProduct.type.eq(it) }
 
-    private fun eqWarehouse(warehouseId: Long?) = warehouseId?.let { basicProduct.warehouse.id.eq(it) }
+    private fun eqWarehouse(warehouseId: Long?) =
+        warehouseId?.let { basicProduct.warehouse.id.eq(it) }
 
     private fun eqExpirationDateManagementYn(expirationDateManagementYn: String?) =
         expirationDateManagementYn?.let { basicProduct.expirationDateManagementYn.eq(it) }

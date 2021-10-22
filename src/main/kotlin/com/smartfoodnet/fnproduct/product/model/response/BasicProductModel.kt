@@ -12,8 +12,10 @@ data class BasicProductModel(
     @ApiModelProperty(value = "id")
     val id: Long? = null,
 
-    @ApiModelProperty(value = "구분 (BASIC:기본상품/CUSTOM_SUB:고객전용부자재/SUB:공통부자재/PACKAGE:모음상품)",
-        allowableValues = "BASIC,CUSTOM_SUB,SUB,PACKAGE")
+    @ApiModelProperty(
+        value = "구분 (BASIC:기본상품/CUSTOM_SUB:고객전용부자재/SUB:공통부자재/PACKAGE:모음상품)",
+        allowableValues = "BASIC,CUSTOM_SUB,SUB,PACKAGE"
+    )
     var type: BasicProductType,
 
     @ApiModelProperty(value = "화주(고객사) ID")
@@ -37,7 +39,10 @@ data class BasicProductModel(
     @ApiModelProperty(value = "부자재카테고리")
     var subsidiaryMaterialCategory: SubsidiaryMaterialCategoryModel?,
 
-    @ApiModelProperty(value = "취급온도 (ROOM:상온/REFRIGERATE:냉장/FREEZE:냉동)", allowableValues = "ROOM,REFRIGERATE,FREEZE")
+    @ApiModelProperty(
+        value = "취급온도 (ROOM:상온/REFRIGERATE:냉장/FREEZE:냉동)",
+        allowableValues = "ROOM,REFRIGERATE,FREEZE"
+    )
     var handlingTemperature: HandlingTemperatureType? = null,
 
     @ApiModelProperty(value = "입고처")
@@ -89,7 +94,9 @@ data class BasicProductModel(
                     code = code,
                     barcodeYn = barcodeYn,
                     barcode = barcode,
-                    basicProductCategory = basicProductCategory?.let { BasicProductCategoryModel.fromEntity(it) },
+                    basicProductCategory = basicProductCategory?.let {
+                        BasicProductCategoryModel.fromEntity(it)
+                    },
                     subsidiaryMaterialCategory = subsidiaryMaterialCategory?.let {
                         SubsidiaryMaterialCategoryModel.fromEntity(it)
                     },

@@ -3,34 +3,47 @@ package com.smartfoodnet.fnproduct.product.validator
 import com.smartfoodnet.common.error.CreateModelValidator
 import com.smartfoodnet.common.error.SaveState
 import com.smartfoodnet.fnproduct.product.BasicProductRepository
+import com.smartfoodnet.fnproduct.product.model.request.BasicProductCreateModel
 import com.smartfoodnet.fnproduct.product.model.request.BasicProductDetailCreateModel
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.validation.Errors
 
 @Component
+@Transactional(readOnly = true)
 class BasicProductDetailCreateModelValidator(
     private val basicProductRepository: BasicProductRepository,
     private val basicProductCreateModelValidator: BasicProductCreateModelValidator,
 ) : CreateModelValidator<BasicProductDetailCreateModel> {
-    override fun supports(clazz: Class<*>): Boolean = clazz.isAssignableFrom(BasicProductDetailCreateModel::class.java)
+    override fun supports(clazz: Class<*>): Boolean =
+        clazz.isAssignableFrom(BasicProductDetailCreateModel::class.java)
 
-    override fun validate(saveState: SaveState, target: BasicProductDetailCreateModel, errors: Errors) {
-        when (target.basicProductModel.type) {
+    override fun validate(
+        saveState: SaveState,
+        target: BasicProductDetailCreateModel,
+        errors: Errors
+    ) {
+        val basicProductModel = target.basicProductModel
+        when (basicProductModel.type) {
             BasicProductType.BASIC -> checkRequiredFieldsBasicType(saveState, target, errors)
             BasicProductType.CUSTOM_SUB -> checkRequiredFieldsCustomSubType(target, errors)
             else -> Unit
         }
 
-        checkBarcode(saveState, target, errors)
+        checkBarcode(saveState, basicProductModel, errors)
 
-        checkExpirationDate(target, errors)
+        checkExpirationDate(basicProductModel, errors)
     }
 
-    private fun checkBarcode(saveState: SaveState, target: BasicProductDetailCreateModel, errors: Errors) {
+    private fun checkBarcode(
+        saveState: SaveState,
+        target: BasicProductCreateModel,
+        errors: Errors
+    ) {
         if (saveState == SaveState.UPDATE) return
 
-        with(target.basicProductModel) {
+        with(target) {
             if (barcodeYn.isNotEmpty() && barcodeYn == "Y") {
                 validateEmpty(errors, "basicProductModel.barcode", "상품바코드", barcode)
                 validateEmpty(errors, "basicProductModel.partnerId", "화주(고객사) ID", partnerId)
@@ -38,19 +51,32 @@ class BasicProductDetailCreateModelValidator(
                 if (barcode == null || partnerId == null) return
 
                 if (barcode.toLongOrNull() == null) {
-                    errors.rejectValue("basicProductModel.barcode", "barcode.invalid", "숫자 입력만 가능합니다.")
+                    errors.rejectValue(
+                        "basicProductModel.barcode",
+                        "barcode.invalid",
+                        "숫자 입력만 가능합니다."
+                    )
                 }
                 basicProductRepository.findByPartnerIdAndBarcode(partnerId, barcode)?.let {
-                    errors.rejectValue("basicProductModel.barcode", "barcode.invalid", "사용중인 상품바코드가 있습니다.")
+                    errors.rejectValue(
+                        "basicProductModel.barcode",
+                        "barcode.invalid",
+                        "사용중인 상품바코드가 있습니다."
+                    )
                 }
             }
         }
     }
 
-    private fun checkExpirationDate(target: BasicProductDetailCreateModel, errors: Errors) {
-        with(target.basicProductModel) {
+    private fun checkExpirationDate(target: BasicProductCreateModel, errors: Errors) {
+        with(target) {
             if (expirationDateManagementYn.isNotEmpty() && expirationDateManagementYn == "Y") {
-                validateEmpty(errors, "basicProductModel.expirationDateInfoModel", "유통기한정보", expirationDateInfoModel)
+                validateEmpty(
+                    errors,
+                    "basicProductModel.expirationDateInfoModel",
+                    "유통기한정보",
+                    expirationDateInfoModel
+                )
 
                 if (expirationDateInfoModel == null) return
                 with(expirationDateInfoModel) {
@@ -61,10 +87,12 @@ class BasicProductDetailCreateModelValidator(
                         )
                     }
                     if (expirationDateWriteYn == "Y") {
-                        validateNull(errors,
+                        validateNull(
+                            errors,
                             "basicProductModel.expirationDateInfoModel.expirationDate",
                             "유통기한(제조일+X일)",
-                            expirationDate)
+                            expirationDate
+                        )
                     }
                 }
             }
@@ -85,9 +113,24 @@ class BasicProductDetailCreateModelValidator(
             validateEmpty(errors, "basicProductModel.partnerId", "화주(고객사) ID", partnerId)
             validateEmpty(errors, "basicProductModel.name", "상품명", name)
             validateEmpty(errors, "basicProductModel.barcodeYn", "상품바코드기재여부", barcodeYn)
-            validateEmpty(errors, "basicProductModel.handlingTemperature", "취급온도", handlingTemperature)
-            validateEmpty(errors, "basicProductModel.basicProductCategory", "상품카테고리", basicProductCategory)
-            validateEmpty(errors, "basicProductModel.singlePackagingYn", "단수(포장)여부", singlePackagingYn)
+            validateEmpty(
+                errors,
+                "basicProductModel.handlingTemperature",
+                "취급온도",
+                handlingTemperature
+            )
+            validateEmpty(
+                errors,
+                "basicProductModel.basicProductCategory",
+                "상품카테고리",
+                basicProductCategory
+            )
+            validateEmpty(
+                errors,
+                "basicProductModel.singlePackagingYn",
+                "단수(포장)여부",
+                singlePackagingYn
+            )
             validateEmpty(
                 errors,
                 "basicProductModel.expirationDateManagementYn",
@@ -124,7 +167,10 @@ class BasicProductDetailCreateModelValidator(
         }
     }
 
-    private fun checkRequiredFieldsCustomSubType(target: BasicProductDetailCreateModel, errors: Errors) {
+    private fun checkRequiredFieldsCustomSubType(
+        target: BasicProductDetailCreateModel,
+        errors: Errors
+    ) {
         val basicProductModel = target.basicProductModel
 
         if (basicProductModel.type != BasicProductType.CUSTOM_SUB) return

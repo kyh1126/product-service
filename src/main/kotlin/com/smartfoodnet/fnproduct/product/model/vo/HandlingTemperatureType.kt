@@ -18,5 +18,6 @@ enum class HandlingTemperatureType(val desc: String, val code: String) {
 @Converter
 class HandlingTemperatureTypeConverter : AttributeConverter<HandlingTemperatureType, String> {
     override fun convertToDatabaseColumn(attribute: HandlingTemperatureType?) = attribute?.name
-    override fun convertToEntityAttribute(dbData: String?) = HandlingTemperatureType.fromName(dbData)
+    override fun convertToEntityAttribute(dbData: String?) =
+        HandlingTemperatureType.fromName(dbData)
 }

@@ -39,7 +39,12 @@ internal class BasicProductControllerTest(
 
     @BeforeAll  // Testcontainers 가 static 으로 떠있기 때문에, DB 저장도 한 번만 실행되어야 한다.
     fun init() {
-        codeService.createCodes(listOf(BasicProductCategoryCodes, SubsidiaryMaterialCategoryCodes).flatten())
+        codeService.createCodes(
+            listOf(
+                BasicProductCategoryCodes,
+                SubsidiaryMaterialCategoryCodes
+            ).flatten()
+        )
     }
 
     @Test
@@ -126,7 +131,8 @@ internal class BasicProductControllerTest(
             content { objectMapper.writeValueAsString(response) }
             jsonPath("$.payload[0].value") { value(level1CategoryId) }
             jsonPath("$.payload[0].label") {
-                val subsidiaryMaterialCategoryLevel1 = SubsidiaryMaterialCategoryCodes.fromId(level1CategoryId)
+                val subsidiaryMaterialCategoryLevel1 =
+                    SubsidiaryMaterialCategoryCodes.fromId(level1CategoryId)
                 value(subsidiaryMaterialCategoryLevel1.keyName)
             }
         }.andDo {

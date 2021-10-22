@@ -65,7 +65,12 @@ internal class BasicProductServiceTest(
     @BeforeAll  // Testcontainers 가 static 으로 떠있기 때문에, DB 저장도 한 번만 실행되어야 한다. + 필요한 데이터 mocking
     fun init() {
         // 코드 생성
-        codeService.createCodes(listOf(BasicProductCategoryCodes, SubsidiaryMaterialCategoryCodes).flatten())
+        codeService.createCodes(
+            listOf(
+                BasicProductCategoryCodes,
+                SubsidiaryMaterialCategoryCodes
+            ).flatten()
+        )
 
         // 화주(고객사) 생성
         partner = buildPartner()
@@ -89,14 +94,26 @@ internal class BasicProductServiceTest(
     fun initEach() {
         given(partnerRepository.findById(anyLong())).willReturn(Optional.of(partner))
         given(warehouseRepository.findById(anyLong())).willReturn(Optional.of(warehouse))
-        given(basicProductCategoryRepository.findById(anyLong())).willReturn(Optional.of(basicProductCategories.first()))
-        given(basicProductCategoryRepository.findByLevel1CategoryAndLevel2Category(anyLong(), anyLong()))
-            .willReturn(listOf(basicProductCategories.first()))
+        given(basicProductCategoryRepository.findById(anyLong()))
+            .willReturn(Optional.of(basicProductCategories.first()))
+        given(
+            basicProductCategoryRepository.findByLevel1CategoryAndLevel2Category(
+                anyLong(),
+                anyLong()
+            )
+        ).willReturn(listOf(basicProductCategories.first()))
         given(subsidiaryMaterialCategoryRepository.findById(anyLong()))
             .willReturn(Optional.of(subsidiaryMaterialCategories.first()))
-        given(subsidiaryMaterialCategoryRepository.findByLevel1CategoryAndLevel2Category(anyLong(), anyLong()))
-            .willReturn(listOf(subsidiaryMaterialCategories.first()))
-        basicproductsSub.forEach { given(basicProductRepository.findById(it.id!!)).willReturn(Optional.of(it)) }
+        given(
+            subsidiaryMaterialCategoryRepository.findByLevel1CategoryAndLevel2Category(
+                anyLong(),
+                anyLong()
+            )
+        ).willReturn(listOf(subsidiaryMaterialCategories.first()))
+        basicproductsSub.forEach {
+            given(basicProductRepository.findById(it.id!!))
+                .willReturn(Optional.of(it))
+        }
     }
 
     @Nested
@@ -114,7 +131,11 @@ internal class BasicProductServiceTest(
                 .willReturn(listOf(firstSubBasicProduct))
 
             val buildSubsidiaryMaterialCreateModel =
-                buildSubsidiaryMaterialCreateModel(subsidiaryMaterial = buildBasicProductSubCreateModel(id = firstSubBasicProduct.id))
+                buildSubsidiaryMaterialCreateModel(
+                    subsidiaryMaterial = buildBasicProductSubCreateModel(
+                        id = firstSubBasicProduct.id
+                    )
+                )
 
             val mockCreateModel = buildBasicProductDetailCreateModel(
                 basicProductModel = buildBasicProductCreateModel(
@@ -127,7 +148,11 @@ internal class BasicProductServiceTest(
             // 저장 가능한 Entity 로 변환
             val basicProductCreateModel = mockCreateModel.basicProductModel
             basicProductCode = with(basicProductCreateModel) {
-                basicProductCodeGenerator.getBasicProductCode(partnerId!!, type, handlingTemperature?.code)
+                basicProductCodeGenerator.getBasicProductCode(
+                    partnerId!!,
+                    type,
+                    handlingTemperature?.code
+                )
             }
             // BasicProductCategory: 있는거 조회해서 넘겨야함
             val basicProductCategory = getBasicProductCategory(basicProductCreateModel)
@@ -155,16 +180,20 @@ internal class BasicProductServiceTest(
                 warehouse = warehouse
             ).apply { id = productId }
             given(basicProductRepository.save(any())).willReturn(mockBasicProduct)
-            given(basicProductRepository.findById(productId)).willReturn(Optional.of(mockBasicProduct))
+            given(basicProductRepository.findById(productId))
+                .willReturn(Optional.of(mockBasicProduct))
 
             // when
-            val actualBasicProductDetailModel = basicProductService.createBasicProduct(mockCreateModel)
+            val actualBasicProductDetailModel =
+                basicProductService.createBasicProduct(mockCreateModel)
 
             // then
             assertNotNull(BasicProductDetailModel)
             verify(basicProductRepository, times(1)).save(any())
-            assertEquals(BasicProductDetailModel.fromEntity(mockBasicProduct, subsidiaryMaterialById),
-                actualBasicProductDetailModel)
+            assertEquals(
+                BasicProductDetailModel.fromEntity(mockBasicProduct, subsidiaryMaterialById),
+                actualBasicProductDetailModel
+            )
         }
 
         @Test
@@ -181,7 +210,11 @@ internal class BasicProductServiceTest(
                 .willReturn(listOf(secondSubBasicProduct))
 
             val buildSubsidiaryMaterialCreateModel =
-                buildSubsidiaryMaterialCreateModel(subsidiaryMaterial = buildBasicProductSubCreateModel(id = secondSubBasicProduct.id))
+                buildSubsidiaryMaterialCreateModel(
+                    subsidiaryMaterial = buildBasicProductSubCreateModel(
+                        id = secondSubBasicProduct.id
+                    )
+                )
 
             val mockUpdateModel = buildBasicProductDetailCreateModel(
                 basicProductModel = buildBasicProductCreateModel(
@@ -217,12 +250,15 @@ internal class BasicProductServiceTest(
             ).apply { id = productId }
 
             // when
-            val actualBasicProductDetailModel = basicProductService.updateBasicProduct(productId, mockUpdateModel)
+            val actualBasicProductDetailModel =
+                basicProductService.updateBasicProduct(productId, mockUpdateModel)
 
             // then
             assertNotNull(BasicProductDetailModel)
-            assertEquals(BasicProductDetailModel.fromEntity(mockBasicProduct, subsidiaryMaterialById),
-                actualBasicProductDetailModel)
+            assertEquals(
+                BasicProductDetailModel.fromEntity(mockBasicProduct, subsidiaryMaterialById),
+                actualBasicProductDetailModel
+            )
         }
     }
 
@@ -234,7 +270,10 @@ internal class BasicProductServiceTest(
 
     private fun getSubsidiaryMaterialCategory(basicProductCreateModel: BasicProductCreateModel): SubsidiaryMaterialCategory? {
         return (basicProductCreateModel.subsidiaryMaterialCategory)?.let {
-            subsidiaryMaterialCategoryFinder.getSubsidiaryMaterialCategoryByKeyName(it.level1!!, it.level2!!)
+            subsidiaryMaterialCategoryFinder.getSubsidiaryMaterialCategoryByKeyName(
+                it.level1!!,
+                it.level2!!
+            )
         }
     }
 

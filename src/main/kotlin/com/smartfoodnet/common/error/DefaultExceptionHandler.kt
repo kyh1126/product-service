@@ -168,7 +168,8 @@ class DefaultExceptionHandler {
         return ExceptionResponse(
             serviceCode = serviceCode,
             errorCode = ErrorCode.USER_BAD_REQUEST_DEFAULT.code,
-            errorMessage = ex.cause?.cause?.message ?: ErrorCode.USER_BAD_REQUEST_DEFAULT.errorMessage
+            errorMessage = ex.cause?.cause?.message
+                ?: ErrorCode.USER_BAD_REQUEST_DEFAULT.errorMessage
         )
     }
 

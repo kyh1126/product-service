@@ -6,7 +6,8 @@ import com.smartfoodnet.fnproduct.product.entity.QSubsidiaryMaterialCategory.sub
 import com.smartfoodnet.fnproduct.product.entity.SubsidiaryMaterialCategory
 
 class SubsidiaryMaterialCategoryRepositoryImpl
-    : Querydsl4RepositorySupport(SubsidiaryMaterialCategory::class.java), SubsidiaryMaterialCategoryCustom {
+    : Querydsl4RepositorySupport(SubsidiaryMaterialCategory::class.java),
+    SubsidiaryMaterialCategoryCustom {
 
     override fun findByLevel1CategoryAndLevel2Category(
         level1CategoryId: Long?,

@@ -7,52 +7,52 @@ import io.swagger.annotations.ApiModelProperty
 
 data class OutWarehouseModel(
     @ApiModelProperty(value = "출고처 고유 ID")
-    var id : Long? = null,
+    var id: Long? = null,
 
     @ApiModelProperty(value = "화주(고객사) ID")
-    var partnerId : Long?,
+    var partnerId: Long?,
 
     @ApiModelProperty(value = "출고처 이름")
-    var name : String?,
+    var name: String?,
 
     @ApiModelProperty(value = "우편번호")
-    var postNumber : String?,
+    var postNumber: String?,
 
     @ApiModelProperty(value = "주소")
-    var address : String?,
+    var address: String?,
 
     @ApiModelProperty(value = "주소 상세")
-    var addressDetail : String?,
+    var addressDetail: String?,
 
     @ApiModelProperty(value = "대표자 이름")
-    var representative : String?,
+    var representative: String?,
 
     @ApiModelProperty(value = "사업자 등록번호")
-    var businessNumber : String?,
+    var businessNumber: String?,
 
     @ApiModelProperty(value = "연락처")
-    var contactNumber : String?,
+    var contactNumber: String?,
 
     @ApiModelProperty(value = "하차방식")
-    var dropType : DropType?,
+    var dropType: DropType?,
 
     @ApiModelProperty(value = "검수방식")
-    var inspectionType : InspectionType?,
+    var inspectionType: InspectionType?,
 
     @ApiModelProperty(value = "대기여부")
-    var waitType : Boolean?,
+    var waitType: Boolean?,
 
     @ApiModelProperty(value = "담당자 이름")
-    var managerName : String?,
+    var managerName: String?,
 
     @ApiModelProperty(value = "담당자 연락처")
-    var managerContactNumber : String?,
+    var managerContactNumber: String?,
 
     @ApiModelProperty(value = "담당자 이메일")
-    var managerEmail : String?
-){
+    var managerEmail: String?
+) {
     companion object {
-        fun fromEntity(outWarehouse: OutWarehouse) : OutWarehouseModel {
+        fun fromEntity(outWarehouse: OutWarehouse): OutWarehouseModel {
             return outWarehouse.run {
                 OutWarehouseModel(
                     id,
