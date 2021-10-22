@@ -31,9 +31,25 @@ class BasicProductDetailCreateModelValidator(
             else -> Unit
         }
 
+        checkDuplicateName(basicProductModel, errors)
+
         checkBarcode(saveState, basicProductModel, errors)
 
         checkExpirationDate(basicProductModel, errors)
+    }
+
+    private fun checkDuplicateName(target: BasicProductCreateModel, errors: Errors) {
+        with(target) {
+            if (name == null || partnerId == null) return
+
+            basicProductRepository.findByPartnerIdAndName(partnerId, name)?.let {
+                errors.rejectValue(
+                    "basicProductModel.name",
+                    "barcode.duplicate",
+                    "사용중인 상품명이 있습니다. 기본상품코드: $code"
+                )
+            }
+        }
     }
 
     private fun checkBarcode(
@@ -107,9 +123,9 @@ class BasicProductDetailCreateModelValidator(
         val basicProductModel = target.basicProductModel
         val subsidiaryMaterialModels = target.subsidiaryMaterialModels
 
-        if (basicProductModel.type != BasicProductType.BASIC) return
-
         with(basicProductModel) {
+            if (type != BasicProductType.BASIC) return
+
             validateEmpty(errors, "basicProductModel.partnerId", "화주(고객사) ID", partnerId)
             validateEmpty(errors, "basicProductModel.name", "상품명", name)
             validateEmpty(errors, "basicProductModel.barcodeYn", "상품바코드기재여부", barcodeYn)
@@ -173,9 +189,9 @@ class BasicProductDetailCreateModelValidator(
     ) {
         val basicProductModel = target.basicProductModel
 
-        if (basicProductModel.type != BasicProductType.CUSTOM_SUB) return
-
         with(basicProductModel) {
+            if (type != BasicProductType.CUSTOM_SUB) return
+
             validateEmpty(errors, "basicProductModel.partnerId", "화주(고객사) ID", partnerId)
             validateEmpty(errors, "basicProductModel.name", "상품명", name)
             validateEmpty(errors, "basicProductModel.barcodeYn", "상품바코드기재여부", barcodeYn)

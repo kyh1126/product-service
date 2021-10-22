@@ -8,4 +8,5 @@ interface BasicProductRepository : JpaRepository<BasicProduct, Long>, BasicProdu
     QuerydslPredicateExecutor<BasicProduct> {
     fun findByCode(code: String): BasicProduct?
     fun findByPartnerIdAndBarcode(partnerId: Long, barcode: String): BasicProduct?
+    fun findByPartnerIdAndName(partnerId: Long, name: String): BasicProduct?
 }
