@@ -44,7 +44,7 @@ class BasicProductSearchCondition(
     var searchKeyword: String? = null
 
     override fun assemblePredicate(predicate: BooleanBuilder): Predicate {
-        return predicate.andAnyOf(
+        return predicate.orAllOf(
             eqPartnerId(partnerId),
             eqType(type),
             eqWarehouse(warehouseId),
