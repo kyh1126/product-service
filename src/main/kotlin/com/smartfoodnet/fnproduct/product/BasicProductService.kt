@@ -4,6 +4,7 @@ import com.smartfoodnet.common.error.SaveState
 import com.smartfoodnet.common.error.ValidatorUtils
 import com.smartfoodnet.common.error.exception.BaseRuntimeException
 import com.smartfoodnet.common.error.exception.ErrorCode
+import com.smartfoodnet.common.model.request.PredicateSearchCondition
 import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.fnproduct.product.entity.*
 import com.smartfoodnet.fnproduct.product.mapper.BasicProductCategoryFinder
@@ -11,7 +12,6 @@ import com.smartfoodnet.fnproduct.product.mapper.BasicProductCodeGenerator
 import com.smartfoodnet.fnproduct.product.mapper.SubsidiaryMaterialCategoryFinder
 import com.smartfoodnet.fnproduct.product.model.request.BasicProductCreateModel
 import com.smartfoodnet.fnproduct.product.model.request.BasicProductDetailCreateModel
-import com.smartfoodnet.fnproduct.product.model.request.BasicProductSearchCondition
 import com.smartfoodnet.fnproduct.product.model.request.SubsidiaryMaterialCreateModel
 import com.smartfoodnet.fnproduct.product.model.response.BasicProductDetailModel
 import com.smartfoodnet.fnproduct.product.model.response.BasicProductModel
@@ -33,7 +33,7 @@ class BasicProductService(
 ) {
 
     fun getBasicProducts(
-        condition: BasicProductSearchCondition,
+        condition: PredicateSearchCondition,
         page: Pageable
     ): PageResponse<BasicProductModel> {
         return basicProductRepository.findAll(condition.toPredicate(), page)
