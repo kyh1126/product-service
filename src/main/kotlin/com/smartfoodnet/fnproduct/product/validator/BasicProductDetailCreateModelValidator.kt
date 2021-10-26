@@ -62,7 +62,7 @@ class BasicProductDetailCreateModelValidator(
         with(target) {
             if (barcodeYn.isNotEmpty() && barcodeYn == "Y") {
                 validateEmpty(errors, "basicProductModel.barcode", "상품바코드", barcode)
-                validateEmpty(errors, "basicProductModel.partnerId", "화주(고객사) ID", partnerId)
+                validateNull(errors, "basicProductModel.partnerId", "화주(고객사) ID", partnerId)
 
                 if (barcode == null || partnerId == null) return
 
@@ -126,7 +126,7 @@ class BasicProductDetailCreateModelValidator(
         with(basicProductModel) {
             if (type != BasicProductType.BASIC) return
 
-            validateEmpty(errors, "basicProductModel.partnerId", "화주(고객사) ID", partnerId)
+            validateNull(errors, "basicProductModel.partnerId", "화주(고객사) ID", partnerId)
             validateEmpty(errors, "basicProductModel.name", "상품명", name)
             validateEmpty(errors, "basicProductModel.barcodeYn", "상품바코드기재여부", barcodeYn)
             validateEmpty(
@@ -192,7 +192,7 @@ class BasicProductDetailCreateModelValidator(
         with(basicProductModel) {
             if (type != BasicProductType.CUSTOM_SUB) return
 
-            validateEmpty(errors, "basicProductModel.partnerId", "화주(고객사) ID", partnerId)
+            validateNull(errors, "basicProductModel.partnerId", "화주(고객사) ID", partnerId)
             validateEmpty(errors, "basicProductModel.name", "상품명", name)
             validateEmpty(errors, "basicProductModel.barcodeYn", "상품바코드기재여부", barcodeYn)
             validateEmpty(errors, "basicProductModel.piecesPerBox", "박스입수", piecesPerBox)

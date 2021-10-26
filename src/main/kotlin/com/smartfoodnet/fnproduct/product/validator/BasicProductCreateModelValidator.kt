@@ -18,12 +18,8 @@ class BasicProductCreateModelValidator : CreateModelValidator<BasicProductCreate
 
     private fun checkRequiredFields(target: BasicProductCreateModel, errors: Errors) {
         when (target.type) {
-            BasicProductType.SUB, BasicProductType.CUSTOM_SUB -> validateNull(
-                errors,
-                "id",
-                "id",
-                target.id
-            )
+            BasicProductType.SUB, BasicProductType.CUSTOM_SUB ->
+                validateNull(errors, "id", "id", target.id)
             else -> Unit
         }
     }
