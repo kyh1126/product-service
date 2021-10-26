@@ -1,6 +1,7 @@
 package com.smartfoodnet.fnproduct.product
 
 import com.smartfoodnet.common.model.response.PageResponse
+import com.smartfoodnet.fnproduct.product.model.request.PackageProductDetailCreateModel
 import com.smartfoodnet.fnproduct.product.model.request.PackageProductSearchCondition
 import com.smartfoodnet.fnproduct.product.model.response.PackageProductDetailModel
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
@@ -10,6 +11,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.web.PageableDefault
 import org.springframework.web.bind.annotation.*
+import javax.validation.Valid
 
 @RestController
 @RequestMapping("package-products")
@@ -31,4 +33,9 @@ class PackageProductController(private val packageProductService: PackageProduct
         return packageProductService.getPackageProducts(condition, page)
     }
 
+    @Operation(summary = "모음상품 추가")
+    @PostMapping
+    fun createBasicProduct(@Valid @RequestBody packageProductDetailCreateModel: PackageProductDetailCreateModel): PackageProductDetailModel {
+        return packageProductService.createPackageProduct(packageProductDetailCreateModel)
+    }
 }
