@@ -75,6 +75,9 @@ class BasicProduct(
     @OneToMany(mappedBy = "basicProduct", cascade = [CascadeType.PERSIST])
     var subsidiaryMaterials: MutableSet<SubsidiaryMaterial> = LinkedHashSet(),
 
+    @OneToMany(mappedBy = "basicProduct", cascade = [CascadeType.PERSIST])
+    var packageProducts: MutableSet<PackageProduct> = LinkedHashSet(),
+
     @Column(name = "active_yn")
     var activeYn: String = "N",
 ) : BaseEntity() {
@@ -86,6 +89,11 @@ class BasicProduct(
     fun addSubsidiaryMaterials(subsidiaryMaterial: SubsidiaryMaterial) {
         subsidiaryMaterials.add(subsidiaryMaterial)
         subsidiaryMaterial.basicProduct = this
+    }
+
+    fun addPackageProducts(packageProduct: PackageProduct) {
+        packageProducts.add(packageProduct)
+        packageProduct.basicProduct = this
     }
 
     fun update(

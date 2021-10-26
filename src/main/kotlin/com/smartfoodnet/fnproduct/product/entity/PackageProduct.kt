@@ -12,14 +12,14 @@ class PackageProduct(
     var id: Long? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "package_product_id", columnDefinition = "BIGINT UNSIGNED")
-    @JsonIgnore
-    var packageProduct: BasicProduct? = null,
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "basic_product_id", columnDefinition = "BIGINT UNSIGNED")
     @JsonIgnore
-    var basicProduct: BasicProduct,
+    var basicProduct: BasicProduct? = null,
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "package_product_id", columnDefinition = "BIGINT UNSIGNED")
+    @JsonIgnore
+    var packageProduct: BasicProduct,
 
     @Column(name = "quantity")
     var quantity: Int,
