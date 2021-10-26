@@ -49,7 +49,7 @@ class BasicProduct(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "warehouse_id", columnDefinition = "BIGINT UNSIGNED")
-    var warehouse: Warehouse,
+    var warehouse: Warehouse? = null,
 
     @Column(name = "supply_price")
     var supplyPrice: Int? = null,
