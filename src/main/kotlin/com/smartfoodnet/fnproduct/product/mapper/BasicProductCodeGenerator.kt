@@ -3,6 +3,7 @@ package com.smartfoodnet.fnproduct.product.mapper
 import com.smartfoodnet.fnproduct.partner.PartnerService
 import com.smartfoodnet.fnproduct.product.BasicProductRepository
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
+import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
@@ -22,10 +23,14 @@ class BasicProductCodeGenerator(
     fun getBasicProductCode(
         partnerId: Long?,
         type: BasicProductType,
-        temperatureCode: String?,
+        handlingTemperature: HandlingTemperatureType?,
     ): String? {
-        if (partnerId == null || temperatureCode == null || validateNotAvailableType(type)) return null
+        if (partnerId == null || handlingTemperature == null) return null
+        if (validateNotAvailableType(type)
+            || validateNotAvailableTemperatureType(type, handlingTemperature)
+        ) return null
 
+        val temperatureCode = handlingTemperature.code
         val customerNumber = partnerService.getPartner(partnerId).customerNumber
         // 00001 부터 시작
         val totalProductCount =
@@ -35,7 +40,12 @@ class BasicProductCodeGenerator(
         return customerNumber + type.code + temperatureCode + totalProductCount
     }
 
-    private fun validateNotAvailableType(type: BasicProductType?): Boolean {
+    private fun validateNotAvailableType(type: BasicProductType): Boolean {
         return type !in basicProductCodeTypes
     }
+
+    private fun validateNotAvailableTemperatureType(
+        type: BasicProductType,
+        handlingTemperature: HandlingTemperatureType
+    ) = type != BasicProductType.PACKAGE && handlingTemperature == HandlingTemperatureType.MIX
 }

@@ -33,8 +33,8 @@ data class BasicProductSimpleCreateModel(
     val barcode: String? = null,
 
     @ApiModelProperty(
-        value = "취급온도 (ROOM:상온/REFRIGERATE:냉장/FREEZE:냉동)",
-        allowableValues = "ROOM,REFRIGERATE,FREEZE"
+        value = "취급온도 (ROOM:상온/REFRIGERATE:냉장/FREEZE:냉동/MIX:혼합)",
+        allowableValues = "ROOM,REFRIGERATE,FREEZE,MIX"
     )
     val handlingTemperature: HandlingTemperatureType? = null,
 

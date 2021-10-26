@@ -84,11 +84,7 @@ class BasicProductService(
         val basicProductCreateModel = createModel.basicProductModel
         // 상품코드 채번
         val basicProductCode = with(basicProductCreateModel) {
-            basicProductCodeGenerator.getBasicProductCode(
-                partnerId,
-                type,
-                handlingTemperature?.code
-            )
+            basicProductCodeGenerator.getBasicProductCode(partnerId, type, handlingTemperature)
         }
         // 기본상품 카테고리 조회
         val basicProductCategory = getBasicProductCategory(basicProductCreateModel)

@@ -41,11 +41,7 @@ class PackageProductService(
         val basicProductModel = createModel.basicProductModel
         // 상품코드 채번
         val basicProductCode = with(basicProductModel) {
-            basicProductCodeGenerator.getBasicProductCode(
-                partnerId,
-                type,
-                handlingTemperature?.code
-            )
+            basicProductCodeGenerator.getBasicProductCode(partnerId, type, handlingTemperature)
         }
         // 기본상품-모음상품 매핑을 위한 모음상품(BasicProduct) 조회
         val packageProductById = getPackageProductById(createModel)

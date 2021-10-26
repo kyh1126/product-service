@@ -6,6 +6,7 @@ import com.smartfoodnet.fnproduct.product.BasicProductRepository
 import com.smartfoodnet.fnproduct.product.model.request.BasicProductCreateModel
 import com.smartfoodnet.fnproduct.product.model.request.BasicProductDetailCreateModel
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
+import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.validation.Errors
@@ -36,6 +37,8 @@ class BasicProductDetailCreateModelValidator(
         checkBarcode(saveState, basicProductModel, errors)
 
         checkExpirationDate(basicProductModel, errors)
+
+        checkTemperatureType(basicProductModel, errors)
     }
 
     private fun checkDuplicateName(target: BasicProductCreateModel, errors: Errors) {
@@ -111,6 +114,16 @@ class BasicProductDetailCreateModelValidator(
                         )
                     }
                 }
+            }
+        }
+    }
+
+    private fun checkTemperatureType(target: BasicProductCreateModel, errors: Errors) {
+        with(target) {
+            if (handlingTemperature == null) return
+
+            if (type != BasicProductType.PACKAGE && handlingTemperature == HandlingTemperatureType.MIX) {
+                errors.reject("basicProductModel", "취급온도-혼합은 모음상품 구분만 선택 가능합니다.")
             }
         }
     }

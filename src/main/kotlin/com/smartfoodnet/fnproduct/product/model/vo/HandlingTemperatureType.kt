@@ -6,7 +6,8 @@ import javax.persistence.Converter
 enum class HandlingTemperatureType(val desc: String, val code: String) {
     ROOM("상온", "A"),
     REFRIGERATE("냉장", "C"),
-    FREEZE("냉동", "B");
+    FREEZE("냉동", "B"),
+    MIX("혼합", "D");
 
     companion object {
         fun fromName(name: String?): HandlingTemperatureType? {
