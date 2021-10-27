@@ -160,7 +160,7 @@ internal class BasicProductServiceTest(
             // ExpirationDateInfo 저장
             val expirationDateInfo: ExpirationDateInfo? =
                 ReflectionTestUtils.invokeMethod(
-                    BasicProductService::class.java,
+                    basicProductService,
                     "createOrUpdateExpirationDateInfo",
                     basicProductCreateModel,
                     null
@@ -168,10 +168,10 @@ internal class BasicProductServiceTest(
             // 기본상품-부자재 매핑 저장
             val subsidiaryMaterialMappings: Set<SubsidiaryMaterialMapping>? =
                 ReflectionTestUtils.invokeMethod(
-                    BasicProductService::class.java,
+                    basicProductService,
                     "createOrUpdateSubsidiaryMaterialMappings",
                     mockCreateModel.subsidiaryMaterialMappingModels,
-                    null,
+                    emptyMap<Long?, SubsidiaryMaterialMapping>(),
                     subsidiaryMaterialById
                 )
 
@@ -241,7 +241,7 @@ internal class BasicProductServiceTest(
             // ExpirationDateInfo 저장
             val expirationDateInfo: ExpirationDateInfo? =
                 ReflectionTestUtils.invokeMethod(
-                    BasicProductService::class.java,
+                    basicProductService,
                     "createOrUpdateExpirationDateInfo",
                     basicProductCreateModel,
                     basicProduct.expirationDateInfo
@@ -251,7 +251,7 @@ internal class BasicProductServiceTest(
             val entityById = basicProduct.subsidiaryMaterialMappings.associateBy { it.id }
             val subsidiaryMaterialMappings: Set<SubsidiaryMaterialMapping>? =
                 ReflectionTestUtils.invokeMethod(
-                    BasicProductService::class.java,
+                    basicProductService,
                     "createOrUpdateSubsidiaryMaterialMappings",
                     mockUpdateModel.subsidiaryMaterialMappingModels,
                     entityById,
