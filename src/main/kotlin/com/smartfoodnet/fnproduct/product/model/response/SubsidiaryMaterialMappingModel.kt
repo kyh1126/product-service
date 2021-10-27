@@ -1,10 +1,10 @@
 package com.smartfoodnet.fnproduct.product.model.response
 
-import com.smartfoodnet.fnproduct.product.entity.SubsidiaryMaterial
+import com.smartfoodnet.fnproduct.product.entity.SubsidiaryMaterialMapping
 import com.smartfoodnet.fnproduct.product.model.vo.SeasonalOption
 import io.swagger.annotations.ApiModelProperty
 
-data class SubsidiaryMaterialModel(
+data class SubsidiaryMaterialMappingModel(
     @ApiModelProperty(value = "id")
     var id: Long? = null,
 
@@ -23,11 +23,11 @@ data class SubsidiaryMaterialModel(
 
     companion object {
         fun fromEntity(
-            subsidiaryMaterial: SubsidiaryMaterial,
+            subsidiaryMaterialMapping: SubsidiaryMaterialMapping,
             basicProductSub: BasicProductModel,
-        ): SubsidiaryMaterialModel {
-            return subsidiaryMaterial.run {
-                SubsidiaryMaterialModel(
+        ): SubsidiaryMaterialMappingModel {
+            return subsidiaryMaterialMapping.run {
+                SubsidiaryMaterialMappingModel(
                     id = id,
                     basicProductId = basicProduct!!.id!!,
                     subsidiaryMaterial = basicProductSub,

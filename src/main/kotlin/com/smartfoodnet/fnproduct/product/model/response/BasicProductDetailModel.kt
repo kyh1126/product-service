@@ -8,8 +8,8 @@ data class BasicProductDetailModel(
     @JsonUnwrapped
     var basicProductModel: BasicProductModel,
 
-    @ApiModelProperty(value = "부자재(매핑)정보")
-    var subsidiaryMaterialModels: MutableList<SubsidiaryMaterialModel> = mutableListOf(),
+    @ApiModelProperty(value = "부자재매핑정보")
+    var subsidiaryMaterialMappingModels: MutableList<SubsidiaryMaterialMappingModel> = mutableListOf(),
 ) {
 
     companion object {
@@ -20,10 +20,10 @@ data class BasicProductDetailModel(
             return basicProduct.run {
                 BasicProductDetailModel(
                     basicProductModel = BasicProductModel.fromEntity(this),
-                    subsidiaryMaterialModels = subsidiaryMaterials.map {
+                    subsidiaryMaterialMappingModels = subsidiaryMaterialMappings.map {
                         val basicProductSub =
                             BasicProductModel.fromEntity(subsidiaryMaterialById[it.subsidiaryMaterial.id]!!)
-                        SubsidiaryMaterialModel.fromEntity(it, basicProductSub)
+                        SubsidiaryMaterialMappingModel.fromEntity(it, basicProductSub)
                     }.toMutableList()
                 )
             }

@@ -8,8 +8,8 @@ import javax.validation.constraints.NotNull
 
 data class BasicProductDetailCreateModel(
     @Valid
-    @ApiModelProperty(value = "부자재(매핑)정보")
-    val subsidiaryMaterialModels: MutableList<SubsidiaryMaterialCreateModel> = mutableListOf(),
+    @ApiModelProperty(value = "부자재매핑정보")
+    val subsidiaryMaterialMappingModels: MutableList<SubsidiaryMaterialMappingCreateModel> = mutableListOf(),
 ) {
     @NotNull
     @Valid
@@ -21,7 +21,7 @@ data class BasicProductDetailCreateModel(
         basicProductCategory: BasicProductCategory? = null,
         subsidiaryMaterialCategory: SubsidiaryMaterialCategory? = null,
         expirationDateInfo: ExpirationDateInfo? = null,
-        subsidiaryMaterials: Set<SubsidiaryMaterial> = setOf(),
+        subsidiaryMaterialMappings: Set<SubsidiaryMaterialMapping> = setOf(),
         warehouse: Warehouse,
     ): BasicProduct {
         val basicProduct = basicProductModel.toEntity(
@@ -31,6 +31,6 @@ data class BasicProductDetailCreateModel(
             expirationDateInfo,
             warehouse
         )
-        return basicProduct.apply { subsidiaryMaterials.forEach(this::addSubsidiaryMaterials) }
+        return basicProduct.apply { subsidiaryMaterialMappings.forEach(this::addSubsidiaryMaterialMappings) }
     }
 }

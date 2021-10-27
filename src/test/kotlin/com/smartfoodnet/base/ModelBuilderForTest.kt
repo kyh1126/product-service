@@ -36,12 +36,12 @@ fun buildSubsidiaryMaterialCategoryCreateModel(
     quantityApplyYn = quantityApplyYn
 )
 
-fun buildSubsidiaryMaterialCreateModel(
+fun buildSubsidiaryMaterialMappingCreateModel(
     basicProductId: Long? = null,
     subsidiaryMaterial: BasicProductCreateModel = buildBasicProductSubCreateModel(),
     seasonalOption: SeasonalOption = SeasonalOption.ALL,
     quantity: Int = 1,
-) = SubsidiaryMaterialCreateModel(
+) = SubsidiaryMaterialMappingCreateModel(
     basicProductId = basicProductId,
     subsidiaryMaterial = subsidiaryMaterial,
     seasonalOption = seasonalOption,
@@ -60,9 +60,9 @@ fun buildWarehouseCreateModel(
 
 fun buildBasicProductDetailCreateModel(
     basicProductModel: BasicProductCreateModel = buildBasicProductCreateModel(),
-    subsidiaryMaterialModels: MutableList<SubsidiaryMaterialCreateModel> = mutableListOf(),
+    subsidiaryMaterialMappingModels: MutableList<SubsidiaryMaterialMappingCreateModel> = mutableListOf(),
 ): BasicProductDetailCreateModel {
-    return BasicProductDetailCreateModel(subsidiaryMaterialModels = subsidiaryMaterialModels)
+    return BasicProductDetailCreateModel(subsidiaryMaterialMappingModels = subsidiaryMaterialMappingModels)
         .apply { this.basicProductModel = basicProductModel }
 }
 

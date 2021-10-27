@@ -1,8 +1,6 @@
 package com.smartfoodnet.fnproduct.product
 
 import com.smartfoodnet.base.*
-import com.smartfoodnet.common.error.exception.BaseRuntimeException
-import com.smartfoodnet.common.error.exception.ErrorCode
 import com.smartfoodnet.fnproduct.code.CodeService
 import com.smartfoodnet.fnproduct.product.entity.*
 import com.smartfoodnet.fnproduct.product.mapper.BasicProductCategoryFinder
@@ -10,7 +8,6 @@ import com.smartfoodnet.fnproduct.product.mapper.BasicProductCodeGenerator
 import com.smartfoodnet.fnproduct.product.mapper.SubsidiaryMaterialCategoryFinder
 import com.smartfoodnet.fnproduct.product.model.request.BasicProductCreateModel
 import com.smartfoodnet.fnproduct.product.model.request.BasicProductDetailCreateModel
-import com.smartfoodnet.fnproduct.product.model.request.SubsidiaryMaterialCreateModel
 import com.smartfoodnet.fnproduct.product.model.response.BasicProductDetailModel
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
@@ -26,6 +23,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestConstructor
+import org.springframework.test.util.ReflectionTestUtils
 import java.util.*
 import kotlin.random.Random
 
@@ -130,8 +128,8 @@ internal class BasicProductServiceTest(
             given(basicProductRepository.findAllById(listOf(firstSubBasicProduct.id)))
                 .willReturn(listOf(firstSubBasicProduct))
 
-            val buildSubsidiaryMaterialCreateModel =
-                buildSubsidiaryMaterialCreateModel(
+            val buildSubsidiaryMaterialMappingCreateModel =
+                buildSubsidiaryMaterialMappingCreateModel(
                     subsidiaryMaterial = buildBasicProductSubCreateModel(
                         id = firstSubBasicProduct.id
                     )
@@ -143,7 +141,7 @@ internal class BasicProductServiceTest(
                     partnerId = partner.id,
                     handlingTemperature = HandlingTemperatureType.FREEZE,
                 )
-            ).apply { subsidiaryMaterialModels.add(buildSubsidiaryMaterialCreateModel) }
+            ).apply { subsidiaryMaterialMappingModels.add(buildSubsidiaryMaterialMappingCreateModel) }
 
             // 저장 가능한 Entity 로 변환
             val basicProductCreateModel = mockCreateModel.basicProductModel
@@ -160,19 +158,29 @@ internal class BasicProductServiceTest(
             val subsidiaryMaterialById = getSubsidiaryMaterialById(mockCreateModel)
 
             // ExpirationDateInfo 저장
-            val expirationDateInfo = createOrUpdateExpirationDateInfo(basicProductCreateModel)
+            val expirationDateInfo: ExpirationDateInfo? =
+                ReflectionTestUtils.invokeMethod(
+                    BasicProductService::class.java,
+                    "createOrUpdateExpirationDateInfo",
+                    basicProductCreateModel,
+                    null
+                )
             // 기본상품-부자재 매핑 저장
-            val subsidiaryMaterials = createOrUpdateSubsidiaryMaterials(
-                subsidiaryMaterialModels = mockCreateModel.subsidiaryMaterialModels,
-                subsidiaryMaterialById = subsidiaryMaterialById
-            )
+            val subsidiaryMaterialMappings: Set<SubsidiaryMaterialMapping>? =
+                ReflectionTestUtils.invokeMethod(
+                    BasicProductService::class.java,
+                    "createOrUpdateSubsidiaryMaterialMappings",
+                    mockCreateModel.subsidiaryMaterialMappingModels,
+                    null,
+                    subsidiaryMaterialById
+                )
 
             val mockBasicProduct = mockCreateModel.toEntity(
                 code = basicProductCode,
                 basicProductCategory = basicProductCategory,
                 subsidiaryMaterialCategory = subsidiaryMaterialCategory,
                 expirationDateInfo = expirationDateInfo,
-                subsidiaryMaterials = subsidiaryMaterials,
+                subsidiaryMaterialMappings = subsidiaryMaterialMappings!!,
                 warehouse = warehouse
             ).apply { id = productId }
             given(basicProductRepository.save(any())).willReturn(mockBasicProduct)
@@ -205,8 +213,8 @@ internal class BasicProductServiceTest(
             given(basicProductRepository.findAllById(listOf(secondSubBasicProduct.id)))
                 .willReturn(listOf(secondSubBasicProduct))
 
-            val buildSubsidiaryMaterialCreateModel =
-                buildSubsidiaryMaterialCreateModel(
+            val buildSubsidiaryMaterialMappingCreateModel =
+                buildSubsidiaryMaterialMappingCreateModel(
                     subsidiaryMaterial = buildBasicProductSubCreateModel(
                         id = secondSubBasicProduct.id
                     )
@@ -218,7 +226,7 @@ internal class BasicProductServiceTest(
                     partnerId = partner.id,
                     handlingTemperature = HandlingTemperatureType.FREEZE,
                 )
-            ).apply { subsidiaryMaterialModels.add(buildSubsidiaryMaterialCreateModel) }
+            ).apply { subsidiaryMaterialMappingModels.add(buildSubsidiaryMaterialMappingCreateModel) }
 
             // 저장 가능한 Entity 로 변환
             val basicProductCreateModel = mockUpdateModel.basicProductModel
@@ -228,20 +236,34 @@ internal class BasicProductServiceTest(
             val warehouse = getWarehouse(basicProductCreateModel)
             val subsidiaryMaterialById = getSubsidiaryMaterialById(mockUpdateModel)
 
+            val basicProduct = basicProductRepository.findById(productId).get()
+
             // ExpirationDateInfo 저장
-            val expirationDateInfo = createOrUpdateExpirationDateInfo(basicProductCreateModel)
+            val expirationDateInfo: ExpirationDateInfo? =
+                ReflectionTestUtils.invokeMethod(
+                    BasicProductService::class.java,
+                    "createOrUpdateExpirationDateInfo",
+                    basicProductCreateModel,
+                    basicProduct.expirationDateInfo
+                )
+
             // 기본상품-부자재 매핑 저장
-            val subsidiaryMaterials = createOrUpdateSubsidiaryMaterials(
-                subsidiaryMaterialModels = mockUpdateModel.subsidiaryMaterialModels,
-                subsidiaryMaterialById = subsidiaryMaterialById
-            )
+            val entityById = basicProduct.subsidiaryMaterialMappings.associateBy { it.id }
+            val subsidiaryMaterialMappings: Set<SubsidiaryMaterialMapping>? =
+                ReflectionTestUtils.invokeMethod(
+                    BasicProductService::class.java,
+                    "createOrUpdateSubsidiaryMaterialMappings",
+                    mockUpdateModel.subsidiaryMaterialMappingModels,
+                    entityById,
+                    subsidiaryMaterialById
+                )
 
             val mockBasicProduct = mockUpdateModel.toEntity(
                 code = basicProductCode,
                 basicProductCategory = basicProductCategory,
                 subsidiaryMaterialCategory = subsidiaryMaterialCategory,
                 expirationDateInfo = expirationDateInfo,
-                subsidiaryMaterials = subsidiaryMaterials,
+                subsidiaryMaterialMappings = subsidiaryMaterialMappings!!,
                 warehouse = warehouse
             ).apply { id = productId }
 
@@ -277,7 +299,7 @@ internal class BasicProductServiceTest(
         warehouseService.getWarehouse(basicProductCreateModel.warehouse.id!!)
 
     private fun getSubsidiaryMaterialById(createModel: BasicProductDetailCreateModel) =
-        basicProductService.getBasicProducts(createModel.subsidiaryMaterialModels.map { it.subsidiaryMaterial.id!! })
+        basicProductService.getBasicProducts(createModel.subsidiaryMaterialMappingModels.map { it.subsidiaryMaterial.id!! })
             .associateBy { it.id }
 
     private fun createOrUpdateExpirationDateInfo(
@@ -291,28 +313,5 @@ internal class BasicProductServiceTest(
                 entity
             }
         }
-    }
-
-    private fun createOrUpdateSubsidiaryMaterials(
-        subsidiaryMaterialModels: List<SubsidiaryMaterialCreateModel>,
-        entityById: Map<Long?, SubsidiaryMaterial> = emptyMap(),
-        subsidiaryMaterialById: Map<Long?, BasicProduct>,
-    ): Set<SubsidiaryMaterial> {
-        val subsidiaryMaterials = subsidiaryMaterialModels.map {
-            val basicProductSub = subsidiaryMaterialById[it.subsidiaryMaterial.id]
-                ?: throw BaseRuntimeException(errorCode = ErrorCode.NO_ELEMENT)
-            if (it.id == null) it.toEntity(basicProductSub)
-            else {
-                val entity = entityById[it.id]
-                entity!!.update(it, basicProductSub)
-                entity
-            }
-        }.run { LinkedHashSet(this) }
-
-        // 연관관계 끊긴 entity 삭제처리
-        entityById.values.toSet().minus(subsidiaryMaterials)
-            .forEach(SubsidiaryMaterial::delete)
-
-        return subsidiaryMaterials
     }
 }

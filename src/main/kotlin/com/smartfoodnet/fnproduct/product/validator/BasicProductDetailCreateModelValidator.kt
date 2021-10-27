@@ -134,7 +134,7 @@ class BasicProductDetailCreateModelValidator(
         errors: Errors,
     ) {
         val basicProductModel = target.basicProductModel
-        val subsidiaryMaterialModels = target.subsidiaryMaterialModels
+        val subsidiaryMaterialMappingModels = target.subsidiaryMaterialMappingModels
 
         with(basicProductModel) {
             if (type != BasicProductType.BASIC) return
@@ -184,13 +184,18 @@ class BasicProductDetailCreateModelValidator(
             )
         }
 
-        validateEmpty(errors, "subsidiaryMaterialModels", "부자재(매핑)정보", subsidiaryMaterialModels)
-        if (subsidiaryMaterialModels.isNotEmpty()) {
+        validateEmpty(
+            errors,
+            "subsidiaryMaterialMappingModels",
+            "부자재매핑정보",
+            subsidiaryMaterialMappingModels
+        )
+        if (subsidiaryMaterialMappingModels.isNotEmpty()) {
             validateCollection(
                 saveState,
                 errors,
-                "subsidiaryMaterialModels",
-                subsidiaryMaterialModels.map { it.subsidiaryMaterial },
+                "subsidiaryMaterialMappingModels",
+                subsidiaryMaterialMappingModels.map { it.subsidiaryMaterial },
                 basicProductCreateModelValidator
             )
         }

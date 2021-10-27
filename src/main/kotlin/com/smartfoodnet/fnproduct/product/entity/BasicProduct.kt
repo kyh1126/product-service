@@ -73,7 +73,7 @@ class BasicProduct(
     var expirationDateInfo: ExpirationDateInfo? = null,
 
     @OneToMany(mappedBy = "basicProduct", cascade = [CascadeType.PERSIST])
-    var subsidiaryMaterials: MutableSet<SubsidiaryMaterial> = LinkedHashSet(),
+    var subsidiaryMaterialMappings: MutableSet<SubsidiaryMaterialMapping> = LinkedHashSet(),
 
     @OneToMany(mappedBy = "packageProduct", cascade = [CascadeType.PERSIST])
     var packageProducts: MutableSet<PackageProduct> = LinkedHashSet(),
@@ -86,9 +86,9 @@ class BasicProduct(
         expirationDateInfoRequest.basicProduct = this
     }
 
-    fun addSubsidiaryMaterials(subsidiaryMaterial: SubsidiaryMaterial) {
-        subsidiaryMaterials.add(subsidiaryMaterial)
-        subsidiaryMaterial.basicProduct = this
+    fun addSubsidiaryMaterialMappings(subsidiaryMaterialMapping: SubsidiaryMaterialMapping) {
+        subsidiaryMaterialMappings.add(subsidiaryMaterialMapping)
+        subsidiaryMaterialMapping.basicProduct = this
     }
 
     fun addPackageProducts(packageProduct: PackageProduct) {
@@ -101,7 +101,7 @@ class BasicProduct(
         basicProductCategoryRequest: BasicProductCategory?,
         subsidiaryMaterialCategoryRequest: SubsidiaryMaterialCategory?,
         expirationDateInfoRequest: ExpirationDateInfo?,
-        subsidiaryMaterialRequests: Set<SubsidiaryMaterial>,
+        subsidiaryMaterialMappingRequests: Set<SubsidiaryMaterialMapping>,
         warehouseRequest: Warehouse,
     ) {
         name = request.name
@@ -121,7 +121,7 @@ class BasicProduct(
         expirationDateInfo = null
         expirationDateInfoRequest?.let { addExpirationDateInfo(it) }
 
-        subsidiaryMaterials.clear()
-        subsidiaryMaterialRequests.forEach { addSubsidiaryMaterials(it) }
+        subsidiaryMaterialMappings.clear()
+        subsidiaryMaterialMappingRequests.forEach { addSubsidiaryMaterialMappings(it) }
     }
 }

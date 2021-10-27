@@ -2,7 +2,7 @@ package com.smartfoodnet.fnproduct.product.entity
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.smartfoodnet.common.entity.BaseEntity
-import com.smartfoodnet.fnproduct.product.model.request.SubsidiaryMaterialCreateModel
+import com.smartfoodnet.fnproduct.product.model.request.SubsidiaryMaterialMappingCreateModel
 import com.smartfoodnet.fnproduct.product.model.vo.SeasonalOption
 import com.smartfoodnet.fnproduct.product.model.vo.SeasonalOptionConverter
 import org.hibernate.annotations.Where
@@ -10,9 +10,9 @@ import java.time.LocalDateTime
 import javax.persistence.*
 
 @Entity
-@Table(name = "subsidiary_material")
+@Table(name = "subsidiary_material_mapping")
 @Where(clause = "deleted_at is NULL")
-class SubsidiaryMaterial(
+class SubsidiaryMaterialMapping(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", columnDefinition = "BIGINT UNSIGNED")
@@ -35,7 +35,7 @@ class SubsidiaryMaterial(
     @Column(name = "quantity")
     var quantity: Int,
 ) : BaseEntity() {
-    fun update(request: SubsidiaryMaterialCreateModel, basicProductSub: BasicProduct) {
+    fun update(request: SubsidiaryMaterialMappingCreateModel, basicProductSub: BasicProduct) {
         subsidiaryMaterial = basicProductSub
         seasonalOption = request.seasonalOption
         quantity = request.quantity

@@ -1,12 +1,12 @@
 package com.smartfoodnet.fnproduct.product.model.request
 
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
-import com.smartfoodnet.fnproduct.product.entity.SubsidiaryMaterial
+import com.smartfoodnet.fnproduct.product.entity.SubsidiaryMaterialMapping
 import com.smartfoodnet.fnproduct.product.model.vo.SeasonalOption
 import io.swagger.annotations.ApiModelProperty
 import javax.validation.constraints.NotNull
 
-data class SubsidiaryMaterialCreateModel(
+data class SubsidiaryMaterialMappingCreateModel(
     @ApiModelProperty(value = "id")
     val id: Long? = null,
 
@@ -25,8 +25,8 @@ data class SubsidiaryMaterialCreateModel(
     @ApiModelProperty(value = "수량")
     val quantity: Int,
 ) {
-    fun toEntity(subsidiaryMaterial: BasicProduct): SubsidiaryMaterial {
-        return SubsidiaryMaterial(
+    fun toEntity(subsidiaryMaterial: BasicProduct): SubsidiaryMaterialMapping {
+        return SubsidiaryMaterialMapping(
             subsidiaryMaterial = subsidiaryMaterial,
             seasonalOption = seasonalOption,
             quantity = quantity
