@@ -22,8 +22,8 @@ data class PackageProductModel(
             return packageProduct.run {
                 PackageProductModel(
                     id = id,
-                    basicProductId = basicProduct!!.id!!,
-                    packageProduct = BasicProductSimpleModel.fromEntity(this.packageProduct),
+                    basicProductId = this.packageProduct!!.id!!,
+                    packageProduct = BasicProductSimpleModel.fromEntity(this.selectedBasicProduct),
                     quantity = quantity,
                 )
             }

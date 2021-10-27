@@ -22,7 +22,7 @@ data class PackageProductCreateModel(
 ) {
     fun toEntity(packageProduct: BasicProduct): PackageProduct {
         return PackageProduct(
-            packageProduct = packageProduct,
+            selectedBasicProduct = packageProduct,
             quantity = quantity,
         )
     }

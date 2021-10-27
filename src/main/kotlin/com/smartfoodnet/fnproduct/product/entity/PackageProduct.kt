@@ -15,20 +15,19 @@ class PackageProduct(
     var id: Long? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "basic_product_id", columnDefinition = "BIGINT UNSIGNED")
-    @JsonIgnore
-    var basicProduct: BasicProduct? = null,
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "package_product_id", columnDefinition = "BIGINT UNSIGNED")
     @JsonIgnore
-    var packageProduct: BasicProduct,
+    var packageProduct: BasicProduct? = null,
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "basic_product_id", columnDefinition = "BIGINT UNSIGNED")
+    var selectedBasicProduct: BasicProduct,
 
     @Column(name = "quantity")
     var quantity: Int,
 ) : BaseEntity() {
     fun update(request: PackageProductCreateModel, basicProductPackage: BasicProduct) {
-        packageProduct = basicProductPackage
+        selectedBasicProduct = basicProductPackage
         quantity = request.quantity
     }
 
