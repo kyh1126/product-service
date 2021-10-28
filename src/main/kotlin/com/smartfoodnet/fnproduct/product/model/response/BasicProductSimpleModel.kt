@@ -25,7 +25,7 @@ data class BasicProductSimpleModel(
     var code: String? = null,
 
     @ApiModelProperty(value = "상품바코드기재여부")
-    var barcodeYn: String,
+    var barcodeYn: String? = null,
 
     @ApiModelProperty(value = "상품바코드")
     var barcode: String? = null,
