@@ -1,8 +1,6 @@
 package com.smartfoodnet.common.model.response
 
 import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 
 class PageResponse<T>(
@@ -13,7 +11,10 @@ class PageResponse<T>(
     companion object {
         fun <T> of(target: Page<T>): PageResponse<T> {
             return target.run {
-                PageResponse(content, Pagination(totalElements, isLast, pageable))
+                val pageRequest = with(pageable) {
+                    CustomPageRequest(number, size, sort)
+                }
+                PageResponse(content, Pagination(totalElements, isLast, pageRequest))
             }
         }
 
@@ -25,19 +26,19 @@ class PageResponse<T>(
             size: Int,
             sort: Sort = Sort.unsorted(),
         ): PageResponse<T> {
-            return of(contents, totalCount, PageRequest.of(page, size, sort))
+            return of(contents, totalCount, CustomPageRequest(page, size, sort))
         }
 
         fun <T> of(
             contents: Collection<T>,
             totalCount: Long,
-            pageRequest: Pageable
+            pageRequest: CustomPageRequest
         ): PageResponse<T> {
             return PageResponse(
                 payload = contents,
                 pagination = Pagination(
                     totalCount = totalCount,
-                    isLast = totalCount <= (pageRequest.pageNumber + 1) * pageRequest.pageSize,
+                    isLast = totalCount <= (pageRequest.page + 1) * pageRequest.size,
                     pageRequest = pageRequest
                 )
             )
@@ -48,5 +49,11 @@ class PageResponse<T>(
 data class Pagination(
     val totalCount: Long,
     val isLast: Boolean,
-    val pageRequest: Pageable,
+    val pageRequest: CustomPageRequest,
+)
+
+data class CustomPageRequest(
+    val page: Int,
+    val size: Int,
+    val sort: Sort,
 )

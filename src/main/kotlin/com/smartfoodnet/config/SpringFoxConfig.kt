@@ -52,10 +52,10 @@ class SpringFoxConfig(
     @ApiModel(description = "페이지 요청")
     data class Page(
         @ApiModelProperty(value = "페이지 번호", example = "0")
-        val pageNumber: Int,
+        val page: Int,
 
         @ApiModelProperty(value = "\${sfn.swagger.size.value}", example = "50")
-        val pageSize: Int,
+        val size: Int,
 
         @ApiModelProperty(value = "정렬 (사용법: 컬럼명,ASC|DESC) ex> id,DESC", example = "id,DESC")
         val sort: List<String>,
