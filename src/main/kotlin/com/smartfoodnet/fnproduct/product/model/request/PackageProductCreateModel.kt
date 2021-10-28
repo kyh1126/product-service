@@ -1,7 +1,7 @@
 package com.smartfoodnet.fnproduct.product.model.request
 
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
-import com.smartfoodnet.fnproduct.product.entity.PackageProduct
+import com.smartfoodnet.fnproduct.product.entity.PackageProductMapping
 import io.swagger.annotations.ApiModelProperty
 import javax.validation.constraints.NotNull
 
@@ -20,8 +20,8 @@ data class PackageProductCreateModel(
     @ApiModelProperty(value = "수량")
     val quantity: Int,
 ) {
-    fun toEntity(packageProduct: BasicProduct): PackageProduct {
-        return PackageProduct(
+    fun toEntity(packageProduct: BasicProduct): PackageProductMapping {
+        return PackageProductMapping(
             selectedBasicProduct = packageProduct,
             quantity = quantity,
         )

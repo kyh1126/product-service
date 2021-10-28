@@ -17,7 +17,7 @@ data class PackageProductDetailModel(
             return basicProduct.run {
                 PackageProductDetailModel(
                     basicProductModel = BasicProductSimpleModel.fromEntity(this),
-                    packageProductModels = packageProducts
+                    packageProductModels = packageProductMappings
                         .map { PackageProductModel.fromEntity(it) }.toMutableList(),
                 )
             }

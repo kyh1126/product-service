@@ -7,8 +7,8 @@ import java.time.LocalDateTime
 import javax.persistence.*
 
 @Entity
-@Table(name = "package_product")
-class PackageProduct(
+@Table(name = "package_product_mapping")
+class PackageProductMapping(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", columnDefinition = "BIGINT UNSIGNED")

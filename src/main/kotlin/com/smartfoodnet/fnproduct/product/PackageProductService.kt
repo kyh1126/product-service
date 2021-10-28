@@ -3,14 +3,15 @@ package com.smartfoodnet.fnproduct.product
 import com.smartfoodnet.common.error.ValidatorUtils
 import com.smartfoodnet.common.error.exception.BaseRuntimeException
 import com.smartfoodnet.common.error.exception.ErrorCode
-import com.smartfoodnet.common.model.request.PredicateSearchCondition
 import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
-import com.smartfoodnet.fnproduct.product.entity.PackageProduct
+import com.smartfoodnet.fnproduct.product.entity.PackageProductMapping
 import com.smartfoodnet.fnproduct.product.mapper.BasicProductCodeGenerator
 import com.smartfoodnet.fnproduct.product.model.request.PackageProductCreateModel
 import com.smartfoodnet.fnproduct.product.model.request.PackageProductDetailCreateModel
+import com.smartfoodnet.fnproduct.product.model.request.PackageProductMappingSearchCondition
 import com.smartfoodnet.fnproduct.product.model.response.PackageProductDetailModel
+import com.smartfoodnet.fnproduct.product.model.response.PackageProductMappingModel
 import com.smartfoodnet.fnproduct.product.validator.PackageProductDetailCreateModelValidator
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -21,16 +22,17 @@ import org.springframework.transaction.annotation.Transactional
 class PackageProductService(
     private val basicProductService: BasicProductService,
     private val basicProductRepository: BasicProductRepository,
+    private val packageProductMappingRepository: PackageProductMappingRepository,
     private val packageProductDetailCreateModelValidator: PackageProductDetailCreateModelValidator,
     private val basicProductCodeGenerator: BasicProductCodeGenerator,
 ) {
 
     fun getPackageProducts(
-        condition: PredicateSearchCondition,
+        condition: PackageProductMappingSearchCondition,
         page: Pageable
-    ): PageResponse<PackageProductDetailModel> {
-        return basicProductRepository.findAll(condition.toPredicate(), page)
-            .map(PackageProductDetailModel::fromEntity)
+    ): PageResponse<PackageProductMappingModel> {
+        return packageProductMappingRepository.findAllByCondition(condition, page)
+            .map(PackageProductMappingModel::fromEntity)
             .run { PageResponse.of(this) }
     }
 
@@ -54,7 +56,7 @@ class PackageProductService(
 
         val basicProduct = createModel.toEntity(
             code = basicProductCode,
-            packageProducts = packageProducts
+            packageProductMappings = packageProducts
         )
         return basicProductRepository.save(basicProduct)
             .run { PackageProductDetailModel.fromEntity(this) }
@@ -66,9 +68,9 @@ class PackageProductService(
 
     private fun createOrUpdatePackageProducts(
         packageProductModels: List<PackageProductCreateModel>,
-        entityById: Map<Long?, PackageProduct> = emptyMap(),
+        entityById: Map<Long?, PackageProductMapping> = emptyMap(),
         packageProductById: Map<Long?, BasicProduct>,
-    ): Set<PackageProduct> {
+    ): Set<PackageProductMapping> {
         val packageProducts = packageProductModels.map {
             val basicProductPackage = packageProductById[it.packageProduct.id]
                 ?: throw BaseRuntimeException(errorCode = ErrorCode.NO_ELEMENT)
@@ -82,7 +84,7 @@ class PackageProductService(
 
         // 연관관계 끊긴 entity 삭제처리
         entityById.values.toSet().minus(packageProducts)
-            .forEach(PackageProduct::delete)
+            .forEach(PackageProductMapping::delete)
 
         return packageProducts
     }

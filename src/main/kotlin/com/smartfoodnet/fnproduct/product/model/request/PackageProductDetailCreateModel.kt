@@ -2,7 +2,7 @@ package com.smartfoodnet.fnproduct.product.model.request
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
-import com.smartfoodnet.fnproduct.product.entity.PackageProduct
+import com.smartfoodnet.fnproduct.product.entity.PackageProductMapping
 import io.swagger.annotations.ApiModelProperty
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
@@ -19,9 +19,9 @@ data class PackageProductDetailCreateModel(
 
     fun toEntity(
         code: String? = null,
-        packageProducts: Set<PackageProduct> = setOf()
+        packageProductMappings: Set<PackageProductMapping> = setOf()
     ): BasicProduct {
         return basicProductModel.toEntity(code)
-            .apply { packageProducts.forEach(this::addPackageProducts) }
+            .apply { packageProductMappings.forEach(this::addPackageProductMappings) }
     }
 }
