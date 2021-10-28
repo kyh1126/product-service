@@ -5,6 +5,7 @@ import com.querydsl.core.types.Expression
 import com.querydsl.core.types.dsl.PathBuilder
 import com.querydsl.jpa.impl.JPAQuery
 import com.querydsl.jpa.impl.JPAQueryFactory
+import com.smartfoodnet.config.querydsl.Impl.CustomJPAQueryFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.support.JpaEntityInformationSupport
@@ -37,7 +38,7 @@ open class Querydsl4RepositorySupport(private val domainClass: Class<*>) {
 
         this.entityManager = entityManager
         querydsl = Querydsl(entityManager, PathBuilder(path.type, path.metadata))
-        queryFactory = JPAQueryFactory(entityManager)
+        queryFactory = CustomJPAQueryFactory(entityManager)
     }
 
     @PostConstruct
