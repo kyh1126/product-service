@@ -12,7 +12,7 @@ import com.querydsl.core.types.Predicate
 class CustomQueryMetadata : DefaultQueryMetadata() {
     override fun addJoinCondition(o: Predicate?) {
         if (o == null) {
-            return;
+            return
         }
         super.addJoinCondition(o)
     }
