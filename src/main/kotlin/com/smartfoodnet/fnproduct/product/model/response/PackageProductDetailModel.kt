@@ -6,19 +6,26 @@ import io.swagger.annotations.ApiModelProperty
 
 data class PackageProductDetailModel(
     @JsonUnwrapped
-    var basicProductModel: BasicProductSimpleModel,
+    var packageProductModel: BasicProductSimpleModel,
 
-    @ApiModelProperty(value = "모음상품(매핑)정보")
-    var packageProductModels: MutableList<PackageProductModel> = mutableListOf(),
+    @ApiModelProperty(value = "모음상품매핑정보")
+    var packageProductMappingModels: MutableList<PackageProductMappingModel> = mutableListOf(),
 ) {
 
     companion object {
-        fun fromEntity(basicProduct: BasicProduct): PackageProductDetailModel {
-            return basicProduct.run {
+        fun fromEntity(
+            packageProduct: BasicProduct,
+            basicProductById: Map<Long?, BasicProduct>,
+        ): PackageProductDetailModel {
+            return packageProduct.run {
                 PackageProductDetailModel(
-                    basicProductModel = BasicProductSimpleModel.fromEntity(this),
-                    packageProductModels = packageProductMappings
-                        .map { PackageProductModel.fromEntity(it) }.toMutableList(),
+                    packageProductModel = BasicProductSimpleModel.fromEntity(this),
+                    packageProductMappingModels = packageProductMappings
+                        .map {
+                            val selectedBasicProduct =
+                                BasicProductSimpleModel.fromEntity(basicProductById[it.selectedBasicProduct.id]!!)
+                            PackageProductMappingModel.fromEntity(it, selectedBasicProduct)
+                        }.toMutableList(),
                 )
             }
         }

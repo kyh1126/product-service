@@ -1,5 +1,6 @@
 package com.smartfoodnet.fnproduct.product
 
+import com.smartfoodnet.common.error.SaveState
 import com.smartfoodnet.common.error.ValidatorUtils
 import com.smartfoodnet.common.error.exception.BaseRuntimeException
 import com.smartfoodnet.common.error.exception.ErrorCode
@@ -7,11 +8,11 @@ import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.product.entity.PackageProductMapping
 import com.smartfoodnet.fnproduct.product.mapper.BasicProductCodeGenerator
-import com.smartfoodnet.fnproduct.product.model.request.PackageProductCreateModel
 import com.smartfoodnet.fnproduct.product.model.request.PackageProductDetailCreateModel
+import com.smartfoodnet.fnproduct.product.model.request.PackageProductMappingCreateModel
 import com.smartfoodnet.fnproduct.product.model.request.PackageProductMappingSearchCondition
 import com.smartfoodnet.fnproduct.product.model.response.PackageProductDetailModel
-import com.smartfoodnet.fnproduct.product.model.response.PackageProductMappingModel
+import com.smartfoodnet.fnproduct.product.model.response.PackageProductMappingDetailModel
 import com.smartfoodnet.fnproduct.product.validator.PackageProductDetailCreateModelValidator
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -21,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional(readOnly = true)
 class PackageProductService(
     private val basicProductService: BasicProductService,
-    private val basicProductRepository: BasicProductRepository,
     private val packageProductMappingRepository: PackageProductMappingRepository,
     private val packageProductDetailCreateModelValidator: PackageProductDetailCreateModelValidator,
     private val basicProductCodeGenerator: BasicProductCodeGenerator,
@@ -30,9 +30,9 @@ class PackageProductService(
     fun getPackageProducts(
         condition: PackageProductMappingSearchCondition,
         page: Pageable
-    ): PageResponse<PackageProductMappingModel> {
+    ): PageResponse<PackageProductMappingDetailModel> {
         return packageProductMappingRepository.findAllByCondition(condition, page)
-            .map(PackageProductMappingModel::fromEntity)
+            .map(PackageProductMappingDetailModel::fromEntity)
             .run { PageResponse.of(this) }
     }
 
@@ -40,52 +40,87 @@ class PackageProductService(
     fun createPackageProduct(createModel: PackageProductDetailCreateModel): PackageProductDetailModel {
         ValidatorUtils.validateAndThrow(packageProductDetailCreateModelValidator, createModel)
 
-        val basicProductModel = createModel.basicProductModel
+        val packageProductModel = createModel.packageProductModel
         // 상품코드 채번
-        val basicProductCode = with(basicProductModel) {
+        val basicProductCode = with(packageProductModel) {
             basicProductCodeGenerator.getBasicProductCode(partnerId, type, handlingTemperature)
         }
-        // 기본상품-모음상품 매핑을 위한 모음상품(BasicProduct) 조회
-        val packageProductById = getPackageProductById(createModel)
+        // 모음상품-기본상품 매핑을 위한 기본상품(BasicProduct) 조회
+        val basicProductById = getBasicProductById(createModel)
 
-        // 기본상품-모음상품 매핑 저장
-        val packageProducts = createOrUpdatePackageProducts(
-            packageProductModels = createModel.packageProductModels,
-            packageProductById = packageProductById
+        // 모음상품-기본상품 매핑 저장
+        val packageProductMappings = createOrUpdatePackageProductMappings(
+            packageProductMappingModels = createModel.packageProductMappingModels,
+            basicProductById = basicProductById
         )
 
         val basicProduct = createModel.toEntity(
             code = basicProductCode,
-            packageProductMappings = packageProducts
+            packageProductMappings = packageProductMappings
         )
-        return basicProductRepository.save(basicProduct)
-            .run { PackageProductDetailModel.fromEntity(this) }
+        return basicProductService.saveBasicProduct(basicProduct)
+            .run { toPackageProductDetailModel(this, basicProductById) }
     }
 
-    private fun getPackageProductById(createModel: PackageProductDetailCreateModel) =
-        basicProductService.getBasicProducts(createModel.packageProductModels.map { it.packageProduct.id!! })
+    @Transactional
+    fun updatePackageProduct(
+        productId: Long,
+        updateModel: PackageProductDetailCreateModel
+    ): PackageProductDetailModel {
+        ValidatorUtils.validateAndThrow(
+            SaveState.UPDATE,
+            packageProductDetailCreateModelValidator,
+            updateModel
+        )
+
+        // 모음상품-기본상품 매핑을 위한 기본상품(BasicProduct) 조회
+        val basicProductById = getBasicProductById(updateModel)
+
+        val packageProduct = basicProductService.getBasicProducts(listOf(productId)).first()
+
+        // 모음상품-기본상품 매핑 저장
+        val entityById = packageProduct.packageProductMappings.associateBy { it.id }
+        val packageProductMappings = createOrUpdatePackageProductMappings(
+            updateModel.packageProductMappingModels,
+            entityById,
+            basicProductById
+        )
+
+        packageProduct.update(updateModel.packageProductModel, packageProductMappings)
+
+        return toPackageProductDetailModel(packageProduct, basicProductById)
+    }
+
+    private fun getBasicProductById(createModel: PackageProductDetailCreateModel) =
+        basicProductService.getBasicProducts(createModel.packageProductMappingModels.map { it.basicProductModel.id!! })
             .associateBy { it.id }
 
-    private fun createOrUpdatePackageProducts(
-        packageProductModels: List<PackageProductCreateModel>,
+    private fun createOrUpdatePackageProductMappings(
+        packageProductMappingModels: List<PackageProductMappingCreateModel>,
         entityById: Map<Long?, PackageProductMapping> = emptyMap(),
-        packageProductById: Map<Long?, BasicProduct>,
+        basicProductById: Map<Long?, BasicProduct>,
     ): Set<PackageProductMapping> {
-        val packageProducts = packageProductModels.map {
-            val basicProductPackage = packageProductById[it.packageProduct.id]
+        val packageProductMappings = packageProductMappingModels.map {
+            val selectedBasicProduct = basicProductById[it.basicProductModel.id]
                 ?: throw BaseRuntimeException(errorCode = ErrorCode.NO_ELEMENT)
-            if (it.id == null) it.toEntity(basicProductPackage)
+            if (it.id == null) it.toEntity(selectedBasicProduct)
             else {
                 val entity = entityById[it.id]
-                entity!!.update(it, basicProductPackage)
+                entity!!.update(it, selectedBasicProduct)
                 entity
             }
         }.run { LinkedHashSet(this) }
 
         // 연관관계 끊긴 entity 삭제처리
-        entityById.values.toSet().minus(packageProducts)
+        entityById.values.toSet().minus(packageProductMappings)
             .forEach(PackageProductMapping::delete)
 
-        return packageProducts
+        return packageProductMappings
     }
+
+    private fun toPackageProductDetailModel(
+        packageProduct: BasicProduct,
+        basicProductById: Map<Long?, BasicProduct>,
+    ) = PackageProductDetailModel.fromEntity(packageProduct, basicProductById)
+
 }

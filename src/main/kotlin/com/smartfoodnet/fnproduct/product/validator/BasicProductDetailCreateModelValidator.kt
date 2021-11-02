@@ -48,7 +48,7 @@ class BasicProductDetailCreateModelValidator(
             basicProductRepository.findByPartnerIdAndName(partnerId, name)?.let {
                 errors.rejectValue(
                     "basicProductModel.name",
-                    "barcode.duplicate",
+                    "name.duplicate",
                     "사용중인 상품명이 있습니다. 기본상품코드: $code"
                 )
             }
@@ -79,7 +79,7 @@ class BasicProductDetailCreateModelValidator(
                 basicProductRepository.findByPartnerIdAndBarcode(partnerId, barcode)?.let {
                     errors.rejectValue(
                         "basicProductModel.barcode",
-                        "barcode.invalid",
+                        "barcode.duplicate",
                         "사용중인 상품바코드가 있습니다."
                     )
                 }

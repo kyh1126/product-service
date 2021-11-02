@@ -4,7 +4,7 @@ import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.fnproduct.product.model.request.PackageProductDetailCreateModel
 import com.smartfoodnet.fnproduct.product.model.request.PackageProductMappingSearchCondition
 import com.smartfoodnet.fnproduct.product.model.response.PackageProductDetailModel
-import com.smartfoodnet.fnproduct.product.model.response.PackageProductMappingModel
+import com.smartfoodnet.fnproduct.product.model.response.PackageProductMappingDetailModel
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import org.springframework.data.domain.Pageable
@@ -25,17 +25,29 @@ class PackageProductController(private val packageProductService: PackageProduct
         @Parameter(description = "검색조건")
         @ModelAttribute condition: PackageProductMappingSearchCondition,
         @PageableDefault(size = 50, sort = ["id"], direction = Sort.Direction.DESC) page: Pageable,
-    ): PageResponse<PackageProductMappingModel> {
+    ): PageResponse<PackageProductMappingDetailModel> {
         condition.apply {
             this.partnerId = partnerId
         }
         return packageProductService.getPackageProducts(condition, page)
     }
 
-    // TODO: 모음상품등록 Flow 시안 리뷰에 따른 설계 변경중...
     @Operation(summary = "모음상품 추가")
     @PostMapping
     fun createBasicProduct(@Valid @RequestBody packageProductDetailCreateModel: PackageProductDetailCreateModel): PackageProductDetailModel {
         return packageProductService.createPackageProduct(packageProductDetailCreateModel)
+    }
+
+    @Operation(summary = "모음상품 수정")
+    @PutMapping("{productId}")
+    fun updateBasicProduct(
+        @Parameter(description = "상품 ID", required = true)
+        @PathVariable productId: Long,
+        @Valid @RequestBody packageProductDetailCreateModel: PackageProductDetailCreateModel,
+    ): PackageProductDetailModel {
+        return packageProductService.updatePackageProduct(
+            productId,
+            packageProductDetailCreateModel
+        )
     }
 }

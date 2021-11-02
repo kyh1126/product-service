@@ -1,4 +1,4 @@
-package com.smartfoodnet.config.querydsl.Impl
+package com.smartfoodnet.config.querydsl.impl
 
 import com.querydsl.jpa.impl.JPAQuery
 import com.querydsl.jpa.impl.JPAQueryFactory
