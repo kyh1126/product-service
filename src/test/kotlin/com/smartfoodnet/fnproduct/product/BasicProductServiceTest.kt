@@ -186,6 +186,8 @@ internal class BasicProductServiceTest(
             given(basicProductRepository.save(any())).willReturn(mockBasicProduct)
             given(basicProductRepository.findById(productId))
                 .willReturn(Optional.of(mockBasicProduct))
+            given(basicProductRepository.findAllById(listOf(productId)))
+                .willReturn(listOf(mockBasicProduct))
 
             // when
             val actualBasicProductDetailModel =
@@ -236,7 +238,7 @@ internal class BasicProductServiceTest(
             val warehouse = getWarehouse(basicProductCreateModel)
             val subsidiaryMaterialById = getSubsidiaryMaterialById(mockUpdateModel)
 
-            val basicProduct = basicProductRepository.findById(productId).get()
+            val basicProduct = basicProductService.getBasicProducts(listOf(productId)).first()
 
             // ExpirationDateInfo 저장
             val expirationDateInfo: ExpirationDateInfo? =
