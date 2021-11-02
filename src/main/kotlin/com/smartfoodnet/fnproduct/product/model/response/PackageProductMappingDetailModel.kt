@@ -3,12 +3,12 @@ package com.smartfoodnet.fnproduct.product.model.response
 import com.smartfoodnet.fnproduct.product.entity.PackageProductMapping
 import io.swagger.annotations.ApiModelProperty
 
-data class PackageProductMappingModel(
+data class PackageProductMappingDetailModel(
     @ApiModelProperty(value = "id")
     val id: Long? = null,
 
-    @ApiModelProperty(value = "모음상품 ID")
-    var packageProductId: Long,
+    @ApiModelProperty(value = "모음상품정보")
+    var packageProductModel: BasicProductSimpleModel,
 
     @ApiModelProperty(value = "기본상품정보")
     var basicProductModel: BasicProductSimpleModel,
@@ -18,15 +18,12 @@ data class PackageProductMappingModel(
 ) {
 
     companion object {
-        fun fromEntity(
-            packageProductMapping: PackageProductMapping,
-            selectedBasicProduct: BasicProductSimpleModel
-        ): PackageProductMappingModel {
+        fun fromEntity(packageProductMapping: PackageProductMapping): PackageProductMappingDetailModel {
             return packageProductMapping.run {
-                PackageProductMappingModel(
+                PackageProductMappingDetailModel(
                     id = id,
-                    packageProductId = packageProduct!!.id!!,
-                    basicProductModel = selectedBasicProduct,
+                    packageProductModel = BasicProductSimpleModel.fromEntity(packageProduct!!),
+                    basicProductModel = BasicProductSimpleModel.fromEntity(selectedBasicProduct),
                     quantity = quantity,
                 )
             }

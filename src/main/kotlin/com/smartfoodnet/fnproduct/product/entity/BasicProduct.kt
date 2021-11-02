@@ -2,6 +2,7 @@ package com.smartfoodnet.fnproduct.product.entity
 
 import com.smartfoodnet.common.entity.BaseEntity
 import com.smartfoodnet.fnproduct.product.model.request.BasicProductCreateModel
+import com.smartfoodnet.fnproduct.product.model.request.BasicProductSimpleCreateModel
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductTypeConverter
 import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
@@ -123,5 +124,16 @@ class BasicProduct(
 
         subsidiaryMaterialMappings.clear()
         subsidiaryMaterialMappingRequests.forEach { addSubsidiaryMaterialMappings(it) }
+    }
+
+    fun update(
+        request: BasicProductSimpleCreateModel,
+        packageProductMappingRequests: Set<PackageProductMapping>,
+    ) {
+        name = request.name
+
+        // 양방향
+        packageProductMappings.clear()
+        packageProductMappingRequests.forEach { addPackageProductMappings(it) }
     }
 }

@@ -2,7 +2,7 @@ package com.smartfoodnet.fnproduct.product.entity
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.smartfoodnet.common.entity.BaseEntity
-import com.smartfoodnet.fnproduct.product.model.request.PackageProductCreateModel
+import com.smartfoodnet.fnproduct.product.model.request.PackageProductMappingCreateModel
 import java.time.LocalDateTime
 import javax.persistence.*
 
@@ -26,8 +26,8 @@ class PackageProductMapping(
     @Column(name = "quantity")
     var quantity: Int,
 ) : BaseEntity() {
-    fun update(request: PackageProductCreateModel, basicProductPackage: BasicProduct) {
-        selectedBasicProduct = basicProductPackage
+    fun update(request: PackageProductMappingCreateModel, basicProduct: BasicProduct) {
+        selectedBasicProduct = basicProduct
         quantity = request.quantity
     }
 

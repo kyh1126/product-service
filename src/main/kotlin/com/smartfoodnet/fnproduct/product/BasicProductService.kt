@@ -46,7 +46,7 @@ class BasicProductService(
     }
 
     fun getBasicProduct(productId: Long): BasicProductDetailModel {
-        val basicProduct = basicProductRepository.findById(productId).get()
+        val basicProduct = getBasicProducts(listOf(productId)).first()
         // 기본상품-부자재 매핑을 위한 부자재(BasicProduct) 조회
         val subsidiaryMaterialById =
             getBasicProducts(basicProduct.subsidiaryMaterialMappings.map { it.subsidiaryMaterial.id!! })
@@ -111,7 +111,7 @@ class BasicProductService(
             subsidiaryMaterialMappings = subsidiaryMaterialMappings,
             warehouse = warehouse
         )
-        return basicProductRepository.save(basicProduct)
+        return saveBasicProduct(basicProduct)
             .run { toBasicProductDetailModel(this, subsidiaryMaterialById) }
     }
 
@@ -137,7 +137,7 @@ class BasicProductService(
         // 기본상품-부자재 매핑을 위한 부자재(BasicProduct) 조회
         val subsidiaryMaterialById = getSubsidiaryMaterialById(updateModel)
 
-        val basicProduct = basicProductRepository.findById(productId).get()
+        val basicProduct = getBasicProducts(listOf(productId)).first()
 
         // 유통기한정보 저장
         val expirationDateInfo =
@@ -164,6 +164,11 @@ class BasicProductService(
         )
 
         return toBasicProductDetailModel(basicProduct, subsidiaryMaterialById)
+    }
+
+    @Transactional
+    fun saveBasicProduct(basicProduct: BasicProduct): BasicProduct {
+        return basicProductRepository.save(basicProduct)
     }
 
     private fun getBasicProductCategory(basicProductCreateModel: BasicProductCreateModel): BasicProductCategory? {

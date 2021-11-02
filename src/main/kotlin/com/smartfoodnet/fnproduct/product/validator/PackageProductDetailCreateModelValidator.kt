@@ -27,10 +27,10 @@ class PackageProductDetailCreateModelValidator(
         target: PackageProductDetailCreateModel,
         errors: Errors,
     ) {
-        val basicProductModel = target.basicProductModel
-        val packageProductModels = target.packageProductModels
+        val packageProductModel = target.packageProductModel
+        val packageProductMappingModels = target.packageProductMappingModels
 
-        with(basicProductModel) {
+        with(packageProductModel) {
             if (type != BasicProductType.PACKAGE) {
                 errors.rejectValue(
                     "basicProductModel.type",
@@ -50,13 +50,13 @@ class PackageProductDetailCreateModelValidator(
             )
         }
 
-        validateEmpty(errors, "packageProductModels", "모음상품(매핑)정보", packageProductModels)
-        if (packageProductModels.isNotEmpty()) {
+        validateEmpty(errors, "packageProductModels", "모음상품매핑정보", packageProductMappingModels)
+        if (packageProductMappingModels.isNotEmpty()) {
             validateCollection(
                 saveState,
                 errors,
                 "packageProductModels",
-                packageProductModels.map { it.packageProduct },
+                packageProductMappingModels.map { it.basicProductModel },
                 basicProductSimpleCreateModelValidator
             )
         }

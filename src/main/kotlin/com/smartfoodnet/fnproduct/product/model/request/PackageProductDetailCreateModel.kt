@@ -9,19 +9,19 @@ import javax.validation.constraints.NotNull
 
 data class PackageProductDetailCreateModel(
     @Valid
-    @ApiModelProperty(value = "모음상품(매핑)정보")
-    val packageProductModels: MutableList<PackageProductCreateModel> = mutableListOf(),
+    @ApiModelProperty(value = "모음상품매핑정보")
+    val packageProductMappingModels: MutableList<PackageProductMappingCreateModel> = mutableListOf(),
 ) {
     @NotNull
     @Valid
     @JsonUnwrapped
-    lateinit var basicProductModel: BasicProductSimpleCreateModel
+    lateinit var packageProductModel: BasicProductSimpleCreateModel
 
     fun toEntity(
         code: String? = null,
         packageProductMappings: Set<PackageProductMapping> = setOf()
     ): BasicProduct {
-        return basicProductModel.toEntity(code)
+        return packageProductModel.toEntity(code)
             .apply { packageProductMappings.forEach(this::addPackageProductMappings) }
     }
 }
