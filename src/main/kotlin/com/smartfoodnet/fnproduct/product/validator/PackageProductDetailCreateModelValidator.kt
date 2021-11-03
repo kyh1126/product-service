@@ -25,18 +25,24 @@ class PackageProductDetailCreateModelValidator(
     ) {
         checkRequiredFields(saveState, target, errors)
 
-        checkDuplicateName(target.packageProductModel, errors)
+        checkDuplicateName(saveState, target.packageProductModel, errors)
 
         checkBarcode(saveState, target.packageProductModel, errors)
 
         checkActiveYn(target.packageProductMappingModels, errors)
     }
 
-    private fun checkDuplicateName(target: BasicProductSimpleCreateModel, errors: Errors) {
+    private fun checkDuplicateName(
+        saveState: SaveState,
+        target: BasicProductSimpleCreateModel,
+        errors: Errors
+    ) {
         with(target) {
             if (name == null || partnerId == null) return
 
             basicProductRepository.findByPartnerIdAndName(partnerId, name)?.let {
+                if (saveState == SaveState.UPDATE && it.id == id) return
+
                 errors.rejectValue(
                     "packageProductModel.name",
                     "name.duplicate",
