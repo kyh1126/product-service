@@ -5,6 +5,7 @@ import com.smartfoodnet.common.error.SaveState
 import com.smartfoodnet.fnproduct.product.BasicProductRepository
 import com.smartfoodnet.fnproduct.product.model.request.BasicProductSimpleCreateModel
 import com.smartfoodnet.fnproduct.product.model.request.PackageProductDetailCreateModel
+import com.smartfoodnet.fnproduct.product.model.request.PackageProductMappingCreateModel
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import org.springframework.stereotype.Component
 import org.springframework.validation.Errors
@@ -27,6 +28,8 @@ class PackageProductDetailCreateModelValidator(
         checkDuplicateName(target.packageProductModel, errors)
 
         checkBarcode(saveState, target.packageProductModel, errors)
+
+        checkActiveYn(target.packageProductMappingModels, errors)
     }
 
     private fun checkDuplicateName(target: BasicProductSimpleCreateModel, errors: Errors) {
@@ -66,6 +69,18 @@ class PackageProductDetailCreateModelValidator(
                     "모음상품은 바코드 입력이 불가합니다."
                 )
             }
+        }
+    }
+
+    private fun checkActiveYn(target: List<PackageProductMappingCreateModel>, errors: Errors) {
+        val inactivatedBasicProduct =
+            target.map { it.basicProductModel }.find { it.activeYn == "N" }
+        if (inactivatedBasicProduct != null) {
+            errors.rejectValue(
+                "packageProductMappingModels",
+                "activeYn.invalid",
+                "모음상품의 기본상품 중 활성여부가 'N'인 것이 있습니다. 기본상품 id: ${inactivatedBasicProduct.id}"
+            )
         }
     }
 
