@@ -32,6 +32,15 @@ class PackageProductController(private val packageProductService: PackageProduct
         return packageProductService.getPackageProducts(condition, page)
     }
 
+    @Operation(summary = "모음상품 상세 조회")
+    @GetMapping("{productId}")
+    fun getPackageProduct(
+        @Parameter(description = "상품 ID", required = true)
+        @PathVariable productId: Long,
+    ): PackageProductDetailModel {
+        return packageProductService.getPackageProduct(productId)
+    }
+
     @Operation(summary = "모음상품 추가")
     @PostMapping
     fun createBasicProduct(@Valid @RequestBody packageProductDetailCreateModel: PackageProductDetailCreateModel): PackageProductDetailModel {

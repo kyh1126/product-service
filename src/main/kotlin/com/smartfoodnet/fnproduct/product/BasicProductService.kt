@@ -52,9 +52,7 @@ class BasicProductService(
             getBasicProducts(basicProduct.subsidiaryMaterialMappings.map { it.subsidiaryMaterial.id!! })
                 .associateBy { it.id }
 
-        return basicProduct.run {
-            toBasicProductDetailModel(this, subsidiaryMaterialById)
-        }
+        return toBasicProductDetailModel(basicProduct, subsidiaryMaterialById)
     }
 
     fun getBasicProductCategories(
