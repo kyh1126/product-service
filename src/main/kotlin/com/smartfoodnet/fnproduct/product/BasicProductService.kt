@@ -6,9 +6,11 @@ import com.smartfoodnet.common.error.exception.BaseRuntimeException
 import com.smartfoodnet.common.error.exception.ErrorCode
 import com.smartfoodnet.common.model.request.PredicateSearchCondition
 import com.smartfoodnet.common.model.response.PageResponse
+import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.fnproduct.product.entity.*
 import com.smartfoodnet.fnproduct.product.mapper.BasicProductCategoryFinder
 import com.smartfoodnet.fnproduct.product.mapper.BasicProductCodeGenerator
+import com.smartfoodnet.fnproduct.product.mapper.BasicProductFinder
 import com.smartfoodnet.fnproduct.product.mapper.SubsidiaryMaterialCategoryFinder
 import com.smartfoodnet.fnproduct.product.model.request.BasicProductCreateModel
 import com.smartfoodnet.fnproduct.product.model.request.BasicProductDetailCreateModel
@@ -27,6 +29,7 @@ class BasicProductService(
     private val warehouseService: WarehouseService,
     private val basicProductRepository: BasicProductRepository,
     private val basicProductDetailCreateModelValidator: BasicProductDetailCreateModelValidator,
+    private val basicProductFinder: BasicProductFinder,
     private val basicProductCategoryFinder: BasicProductCategoryFinder,
     private val subsidiaryMaterialCategoryFinder: SubsidiaryMaterialCategoryFinder,
     private val basicProductCodeGenerator: BasicProductCodeGenerator,
@@ -152,6 +155,9 @@ class BasicProductService(
                 subsidiaryMaterialById
             )
 
+        // 모음상품-기본상품의 기본상품이 비활성화 될 경우, 모음상품도 비활성화
+        inactivatePackageProduct(basicProductCreateModel, basicProduct)
+
         basicProduct.update(
             basicProductCreateModel,
             basicProductCategory,
@@ -227,6 +233,19 @@ class BasicProductService(
         return subsidiaryMaterialMappings
     }
 
+    private fun inactivatePackageProduct(
+        request: BasicProductCreateModel,
+        basicProduct: BasicProduct
+    ) {
+        if (request.activeYn == "Y") return
+
+        basicProductFinder.getPackageProductByBasicProduct(basicProduct.id!!)?.let {
+            if (it.activeYn == "N") return
+            it.inactivate()
+            log.info("기본상품(${basicProduct.id})에 의한 모음상품(${it.id}) 비활성화")
+        }
+    }
+
     private fun toBasicProductDetailModel(
         basicProduct: BasicProduct,
         subsidiaryMaterialById: Map<Long?, BasicProduct>,
@@ -234,4 +253,5 @@ class BasicProductService(
         return BasicProductDetailModel.fromEntity(basicProduct, subsidiaryMaterialById)
     }
 
+    companion object : Log
 }

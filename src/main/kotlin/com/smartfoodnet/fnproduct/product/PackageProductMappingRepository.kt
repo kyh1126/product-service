@@ -6,4 +6,7 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor
 
 interface PackageProductMappingRepository : JpaRepository<PackageProductMapping, Long>,
     PackageProductMappingCustom,
-    QuerydslPredicateExecutor<PackageProductMapping>
+    QuerydslPredicateExecutor<PackageProductMapping> {
+
+    fun findBySelectedBasicProduct_Id(productId: Long): PackageProductMapping?
+}

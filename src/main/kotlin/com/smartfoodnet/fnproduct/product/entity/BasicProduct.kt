@@ -136,4 +136,8 @@ class BasicProduct(
         packageProductMappings.clear()
         packageProductMappingRequests.forEach { addPackageProductMappings(it) }
     }
+
+    fun inactivate() {
+        activeYn = "N"
+    }
 }
