@@ -32,7 +32,7 @@ class BasicProductDetailCreateModelValidator(
             else -> Unit
         }
 
-        checkDuplicateName(basicProductModel, errors)
+        checkDuplicateName(saveState, basicProductModel, errors)
 
         checkBarcode(saveState, basicProductModel, errors)
 
@@ -41,11 +41,17 @@ class BasicProductDetailCreateModelValidator(
         checkTemperatureType(basicProductModel, errors)
     }
 
-    private fun checkDuplicateName(target: BasicProductCreateModel, errors: Errors) {
+    private fun checkDuplicateName(
+        saveState: SaveState,
+        target: BasicProductCreateModel,
+        errors: Errors
+    ) {
         with(target) {
             if (name == null || partnerId == null) return
 
             basicProductRepository.findByPartnerIdAndName(partnerId, name)?.let {
+                if (saveState == SaveState.UPDATE && it.id == id) return
+
                 errors.rejectValue(
                     "basicProductModel.name",
                     "name.duplicate",
