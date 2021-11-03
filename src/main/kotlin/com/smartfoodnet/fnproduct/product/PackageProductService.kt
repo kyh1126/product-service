@@ -36,6 +36,16 @@ class PackageProductService(
             .run { PageResponse.of(this) }
     }
 
+    fun getPackageProduct(productId: Long): PackageProductDetailModel {
+        val packageProduct = basicProductService.getBasicProducts(listOf(productId)).first()
+        // 모음상품-기본상품 매핑을 위한 기본상품(BasicProduct) 조회
+        val basicProductById =
+            basicProductService.getBasicProducts(packageProduct.packageProductMappings.map { it.selectedBasicProduct.id!! })
+                .associateBy { it.id }
+
+        return toPackageProductDetailModel(packageProduct, basicProductById)
+    }
+
     @Transactional
     fun createPackageProduct(createModel: PackageProductDetailCreateModel): PackageProductDetailModel {
         ValidatorUtils.validateAndThrow(packageProductDetailCreateModelValidator, createModel)
