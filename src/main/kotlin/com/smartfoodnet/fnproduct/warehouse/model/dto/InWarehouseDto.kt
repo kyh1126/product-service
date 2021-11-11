@@ -1,7 +1,5 @@
 package com.smartfoodnet.fnproduct.warehouse.model.dto
 
-import com.smartfoodnet.fnproduct.product.model.vo.DropType
-import com.smartfoodnet.fnproduct.product.model.vo.InspectionType
 import com.smartfoodnet.fnproduct.warehouse.entity.InWarehouse
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
@@ -28,15 +26,6 @@ data class InWarehouseDto(
 
     @ApiModelProperty(value = "연락처", example = "01011112222")
     var contactNumber: String,
-
-    @ApiModelProperty(value = "하차방식", example = "HANDWORK")
-    var dropType: DropType,
-
-    @ApiModelProperty(value = "검수방식", example = "SAMPLE")
-    var inspectionType: InspectionType,
-
-    @ApiModelProperty(value = "대기여부", example = "false")
-    var waitType: Boolean,
 
     @ApiModelProperty(value = "담당자 이름", example = "김담당")
     var managerName: String,
