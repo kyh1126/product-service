@@ -1,9 +1,12 @@
 package com.smartfoodnet.fnproduct.warehouse.model.response
 
+import com.fasterxml.jackson.annotation.JsonFormat
+import com.smartfoodnet.common.Constants
 import com.smartfoodnet.fnproduct.product.model.vo.DropType
 import com.smartfoodnet.fnproduct.product.model.vo.InspectionType
 import com.smartfoodnet.fnproduct.warehouse.entity.OutWarehouse
 import io.swagger.annotations.ApiModelProperty
+import java.time.LocalDateTime
 
 data class OutWarehouseModel(
     @ApiModelProperty(value = "출고처 고유 ID")
@@ -49,7 +52,15 @@ data class OutWarehouseModel(
     var managerContactNumber: String?,
 
     @ApiModelProperty(value = "담당자 이메일")
-    var managerEmail: String?
+    var managerEmail: String?,
+
+    @ApiModelProperty(value = "생성일자")
+    @field:JsonFormat(pattern = Constants.TIMESTAMP_FORMAT)
+    var createdAt: LocalDateTime?,
+
+    @ApiModelProperty(value = "수정일자")
+    @field:JsonFormat(pattern = Constants.TIMESTAMP_FORMAT)
+    var updatedAt: LocalDateTime?
 ) {
     companion object {
         fun fromEntity(outWarehouse: OutWarehouse): OutWarehouseModel {
@@ -69,7 +80,9 @@ data class OutWarehouseModel(
                     waitType,
                     managerName,
                     managerContactNumber,
-                    managerEmail
+                    managerEmail,
+                    createdAt,
+                    updatedAt
                 )
             }
         }

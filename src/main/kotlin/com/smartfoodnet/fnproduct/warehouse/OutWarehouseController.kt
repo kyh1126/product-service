@@ -8,7 +8,7 @@ import io.swagger.v3.oas.annotations.Parameter
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("out-warehouse")
+@RequestMapping("out/warehouse")
 class OutWarehouseController(private val outWarehouseService: OutWarehouseService) {
 
     @Operation(summary = "특정화주의 출고처 목록")
@@ -34,7 +34,6 @@ class OutWarehouseController(private val outWarehouseService: OutWarehouseServic
         @Parameter(description = "출고처 고유 ID") @PathVariable id: Long,
         @Parameter(description = "출고처 업데이트 모델") @RequestBody updateDto: OutWarehouseUpdateDto
     ) {
-        println(updateDto)
         outWarehouseService.updateOutWarehouse(id, updateDto)
     }
 }
