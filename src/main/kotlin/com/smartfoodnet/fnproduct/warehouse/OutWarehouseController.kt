@@ -19,6 +19,15 @@ class OutWarehouseController(private val outWarehouseService: OutWarehouseServic
         return outWarehouseService.getOutWarehouses(partnerId)
     }
 
+    @Operation(summary = "화주의 출고처 이름 중복 체크")
+    @GetMapping("partners/{partnerId}/check")
+    fun existsOutWarehouse(
+        @Parameter(description = "화주(고객사) ID") @PathVariable partnerId: Long,
+        @Parameter(description = "중복체크할 이름") @RequestParam name : String
+    ):Boolean{
+        return outWarehouseService.existsOutWarehouse(partnerId, name);
+    }
+
     @Operation(summary = "화주 출고처 등록")
     @PostMapping("partners/{partnerId}")
     fun saveOutWarehouse(
@@ -35,5 +44,13 @@ class OutWarehouseController(private val outWarehouseService: OutWarehouseServic
         @Parameter(description = "출고처 업데이트 모델") @RequestBody updateDto: OutWarehouseUpdateDto
     ) {
         outWarehouseService.updateOutWarehouse(id, updateDto)
+    }
+
+    @Operation(summary = "화주 출고처 삭제")
+    @DeleteMapping("/{id}")
+    fun deleteInWarehouse(
+        @Parameter(description = "출고처 고유 ID") @PathVariable id: Long
+    ) {
+        outWarehouseService.deleteOutWarehouse(id)
     }
 }

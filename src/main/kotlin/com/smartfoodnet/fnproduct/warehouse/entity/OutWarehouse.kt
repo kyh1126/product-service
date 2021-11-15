@@ -4,6 +4,7 @@ import com.smartfoodnet.common.entity.BaseEntity
 import com.smartfoodnet.fnproduct.product.model.vo.DropType
 import com.smartfoodnet.fnproduct.product.model.vo.InspectionType
 import org.hibernate.annotations.DynamicUpdate
+import org.hibernate.annotations.Where
 import javax.persistence.*
 
 /**
@@ -11,7 +12,7 @@ import javax.persistence.*
  */
 @Entity
 @Table(name = "out_warehouse")
-@DynamicUpdate
+@Where(clause = "deleted_at IS NULL")
 class OutWarehouse(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "BIGINT UNSIGNED")
