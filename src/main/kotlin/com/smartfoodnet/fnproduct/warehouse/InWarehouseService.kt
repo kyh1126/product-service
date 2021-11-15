@@ -5,8 +5,11 @@ import com.smartfoodnet.fnproduct.warehouse.model.dto.InWarehouseDto
 import com.smartfoodnet.fnproduct.warehouse.model.dto.InWarehouseUpdateDto
 import com.smartfoodnet.fnproduct.warehouse.model.response.InWarehouseModel
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Service
+@Transactional(readOnly = true)
 class InWarehouseService(
     private val inWarehouseRepository: InWarehouseRepository
 ) {
@@ -15,15 +18,24 @@ class InWarehouseService(
             .map { InWarehouseModel.fromEntity(it) }
     }
 
-    fun saveInWarehouse(partnerId: Long, outWarehouseDto: InWarehouseDto) {
-        inWarehouseRepository.save(outWarehouseDto.toEntity(partnerId))
+    @Transactional
+    fun saveInWarehouse(partnerId: Long, inWarehouseDto: InWarehouseDto) {
+        inWarehouseRepository.save(inWarehouseDto.toEntity(partnerId))
     }
 
+    @Transactional
     fun updateInWarehouse(warehouseId: Long, updateDto: InWarehouseUpdateDto) {
         var inWarehouse = inWarehouseRepository.findById(warehouseId).get();
-
         copyNonNullProperty(updateDto, inWarehouse)
+    }
 
-        inWarehouseRepository.save(inWarehouse)
+    @Transactional
+    fun deleteInWarehouse(warehouseId: Long){
+        val inWarehouse = inWarehouseRepository.findById(warehouseId).get();
+        inWarehouse.deletedAt = LocalDateTime.now();
+    }
+
+    fun existsInWarehouse(partnerId: Long, name : String):Boolean{
+        return inWarehouseRepository.existsByPartnerIdAndName(partnerId, name);
     }
 }

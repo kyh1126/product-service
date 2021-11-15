@@ -5,4 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface InWarehouseRepository : JpaRepository<InWarehouse, Long> {
     fun findByPartnerId(partnerId: Long): List<InWarehouse>
+    fun existsByPartnerIdAndName(partnerId: Long, name : String) : Boolean;
 }

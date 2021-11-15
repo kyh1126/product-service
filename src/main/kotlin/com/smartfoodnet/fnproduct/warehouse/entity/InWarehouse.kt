@@ -2,6 +2,7 @@ package com.smartfoodnet.fnproduct.warehouse.entity
 
 import com.smartfoodnet.common.entity.BaseEntity
 import org.hibernate.annotations.DynamicUpdate
+import org.hibernate.annotations.Where
 import javax.persistence.*
 
 /**
@@ -9,7 +10,7 @@ import javax.persistence.*
  */
 @Entity
 @Table(name = "in_warehouse")
-@DynamicUpdate
+@Where(clause = "deleted_at IS NULL")
 class InWarehouse(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "BIGINT UNSIGNED")
