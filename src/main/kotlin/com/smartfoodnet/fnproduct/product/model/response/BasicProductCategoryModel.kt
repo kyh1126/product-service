@@ -15,11 +15,8 @@ data class BasicProductCategoryModel(
     @JsonIgnore
     var level2Category: Code? = null,
 
-    @ApiModelProperty(value = "대분류")
-    var level1: String = level1Category.keyName,
-
-    @ApiModelProperty(value = "중분류")
-    var level2: String? = level2Category?.keyName,
+    @ApiModelProperty(value = "대분류 / 중분류")
+    var level: String = listOf(level1Category.keyName, level2Category?.keyName).joinToString(" / "),
 ) {
 
     companion object {

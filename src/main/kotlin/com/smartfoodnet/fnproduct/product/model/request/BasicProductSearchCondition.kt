@@ -14,12 +14,6 @@ class BasicProductSearchCondition(
     @JsonIgnore
     var partnerId: Long? = null,
 
-    @ApiModelProperty(
-        value = "구분 (BASIC:기본상품/CUSTOM_SUB:고객전용부자재)",
-        allowableValues = "BASIC,CUSTOM_SUB"
-    )
-    var type: BasicProductType? = null,
-
     @ApiModelProperty(value = "입고처 ID", example = "1")
     var warehouseId: Long? = null,
 
@@ -29,10 +23,18 @@ class BasicProductSearchCondition(
     @ApiModelProperty(value = "활성화여부")
     var activeYn: String? = null,
 ) : PredicateSearchCondition() {
+    private val basicProductApiTypes = setOf(BasicProductType.BASIC, BasicProductType.CUSTOM_SUB)
 
     enum class SearchType {
         NAME, CODE, BARCODE
     }
+
+    @ApiModelProperty(
+        value = "구분 (BASIC:기본상품/CUSTOM_SUB:고객전용부자재) ex> BASIC,CUSTOM_SUB",
+        allowableValues = "BASIC,CUSTOM_SUB",
+    )
+    var types: Set<BasicProductType> = basicProductApiTypes
+        get() = field.ifEmpty { basicProductApiTypes }
 
     @ApiModelProperty(
         value = "상품별검색 (NAME:기본상품명/CODE:기본상품코드/BARCODE:상품바코드)",
@@ -46,7 +48,7 @@ class BasicProductSearchCondition(
     override fun assemblePredicate(predicate: BooleanBuilder): Predicate {
         return predicate.orAllOf(
             eqPartnerId(partnerId),
-            eqType(type),
+            inType(types),
             eqWarehouse(warehouseId),
             eqExpirationDateManagementYn(expirationDateManagementYn),
             eqActiveYn(activeYn),
@@ -63,7 +65,7 @@ class BasicProductSearchCondition(
 
     private fun eqPartnerId(partnerId: Long?) = partnerId?.let { basicProduct.partnerId.eq(it) }
 
-    private fun eqType(type: BasicProductType?) = type?.let { basicProduct.type.eq(it) }
+    private fun inType(types: Collection<BasicProductType>) = basicProduct.type.`in`(types)
 
     private fun eqWarehouse(warehouseId: Long?) =
         warehouseId?.let { basicProduct.warehouse.id.eq(it) }
