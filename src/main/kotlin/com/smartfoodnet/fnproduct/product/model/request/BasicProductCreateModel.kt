@@ -56,7 +56,6 @@ data class BasicProductCreateModel(
     @ApiModelProperty(value = "단수(포장)여부")
     val singlePackagingYn: String = "N",
 
-    @JsonUnwrapped
     @ApiModelProperty(value = "유통기한관리여부 (default: N)", allowableValues = "Y,N")
     val expirationDateManagementYn: String = "N",
 
