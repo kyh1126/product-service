@@ -1,7 +1,6 @@
 package com.smartfoodnet.fnproduct.product.model.response
 
 import com.fasterxml.jackson.annotation.JsonFormat
-import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.smartfoodnet.common.Constants
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
@@ -58,9 +57,14 @@ data class BasicProductModel(
     @ApiModelProperty(value = "유통기한관리여부 (default: N)", allowableValues = "Y,N")
     var expirationDateManagementYn: String,
 
-    @JsonUnwrapped
-    @ApiModelProperty(value = "유통기한정보")
-    var expirationDateInfoModel: ExpirationDateInfoModel? = null,
+    @ApiModelProperty(value = "제조일자 기재 여부")
+    var manufactureDateWriteYn: String? = null,
+
+    @ApiModelProperty(value = "유통기한 기재 여부")
+    var expirationDateWriteYn: String? = null,
+
+    @ApiModelProperty(value = "유통기한(제조일+X일)")
+    var expirationDate: Int? = null,
 
     @ApiModelProperty(value = "박스입수")
     var piecesPerBox: Int? = null,
@@ -110,9 +114,9 @@ data class BasicProductModel(
                     supplyPrice = supplyPrice,
                     singlePackagingYn = singlePackagingYn,
                     expirationDateManagementYn = expirationDateManagementYn,
-                    expirationDateInfoModel = expirationDateInfo?.let {
-                        ExpirationDateInfoModel.fromEntity(it)
-                    },
+                    manufactureDateWriteYn = manufactureDateWriteYn,
+                    expirationDateWriteYn = expirationDateWriteYn,
+                    expirationDate = expirationDate,
                     piecesPerBox = piecesPerBox,
                     boxesPerPalette = boxesPerPalette,
                     imageUrl = imageUrl,

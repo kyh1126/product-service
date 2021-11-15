@@ -20,7 +20,6 @@ data class BasicProductDetailCreateModel(
         code: String? = null,
         basicProductCategory: BasicProductCategory? = null,
         subsidiaryMaterialCategory: SubsidiaryMaterialCategory? = null,
-        expirationDateInfo: ExpirationDateInfo? = null,
         subsidiaryMaterialMappings: Set<SubsidiaryMaterialMapping> = setOf(),
         warehouse: Warehouse,
     ): BasicProduct {
@@ -28,7 +27,6 @@ data class BasicProductDetailCreateModel(
             code,
             basicProductCategory,
             subsidiaryMaterialCategory,
-            expirationDateInfo,
             warehouse
         )
         return basicProduct.apply { subsidiaryMaterialMappings.forEach(this::addSubsidiaryMaterialMappings) }

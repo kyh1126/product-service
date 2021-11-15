@@ -156,14 +156,6 @@ internal class BasicProductServiceTest(
             // subsidiaryMaterial: (BasicProduct) 조회해서 넘겨야함
             val subsidiaryMaterialById = getSubsidiaryMaterialById(mockCreateModel)
 
-            // ExpirationDateInfo 저장
-            val expirationDateInfo: ExpirationDateInfo? =
-                ReflectionTestUtils.invokeMethod(
-                    basicProductService,
-                    "createOrUpdateExpirationDateInfo",
-                    basicProductCreateModel,
-                    null
-                )
             // 기본상품-부자재 매핑 저장
             val subsidiaryMaterialMappings: Set<SubsidiaryMaterialMapping>? =
                 ReflectionTestUtils.invokeMethod(
@@ -178,7 +170,6 @@ internal class BasicProductServiceTest(
                 code = basicProductCode,
                 basicProductCategory = basicProductCategory,
                 subsidiaryMaterialCategory = subsidiaryMaterialCategory,
-                expirationDateInfo = expirationDateInfo,
                 subsidiaryMaterialMappings = subsidiaryMaterialMappings!!,
                 warehouse = warehouse
             ).apply { id = productId }
@@ -239,15 +230,6 @@ internal class BasicProductServiceTest(
 
             val basicProduct = basicProductService.getBasicProducts(listOf(productId)).first()
 
-            // ExpirationDateInfo 저장
-            val expirationDateInfo: ExpirationDateInfo? =
-                ReflectionTestUtils.invokeMethod(
-                    basicProductService,
-                    "createOrUpdateExpirationDateInfo",
-                    basicProductCreateModel,
-                    basicProduct.expirationDateInfo
-                )
-
             // 기본상품-부자재 매핑 저장
             val entityById = basicProduct.subsidiaryMaterialMappings.associateBy { it.id }
             val subsidiaryMaterialMappings: Set<SubsidiaryMaterialMapping>? =
@@ -263,7 +245,6 @@ internal class BasicProductServiceTest(
                 code = basicProductCode,
                 basicProductCategory = basicProductCategory,
                 subsidiaryMaterialCategory = subsidiaryMaterialCategory,
-                expirationDateInfo = expirationDateInfo,
                 subsidiaryMaterialMappings = subsidiaryMaterialMappings!!,
                 warehouse = warehouse
             ).apply { id = productId }

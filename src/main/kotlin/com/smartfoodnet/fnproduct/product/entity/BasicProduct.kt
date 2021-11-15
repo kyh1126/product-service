@@ -61,6 +61,15 @@ class BasicProduct(
     @Column(name = "expiration_date_management_yn")
     var expirationDateManagementYn: String = "N",
 
+    @Column(name = "manufacture_date_write_yn")
+    var manufactureDateWriteYn: String = "N",
+
+    @Column(name = "expiration_date_write_yn")
+    var expirationDateWriteYn: String = "N",
+
+    @Column(name = "expiration_date")
+    var expirationDate: Int? = null,
+
     @Column(name = "pieces_per_box")
     var piecesPerBox: Int? = null,
 
@@ -69,9 +78,6 @@ class BasicProduct(
 
     @Column(name = "image_url")
     var imageUrl: String? = null,
-
-    @OneToOne(mappedBy = "basicProduct", cascade = [CascadeType.PERSIST])
-    var expirationDateInfo: ExpirationDateInfo? = null,
 
     @OneToMany(mappedBy = "basicProduct", cascade = [CascadeType.PERSIST])
     var subsidiaryMaterialMappings: MutableSet<SubsidiaryMaterialMapping> = LinkedHashSet(),
@@ -82,11 +88,6 @@ class BasicProduct(
     @Column(name = "active_yn")
     var activeYn: String = "N",
 ) : BaseEntity() {
-    fun addExpirationDateInfo(expirationDateInfoRequest: ExpirationDateInfo) {
-        expirationDateInfo = expirationDateInfoRequest
-        expirationDateInfoRequest.basicProduct = this
-    }
-
     fun addSubsidiaryMaterialMappings(subsidiaryMaterialMapping: SubsidiaryMaterialMapping) {
         subsidiaryMaterialMappings.add(subsidiaryMaterialMapping)
         subsidiaryMaterialMapping.basicProduct = this
@@ -101,7 +102,6 @@ class BasicProduct(
         request: BasicProductCreateModel,
         basicProductCategoryRequest: BasicProductCategory?,
         subsidiaryMaterialCategoryRequest: SubsidiaryMaterialCategory?,
-        expirationDateInfoRequest: ExpirationDateInfo?,
         subsidiaryMaterialMappingRequests: Set<SubsidiaryMaterialMapping>,
         warehouseRequest: Warehouse,
     ) {
@@ -109,6 +109,10 @@ class BasicProduct(
         supplyPrice = request.supplyPrice
         singlePackagingYn = request.singlePackagingYn
         expirationDateManagementYn = request.expirationDateManagementYn
+        manufactureDateWriteYn = request.manufactureDateWriteYn
+        expirationDateWriteYn = request.expirationDateWriteYn
+        expirationDate = request.expirationDate
+
         piecesPerBox = request.piecesPerBox
         boxesPerPalette = request.boxesPerPalette
         imageUrl = request.imageUrl
@@ -117,10 +121,6 @@ class BasicProduct(
         basicProductCategory = basicProductCategoryRequest
         subsidiaryMaterialCategory = subsidiaryMaterialCategoryRequest
         warehouse = warehouseRequest
-
-        // 양방향
-        expirationDateInfo = null
-        expirationDateInfoRequest?.let { addExpirationDateInfo(it) }
 
         subsidiaryMaterialMappings.clear()
         subsidiaryMaterialMappingRequests.forEach { addSubsidiaryMaterialMappings(it) }

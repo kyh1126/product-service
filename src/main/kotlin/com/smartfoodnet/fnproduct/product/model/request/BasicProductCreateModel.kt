@@ -1,11 +1,12 @@
 package com.smartfoodnet.fnproduct.product.model.request
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped
-import com.smartfoodnet.fnproduct.product.entity.*
+import com.smartfoodnet.fnproduct.product.entity.BasicProduct
+import com.smartfoodnet.fnproduct.product.entity.BasicProductCategory
+import com.smartfoodnet.fnproduct.product.entity.SubsidiaryMaterialCategory
+import com.smartfoodnet.fnproduct.product.entity.Warehouse
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
 import io.swagger.annotations.ApiModelProperty
-import javax.validation.Valid
 import javax.validation.constraints.NotNull
 
 data class BasicProductCreateModel(
@@ -59,6 +60,15 @@ data class BasicProductCreateModel(
     @ApiModelProperty(value = "유통기한관리여부 (default: N)", allowableValues = "Y,N")
     val expirationDateManagementYn: String = "N",
 
+    @ApiModelProperty(value = "제조일자 기재 여부")
+    val manufactureDateWriteYn: String = "N",
+
+    @ApiModelProperty(value = "유통기한 기재 여부")
+    val expirationDateWriteYn: String = "N",
+
+    @ApiModelProperty(value = "유통기한(제조일+X일)")
+    val expirationDate: Int? = null,
+
     @ApiModelProperty(value = "박스입수")
     val piecesPerBox: Int? = null,
 
@@ -71,16 +81,10 @@ data class BasicProductCreateModel(
     @ApiModelProperty(value = "활성화여부 (default: N)", allowableValues = "Y,N")
     val activeYn: String = "N",
 ) {
-    @Valid
-    @JsonUnwrapped
-    @ApiModelProperty(value = "유통기한정보")
-    var expirationDateInfoModel: ExpirationDateInfoCreateModel? = null
-
     fun toEntity(
         code: String?,
         basicProductCategory: BasicProductCategory?,
         subsidiaryMaterialCategory: SubsidiaryMaterialCategory?,
-        expirationDateInfo: ExpirationDateInfo?,
         warehouse: Warehouse,
     ): BasicProduct {
         return BasicProduct(
@@ -97,10 +101,13 @@ data class BasicProductCreateModel(
             supplyPrice = supplyPrice,
             singlePackagingYn = singlePackagingYn,
             expirationDateManagementYn = expirationDateManagementYn,
+            manufactureDateWriteYn = manufactureDateWriteYn,
+            expirationDateWriteYn = expirationDateWriteYn,
+            expirationDate = expirationDate,
             piecesPerBox = piecesPerBox,
             boxesPerPalette = boxesPerPalette,
             imageUrl = imageUrl,
             activeYn = activeYn
-        ).apply { expirationDateInfo?.let(this::addExpirationDateInfo) }
+        )
     }
 }

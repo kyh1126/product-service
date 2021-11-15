@@ -7,7 +7,10 @@ import com.smartfoodnet.common.error.exception.ErrorCode
 import com.smartfoodnet.common.model.request.PredicateSearchCondition
 import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.common.utils.Log
-import com.smartfoodnet.fnproduct.product.entity.*
+import com.smartfoodnet.fnproduct.product.entity.BasicProduct
+import com.smartfoodnet.fnproduct.product.entity.BasicProductCategory
+import com.smartfoodnet.fnproduct.product.entity.SubsidiaryMaterialCategory
+import com.smartfoodnet.fnproduct.product.entity.SubsidiaryMaterialMapping
 import com.smartfoodnet.fnproduct.product.mapper.BasicProductCategoryFinder
 import com.smartfoodnet.fnproduct.product.mapper.BasicProductCodeGenerator
 import com.smartfoodnet.fnproduct.product.mapper.BasicProductFinder
@@ -96,8 +99,6 @@ class BasicProductService(
         // 기본상품-부자재 매핑을 위한 부자재(BasicProduct) 조회
         val subsidiaryMaterialById = getSubsidiaryMaterialById(createModel)
 
-        // 유통기한정보 저장
-        val expirationDateInfo = createOrUpdateExpirationDateInfo(basicProductCreateModel)
         // 기본상품-부자재 매핑 저장
         val subsidiaryMaterialMappings = createOrUpdateSubsidiaryMaterialMappings(
             subsidiaryMaterialMappingModels = createModel.subsidiaryMaterialMappingModels,
@@ -108,7 +109,6 @@ class BasicProductService(
             code = basicProductCode,
             basicProductCategory = basicProductCategory,
             subsidiaryMaterialCategory = subsidiaryMaterialCategory,
-            expirationDateInfo = expirationDateInfo,
             subsidiaryMaterialMappings = subsidiaryMaterialMappings,
             warehouse = warehouse
         )
@@ -140,12 +140,6 @@ class BasicProductService(
 
         val basicProduct = getBasicProducts(listOf(productId)).first()
 
-        // 유통기한정보 저장
-        val expirationDateInfo =
-            createOrUpdateExpirationDateInfo(
-                basicProductCreateModel,
-                basicProduct.expirationDateInfo
-            )
         // 기본상품-부자재 매핑 저장
         val entityById = basicProduct.subsidiaryMaterialMappings.associateBy { it.id }
         val subsidiaryMaterials =
@@ -162,7 +156,6 @@ class BasicProductService(
             basicProductCreateModel,
             basicProductCategory,
             subsidiaryMaterialCategory,
-            expirationDateInfo,
             subsidiaryMaterials,
             warehouse
         )
@@ -197,19 +190,6 @@ class BasicProductService(
     private fun getSubsidiaryMaterialById(createModel: BasicProductDetailCreateModel) =
         getBasicProducts(createModel.subsidiaryMaterialMappingModels.map { it.subsidiaryMaterial.id!! })
             .associateBy { it.id }
-
-    private fun createOrUpdateExpirationDateInfo(
-        basicProductCreateModel: BasicProductCreateModel,
-        entity: ExpirationDateInfo? = null,
-    ): ExpirationDateInfo? {
-        return (basicProductCreateModel.expirationDateInfoModel)?.let {
-            if (entity == null) it.toEntity()
-            else {
-                entity.update(it)
-                entity
-            }
-        }
-    }
 
     private fun createOrUpdateSubsidiaryMaterialMappings(
         subsidiaryMaterialMappingModels: List<SubsidiaryMaterialMappingCreateModel>,
