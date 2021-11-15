@@ -37,7 +37,8 @@ class BasicProductController(private val basicProductService: BasicProductServic
     fun getBasicProductsSub(
         @PageableDefault(size = 50, sort = ["id"], direction = Sort.Direction.DESC) page: Pageable,
     ): PageResponse<BasicProductModel> {
-        val searchCondition = BasicProductSearchCondition(type = BasicProductType.SUB)
+        val searchCondition =
+            BasicProductSearchCondition().apply { types = setOf(BasicProductType.SUB) }
 
         return basicProductService.getBasicProducts(condition = searchCondition, page = page)
     }
