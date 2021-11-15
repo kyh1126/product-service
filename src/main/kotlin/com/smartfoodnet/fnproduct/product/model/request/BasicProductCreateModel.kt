@@ -1,9 +1,11 @@
 package com.smartfoodnet.fnproduct.product.model.request
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.smartfoodnet.fnproduct.product.entity.*
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
 import io.swagger.annotations.ApiModelProperty
+import javax.validation.Valid
 import javax.validation.constraints.NotNull
 
 data class BasicProductCreateModel(
@@ -32,8 +34,8 @@ data class BasicProductCreateModel(
     @ApiModelProperty(value = "상품바코드")
     val barcode: String? = null,
 
-    @ApiModelProperty(value = "상품카테고리")
-    val basicProductCategory: BasicProductCategoryCreateModel? = null,
+    @ApiModelProperty(value = "상품카테고리명")
+    val basicProductCategoryName: String? = null,
 
     @ApiModelProperty(value = "부자재카테고리")
     val subsidiaryMaterialCategory: SubsidiaryMaterialCategoryCreateModel? = null,
@@ -45,8 +47,8 @@ data class BasicProductCreateModel(
     val handlingTemperature: HandlingTemperatureType? = null,
 
     @NotNull
-    @ApiModelProperty(value = "입고처")
-    val warehouse: WarehouseCreateModel,
+    @ApiModelProperty(value = "입고처명")
+    val warehouseName: String,
 
     @ApiModelProperty(value = "공급가")
     val supplyPrice: Int? = null,
@@ -54,11 +56,9 @@ data class BasicProductCreateModel(
     @ApiModelProperty(value = "단수(포장)여부")
     val singlePackagingYn: String = "N",
 
+    @JsonUnwrapped
     @ApiModelProperty(value = "유통기한관리여부 (default: N)", allowableValues = "Y,N")
     val expirationDateManagementYn: String = "N",
-
-    @ApiModelProperty(value = "유통기한정보")
-    val expirationDateInfoModel: ExpirationDateInfoCreateModel? = null,
 
     @ApiModelProperty(value = "박스입수")
     val piecesPerBox: Int? = null,
@@ -72,6 +72,11 @@ data class BasicProductCreateModel(
     @ApiModelProperty(value = "활성화여부 (default: N)", allowableValues = "Y,N")
     val activeYn: String = "N",
 ) {
+    @Valid
+    @JsonUnwrapped
+    @ApiModelProperty(value = "유통기한정보")
+    var expirationDateInfoModel: ExpirationDateInfoCreateModel? = null
+
     fun toEntity(
         code: String?,
         basicProductCategory: BasicProductCategory?,

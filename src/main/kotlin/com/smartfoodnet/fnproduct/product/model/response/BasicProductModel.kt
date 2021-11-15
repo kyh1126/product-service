@@ -1,6 +1,7 @@
 package com.smartfoodnet.fnproduct.product.model.response
 
 import com.fasterxml.jackson.annotation.JsonFormat
+import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.smartfoodnet.common.Constants
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
@@ -33,8 +34,8 @@ data class BasicProductModel(
     @ApiModelProperty(value = "상품바코드")
     var barcode: String? = null,
 
-    @ApiModelProperty(value = "상품카테고리")
-    var basicProductCategory: BasicProductCategoryModel?,
+    @ApiModelProperty(value = "상품카테고리명")
+    var basicProductCategoryName: String? = null,
 
     @ApiModelProperty(value = "부자재카테고리")
     var subsidiaryMaterialCategory: SubsidiaryMaterialCategoryModel?,
@@ -57,6 +58,7 @@ data class BasicProductModel(
     @ApiModelProperty(value = "유통기한관리여부 (default: N)", allowableValues = "Y,N")
     var expirationDateManagementYn: String,
 
+    @JsonUnwrapped
     @ApiModelProperty(value = "유통기한정보")
     var expirationDateInfoModel: ExpirationDateInfoModel? = null,
 
@@ -94,8 +96,11 @@ data class BasicProductModel(
                     code = code,
                     barcodeYn = barcodeYn,
                     barcode = barcode,
-                    basicProductCategory = basicProductCategory?.let {
-                        BasicProductCategoryModel.fromEntity(it)
+                    basicProductCategoryName = basicProductCategory?.let {
+                        listOf(
+                            it.level1Category.keyName,
+                            it.level2Category?.keyName
+                        ).joinToString(" / ")
                     },
                     subsidiaryMaterialCategory = subsidiaryMaterialCategory?.let {
                         SubsidiaryMaterialCategoryModel.fromEntity(it)

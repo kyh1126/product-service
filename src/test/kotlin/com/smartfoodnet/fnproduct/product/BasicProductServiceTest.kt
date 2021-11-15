@@ -14,8 +14,7 @@ import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
-import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchers.anyLong
+import org.mockito.ArgumentMatchers.*
 import org.mockito.BDDMockito.given
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
@@ -91,7 +90,7 @@ internal class BasicProductServiceTest(
     @BeforeEach
     fun initEach() {
         given(partnerRepository.findById(anyLong())).willReturn(Optional.of(partner))
-        given(warehouseRepository.findById(anyLong())).willReturn(Optional.of(warehouse))
+        given(warehouseRepository.findByName(anyString())).willReturn(warehouse)
         given(basicProductCategoryRepository.findById(anyLong()))
             .willReturn(Optional.of(basicProductCategories.first()))
         given(
@@ -283,8 +282,9 @@ internal class BasicProductServiceTest(
     }
 
     private fun getBasicProductCategory(basicProductCreateModel: BasicProductCreateModel): BasicProductCategory? {
-        return (basicProductCreateModel.basicProductCategory)?.let {
-            basicProductCategoryFinder.getBasicProductCategoryByKeyName(it.level1!!, it.level2!!)
+        return (basicProductCreateModel.basicProductCategoryName)?.let {
+            val (level1, level2) = it.split(" / ")
+            basicProductCategoryFinder.getBasicProductCategoryByKeyName(level1, level2)
         }
     }
 
@@ -298,22 +298,9 @@ internal class BasicProductServiceTest(
     }
 
     private fun getWarehouse(basicProductCreateModel: BasicProductCreateModel) =
-        warehouseService.getWarehouse(basicProductCreateModel.warehouse.id!!)
+        warehouseService.getWarehouse(basicProductCreateModel.warehouseName)
 
     private fun getSubsidiaryMaterialById(createModel: BasicProductDetailCreateModel) =
         basicProductService.getBasicProducts(createModel.subsidiaryMaterialMappingModels.map { it.subsidiaryMaterial.id!! })
             .associateBy { it.id }
-
-    private fun createOrUpdateExpirationDateInfo(
-        basicProductCreateModel: BasicProductCreateModel,
-        entity: ExpirationDateInfo? = null,
-    ): ExpirationDateInfo? {
-        return (basicProductCreateModel.expirationDateInfoModel)?.let {
-            if (it.id == null) it.toEntity()
-            else {
-                entity!!.update(it)
-                entity
-            }
-        }
-    }
 }

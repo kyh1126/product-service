@@ -176,8 +176,9 @@ class BasicProductService(
     }
 
     private fun getBasicProductCategory(basicProductCreateModel: BasicProductCreateModel): BasicProductCategory? {
-        return (basicProductCreateModel.basicProductCategory)?.let {
-            basicProductCategoryFinder.getBasicProductCategoryByKeyName(it.level1!!, it.level2!!)
+        return (basicProductCreateModel.basicProductCategoryName)?.let {
+            val (level1, level2) = it.split(" / ")
+            basicProductCategoryFinder.getBasicProductCategoryByKeyName(level1, level2)
         }
     }
 
@@ -191,7 +192,7 @@ class BasicProductService(
     }
 
     private fun getWarehouse(basicProductCreateModel: BasicProductCreateModel) =
-        warehouseService.getWarehouse(basicProductCreateModel.warehouse.id!!)
+        warehouseService.getWarehouse(basicProductCreateModel.warehouseName)
 
     private fun getSubsidiaryMaterialById(createModel: BasicProductDetailCreateModel) =
         getBasicProducts(createModel.subsidiaryMaterialMappingModels.map { it.subsidiaryMaterial.id!! })
@@ -202,9 +203,9 @@ class BasicProductService(
         entity: ExpirationDateInfo? = null,
     ): ExpirationDateInfo? {
         return (basicProductCreateModel.expirationDateInfoModel)?.let {
-            if (it.id == null) it.toEntity()
+            if (entity == null) it.toEntity()
             else {
-                entity!!.update(it)
+                entity.update(it)
                 entity
             }
         }
