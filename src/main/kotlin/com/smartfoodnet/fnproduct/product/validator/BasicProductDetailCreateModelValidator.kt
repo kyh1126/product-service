@@ -96,19 +96,21 @@ class BasicProductDetailCreateModelValidator(
     private fun checkExpirationDate(target: BasicProductCreateModel, errors: Errors) {
         with(target) {
             if (expirationDateManagementYn.isNotEmpty() && expirationDateManagementYn == "Y") {
-                if (manufactureDateWriteYn == "N" && expirationDateWriteYn == "N") {
-                    errors.reject(
-                        "basicProductModel",
-                        "유통기한정보의 유통기한 기재 여부, 제조일자 기재 여부 중 하나는 YES 여야 합니다."
-                    )
-                }
-                if (expirationDateWriteYn == "Y") {
-                    validateNull(
-                        errors,
-                        "basicProductModel.expirationDate",
-                        "유통기한(제조일+X일)",
-                        expirationDate
-                    )
+                with(expirationDateInfoModel!!) {
+                    if (manufactureDateWriteYn == "N" && expirationDateWriteYn == "N") {
+                        errors.reject(
+                            "basicProductModel.expirationDateInfoModel",
+                            "유통기한정보의 유통기한 기재 여부, 제조일자 기재 여부 중 하나는 YES 여야 합니다."
+                        )
+                    }
+                    if (expirationDateWriteYn == "Y") {
+                        validateNull(
+                            errors,
+                            "basicProductModel.expirationDateInfoModel.expirationDate",
+                            "유통기한(제조일+X일)",
+                            expirationDate
+                        )
+                    }
                 }
             }
         }

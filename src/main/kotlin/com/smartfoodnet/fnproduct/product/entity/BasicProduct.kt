@@ -61,14 +61,8 @@ class BasicProduct(
     @Column(name = "expiration_date_management_yn")
     var expirationDateManagementYn: String = "N",
 
-    @Column(name = "manufacture_date_write_yn")
-    var manufactureDateWriteYn: String = "N",
-
-    @Column(name = "expiration_date_write_yn")
-    var expirationDateWriteYn: String = "N",
-
-    @Column(name = "expiration_date")
-    var expirationDate: Int? = null,
+    @Embedded
+    var expirationDateInfo: ExpirationDateInfo? = null,
 
     @Column(name = "pieces_per_box")
     var piecesPerBox: Int? = null,
@@ -109,10 +103,7 @@ class BasicProduct(
         supplyPrice = request.supplyPrice
         singlePackagingYn = request.singlePackagingYn
         expirationDateManagementYn = request.expirationDateManagementYn
-        manufactureDateWriteYn = request.manufactureDateWriteYn
-        expirationDateWriteYn = request.expirationDateWriteYn
-        expirationDate = request.expirationDate
-
+        expirationDateInfo = request.expirationDateInfoModel?.toEntity()
         piecesPerBox = request.piecesPerBox
         boxesPerPalette = request.boxesPerPalette
         imageUrl = request.imageUrl

@@ -1,5 +1,6 @@
 package com.smartfoodnet.fnproduct.product.model.request
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.product.entity.BasicProductCategory
 import com.smartfoodnet.fnproduct.product.entity.SubsidiaryMaterialCategory
@@ -60,15 +61,6 @@ data class BasicProductCreateModel(
     @ApiModelProperty(value = "유통기한관리여부 (default: N)", allowableValues = "Y,N")
     val expirationDateManagementYn: String = "N",
 
-    @ApiModelProperty(value = "제조일자 기재 여부")
-    val manufactureDateWriteYn: String = "N",
-
-    @ApiModelProperty(value = "유통기한 기재 여부")
-    val expirationDateWriteYn: String = "N",
-
-    @ApiModelProperty(value = "유통기한(제조일+X일)")
-    val expirationDate: Int? = null,
-
     @ApiModelProperty(value = "박스입수")
     val piecesPerBox: Int? = null,
 
@@ -81,6 +73,9 @@ data class BasicProductCreateModel(
     @ApiModelProperty(value = "활성화여부 (default: N)", allowableValues = "Y,N")
     val activeYn: String = "N",
 ) {
+    @JsonUnwrapped
+    var expirationDateInfoModel: ExpirationDateInfoCreateModel? = null
+
     fun toEntity(
         code: String?,
         basicProductCategory: BasicProductCategory?,
@@ -101,9 +96,7 @@ data class BasicProductCreateModel(
             supplyPrice = supplyPrice,
             singlePackagingYn = singlePackagingYn,
             expirationDateManagementYn = expirationDateManagementYn,
-            manufactureDateWriteYn = manufactureDateWriteYn,
-            expirationDateWriteYn = expirationDateWriteYn,
-            expirationDate = expirationDate,
+            expirationDateInfo = expirationDateInfoModel?.toEntity(),
             piecesPerBox = piecesPerBox,
             boxesPerPalette = boxesPerPalette,
             imageUrl = imageUrl,
