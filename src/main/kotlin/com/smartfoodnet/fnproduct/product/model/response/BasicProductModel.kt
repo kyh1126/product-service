@@ -34,7 +34,7 @@ data class BasicProductModel(
     @ApiModelProperty(value = "상품바코드")
     var barcode: String? = null,
 
-    @ApiModelProperty(value = "상품카테고리")
+    @ApiModelProperty(value = "상품카테고리명")
     var basicProductCategoryName: String? = null,
 
     @ApiModelProperty(value = "부자재카테고리")

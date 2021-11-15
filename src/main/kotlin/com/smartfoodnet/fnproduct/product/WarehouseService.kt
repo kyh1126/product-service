@@ -9,7 +9,8 @@ import org.springframework.transaction.annotation.Transactional
 class WarehouseService(
     private val warehouseRepository: WarehouseRepository,
 ) {
-    fun getWarehouse(id: Long): Warehouse {
-        return warehouseRepository.findById(id).get()
+    fun getWarehouse(name: String): Warehouse {
+        return warehouseRepository.findByName(name)
+            ?: throw NoSuchElementException("No value present")
     }
 }

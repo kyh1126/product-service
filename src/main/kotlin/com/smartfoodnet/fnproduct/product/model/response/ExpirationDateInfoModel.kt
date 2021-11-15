@@ -1,16 +1,9 @@
 package com.smartfoodnet.fnproduct.product.model.response
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import com.smartfoodnet.fnproduct.product.entity.ExpirationDateInfo
 import io.swagger.annotations.ApiModelProperty
 
 data class ExpirationDateInfoModel(
-    @JsonIgnore
-    var id: Long? = null,
-
-    @JsonIgnore
-    var basicProductId: Long? = null,
-
     @ApiModelProperty(value = "제조일자 기재 여부")
     var manufactureDateWriteYn: String? = null,
 
@@ -25,8 +18,6 @@ data class ExpirationDateInfoModel(
         fun fromEntity(expirationDateInfo: ExpirationDateInfo): ExpirationDateInfoModel {
             return expirationDateInfo.run {
                 ExpirationDateInfoModel(
-                    id = id,
-                    basicProductId = basicProduct!!.id!!,
                     manufactureDateWriteYn = manufactureDateWriteYn,
                     expirationDateWriteYn = expirationDateWriteYn,
                     expirationDate = expirationDate

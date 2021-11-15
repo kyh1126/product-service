@@ -5,7 +5,6 @@ import com.smartfoodnet.common.error.ValidatorUtils
 import com.smartfoodnet.common.error.exception.CreateModelValidateError
 import com.smartfoodnet.fnproduct.product.BasicProductRepository
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
-import com.smartfoodnet.fnproduct.product.model.request.BasicProductCategoryCreateModel
 import com.smartfoodnet.fnproduct.product.model.request.BasicProductCreateModel
 import com.smartfoodnet.fnproduct.product.model.request.BasicProductDetailCreateModel
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
@@ -76,7 +75,7 @@ internal class BasicProductDetailCreateModelValidatorTest {
                     "상품명 값을 입력해주세요.",
                     "상품바코드기재여부 값을 입력해주세요.",
                     "취급온도 값은 null 이 아닌 값을 입력해주세요.",
-                    "상품카테고리 값은 null 이 아닌 값을 입력해주세요.",
+                    "상품카테고리명 값은 null 이 아닌 값을 입력해주세요.",
                     "단수(포장)여부 값을 입력해주세요.",
                     "유통기한관리여부 값을 입력해주세요.",
                     "박스입수 값은 null 이 아닌 값을 입력해주세요.",
@@ -135,7 +134,7 @@ internal class BasicProductDetailCreateModelValidatorTest {
             barcodeYn = "",
             type = BasicProductType.BASIC,
             handlingTemperature = null,
-            basicProductCategory = null,
+            basicProductCategoryName = null,
             singlePackagingYn = "",
             expirationDateManagementYn = "",
             piecesPerBox = null,
@@ -148,7 +147,7 @@ internal class BasicProductDetailCreateModelValidatorTest {
         val basicProductModel = buildBasicProductCreateModel(
             type = BasicProductType.BASIC,
             handlingTemperature = HandlingTemperatureType.FREEZE,
-            basicProductCategory = BasicProductCategoryCreateModel(level1 = "", level2 = ""),
+            basicProductCategoryName = " / ",
         )
         return getInput(basicProductModel)
     }

@@ -104,7 +104,7 @@ class BasicProductDetailCreateModelValidator(
                 )
 
                 if (expirationDateInfoModel == null) return
-                with(expirationDateInfoModel) {
+                with(expirationDateInfoModel!!) {
                     if (manufactureDateWriteYn == "N" && expirationDateWriteYn == "N") {
                         errors.reject(
                             "basicProductModel.expirationDateInfoModel",
@@ -156,9 +156,9 @@ class BasicProductDetailCreateModelValidator(
             )
             validateEmpty(
                 errors,
-                "basicProductModel.basicProductCategory",
-                "상품카테고리",
-                basicProductCategory
+                "basicProductModel.basicProductCategoryName",
+                "상품카테고리명",
+                basicProductCategoryName
             )
             validateEmpty(
                 errors,
@@ -175,18 +175,27 @@ class BasicProductDetailCreateModelValidator(
             validateEmpty(errors, "basicProductModel.piecesPerBox", "박스입수", piecesPerBox)
             validateEmpty(errors, "basicProductModel.boxesPerPalette", "파레트입수", boxesPerPalette)
 
-            if (basicProductCategory == null) return
+            if (basicProductCategoryName != null && !basicProductCategoryName.contains(" / ")) {
+                errors.rejectValue(
+                    "basicProductModel.basicProductCategoryName",
+                    "basicProductCategoryName.invalid",
+                    "상품카테고리명은 \" / \"로 구분하여 입력해주세요."
+                )
+            }
+
+            if (basicProductCategoryName == null || !basicProductCategoryName.contains(" / ")) return
+            val (level1, level2) = basicProductCategoryName.split(" / ")
             validateEmpty(
                 errors,
-                "basicProductModel.basicProductCategory.level1",
+                "basicProductModel.basicProductCategoryName",
                 "상품카테고리(대분류)",
-                basicProductCategory.level1
+                level1
             )
             validateEmpty(
                 errors,
-                "basicProductModel.basicProductCategory.level2",
+                "basicProductModel.basicProductCategoryName",
                 "상품카테고리(중분류)",
-                basicProductCategory.level2
+                level2
             )
         }
 
