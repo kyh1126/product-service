@@ -5,6 +5,7 @@ import com.smartfoodnet.common.error.SaveState
 import com.smartfoodnet.fnproduct.product.BasicProductRepository
 import com.smartfoodnet.fnproduct.product.model.request.BasicProductCreateModel
 import com.smartfoodnet.fnproduct.product.model.request.BasicProductDetailCreateModel
+import com.smartfoodnet.fnproduct.product.model.request.ExpirationDateInfoCreateModel
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
 import org.springframework.stereotype.Component
@@ -36,7 +37,7 @@ class BasicProductDetailCreateModelValidator(
 
         checkBarcode(saveState, basicProductModel, errors)
 
-        checkExpirationDate(basicProductModel, errors)
+        checkexpirationDateInfo(basicProductModel, errors)
 
         checkTemperatureType(basicProductModel, errors)
     }
@@ -93,17 +94,37 @@ class BasicProductDetailCreateModelValidator(
         }
     }
 
-    private fun checkExpirationDate(target: BasicProductCreateModel, errors: Errors) {
+    private fun checkexpirationDateInfo(target: BasicProductCreateModel, errors: Errors) {
         with(target) {
             if (expirationDateManagementYn.isNotEmpty() && expirationDateManagementYn == "Y") {
                 with(expirationDateInfoModel!!) {
-                    if (manufactureDateWriteYn == "N" && expirationDateWriteYn == "N") {
-                        errors.reject(
-                            "basicProductModel.expirationDateInfoModel",
-                            "유통기한정보의 유통기한 기재 여부, 제조일자 기재 여부 중 하나는 YES 여야 합니다."
-                        )
-                    }
-                    if (expirationDateWriteYn == "Y") {
+                    validateEmpty(
+                        errors,
+                        "basicProductModel.expirationDateInfoModel.manufactureDateWriteYn",
+                        "제조일자기재여부",
+                        manufactureDateWriteYn
+                    )
+                    validateEmpty(
+                        errors,
+                        "basicProductModel.expirationDateInfoModel.expirationDateWriteYn",
+                        "유통기한기재여부",
+                        expirationDateWriteYn
+                    )
+
+                    checkByExpirationDateWriteYn(this, errors)
+                }
+            }
+        }
+    }
+
+    private fun checkByExpirationDateWriteYn(
+        expirationDateInfoModel: ExpirationDateInfoCreateModel,
+        errors: Errors
+    ) {
+        with(expirationDateInfoModel) {
+            when (expirationDateWriteYn) {
+                "Y" -> {
+                    if (manufactureDateWriteYn == "N") {
                         validateNull(
                             errors,
                             "basicProductModel.expirationDateInfoModel.expirationDate",
@@ -112,6 +133,15 @@ class BasicProductDetailCreateModelValidator(
                         )
                     }
                 }
+                "N" -> {
+                    if (manufactureDateWriteYn == "N" || expirationDate == null) {
+                        errors.reject(
+                            "basicProductModel.expirationDateInfoModel",
+                            "유통기한기재여부가 'N' 이면 제조일자기재여부는 'Y', 유통기한(제조일+X일)도 값이 있어야 합니다."
+                        )
+                    }
+                }
+                else -> Unit
             }
         }
     }
