@@ -4,10 +4,10 @@ import com.smartfoodnet.fnproduct.product.entity.ExpirationDateInfo
 import io.swagger.annotations.ApiModelProperty
 
 data class ExpirationDateInfoModel(
-    @ApiModelProperty(value = "제조일자 기재 여부")
+    @ApiModelProperty(value = "제조일자기재여부")
     var manufactureDateWriteYn: String? = null,
 
-    @ApiModelProperty(value = "유통기한 기재 여부")
+    @ApiModelProperty(value = "유통기한기재여부")
     var expirationDateWriteYn: String? = null,
 
     @ApiModelProperty(value = "유통기한(제조일+X일)")
