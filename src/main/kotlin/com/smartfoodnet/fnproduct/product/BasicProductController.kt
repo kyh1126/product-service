@@ -16,9 +16,9 @@ import org.springframework.data.web.PageableDefault
 import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
 
+@Api(description = "기본상품 관련 API")
 @RestController
 @RequestMapping("basic-products")
-@Api(description = "기본상품 관련 API")
 class BasicProductController(private val basicProductService: BasicProductService) {
 
     @Operation(summary = "특정 화주(고객사) ID 의 기본상품 리스트 조회")

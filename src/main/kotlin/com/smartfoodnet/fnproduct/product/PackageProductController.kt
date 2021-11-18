@@ -14,9 +14,9 @@ import org.springframework.data.web.PageableDefault
 import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
 
+@Api(description = "모음상품 관련 API")
 @RestController
 @RequestMapping("package-products")
-@Api(description = "모음상품 관련 API")
 class PackageProductController(private val packageProductService: PackageProductService) {
 
     @Operation(summary = "특정 화주(고객사) ID 의 모음상품 리스트 조회")
