@@ -30,7 +30,7 @@ data class BasicProductCreateModel(
     @ApiModelProperty(value = "상품코드")
     val code: String? = null,
 
-    @ApiModelProperty(value = "상품바코드기재여부")
+    @ApiModelProperty(value = "상품바코드기재여부", allowableValues = "Y,N")
     val barcodeYn: String = "N",
 
     @ApiModelProperty(value = "상품바코드")
@@ -55,7 +55,7 @@ data class BasicProductCreateModel(
     @ApiModelProperty(value = "공급가")
     val supplyPrice: Int? = null,
 
-    @ApiModelProperty(value = "단수(포장)여부")
+    @ApiModelProperty(value = "단수(포장)여부", allowableValues = "Y,N")
     val singlePackagingYn: String = "N",
 
     @ApiModelProperty(value = "유통기한관리여부 (default: N)", allowableValues = "Y,N")

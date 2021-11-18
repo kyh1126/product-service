@@ -21,7 +21,7 @@ data class SubsidiaryMaterialCategoryModel(
     @ApiModelProperty(value = "소분류")
     val level2: String? = level2Category?.keyName,
 
-    @ApiModelProperty(value = "수량적용여부")
+    @ApiModelProperty(value = "수량적용여부", allowableValues = "Y,N")
     val quantityApplyYn: String,
 ) {
 

@@ -26,7 +26,7 @@ data class BasicProductSimpleCreateModel(
     @ApiModelProperty(value = "상품코드")
     val code: String? = null,
 
-    @ApiModelProperty(value = "상품바코드기재여부")
+    @ApiModelProperty(value = "상품바코드기재여부", allowableValues = "Y,N")
     val barcodeYn: String = "N",
 
     @ApiModelProperty(value = "상품바코드")

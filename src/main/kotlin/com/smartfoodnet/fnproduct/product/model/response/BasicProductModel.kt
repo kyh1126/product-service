@@ -28,7 +28,7 @@ data class BasicProductModel(
     @ApiModelProperty(value = "상품코드")
     var code: String? = null,
 
-    @ApiModelProperty(value = "상품바코드기재여부")
+    @ApiModelProperty(value = "상품바코드기재여부", allowableValues = "Y,N")
     var barcodeYn: String,
 
     @ApiModelProperty(value = "상품바코드")
@@ -52,7 +52,7 @@ data class BasicProductModel(
     @ApiModelProperty(value = "공급가")
     var supplyPrice: Int? = null,
 
-    @ApiModelProperty(value = "단수(포장)여부")
+    @ApiModelProperty(value = "단수(포장)여부", allowableValues = "Y,N")
     var singlePackagingYn: String,
 
     @ApiModelProperty(value = "유통기한관리여부 (default: N)", allowableValues = "Y,N")
