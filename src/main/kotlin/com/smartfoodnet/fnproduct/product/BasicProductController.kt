@@ -7,6 +7,7 @@ import com.smartfoodnet.fnproduct.product.model.response.BasicProductDetailModel
 import com.smartfoodnet.fnproduct.product.model.response.BasicProductModel
 import com.smartfoodnet.fnproduct.product.model.response.CategoryByLevelModel
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
+import io.swagger.annotations.Api
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import org.springframework.data.domain.Pageable
@@ -17,6 +18,7 @@ import javax.validation.Valid
 
 @RestController
 @RequestMapping("basic-products")
+@Api(description = "기본상품 관련 API")
 class BasicProductController(private val basicProductService: BasicProductService) {
 
     @Operation(summary = "특정 화주(고객사) ID 의 기본상품 리스트 조회")

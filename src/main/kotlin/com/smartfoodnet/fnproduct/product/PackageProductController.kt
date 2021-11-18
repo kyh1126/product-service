@@ -5,6 +5,7 @@ import com.smartfoodnet.fnproduct.product.model.request.PackageProductDetailCrea
 import com.smartfoodnet.fnproduct.product.model.request.PackageProductMappingSearchCondition
 import com.smartfoodnet.fnproduct.product.model.response.PackageProductDetailModel
 import com.smartfoodnet.fnproduct.product.model.response.PackageProductMappingDetailModel
+import io.swagger.annotations.Api
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import org.springframework.data.domain.Pageable
@@ -15,6 +16,7 @@ import javax.validation.Valid
 
 @RestController
 @RequestMapping("package-products")
+@Api(description = "모음상품 관련 API")
 class PackageProductController(private val packageProductService: PackageProductService) {
 
     @Operation(summary = "특정 화주(고객사) ID 의 모음상품 리스트 조회")
