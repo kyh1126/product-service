@@ -2,6 +2,7 @@ package com.smartfoodnet.fnproduct.order.entity
 
 import com.smartfoodnet.common.entity.BaseEntity
 import com.smartfoodnet.fnproduct.store.entity.StoreProduct
+import io.swagger.annotations.ApiModelProperty
 import java.time.LocalDateTime
 import javax.persistence.*
 
@@ -15,6 +16,10 @@ class OrderDetail(
 
     @Column(name = "partner_id", columnDefinition = "BIGINT UNSIGNED")
     var partnerId: Long? = null,
+
+    @ApiModelProperty(value = "중복처리를 위한 쇼핑몰 종속적 유니크 키")
+    @Column(name = "order_unique_key", unique = true)
+    val orderUniqueKey: String? = null,
 
     @Column(name = "store_name")
     var storeName: String? = null,

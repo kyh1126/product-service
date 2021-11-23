@@ -11,7 +11,7 @@ data class OrderDetailModel(
     val partnerId: Long? = null,
 
     @ApiModelProperty(value = "중복처리를 위한 쇼핑몰 종속적 유니크 키")
-    val storeSpecificUniqueKey: String? = null,
+    val orderUniqueKey: String? = null,
 
     @ApiModelProperty(value = "불러오기 상태")
     val loadStatus: String? = null,
