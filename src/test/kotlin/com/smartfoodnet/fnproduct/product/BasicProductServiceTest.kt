@@ -17,7 +17,8 @@ import com.smartfoodnet.fnproduct.warehouse.entity.InWarehouse
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
-import org.mockito.ArgumentMatchers.*
+import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.anyLong
 import org.mockito.BDDMockito.given
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
@@ -93,7 +94,7 @@ internal class BasicProductServiceTest(
     @BeforeEach
     fun initEach() {
         given(partnerRepository.findById(anyLong())).willReturn(Optional.of(partner))
-        given(inWarehouseRepository.findByPartnerIdAndName(anyLong(),anyString())).willReturn(warehouse)
+        given(inWarehouseRepository.findById(anyLong())).willReturn(Optional.of(warehouse))
         given(basicProductCategoryRepository.findById(anyLong()))
             .willReturn(Optional.of(basicProductCategories.first()))
         given(
@@ -131,11 +132,7 @@ internal class BasicProductServiceTest(
                 .willReturn(listOf(firstSubBasicProduct))
 
             val buildSubsidiaryMaterialMappingCreateModel =
-                buildSubsidiaryMaterialMappingCreateModel(
-                    subsidiaryMaterial = buildBasicProductSubCreateModel(
-                        id = firstSubBasicProduct.id
-                    )
-                )
+                buildSubsidiaryMaterialMappingCreateModel(subsidiaryMaterialId = firstSubBasicProduct.id!!)
 
             val mockCreateModel = buildBasicProductDetailCreateModel(
                 basicProductModel = buildBasicProductCreateModel(
@@ -209,11 +206,7 @@ internal class BasicProductServiceTest(
                 .willReturn(listOf(secondSubBasicProduct))
 
             val buildSubsidiaryMaterialMappingCreateModel =
-                buildSubsidiaryMaterialMappingCreateModel(
-                    subsidiaryMaterial = buildBasicProductSubCreateModel(
-                        id = secondSubBasicProduct.id
-                    )
-                )
+                buildSubsidiaryMaterialMappingCreateModel(subsidiaryMaterialId = secondSubBasicProduct.id!!)
 
             val mockUpdateModel = buildBasicProductDetailCreateModel(
                 basicProductModel = buildBasicProductCreateModel(
@@ -266,25 +259,21 @@ internal class BasicProductServiceTest(
     }
 
     private fun getBasicProductCategory(basicProductCreateModel: BasicProductCreateModel): BasicProductCategory? {
-        return (basicProductCreateModel.basicProductCategoryName)?.let {
-            val (level1, level2) = it.split(" / ")
-            basicProductCategoryFinder.getBasicProductCategoryByKeyName(level1, level2)
+        return (basicProductCreateModel.basicProductCategoryId)?.let {
+            basicProductCategoryFinder.getBasicProductCategory(it)
         }
     }
 
     private fun getSubsidiaryMaterialCategory(basicProductCreateModel: BasicProductCreateModel): SubsidiaryMaterialCategory? {
-        return (basicProductCreateModel.subsidiaryMaterialCategory)?.let {
-            subsidiaryMaterialCategoryFinder.getSubsidiaryMaterialCategoryByKeyName(
-                it.level1!!,
-                it.level2!!
-            )
+        return (basicProductCreateModel.subsidiaryMaterialCategoryId)?.let {
+            subsidiaryMaterialCategoryFinder.getSubsidiaryMaterialCategory(it)
         }
     }
 
     private fun getWarehouse(basicProductCreateModel: BasicProductCreateModel) =
-        inWarehouseService.getInWarehouseWithName(basicProductCreateModel.partnerId!!,basicProductCreateModel.warehouseName)
+        inWarehouseService.getInWarehouse(basicProductCreateModel.warehouseId)
 
     private fun getSubsidiaryMaterialById(createModel: BasicProductDetailCreateModel) =
-        basicProductService.getBasicProducts(createModel.subsidiaryMaterialMappingModels.map { it.subsidiaryMaterial.id!! })
+        basicProductService.getBasicProducts(createModel.subsidiaryMaterialMappingModels.map { it.subsidiaryMaterialId })
             .associateBy { it.id }
 }

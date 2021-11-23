@@ -19,8 +19,8 @@ class InWarehouseService(
             .map { InWarehouseModel.fromEntity(it) }
     }
 
-    fun getInWarehouseWithName(partnerId: Long, name: String) : InWarehouse {
-        return inWarehouseRepository.findByPartnerIdAndName(partnerId, name)?: throw NoSuchElementException("No value present");
+    fun getInWarehouse(warehouseId: Long): InWarehouse {
+        return inWarehouseRepository.findById(warehouseId).get()
     }
 
     @Transactional

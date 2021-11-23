@@ -14,8 +14,8 @@ data class SubsidiaryMaterialMappingCreateModel(
     val basicProductId: Long?,
 
     @NotNull
-    @ApiModelProperty(value = "부자재(기본상품) 정보")
-    val subsidiaryMaterial: BasicProductCreateModel,
+    @ApiModelProperty(value = "부자재(기본상품) ID")
+    val subsidiaryMaterialId: Long,
 
     @NotNull
     @ApiModelProperty(value = "계절옵션 (ALL:계절무관/SUMMER:하절기)", allowableValues = "ALL,SUMMER")

@@ -1,38 +1,20 @@
 package com.smartfoodnet.base
 
-import com.smartfoodnet.fnproduct.code.entity.Code
 import com.smartfoodnet.fnproduct.product.model.request.BasicProductCreateModel
 import com.smartfoodnet.fnproduct.product.model.request.BasicProductDetailCreateModel
-import com.smartfoodnet.fnproduct.product.model.request.SubsidiaryMaterialCategoryCreateModel
 import com.smartfoodnet.fnproduct.product.model.request.SubsidiaryMaterialMappingCreateModel
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
 import com.smartfoodnet.fnproduct.product.model.vo.SeasonalOption
 
-fun buildSubsidiaryMaterialCategoryCreateModel(
-    id: Long? = 1,
-    level1Category: Code? = null,
-    level2Category: Code? = null,
-    level1: String? = "포장재",
-    level2: String? = "종이박스",
-    quantityApplyYn: String = "N",
-) = SubsidiaryMaterialCategoryCreateModel(
-    id = id,
-    level1Category = level1Category,
-    level2Category = level2Category,
-    level1 = level1Category?.let { level1 },
-    level2 = level2Category?.let { level2 },
-    quantityApplyYn = quantityApplyYn
-)
-
 fun buildSubsidiaryMaterialMappingCreateModel(
     basicProductId: Long? = null,
-    subsidiaryMaterial: BasicProductCreateModel = buildBasicProductSubCreateModel(),
+    subsidiaryMaterialId: Long = buildBasicProductSubCreateModel().id!!,
     seasonalOption: SeasonalOption = SeasonalOption.ALL,
     quantity: Int = 1,
 ) = SubsidiaryMaterialMappingCreateModel(
     basicProductId = basicProductId,
-    subsidiaryMaterial = subsidiaryMaterial,
+    subsidiaryMaterialId = subsidiaryMaterialId,
     seasonalOption = seasonalOption,
     quantity = quantity
 )
@@ -50,10 +32,10 @@ fun buildBasicProductCreateModel(
     partnerId: Long? = 1,
     name: String? = "테스트 기본상품",
     barcodeYn: String = "N",
-    basicProductCategoryName: String? = "농산 / 쌀",
-    subsidiaryMaterialCategory: SubsidiaryMaterialCategoryCreateModel? = null,
+    basicProductCategoryId: Long? = 1,
+    subsidiaryMaterialCategoryId: Long? = 1,
     handlingTemperature: HandlingTemperatureType? = null,
-    warehouseName: String = "입고처(주)파이",
+    warehouseId: Long = 1,
     singlePackagingYn: String = "N",
     expirationDateManagementYn: String = "N",
     piecesPerBox: Int? = 2,
@@ -63,10 +45,10 @@ fun buildBasicProductCreateModel(
     partnerId = partnerId,
     name = name,
     barcodeYn = barcodeYn,
-    basicProductCategoryName = basicProductCategoryName,
-    subsidiaryMaterialCategory = subsidiaryMaterialCategory,
+    basicProductCategoryId = basicProductCategoryId,
+    subsidiaryMaterialCategoryId = subsidiaryMaterialCategoryId,
     handlingTemperature = handlingTemperature,
-    warehouseName = warehouseName,
+    warehouseId = warehouseId,
     singlePackagingYn = singlePackagingYn,
     expirationDateManagementYn = expirationDateManagementYn,
     piecesPerBox = piecesPerBox,
@@ -79,18 +61,18 @@ fun buildBasicProductSubCreateModel(
     type: BasicProductType = BasicProductType.SUB,
     partnerId: Long? = 1,
     name: String? = "종이박스",
-    basicProductCategoryName: String? = null,
-    subsidiaryMaterialCategory: SubsidiaryMaterialCategoryCreateModel? = buildSubsidiaryMaterialCategoryCreateModel(),
+    basicProductCategoryId: Long? = null,
+    subsidiaryMaterialCategoryId: Long? = 1,
     handlingTemperature: HandlingTemperatureType? = null,
-    warehouseName: String = "입고처(주)파이",
+    warehouseId: Long = 1,
 ) = BasicProductCreateModel(
     id = id,
     type = type,
     partnerId = partnerId,
     name = name,
-    basicProductCategoryName = basicProductCategoryName,
-    subsidiaryMaterialCategory = subsidiaryMaterialCategory,
+    basicProductCategoryId = basicProductCategoryId,
+    subsidiaryMaterialCategoryId = subsidiaryMaterialCategoryId,
     handlingTemperature = handlingTemperature,
-    warehouseName = warehouseName,
+    warehouseId = warehouseId,
     activeYn = "Y"
 )

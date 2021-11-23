@@ -21,7 +21,6 @@ internal class BasicProductDetailCreateModelValidatorTest {
     @Mock
     lateinit var basicProductRepository: BasicProductRepository
 
-    lateinit var basicProductCreateModelValidator: BasicProductCreateModelValidator
     lateinit var basicProductDetailCreateModelValidator: BasicProductDetailCreateModelValidator
     private var basicproductsSub: List<BasicProduct> = mutableListOf()
 
@@ -37,12 +36,8 @@ internal class BasicProductDetailCreateModelValidatorTest {
             )
         }
 
-        basicProductCreateModelValidator = BasicProductCreateModelValidator()
         basicProductDetailCreateModelValidator =
-            BasicProductDetailCreateModelValidator(
-                basicProductRepository,
-                basicProductCreateModelValidator
-            )
+            BasicProductDetailCreateModelValidator(basicProductRepository)
     }
 
     @Nested
@@ -75,34 +70,11 @@ internal class BasicProductDetailCreateModelValidatorTest {
                     "상품명 값을 입력해주세요.",
                     "상품바코드기재여부 값을 입력해주세요.",
                     "취급온도 값은 null 이 아닌 값을 입력해주세요.",
-                    "상품카테고리명 값은 null 이 아닌 값을 입력해주세요.",
+                    "상품카테고리 ID 값은 null 이 아닌 값을 입력해주세요.",
                     "단수(포장)여부 값을 입력해주세요.",
                     "유통기한관리여부 값을 입력해주세요.",
                     "박스입수 값은 null 이 아닌 값을 입력해주세요.",
                     "파레트입수 값은 null 이 아닌 값을 입력해주세요."
-                ).joinToString(separator, "", separator)
-
-                // when & then
-                val ex = assertThrows<CreateModelValidateError> {
-                    ValidatorUtils.validateAndThrow(
-                        basicProductDetailCreateModelValidator,
-                        mockCreateModel
-                    )
-                }
-                assertNotNull(ex.message)
-                assertTrue(ex.message!!.contains(expectedMessage))
-            }
-
-            @Test
-            @DisplayName("validate 실패한다 - 기본상품 카테고리 대분류/중분류")
-            fun checkRequiredFieldsBasicType_InvalidBasicProductCategory_ThenFail() {
-                // given
-                val mockCreateModel = getInvalidBasicProductCategory_checkRequiredFieldsBasicType()
-
-                val expectedMessage = listOf(
-                    "CreateModelValidateErrorMessage: ",
-                    "상품카테고리(대분류) 값을 입력해주세요.",
-                    "상품카테고리(중분류) 값을 입력해주세요."
                 ).joinToString(separator, "", separator)
 
                 // when & then
@@ -134,7 +106,7 @@ internal class BasicProductDetailCreateModelValidatorTest {
             barcodeYn = "",
             type = BasicProductType.BASIC,
             handlingTemperature = null,
-            basicProductCategoryName = null,
+            basicProductCategoryId = null,
             singlePackagingYn = "",
             expirationDateManagementYn = "",
             piecesPerBox = null,
@@ -143,23 +115,10 @@ internal class BasicProductDetailCreateModelValidatorTest {
         return getInput(basicProductModel)
     }
 
-    private fun getInvalidBasicProductCategory_checkRequiredFieldsBasicType(): BasicProductDetailCreateModel {
-        val basicProductModel = buildBasicProductCreateModel(
-            type = BasicProductType.BASIC,
-            handlingTemperature = HandlingTemperatureType.FREEZE,
-            basicProductCategoryName = " / ",
-        )
-        return getInput(basicProductModel)
-    }
-
     private fun getInput(basicProductModel: BasicProductCreateModel): BasicProductDetailCreateModel {
         val firstSubBasicProduct = basicproductsSub.first()
         val buildSubsidiaryMaterialMappingCreateModel =
-            buildSubsidiaryMaterialMappingCreateModel(
-                subsidiaryMaterial = buildBasicProductSubCreateModel(
-                    id = firstSubBasicProduct.id
-                )
-            )
+            buildSubsidiaryMaterialMappingCreateModel(subsidiaryMaterialId = firstSubBasicProduct.id!!)
 
         return buildBasicProductDetailCreateModel(basicProductModel = basicProductModel)
             .apply { subsidiaryMaterialMappingModels.add(buildSubsidiaryMaterialMappingCreateModel) }

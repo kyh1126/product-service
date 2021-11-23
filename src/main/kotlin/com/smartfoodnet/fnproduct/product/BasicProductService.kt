@@ -22,7 +22,6 @@ import com.smartfoodnet.fnproduct.product.model.response.BasicProductDetailModel
 import com.smartfoodnet.fnproduct.product.model.response.BasicProductModel
 import com.smartfoodnet.fnproduct.product.model.response.CategoryByLevelModel
 import com.smartfoodnet.fnproduct.product.validator.BasicProductDetailCreateModelValidator
-import com.smartfoodnet.fnproduct.warehouse.InWarehouseRepository
 import com.smartfoodnet.fnproduct.warehouse.InWarehouseService
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -172,27 +171,22 @@ class BasicProductService(
     }
 
     private fun getBasicProductCategory(basicProductCreateModel: BasicProductCreateModel): BasicProductCategory? {
-        return (basicProductCreateModel.basicProductCategoryName)?.let {
-            val (level1, level2) = it.split(" / ")
-            basicProductCategoryFinder.getBasicProductCategoryByKeyName(level1, level2)
+        return (basicProductCreateModel.basicProductCategoryId)?.let {
+            basicProductCategoryFinder.getBasicProductCategory(it)
         }
     }
 
     private fun getSubsidiaryMaterialCategory(basicProductCreateModel: BasicProductCreateModel): SubsidiaryMaterialCategory? {
-        return (basicProductCreateModel.subsidiaryMaterialCategory)?.let {
-            subsidiaryMaterialCategoryFinder.getSubsidiaryMaterialCategoryByKeyName(
-                it.level1!!,
-                it.level2!!
-            )
+        return (basicProductCreateModel.subsidiaryMaterialCategoryId)?.let {
+            subsidiaryMaterialCategoryFinder.getSubsidiaryMaterialCategory(it)
         }
     }
 
     private fun getWarehouse(basicProductCreateModel: BasicProductCreateModel) =
-        inWarehouseService.getInWarehouseWithName(basicProductCreateModel.partnerId!!, basicProductCreateModel.warehouseName);
-//        warehouseService.getWarehouse(basicProductCreateModel.warehouseName)
+        inWarehouseService.getInWarehouse(basicProductCreateModel.warehouseId)
 
     private fun getSubsidiaryMaterialById(createModel: BasicProductDetailCreateModel) =
-        getBasicProducts(createModel.subsidiaryMaterialMappingModels.map { it.subsidiaryMaterial.id!! })
+        getBasicProducts(createModel.subsidiaryMaterialMappingModels.map { it.subsidiaryMaterialId })
             .associateBy { it.id }
 
     private fun createOrUpdateSubsidiaryMaterialMappings(
@@ -201,7 +195,7 @@ class BasicProductService(
         subsidiaryMaterialById: Map<Long?, BasicProduct>,
     ): Set<SubsidiaryMaterialMapping> {
         val subsidiaryMaterialMappings = subsidiaryMaterialMappingModels.map {
-            val basicProductSub = subsidiaryMaterialById[it.subsidiaryMaterial.id]
+            val basicProductSub = subsidiaryMaterialById[it.subsidiaryMaterialId]
                 ?: throw BaseRuntimeException(errorCode = ErrorCode.NO_ELEMENT)
             if (it.id == null) it.toEntity(basicProductSub)
             else {

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.product.entity.BasicProductCategory
 import com.smartfoodnet.fnproduct.product.entity.SubsidiaryMaterialCategory
-import com.smartfoodnet.fnproduct.product.entity.Warehouse
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
 import com.smartfoodnet.fnproduct.warehouse.entity.InWarehouse
@@ -37,11 +36,11 @@ data class BasicProductCreateModel(
     @ApiModelProperty(value = "상품바코드")
     val barcode: String? = null,
 
-    @ApiModelProperty(value = "상품카테고리명", example = "축산 / 가공식품")
-    val basicProductCategoryName: String? = null,
+    @ApiModelProperty(value = "상품카테고리 ID")
+    val basicProductCategoryId: Long? = null,
 
-    @ApiModelProperty(value = "부자재카테고리")
-    val subsidiaryMaterialCategory: SubsidiaryMaterialCategoryCreateModel? = null,
+    @ApiModelProperty(value = "부자재카테고리 ID")
+    val subsidiaryMaterialCategoryId: Long? = null,
 
     @ApiModelProperty(
         value = "취급온도 (ROOM:상온/REFRIGERATE:냉장/FREEZE:냉동)",
@@ -50,8 +49,8 @@ data class BasicProductCreateModel(
     val handlingTemperature: HandlingTemperatureType? = null,
 
     @NotNull
-    @ApiModelProperty(value = "입고처명", example = "CJ")
-    val warehouseName: String,
+    @ApiModelProperty(value = "입고처 ID")
+    val warehouseId: Long,
 
     @ApiModelProperty(value = "공급가")
     val supplyPrice: Int? = null,

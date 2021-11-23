@@ -15,8 +15,7 @@ import org.springframework.validation.Errors
 @Component
 @Transactional(readOnly = true)
 class BasicProductDetailCreateModelValidator(
-    private val basicProductRepository: BasicProductRepository,
-    private val basicProductCreateModelValidator: BasicProductCreateModelValidator,
+    private val basicProductRepository: BasicProductRepository
 ) : CreateModelValidator<BasicProductDetailCreateModel> {
     override fun supports(clazz: Class<*>): Boolean =
         clazz.isAssignableFrom(BasicProductDetailCreateModel::class.java)
@@ -28,7 +27,7 @@ class BasicProductDetailCreateModelValidator(
     ) {
         val basicProductModel = target.basicProductModel
         when (basicProductModel.type) {
-            BasicProductType.BASIC -> checkRequiredFieldsBasicType(saveState, target, errors)
+            BasicProductType.BASIC -> checkRequiredFieldsBasicType(target, errors)
             BasicProductType.CUSTOM_SUB -> checkRequiredFieldsCustomSubType(target, errors)
             else -> Unit
         }
@@ -157,7 +156,6 @@ class BasicProductDetailCreateModelValidator(
     }
 
     private fun checkRequiredFieldsBasicType(
-        saveState: SaveState,
         target: BasicProductDetailCreateModel,
         errors: Errors,
     ) {
@@ -178,9 +176,9 @@ class BasicProductDetailCreateModelValidator(
             )
             validateEmpty(
                 errors,
-                "basicProductModel.basicProductCategoryName",
-                "상품카테고리명",
-                basicProductCategoryName
+                "basicProductModel.basicProductCategoryId",
+                "상품카테고리 ID",
+                basicProductCategoryId
             )
             validateEmpty(
                 errors,
@@ -196,46 +194,14 @@ class BasicProductDetailCreateModelValidator(
             )
             validateEmpty(errors, "basicProductModel.piecesPerBox", "박스입수", piecesPerBox)
             validateEmpty(errors, "basicProductModel.boxesPerPalette", "파레트입수", boxesPerPalette)
-
-            if (basicProductCategoryName != null && !basicProductCategoryName.contains(" / ")) {
-                errors.rejectValue(
-                    "basicProductModel.basicProductCategoryName",
-                    "basicProductCategoryName.invalid",
-                    "상품카테고리명은 \" / \"로 구분하여 입력해주세요."
-                )
-            }
-
-            if (basicProductCategoryName == null || !basicProductCategoryName.contains(" / ")) return
-            val (level1, level2) = basicProductCategoryName.split(" / ")
-            validateEmpty(
-                errors,
-                "basicProductModel.basicProductCategoryName",
-                "상품카테고리(대분류)",
-                level1
-            )
-            validateEmpty(
-                errors,
-                "basicProductModel.basicProductCategoryName",
-                "상품카테고리(중분류)",
-                level2
-            )
         }
 
         validateEmpty(
             errors,
-            "subsidiaryMaterialMappingModels",
+            "basicProductModel.subsidiaryMaterialMappingModels",
             "부자재매핑정보",
             subsidiaryMaterialMappingModels
         )
-        if (subsidiaryMaterialMappingModels.isNotEmpty()) {
-            validateCollection(
-                saveState,
-                errors,
-                "subsidiaryMaterialMappingModels",
-                subsidiaryMaterialMappingModels.map { it.subsidiaryMaterial },
-                basicProductCreateModelValidator
-            )
-        }
     }
 
     private fun checkRequiredFieldsCustomSubType(
