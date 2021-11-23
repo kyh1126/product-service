@@ -10,6 +10,9 @@ data class OrderDetailModel(
     @ApiModelProperty(value = "화주사 ID")
     val partnerId: Long? = null,
 
+    @ApiModelProperty(value = "중복처리를 위한 쇼핑몰 종속적 유니크 키")
+    val storeSpecificUniqueKey: String? = null,
+
     @ApiModelProperty(value = "불러오기 상태")
     val loadStatus: String? = null,
 
@@ -53,6 +56,6 @@ data class OrderDetailModel(
 
     val sender: SenderModel? = null,
 
-    @ApiModelProperty(value = "업로드")
+    @ApiModelProperty(value = "업로드방식")
     val uploadType: String? = null
 )
