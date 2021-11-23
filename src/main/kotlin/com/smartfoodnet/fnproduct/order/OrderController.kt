@@ -1,8 +1,6 @@
 package com.smartfoodnet.fnproduct.order
 
 import com.smartfoodnet.fnproduct.order.model.OrderDetailModel
-import com.smartfoodnet.fnproduct.product.model.request.BasicProductDetailCreateModel
-import com.smartfoodnet.fnproduct.product.model.response.BasicProductDetailModel
 import io.swagger.annotations.Api
 import io.swagger.v3.oas.annotations.Operation
 import org.springframework.web.bind.annotation.PostMapping
@@ -19,7 +17,7 @@ class OrderController(
 ) {
     @Operation(summary = "기본상품 추가")
     @PostMapping
-    fun createBasicProduct(@Valid @RequestBody orderDetailModel: OrderDetailModel): BasicProductDetailModel {
-        return
+    fun createBasicProduct(@Valid @RequestBody orderDetailModel: OrderDetailModel): OrderDetailModel {
+        return orderDetailModel
     }
 }
