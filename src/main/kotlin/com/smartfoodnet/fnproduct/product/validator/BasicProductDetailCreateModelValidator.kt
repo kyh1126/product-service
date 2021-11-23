@@ -37,7 +37,7 @@ class BasicProductDetailCreateModelValidator(
 
         checkBarcode(saveState, basicProductModel, errors)
 
-        checkexpirationDateInfo(basicProductModel, errors)
+        checkExpirationDateInfo(basicProductModel, errors)
 
         checkTemperatureType(basicProductModel, errors)
     }
@@ -94,7 +94,7 @@ class BasicProductDetailCreateModelValidator(
         }
     }
 
-    private fun checkexpirationDateInfo(target: BasicProductCreateModel, errors: Errors) {
+    private fun checkExpirationDateInfo(target: BasicProductCreateModel, errors: Errors) {
         with(target) {
             if (expirationDateManagementYn.isNotEmpty() && expirationDateManagementYn == "Y") {
                 with(expirationDateInfoModel!!) {
