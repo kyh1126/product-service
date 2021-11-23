@@ -17,10 +17,10 @@ class BasicProductSearchCondition(
     @ApiModelProperty(value = "입고처 ID", example = "1")
     var warehouseId: Long? = null,
 
-    @ApiModelProperty(value = "유통기한관리여부")
+    @ApiModelProperty(value = "유통기한관리여부", allowableValues = "Y,N")
     var expirationDateManagementYn: String? = null,
 
-    @ApiModelProperty(value = "활성화여부")
+    @ApiModelProperty(value = "활성화여부", allowableValues = "Y,N")
     var activeYn: String? = null,
 ) : PredicateSearchCondition() {
     private val basicProductApiTypes = setOf(BasicProductType.BASIC, BasicProductType.CUSTOM_SUB)

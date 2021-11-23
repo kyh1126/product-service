@@ -8,7 +8,7 @@ class PackageProductMappingSearchCondition(
     @JsonIgnore
     var partnerId: Long? = null,
 
-    @ApiModelProperty(value = "활성화여부(모음상품)")
+    @ApiModelProperty(value = "활성화여부(모음상품)", allowableValues = "Y,N")
     var activeYn: String? = null,
 ) {
 
