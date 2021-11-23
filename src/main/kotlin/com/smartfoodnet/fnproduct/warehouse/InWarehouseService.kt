@@ -1,6 +1,7 @@
 package com.smartfoodnet.fnproduct.warehouse
 
 import com.smartfoodnet.common.copyNonNullProperty
+import com.smartfoodnet.fnproduct.warehouse.entity.InWarehouse
 import com.smartfoodnet.fnproduct.warehouse.model.dto.InWarehouseDto
 import com.smartfoodnet.fnproduct.warehouse.model.dto.InWarehouseUpdateDto
 import com.smartfoodnet.fnproduct.warehouse.model.response.InWarehouseModel
@@ -16,6 +17,10 @@ class InWarehouseService(
     fun getInWarehouses(partnerId: Long): List<InWarehouseModel> {
         return inWarehouseRepository.findByPartnerId(partnerId)
             .map { InWarehouseModel.fromEntity(it) }
+    }
+
+    fun getInWarehouseWithName(partnerId: Long, name: String) : InWarehouse {
+        return inWarehouseRepository.findByPartnerIdAndName(partnerId, name)?: throw NoSuchElementException("No value present");
     }
 
     @Transactional
