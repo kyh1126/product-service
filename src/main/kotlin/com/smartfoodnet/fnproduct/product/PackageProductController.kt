@@ -5,6 +5,7 @@ import com.smartfoodnet.fnproduct.product.model.request.PackageProductDetailCrea
 import com.smartfoodnet.fnproduct.product.model.request.PackageProductMappingSearchCondition
 import com.smartfoodnet.fnproduct.product.model.response.PackageProductDetailModel
 import com.smartfoodnet.fnproduct.product.model.response.PackageProductMappingDetailModel
+import io.swagger.annotations.Api
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import org.springframework.data.domain.Pageable
@@ -13,6 +14,7 @@ import org.springframework.data.web.PageableDefault
 import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
 
+@Api(description = "모음상품 관련 API")
 @RestController
 @RequestMapping("package-products")
 class PackageProductController(private val packageProductService: PackageProductService) {

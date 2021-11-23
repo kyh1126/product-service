@@ -2,6 +2,7 @@ package com.smartfoodnet.fnproduct.product.model.request
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.smartfoodnet.fnproduct.product.entity.*
+import com.smartfoodnet.fnproduct.warehouse.entity.InWarehouse
 import io.swagger.annotations.ApiModelProperty
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
@@ -21,13 +22,13 @@ data class BasicProductDetailCreateModel(
         basicProductCategory: BasicProductCategory? = null,
         subsidiaryMaterialCategory: SubsidiaryMaterialCategory? = null,
         subsidiaryMaterialMappings: Set<SubsidiaryMaterialMapping> = setOf(),
-        warehouse: Warehouse,
+        inWarehouse: InWarehouse,
     ): BasicProduct {
         val basicProduct = basicProductModel.toEntity(
             code,
             basicProductCategory,
             subsidiaryMaterialCategory,
-            warehouse
+            inWarehouse
         )
         return basicProduct.apply { subsidiaryMaterialMappings.forEach(this::addSubsidiaryMaterialMappings) }
     }

@@ -7,6 +7,7 @@ import com.smartfoodnet.fnproduct.product.entity.SubsidiaryMaterialCategory
 import com.smartfoodnet.fnproduct.product.entity.Warehouse
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
+import com.smartfoodnet.fnproduct.warehouse.entity.InWarehouse
 import io.swagger.annotations.ApiModelProperty
 import javax.validation.constraints.NotNull
 
@@ -21,7 +22,7 @@ data class BasicProductCreateModel(
     )
     val type: BasicProductType = BasicProductType.BASIC,
 
-    @ApiModelProperty(value = "화주(고객사) ID")
+    @ApiModelProperty(value = "화주(고객사) ID", example = "1")
     val partnerId: Long? = null,
 
     @ApiModelProperty(value = "상품명")
@@ -30,13 +31,13 @@ data class BasicProductCreateModel(
     @ApiModelProperty(value = "상품코드")
     val code: String? = null,
 
-    @ApiModelProperty(value = "상품바코드기재여부")
+    @ApiModelProperty(value = "상품바코드기재여부", allowableValues = "Y,N")
     val barcodeYn: String = "N",
 
     @ApiModelProperty(value = "상품바코드")
     val barcode: String? = null,
 
-    @ApiModelProperty(value = "상품카테고리명")
+    @ApiModelProperty(value = "상품카테고리명", example = "축산 / 가공식품")
     val basicProductCategoryName: String? = null,
 
     @ApiModelProperty(value = "부자재카테고리")
@@ -49,13 +50,13 @@ data class BasicProductCreateModel(
     val handlingTemperature: HandlingTemperatureType? = null,
 
     @NotNull
-    @ApiModelProperty(value = "입고처명")
+    @ApiModelProperty(value = "입고처명", example = "CJ")
     val warehouseName: String,
 
     @ApiModelProperty(value = "공급가")
     val supplyPrice: Int? = null,
 
-    @ApiModelProperty(value = "단수(포장)여부")
+    @ApiModelProperty(value = "단수(포장)여부", allowableValues = "Y,N")
     val singlePackagingYn: String = "N",
 
     @ApiModelProperty(value = "유통기한관리여부 (default: N)", allowableValues = "Y,N")
@@ -80,7 +81,7 @@ data class BasicProductCreateModel(
         code: String?,
         basicProductCategory: BasicProductCategory?,
         subsidiaryMaterialCategory: SubsidiaryMaterialCategory?,
-        warehouse: Warehouse,
+        inWarehouse: InWarehouse,
     ): BasicProduct {
         return BasicProduct(
             type = type,
@@ -92,7 +93,7 @@ data class BasicProductCreateModel(
             basicProductCategory = basicProductCategory,
             subsidiaryMaterialCategory = subsidiaryMaterialCategory,
             handlingTemperature = handlingTemperature,
-            warehouse = warehouse,
+            warehouse = inWarehouse,
             supplyPrice = supplyPrice,
             singlePackagingYn = singlePackagingYn,
             expirationDateManagementYn = expirationDateManagementYn,

@@ -3,6 +3,7 @@ package com.smartfoodnet.base
 import com.smartfoodnet.fnproduct.code.entity.Code
 import com.smartfoodnet.fnproduct.product.entity.*
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
+import com.smartfoodnet.fnproduct.warehouse.entity.InWarehouse
 import kotlin.random.Random
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -101,7 +102,21 @@ fun buildPartner() =
 // -- Warehouse
 // ---------------------------------------------------------------------------------------------------------------------
 fun buildWarehouse(partner: Partner) =
-    Warehouse(id = Random.nextLong(0, Long.MAX_VALUE), name = "입고처(주)파이", partnerId = partner.id!!)
+    InWarehouse(
+        id = Random.nextLong(0, Long.MAX_VALUE),
+        name = "입고처(주)파이",
+        partnerId = partner.id!!,
+        postNumber = "12345",
+        address = "서울시 동대문구",
+        addressDetail = "101-1",
+        representative = "대표자",
+        businessNumber = "1234567890",
+        contactNumber = "01034561234",
+        managerName = "담당자",
+        managerEmail = "manager@kakao.com",
+        managerContactNumber = ""
+    )
+//    Warehouse(id = Random.nextLong(0, Long.MAX_VALUE), name = "입고처(주)파이", partnerId = partner.id!!)
 
 // ---------------------------------------------------------------------------------------------------------------------
 // -- BasicProduct
