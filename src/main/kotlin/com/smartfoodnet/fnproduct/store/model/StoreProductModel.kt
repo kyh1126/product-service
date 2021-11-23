@@ -1,6 +1,6 @@
-package com.smartfoodnet.store.model
+package com.smartfoodnet.fnproduct.store.model
 
-import com.smartfoodnet.store.entity.StoreProduct
+import com.smartfoodnet.fnproduct.store.entity.StoreProduct
 
 data class StoreProductModel(
     var id: Long? = null,

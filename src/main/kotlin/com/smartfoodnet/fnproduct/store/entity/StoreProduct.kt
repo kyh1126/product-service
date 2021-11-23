@@ -1,4 +1,4 @@
-package com.smartfoodnet.store.entity
+package com.smartfoodnet.fnproduct.store.entity
 
 import com.smartfoodnet.common.entity.BaseEntity
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct

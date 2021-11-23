@@ -1,12 +1,12 @@
-package com.smartfoodnet.store
+package com.smartfoodnet.fnproduct.store
 
 import com.google.common.collect.Lists
 import com.smartfoodnet.fnproduct.product.BasicProductRepository
-import com.smartfoodnet.store.model.StoreProductModel
-import com.smartfoodnet.store.support.StoreProductHeader
-import com.smartfoodnet.store.support.StoreProductHeader.*
-import com.smartfoodnet.store.support.StoreProductHeaderIndexMap
-import com.smartfoodnet.store.support.StoreProductRepository
+import com.smartfoodnet.fnproduct.store.model.StoreProductModel
+import com.smartfoodnet.fnproduct.store.support.StoreProductHeader
+import com.smartfoodnet.fnproduct.store.support.StoreProductHeader.*
+import com.smartfoodnet.fnproduct.store.support.StoreProductHeaderIndexMap
+import com.smartfoodnet.fnproduct.store.support.StoreProductRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile

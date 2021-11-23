@@ -1,6 +1,6 @@
-package com.smartfoodnet.store
+package com.smartfoodnet.fnproduct.store
 
-import com.smartfoodnet.store.model.StoreProductModel
+import com.smartfoodnet.fnproduct.store.model.StoreProductModel
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import org.springframework.web.bind.annotation.*
