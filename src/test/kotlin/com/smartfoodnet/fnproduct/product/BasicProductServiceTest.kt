@@ -11,6 +11,9 @@ import com.smartfoodnet.fnproduct.product.model.request.BasicProductDetailCreate
 import com.smartfoodnet.fnproduct.product.model.response.BasicProductDetailModel
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
+import com.smartfoodnet.fnproduct.warehouse.InWarehouseRepository
+import com.smartfoodnet.fnproduct.warehouse.InWarehouseService
+import com.smartfoodnet.fnproduct.warehouse.entity.InWarehouse
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -32,7 +35,7 @@ import kotlin.random.Random
 @EnableAutoConfiguration
 internal class BasicProductServiceTest(
     private val codeService: CodeService,
-    private val warehouseService: WarehouseService,
+    private val inWarehouseService: InWarehouseService,
     private val basicProductService: BasicProductService,
     private val basicProductCategoryFinder: BasicProductCategoryFinder,
     private val subsidiaryMaterialCategoryFinder: SubsidiaryMaterialCategoryFinder,
@@ -45,7 +48,7 @@ internal class BasicProductServiceTest(
     lateinit var partnerRepository: PartnerRepository
 
     @MockBean
-    lateinit var warehouseRepository: WarehouseRepository
+    lateinit var inWarehouseRepository: InWarehouseRepository
 
     @MockBean
     lateinit var basicProductCategoryRepository: BasicProductCategoryRepository
@@ -54,7 +57,7 @@ internal class BasicProductServiceTest(
     lateinit var subsidiaryMaterialCategoryRepository: SubsidiaryMaterialCategoryRepository
 
     lateinit var partner: Partner
-    lateinit var warehouse: Warehouse
+    lateinit var warehouse: InWarehouse
     private var basicProductCategories: List<BasicProductCategory> = mutableListOf()
     private var subsidiaryMaterialCategories: List<SubsidiaryMaterialCategory> = mutableListOf()
     private var basicproductsSub: List<BasicProduct> = mutableListOf()
@@ -90,7 +93,7 @@ internal class BasicProductServiceTest(
     @BeforeEach
     fun initEach() {
         given(partnerRepository.findById(anyLong())).willReturn(Optional.of(partner))
-        given(warehouseRepository.findByName(anyString())).willReturn(warehouse)
+        given(inWarehouseRepository.findByPartnerIdAndName(anyLong(),anyString())).willReturn(warehouse)
         given(basicProductCategoryRepository.findById(anyLong()))
             .willReturn(Optional.of(basicProductCategories.first()))
         given(
@@ -171,7 +174,7 @@ internal class BasicProductServiceTest(
                 basicProductCategory = basicProductCategory,
                 subsidiaryMaterialCategory = subsidiaryMaterialCategory,
                 subsidiaryMaterialMappings = subsidiaryMaterialMappings!!,
-                warehouse = warehouse
+                inWarehouse = warehouse
             ).apply { id = productId }
             given(basicProductRepository.save(any())).willReturn(mockBasicProduct)
             given(basicProductRepository.findById(productId))
@@ -246,7 +249,7 @@ internal class BasicProductServiceTest(
                 basicProductCategory = basicProductCategory,
                 subsidiaryMaterialCategory = subsidiaryMaterialCategory,
                 subsidiaryMaterialMappings = subsidiaryMaterialMappings!!,
-                warehouse = warehouse
+                inWarehouse = warehouse
             ).apply { id = productId }
 
             // when
@@ -279,7 +282,7 @@ internal class BasicProductServiceTest(
     }
 
     private fun getWarehouse(basicProductCreateModel: BasicProductCreateModel) =
-        warehouseService.getWarehouse(basicProductCreateModel.warehouseName)
+        inWarehouseService.getInWarehouseWithName(basicProductCreateModel.partnerId!!,basicProductCreateModel.warehouseName)
 
     private fun getSubsidiaryMaterialById(createModel: BasicProductDetailCreateModel) =
         basicProductService.getBasicProducts(createModel.subsidiaryMaterialMappingModels.map { it.subsidiaryMaterial.id!! })

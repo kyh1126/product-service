@@ -7,6 +7,7 @@ import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductTypeConverter
 import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
 import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureTypeConverter
+import com.smartfoodnet.fnproduct.warehouse.entity.InWarehouse
 import javax.persistence.*
 
 @Entity
@@ -50,7 +51,7 @@ class BasicProduct(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "warehouse_id", columnDefinition = "BIGINT UNSIGNED")
-    var warehouse: Warehouse? = null,
+    var warehouse: InWarehouse? = null,
 
     @Column(name = "supply_price")
     var supplyPrice: Int? = null,
@@ -97,7 +98,7 @@ class BasicProduct(
         basicProductCategoryRequest: BasicProductCategory?,
         subsidiaryMaterialCategoryRequest: SubsidiaryMaterialCategory?,
         subsidiaryMaterialMappingRequests: Set<SubsidiaryMaterialMapping>,
-        warehouseRequest: Warehouse,
+        warehouseRequest: InWarehouse,
     ) {
         name = request.name
         supplyPrice = request.supplyPrice

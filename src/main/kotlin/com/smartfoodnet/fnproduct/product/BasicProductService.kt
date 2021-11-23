@@ -22,6 +22,8 @@ import com.smartfoodnet.fnproduct.product.model.response.BasicProductDetailModel
 import com.smartfoodnet.fnproduct.product.model.response.BasicProductModel
 import com.smartfoodnet.fnproduct.product.model.response.CategoryByLevelModel
 import com.smartfoodnet.fnproduct.product.validator.BasicProductDetailCreateModelValidator
+import com.smartfoodnet.fnproduct.warehouse.InWarehouseRepository
+import com.smartfoodnet.fnproduct.warehouse.InWarehouseService
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -29,7 +31,8 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 @Transactional(readOnly = true)
 class BasicProductService(
-    private val warehouseService: WarehouseService,
+//    private val warehouseService: WarehouseService,
+    private val inWarehouseService: InWarehouseService,
     private val basicProductRepository: BasicProductRepository,
     private val basicProductDetailCreateModelValidator: BasicProductDetailCreateModelValidator,
     private val basicProductFinder: BasicProductFinder,
@@ -95,7 +98,7 @@ class BasicProductService(
         // (공통)부자재 카테고리 조회
         val subsidiaryMaterialCategory = getSubsidiaryMaterialCategory(basicProductCreateModel)
         // 입고처 조회
-        val warehouse = getWarehouse(basicProductCreateModel)
+        val inWarehouse = getWarehouse(basicProductCreateModel)
         // 기본상품-부자재 매핑을 위한 부자재(BasicProduct) 조회
         val subsidiaryMaterialById = getSubsidiaryMaterialById(createModel)
 
@@ -110,7 +113,7 @@ class BasicProductService(
             basicProductCategory = basicProductCategory,
             subsidiaryMaterialCategory = subsidiaryMaterialCategory,
             subsidiaryMaterialMappings = subsidiaryMaterialMappings,
-            warehouse = warehouse
+            inWarehouse = inWarehouse
         )
         return saveBasicProduct(basicProduct)
             .run { toBasicProductDetailModel(this, subsidiaryMaterialById) }
@@ -134,7 +137,7 @@ class BasicProductService(
         // (공통)부자재 카테고리 조회
         val subsidiaryMaterialCategory = getSubsidiaryMaterialCategory(basicProductCreateModel)
         // 입고처 조회
-        val warehouse = getWarehouse(basicProductCreateModel)
+        val inWarehouse = getWarehouse(basicProductCreateModel)
         // 기본상품-부자재 매핑을 위한 부자재(BasicProduct) 조회
         val subsidiaryMaterialById = getSubsidiaryMaterialById(updateModel)
 
@@ -157,7 +160,7 @@ class BasicProductService(
             basicProductCategory,
             subsidiaryMaterialCategory,
             subsidiaryMaterials,
-            warehouse
+            inWarehouse
         )
 
         return toBasicProductDetailModel(basicProduct, subsidiaryMaterialById)
@@ -185,7 +188,8 @@ class BasicProductService(
     }
 
     private fun getWarehouse(basicProductCreateModel: BasicProductCreateModel) =
-        warehouseService.getWarehouse(basicProductCreateModel.warehouseName)
+        inWarehouseService.getInWarehouseWithName(basicProductCreateModel.partnerId!!, basicProductCreateModel.warehouseName);
+//        warehouseService.getWarehouse(basicProductCreateModel.warehouseName)
 
     private fun getSubsidiaryMaterialById(createModel: BasicProductDetailCreateModel) =
         getBasicProducts(createModel.subsidiaryMaterialMappingModels.map { it.subsidiaryMaterial.id!! })
