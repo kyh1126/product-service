@@ -1,5 +1,6 @@
 package com.smartfoodnet.fnproduct.order.entity
 
+import com.smartfoodnet.common.entity.BaseEntity
 import com.smartfoodnet.fnproduct.store.entity.StoreProduct
 import java.time.LocalDateTime
 import javax.persistence.*
@@ -60,4 +61,5 @@ class OrderDetail(
 
     @Column(name = "upload_type")
     var uploadType: String? = null
-)
+
+): BaseEntity()
