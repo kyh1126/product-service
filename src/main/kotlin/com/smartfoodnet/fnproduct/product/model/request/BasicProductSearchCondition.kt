@@ -14,7 +14,7 @@ class BasicProductSearchCondition(
     @JsonIgnore
     var partnerId: Long? = null,
 
-    @ApiModelProperty(value = "입고처 ID", example = "1")
+    @ApiModelProperty(value = "입고처 ID")
     var warehouseId: Long? = null,
 
     @ApiModelProperty(value = "유통기한관리여부", allowableValues = "Y,N")
