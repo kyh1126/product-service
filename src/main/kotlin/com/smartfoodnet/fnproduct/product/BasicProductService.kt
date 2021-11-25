@@ -175,12 +175,11 @@ class BasicProductService(
 
         // 기본상품-부자재 매핑 저장
         val entityById = basicProduct.subsidiaryMaterialMappings.associateBy { it.id }
-        val subsidiaryMaterials =
-            createOrUpdateSubsidiaryMaterialMappings(
-                updateModel.subsidiaryMaterialMappingModels,
-                entityById,
-                subsidiaryMaterialById
-            )
+        val subsidiaryMaterials = createOrUpdateSubsidiaryMaterialMappings(
+            updateModel.subsidiaryMaterialMappingModels,
+            entityById,
+            subsidiaryMaterialById
+        )
 
         // 모음상품-기본상품의 기본상품이 비활성화 될 경우, 모음상품도 비활성화
         inactivatePackageProduct(basicProductCreateModel, basicProduct)

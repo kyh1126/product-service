@@ -114,6 +114,7 @@ class BasicProduct(
         subsidiaryMaterialCategory = subsidiaryMaterialCategoryRequest
         warehouse = warehouseRequest
 
+        // 양방향
         subsidiaryMaterialMappings.clear()
         subsidiaryMaterialMappingRequests.forEach { addSubsidiaryMaterialMappings(it) }
     }
