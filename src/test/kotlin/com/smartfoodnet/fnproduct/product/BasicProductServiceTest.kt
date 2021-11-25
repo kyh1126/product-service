@@ -17,8 +17,7 @@ import com.smartfoodnet.fnproduct.warehouse.entity.InWarehouse
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
-import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchers.anyLong
+import org.mockito.ArgumentMatchers.*
 import org.mockito.BDDMockito.given
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
@@ -99,16 +98,16 @@ internal class BasicProductServiceTest(
             .willReturn(Optional.of(basicProductCategories.first()))
         given(
             basicProductCategoryRepository.findByLevel1CategoryAndLevel2Category(
-                anyLong(),
-                anyLong()
+                anyString(),
+                anyString()
             )
         ).willReturn(listOf(basicProductCategories.first()))
         given(subsidiaryMaterialCategoryRepository.findById(anyLong()))
             .willReturn(Optional.of(subsidiaryMaterialCategories.first()))
         given(
             subsidiaryMaterialCategoryRepository.findByLevel1CategoryAndLevel2Category(
-                anyLong(),
-                anyLong()
+                anyString(),
+                anyString()
             )
         ).willReturn(listOf(subsidiaryMaterialCategories.first()))
         basicproductsSub.forEach {

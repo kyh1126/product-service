@@ -57,22 +57,22 @@ class BasicProductController(private val basicProductService: BasicProductServic
     @Operation(summary = "기본상품 카테고리 조회")
     @GetMapping("categories")
     fun getBasicProductCategories(
-        @Parameter(description = "대분류") @RequestParam(required = false) level1CategoryId: Long?,
-        @Parameter(description = "중분류") @RequestParam(required = false) level2CategoryId: Long?,
+        @Parameter(description = "대분류명") @RequestParam(required = false) level1CategoryName: String?,
+        @Parameter(description = "중분류명") @RequestParam(required = false) level2CategoryName: String?,
     ): List<CategoryByLevelModel> {
-        return basicProductService.getBasicProductCategories(level1CategoryId, level2CategoryId)
+        return basicProductService.getBasicProductCategories(level1CategoryName, level2CategoryName)
     }
 
     @java.lang.Deprecated(forRemoval = true)
     @Operation(summary = "부자재 카테고리 조회")
     @GetMapping("subsidiary-material-categories")
     fun getSubsidiaryMaterialCategories(
-        @Parameter(description = "대분류") @RequestParam(required = false) level1CategoryId: Long?,
-        @Parameter(description = "소분류") @RequestParam(required = false) level2CategoryId: Long?,
+        @Parameter(description = "대분류명") @RequestParam(required = false) level1CategoryName: String?,
+        @Parameter(description = "소분류명") @RequestParam(required = false) level2CategoryName: String?,
     ): List<CategoryByLevelModel> {
         return basicProductService.getSubsidiaryMaterialCategories(
-            level1CategoryId,
-            level2CategoryId
+            level1CategoryName,
+            level2CategoryName
         )
     }
 

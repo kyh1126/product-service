@@ -82,12 +82,12 @@ class BasicProductService(
     }
 
     fun getBasicProductCategories(
-        level1CategoryId: Long?,
-        level2CategoryId: Long?
+        level1CategoryName: String?,
+        level2CategoryName: String?
     ): List<CategoryByLevelModel> {
         val basicProductCategories = basicProductCategoryFinder.getBasicProductCategories(
-            level1CategoryId,
-            level2CategoryId
+            level1CategoryName,
+            level2CategoryName
         )
 
         // level2 카테고리에 기본상품 카테고리의 id 를 넣어준다.
@@ -98,13 +98,13 @@ class BasicProductService(
     }
 
     fun getSubsidiaryMaterialCategories(
-        level1CategoryId: Long? = null,
-        level2CategoryId: Long? = null,
+        level1CategoryName: String? = null,
+        level2CategoryName: String? = null,
     ): List<CategoryByLevelModel> {
         val subsidiaryMaterialCategories =
             subsidiaryMaterialCategoryFinder.getSubsidiaryMaterialCategories(
-                level1CategoryId,
-                level2CategoryId
+                level1CategoryName,
+                level2CategoryName
             )
 
         // level2 카테고리에 기본상품 카테고리의 id 를 넣어준다.

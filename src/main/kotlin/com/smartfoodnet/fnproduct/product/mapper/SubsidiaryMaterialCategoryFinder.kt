@@ -11,12 +11,12 @@ class SubsidiaryMaterialCategoryFinder(
     private val subsidiaryMaterialCategoryRepository: SubsidiaryMaterialCategoryRepository,
 ) {
     fun getSubsidiaryMaterialCategories(
-        level1CategoryId: Long? = null,
-        level2CategoryId: Long? = null,
+        level1CategoryName: String? = null,
+        level2CategoryName: String? = null,
     ): List<SubsidiaryMaterialCategory> {
         return subsidiaryMaterialCategoryRepository.findByLevel1CategoryAndLevel2Category(
-            level1CategoryId,
-            level2CategoryId
+            level1CategoryName,
+            level2CategoryName
         )
     }
 

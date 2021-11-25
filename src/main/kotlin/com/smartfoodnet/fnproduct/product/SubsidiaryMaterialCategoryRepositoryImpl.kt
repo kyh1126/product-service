@@ -10,19 +10,22 @@ class SubsidiaryMaterialCategoryRepositoryImpl
     SubsidiaryMaterialCategoryCustom {
 
     override fun findByLevel1CategoryAndLevel2Category(
-        level1CategoryId: Long?,
-        level2CategoryId: Long?,
+        level1CategoryName: String?,
+        level2CategoryName: String?,
     ): List<SubsidiaryMaterialCategory> {
         return selectFrom(subsidiaryMaterialCategory)
             .innerJoin(subsidiaryMaterialCategory.level1Category, code).fetchJoin()
             .leftJoin(subsidiaryMaterialCategory.level2Category, code).fetchJoin()
-            .where(eqLevel1CategoryId(level1CategoryId), eqLevel2CategoryId(level2CategoryId))
+            .where(
+                eqLevel1CategoryName(level1CategoryName),
+                eqLevel2CategoryName(level2CategoryName)
+            )
             .fetch()
     }
 
-    private fun eqLevel1CategoryId(level1CategoryId: Long?) =
-        level1CategoryId?.let { subsidiaryMaterialCategory.level1Category.id.eq(it) }
+    private fun eqLevel1CategoryName(level1CategoryName: String?) =
+        level1CategoryName?.let { subsidiaryMaterialCategory.level1Category.keyName.eq(it) }
 
-    private fun eqLevel2CategoryId(level2CategoryId: Long?) =
-        level2CategoryId?.let { subsidiaryMaterialCategory.level2Category.id.eq(it) }
+    private fun eqLevel2CategoryName(level2CategoryName: String?) =
+        level2CategoryName?.let { subsidiaryMaterialCategory.level2Category.keyName.eq(it) }
 }

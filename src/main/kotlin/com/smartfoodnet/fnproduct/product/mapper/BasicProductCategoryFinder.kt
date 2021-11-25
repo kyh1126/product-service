@@ -11,12 +11,12 @@ class BasicProductCategoryFinder(
     private val basicProductCategoryRepository: BasicProductCategoryRepository,
 ) {
     fun getBasicProductCategories(
-        level1CategoryId: Long? = null,
-        level2CategoryId: Long? = null,
+        level1CategoryName: String? = null,
+        level2CategoryName: String? = null,
     ): List<BasicProductCategory> {
         return basicProductCategoryRepository.findByLevel1CategoryAndLevel2Category(
-            level1CategoryId,
-            level2CategoryId
+            level1CategoryName,
+            level2CategoryName
         )
     }
 
