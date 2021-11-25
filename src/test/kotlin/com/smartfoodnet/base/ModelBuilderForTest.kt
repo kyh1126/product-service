@@ -8,12 +8,10 @@ import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
 import com.smartfoodnet.fnproduct.product.model.vo.SeasonalOption
 
 fun buildSubsidiaryMaterialMappingCreateModel(
-    basicProductId: Long? = null,
     subsidiaryMaterialId: Long = buildBasicProductSubCreateModel().id!!,
     seasonalOption: SeasonalOption = SeasonalOption.ALL,
     quantity: Int = 1,
 ) = SubsidiaryMaterialMappingCreateModel(
-    basicProductId = basicProductId,
     subsidiaryMaterialId = subsidiaryMaterialId,
     seasonalOption = seasonalOption,
     quantity = quantity

@@ -10,9 +10,6 @@ data class SubsidiaryMaterialMappingCreateModel(
     @ApiModelProperty(value = "id")
     val id: Long? = null,
 
-    @ApiModelProperty(value = "기본상품 ID")
-    val basicProductId: Long?,
-
     @NotNull
     @ApiModelProperty(value = "부자재(기본상품) ID")
     val subsidiaryMaterialId: Long,
