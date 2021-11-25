@@ -55,6 +55,22 @@ class BasicProductService(
         return basicProductRepository.findAllById(ids)
     }
 
+    fun getBasicProductSubs(
+        condition: PredicateSearchCondition,
+        page: Pageable
+    ): List<CategoryByLevelModel> {
+        val basicProductSubIdsByCategoryId = getBasicProducts(condition, page).payload
+            .groupBy({ it.subsidiaryMaterialCategory!!.id!! }, { it.id })
+
+        // level2 카테고리에 기본상품 id 를 넣어준다.
+        return getSubsidiaryMaterialCategories().map {
+            it.children.map {
+                it.value = basicProductSubIdsByCategoryId[it.value]?.first()
+            }
+            it
+        }
+    }
+
     fun getBasicProduct(productId: Long): BasicProductDetailModel {
         val basicProduct = getBasicProducts(listOf(productId)).first()
         // 기본상품-부자재 매핑을 위한 부자재(BasicProduct) 조회
@@ -82,8 +98,8 @@ class BasicProductService(
     }
 
     fun getSubsidiaryMaterialCategories(
-        level1CategoryId: Long?,
-        level2CategoryId: Long?,
+        level1CategoryId: Long? = null,
+        level2CategoryId: Long? = null,
     ): List<CategoryByLevelModel> {
         val subsidiaryMaterialCategories =
             subsidiaryMaterialCategoryFinder.getSubsidiaryMaterialCategories(

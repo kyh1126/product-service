@@ -38,11 +38,11 @@ class BasicProductController(private val basicProductService: BasicProductServic
     @GetMapping("sub")
     fun getBasicProductsSub(
         @PageableDefault(size = 50, sort = ["id"], direction = Sort.Direction.DESC) page: Pageable,
-    ): PageResponse<BasicProductModel> {
+    ): List<CategoryByLevelModel> {
         val searchCondition =
             BasicProductSearchCondition().apply { types = setOf(BasicProductType.SUB) }
 
-        return basicProductService.getBasicProducts(condition = searchCondition, page = page)
+        return basicProductService.getBasicProductSubs(condition = searchCondition, page = page)
     }
 
     @Operation(summary = "기본상품 상세 조회")
@@ -63,6 +63,7 @@ class BasicProductController(private val basicProductService: BasicProductServic
         return basicProductService.getBasicProductCategories(level1CategoryId, level2CategoryId)
     }
 
+    @java.lang.Deprecated(forRemoval = true)
     @Operation(summary = "부자재 카테고리 조회")
     @GetMapping("subsidiary-material-categories")
     fun getSubsidiaryMaterialCategories(
