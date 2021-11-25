@@ -8,10 +8,10 @@ data class CategoryDto(
 ) {
 
     companion object {
-        fun fromEntity(category: Code?): CategoryDto? {
+        fun fromEntity(categoryId: Long?, category: Code?): CategoryDto? {
             return category?.run {
                 CategoryDto(
-                    value = id,
+                    value = categoryId,
                     label = keyName
                 )
             }

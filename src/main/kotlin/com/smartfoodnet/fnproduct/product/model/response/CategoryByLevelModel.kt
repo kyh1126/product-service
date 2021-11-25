@@ -16,12 +16,12 @@ data class CategoryByLevelModel(
 ) {
 
     companion object {
-        fun fromEntity(category: Code, children: List<Code?>): CategoryByLevelModel {
+        fun fromEntity(category: Code, children: List<CategoryDto?>): CategoryByLevelModel {
             return category.run {
+                // level1 만으로는 카테고리 id 가 없으므로 value 를 설정하지 않는다.
                 CategoryByLevelModel(
-                    value = id,
                     label = keyName,
-                    children = children.mapNotNull { CategoryDto.fromEntity(it) }.toSet()
+                    children = children.filterNotNull().toSet()
                 )
             }
         }

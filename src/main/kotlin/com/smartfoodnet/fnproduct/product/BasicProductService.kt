@@ -7,6 +7,7 @@ import com.smartfoodnet.common.error.exception.ErrorCode
 import com.smartfoodnet.common.model.request.PredicateSearchCondition
 import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.common.utils.Log
+import com.smartfoodnet.fnproduct.code.entity.Code
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.product.entity.BasicProductCategory
 import com.smartfoodnet.fnproduct.product.entity.SubsidiaryMaterialCategory
@@ -15,6 +16,7 @@ import com.smartfoodnet.fnproduct.product.mapper.BasicProductCategoryFinder
 import com.smartfoodnet.fnproduct.product.mapper.BasicProductCodeGenerator
 import com.smartfoodnet.fnproduct.product.mapper.BasicProductFinder
 import com.smartfoodnet.fnproduct.product.mapper.SubsidiaryMaterialCategoryFinder
+import com.smartfoodnet.fnproduct.product.model.dto.CategoryDto
 import com.smartfoodnet.fnproduct.product.model.request.BasicProductCreateModel
 import com.smartfoodnet.fnproduct.product.model.request.BasicProductDetailCreateModel
 import com.smartfoodnet.fnproduct.product.model.request.SubsidiaryMaterialMappingCreateModel
@@ -67,20 +69,33 @@ class BasicProductService(
         level1CategoryId: Long?,
         level2CategoryId: Long?
     ): List<CategoryByLevelModel> {
-        return basicProductCategoryFinder.getBasicProductCategories(
+        val basicProductCategories = basicProductCategoryFinder.getBasicProductCategories(
             level1CategoryId,
             level2CategoryId
         )
+
+        // level2 카테고리에 기본상품 카테고리의 id 를 넣어준다.
+        return basicProductCategories.groupBy(
+            { it.level1Category },
+            { CategoryDto.fromEntity(it.id, it.level2Category) }
+        ).run { toCategoriesByLevelModel(this) }
     }
 
     fun getSubsidiaryMaterialCategories(
         level1CategoryId: Long?,
         level2CategoryId: Long?,
     ): List<CategoryByLevelModel> {
-        return subsidiaryMaterialCategoryFinder.getSubsidiaryMaterialCategories(
-            level1CategoryId,
-            level2CategoryId
-        )
+        val subsidiaryMaterialCategories =
+            subsidiaryMaterialCategoryFinder.getSubsidiaryMaterialCategories(
+                level1CategoryId,
+                level2CategoryId
+            )
+
+        // level2 카테고리에 기본상품 카테고리의 id 를 넣어준다.
+        return subsidiaryMaterialCategories.groupBy(
+            { it.level1Category },
+            { CategoryDto.fromEntity(it.id, it.level2Category) }
+        ).run { toCategoriesByLevelModel(this) }
     }
 
     @Transactional
@@ -231,6 +246,9 @@ class BasicProductService(
     ): BasicProductDetailModel {
         return BasicProductDetailModel.fromEntity(basicProduct, subsidiaryMaterialById)
     }
+
+    private fun toCategoriesByLevelModel(categoriesByLevel1: Map<Code, List<CategoryDto?>>) =
+        categoriesByLevel1.map { CategoryByLevelModel.fromEntity(it.key, it.value) }
 
     companion object : Log
 }
