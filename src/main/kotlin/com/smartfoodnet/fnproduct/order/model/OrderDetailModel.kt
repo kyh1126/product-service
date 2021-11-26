@@ -4,7 +4,6 @@ import io.swagger.annotations.ApiModelProperty
 import java.time.LocalDateTime
 
 data class OrderDetailModel(
-
     val id: Long? = null,
 
     @ApiModelProperty(value = "화주사 ID")
@@ -24,6 +23,18 @@ data class OrderDetailModel(
 
     @ApiModelProperty(value = "화주사 쇼핑몰 ID")
     val userStoreId: String? = null,
+
+    @ApiModelProperty(value = "쇼핑몰 주문번호 + 상품주문번호 ")
+    val storeOrderCode: String? = null,
+
+    @ApiModelProperty(value = "쇼핑몰 상품명")
+    val storeProductName: String? = null,
+
+    @ApiModelProperty(value = "쇼핑몰별 상품코드")
+    val storeProductCode: String? = null,
+
+    @ApiModelProperty(value = "상품 옵션명")
+    val storeProductOptionName: String? = null,
 
     @ApiModelProperty(value = "주문일자")
     val orderedAt: LocalDateTime? = null,
