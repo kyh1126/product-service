@@ -71,7 +71,7 @@ data class OrderDetailCreateModel(
     val uploadType: String? = null
 ) {
     fun toEntity(): OrderDetail {
-        return this.run{
+        return run{
             OrderDetail(
                     partnerId = partnerId,
                     orderUniqueKey = orderUniqueKey,

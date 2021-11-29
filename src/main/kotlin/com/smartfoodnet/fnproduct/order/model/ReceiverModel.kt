@@ -6,20 +6,24 @@ import javax.persistence.Embeddable
 
 @Embeddable
 class ReceiverModel(
-        @ApiModelProperty(value = "받는 분 이름")
-        var name: String? = null,
-        @ApiModelProperty(value = "받는 분 주소")
-        var address: String? = null,
-        @ApiModelProperty(value = "받는 분 전화번호")
-        var phoneNumber: String? = null,
+    @ApiModelProperty(value = "받는 분 이름")
+    var name: String? = null,
+    @ApiModelProperty(value = "받는 분 주소")
+    var address: String? = null,
+    @ApiModelProperty(value = "받는 분 전화번호")
+    var phoneNumber: String? = null,
 ) {
     fun toEntity(): Receiver {
         return run {
-            Receiver(
-                    name = name,
-                    address = address,
-                    phoneNumber = phoneNumber
-            )
+            Receiver(name = name, address = address, phoneNumber = phoneNumber)
+        }
+    }
+
+    companion object {
+        fun from(receiver: Receiver): ReceiverModel {
+            return receiver.run {
+                ReceiverModel(name = name, address = address, phoneNumber = phoneNumber)
+            }
         }
     }
 }
