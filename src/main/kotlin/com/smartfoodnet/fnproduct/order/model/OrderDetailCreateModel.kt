@@ -1,5 +1,7 @@
 package com.smartfoodnet.fnproduct.order.model
 
+import com.fasterxml.jackson.annotation.JsonFormat
+import com.smartfoodnet.common.Constants
 import com.smartfoodnet.fnproduct.order.entity.OrderDetail
 import io.swagger.annotations.ApiModelProperty
 import java.time.LocalDateTime
@@ -21,6 +23,7 @@ data class OrderDetailCreateModel(
     val userStoreId: String? = null,
 
     @ApiModelProperty(value = "주문일자")
+    @JsonFormat(pattern = Constants.TIMESTAMP_FORMAT)
     val orderedAt: LocalDateTime? = null,
 
     @ApiModelProperty(value = "주문번호")
@@ -42,9 +45,11 @@ data class OrderDetailCreateModel(
     val storeProductOptionName: String? = null,
 
     @ApiModelProperty(value = "주문수집일")
+    @JsonFormat(pattern = Constants.TIMESTAMP_FORMAT)
     val collectedAt: LocalDateTime? = null,
 
     @ApiModelProperty(value = "상태변경일자")
+    @JsonFormat(pattern = Constants.TIMESTAMP_FORMAT)
     val statusChangedAt: LocalDateTime? = null,
 
     @ApiModelProperty(value = "배송방식")
