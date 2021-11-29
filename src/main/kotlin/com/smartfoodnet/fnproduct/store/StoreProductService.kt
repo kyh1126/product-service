@@ -1,7 +1,9 @@
 package com.smartfoodnet.fnproduct.store
 
+import com.smartfoodnet.common.error.exception.UserRequestError
 import com.smartfoodnet.common.error.exception.ValidateError
 import com.smartfoodnet.fnproduct.product.BasicProductRepository
+import com.smartfoodnet.fnproduct.store.entity.StoreProduct
 import com.smartfoodnet.fnproduct.store.model.StoreProductModel
 import com.smartfoodnet.fnproduct.store.support.StoreProductRepository
 import org.springframework.stereotype.Service
@@ -17,6 +19,10 @@ class StoreProductService(
     fun getStoreProducts(partnerId: Long): List<StoreProductModel> {
         val storeProducts = storeProductRepository.findAllByPartnerId(partnerId)
         return storeProducts.map { StoreProductModel.from(it) }
+    }
+
+    fun getStoreProductForOrderDetail(partnerId: Long?, storeProductCode: String?): StoreProduct {
+        return storeProductRepository.findByPartnerIdAndStoreProductCode(partnerId!!, storeProductCode!!) ?: throw UserRequestError(errorMessage = "쇼핑몰 상품이 존재하지 않습니다")
     }
 
     @Transactional

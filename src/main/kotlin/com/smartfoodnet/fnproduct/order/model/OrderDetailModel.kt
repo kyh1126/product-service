@@ -50,7 +50,7 @@ data class OrderDetailModel(
     val deliveryType: String? = null,
 
     @ApiModelProperty(value = "배송완료요청일")
-    val desiredDeliveryDate: LocalDateTime? = null,
+    val expectedDeliveryDate: LocalDateTime? = null,
 
     @ApiModelProperty(value = "쇼핑몰 상품 ID")
     val storeProductId: Long? = null,
@@ -87,7 +87,7 @@ data class OrderDetailModel(
                         status = status,
                         claimStatus = claimStatus,
                         deliveryType = deliveryType,
-                        desiredDeliveryDate = desiredDeliveryDate,
+                        expectedDeliveryDate = expectedDeliveryDate,
                         storeProductId = storeProduct?.id,
                         price = price,
                         shippingPrice = shippingPrice,

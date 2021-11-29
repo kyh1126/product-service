@@ -55,6 +55,10 @@ data class OrderDetailCreateModel(
     @ApiModelProperty(value = "배송방식")
     val deliveryType: String? = null,
 
+    @ApiModelProperty(value = "배송완료요청일")
+    @JsonFormat(pattern = Constants.TIMESTAMP_FORMAT)
+    val expectedDeliveryDate: LocalDateTime? = null,
+
     @ApiModelProperty(value = "주문금액")
     val price: Double? = null,
 
