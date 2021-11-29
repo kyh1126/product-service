@@ -18,7 +18,7 @@ class OrderService(
 
     @Transactional
     fun createOrderDetail(orderDetailModels: List<OrderDetailCreateModel>): List<OrderDetailModel> {
-        var orderDetails = orderDetailModels.stream().map { it.toEntity() }.toList()
+        val orderDetails = orderDetailModels.stream().map { toEntity(it) }.toList()
 
         return orderDetails.map{OrderDetailModel.from (it)}
     }
