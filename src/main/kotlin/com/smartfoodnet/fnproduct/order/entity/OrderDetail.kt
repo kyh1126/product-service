@@ -45,8 +45,8 @@ class OrderDetail(
     @Column(name = "delivery_type")
     var deliveryType: String? = null,
 
-    @Column(name = "desired_delivery_date")
-    var desiredDeliveryDate: LocalDateTime? = null,
+    @Column(name = "expected_delivery_date")
+    var expectedDeliveryDate: LocalDateTime? = null,
 
     @JoinColumn(name = "store_product_id")
     @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
