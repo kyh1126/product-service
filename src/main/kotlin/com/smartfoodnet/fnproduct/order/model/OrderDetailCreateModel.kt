@@ -1,5 +1,6 @@
 package com.smartfoodnet.fnproduct.order.model
 
+import com.smartfoodnet.fnproduct.order.entity.OrderDetail
 import io.swagger.annotations.ApiModelProperty
 import java.time.LocalDateTime
 
@@ -19,8 +20,17 @@ data class OrderDetailCreateModel(
     @ApiModelProperty(value = "화주사 쇼핑몰 ID")
     val userStoreId: String? = null,
 
+    @ApiModelProperty(value = "주문일자")
+    val orderedAt: LocalDateTime? = null,
+
     @ApiModelProperty(value = "주문번호")
     val orderNumber: String? = null,
+
+    @ApiModelProperty(value = "주문 상태")
+    val status: OrderStatus? = null,
+
+    @ApiModelProperty(value = "클레임 상태")
+    val claimStatus: String? = null,
 
     @ApiModelProperty(value = "쇼핑몰 상품명")
     val storeProductName: String? = null,
@@ -31,14 +41,11 @@ data class OrderDetailCreateModel(
     @ApiModelProperty(value = "상품 옵션명")
     val storeProductOptionName: String? = null,
 
-    @ApiModelProperty(value = "주문일자")
-    val orderedAt: LocalDateTime? = null,
+    @ApiModelProperty(value = "주문수집일")
+    val collectedAt: LocalDateTime? = null,
 
-    @ApiModelProperty(value = "주문 상태")
-    val status: OrderStatus? = null,
-
-    @ApiModelProperty(value = "클레임 상태")
-    val claimStatus: String? = null,
+    @ApiModelProperty(value = "상태변경일자")
+    val statusChangedAt: LocalDateTime? = null,
 
     @ApiModelProperty(value = "배송방식")
     val deliveryType: String? = null,
@@ -53,4 +60,24 @@ data class OrderDetailCreateModel(
 
     @ApiModelProperty(value = "업로드방식")
     val uploadType: String? = null
-)
+) {
+    fun toEntity(): OrderDetail {
+        return this.run{
+            OrderDetail(
+                    partnerId = partnerId,
+                    orderUniqueKey = orderUniqueKey,
+                    storeName = storeName,
+                    omsStoreCode = omsStoreCode,
+                    userStoreId = userStoreId,
+                    orderedAt = orderedAt,
+                    orderNumber = orderNumber,
+                    status = status,
+                    claimStatus = claimStatus,
+                    price = price,
+                    shippingPrice = shippingPrice,
+                    receiver = receiver?.toEntity(),
+                    uploadType = uploadType
+            )
+        }
+    }
+}

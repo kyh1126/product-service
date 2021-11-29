@@ -1,5 +1,6 @@
 package com.smartfoodnet.fnproduct.order.model
 
+import com.smartfoodnet.fnproduct.order.entity.OrderDetail
 import io.swagger.annotations.ApiModelProperty
 import java.time.LocalDateTime
 
@@ -19,13 +20,10 @@ data class OrderDetailModel(
     val storeName: String? = null,
 
     @ApiModelProperty(value = "쇼핑몰 코드(SFN 기준 코드)")
-    val storeCode: String? = null,
+    val omsStoreCode: String? = null,
 
     @ApiModelProperty(value = "화주사 쇼핑몰 ID")
     val userStoreId: String? = null,
-
-    @ApiModelProperty(value = "쇼핑몰 주문번호 + 상품주문번호 ")
-    val storeOrderCode: String? = null,
 
     @ApiModelProperty(value = "쇼핑몰 상품명")
     val storeProductName: String? = null,
@@ -43,7 +41,7 @@ data class OrderDetailModel(
     val orderNumber: String? = null,
 
     @ApiModelProperty(value = "주문 상태")
-    val status: String? = null,
+    val status: OrderStatus? = null,
 
     @ApiModelProperty(value = "클레임 상태")
     val claimStatus: String? = null,
@@ -61,7 +59,7 @@ data class OrderDetailModel(
     val price: Double? = null,
 
     @ApiModelProperty(value = "배송비")
-    val shippingPrice: String? = null,
+    val shippingPrice: Double? = null,
 
     val receiver: ReceiverModel? = null,
 
@@ -69,4 +67,34 @@ data class OrderDetailModel(
 
     @ApiModelProperty(value = "업로드방식")
     val uploadType: String? = null
-)
+) {
+    companion object {
+        fun from(orderDetail: OrderDetail): OrderDetailModel {
+            return orderDetail.run {
+                OrderDetailModel(
+                        id = id,
+                        partnerId = partnerId,
+                        orderUniqueKey = orderUniqueKey,
+                        loadStatus = null,
+                        storeName = storeName,
+                        omsStoreCode = omsStoreCode,
+                        userStoreId = userStoreId,
+                        storeProductName = storeProduct?.name,
+                        storeProductCode = storeProduct?.storeProductCode,
+                        storeProductOptionName = storeProduct?.optionName,
+                        orderedAt = orderedAt,
+                        orderNumber = orderNumber,
+                        status = status,
+                        claimStatus = claimStatus,
+                        deliveryType = deliveryType,
+                        desiredDeliveryDate = desiredDeliveryDate,
+                        storeProductId = storeProduct?.id,
+                        price = price,
+                        shippingPrice = shippingPrice,
+                        uploadType = uploadType
+
+                )
+            }
+        }
+    }
+}
