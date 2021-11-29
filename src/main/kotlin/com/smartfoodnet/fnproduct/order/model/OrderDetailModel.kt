@@ -90,6 +90,8 @@ data class OrderDetailModel(
                         expectedDeliveryDate = expectedDeliveryDate,
                         storeProductId = storeProduct?.id,
                         price = price,
+                        receiver = receiver?.let { ReceiverModel.from(it) },
+                        sender = sender?.let { SenderModel.from(it) },
                         shippingPrice = shippingPrice,
                         uploadType = uploadType
 
