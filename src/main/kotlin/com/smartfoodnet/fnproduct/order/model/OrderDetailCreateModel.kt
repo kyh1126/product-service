@@ -16,8 +16,8 @@ data class OrderDetailCreateModel(
     @ApiModelProperty(value = "쇼핑몰 이름")
     val storeName: String? = null,
 
-    @ApiModelProperty(value = "쇼핑몰 코드(플레이오토 쇼핑몰 코드)")
-    val omsStoreCode: String? = null,
+    @ApiModelProperty(value = "쇼핑몰 ID")
+    val storeId: Long? = null,
 
     @ApiModelProperty(value = "화주사 쇼핑몰 ID")
     val userStoreId: String? = null,
@@ -76,7 +76,7 @@ data class OrderDetailCreateModel(
                 partnerId = partnerId,
                 orderUniqueKey = orderUniqueKey,
                 storeName = storeName,
-                omsStoreCode = omsStoreCode,
+                storeId = storeId,
                 userStoreId = userStoreId,
                 orderedAt = orderedAt,
                 collectedAt = collectedAt,

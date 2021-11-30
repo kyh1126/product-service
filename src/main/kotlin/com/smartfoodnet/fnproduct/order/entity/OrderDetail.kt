@@ -25,8 +25,8 @@ class OrderDetail(
     @Column(name = "store_name")
     var storeName: String? = null,
 
-    @Column(name = "oms_store_code")
-    var omsStoreCode: String? = null,
+    @Column(name = "store_id")
+    var storeId: Long? = null,
 
     @Column(name = "user_store_id")
     var userStoreId: String? = null,
