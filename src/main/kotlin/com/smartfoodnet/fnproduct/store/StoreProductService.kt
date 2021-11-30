@@ -1,6 +1,5 @@
 package com.smartfoodnet.fnproduct.store
 
-import com.smartfoodnet.common.error.exception.UserRequestError
 import com.smartfoodnet.common.error.exception.ValidateError
 import com.smartfoodnet.fnproduct.product.BasicProductRepository
 import com.smartfoodnet.fnproduct.store.entity.StoreProduct
@@ -21,8 +20,12 @@ class StoreProductService(
         return storeProducts.map { StoreProductModel.from(it) }
     }
 
-    fun getStoreProductForOrderDetail(partnerId: Long?, storeProductCode: String?): StoreProduct {
-        return storeProductRepository.findByPartnerIdAndStoreProductCode(partnerId!!, storeProductCode!!) ?: throw UserRequestError(errorMessage = "쇼핑몰 상품이 존재하지 않습니다")
+    fun getStoreProductForOrderDetail(partnerId: Long?, storeProductCode: String?): StoreProduct? {
+        if(partnerId == null || storeProductCode == null) {
+            return null
+        }
+
+        return storeProductRepository.findByPartnerIdAndStoreProductCode(partnerId, storeProductCode)
     }
 
     @Transactional

@@ -5,7 +5,6 @@ import com.smartfoodnet.fnproduct.order.model.OrderDetailCreateModel
 import com.smartfoodnet.fnproduct.order.model.OrderDetailModel
 import com.smartfoodnet.fnproduct.order.support.OrderDetailRepository
 import com.smartfoodnet.fnproduct.store.StoreProductService
-import com.smartfoodnet.fnproduct.store.entity.StoreProduct
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import kotlin.streams.toList
@@ -27,7 +26,7 @@ class OrderService(
     private fun convert(orderDetailModel: OrderDetailCreateModel): OrderDetail {
         val orderDetail: OrderDetail = orderDetailModel.toEntity()
 
-        val storeProduct: StoreProduct = storeProductService.getStoreProductForOrderDetail(orderDetailModel.partnerId, orderDetailModel.storeProductCode)
+        val storeProduct = storeProductService.getStoreProductForOrderDetail(orderDetailModel.partnerId, orderDetailModel.storeProductCode)
         orderDetail.storeProduct = storeProduct
 
         return orderDetailRepository.save(orderDetail)
