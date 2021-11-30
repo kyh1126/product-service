@@ -26,6 +26,10 @@ data class OrderDetailCreateModel(
     @JsonFormat(pattern = Constants.TIMESTAMP_FORMAT)
     val orderedAt: LocalDateTime? = null,
 
+    @ApiModelProperty(value = "주문수집일")
+    @JsonFormat(pattern = Constants.TIMESTAMP_FORMAT)
+    val collectedAt: LocalDateTime? = null,
+
     @ApiModelProperty(value = "주문번호")
     val orderNumber: String? = null,
 
@@ -43,10 +47,6 @@ data class OrderDetailCreateModel(
 
     @ApiModelProperty(value = "상품 옵션명")
     val storeProductOptionName: String? = null,
-
-    @ApiModelProperty(value = "주문수집일")
-    @JsonFormat(pattern = Constants.TIMESTAMP_FORMAT)
-    val collectedAt: LocalDateTime? = null,
 
     @ApiModelProperty(value = "상태변경일자")
     @JsonFormat(pattern = Constants.TIMESTAMP_FORMAT)
