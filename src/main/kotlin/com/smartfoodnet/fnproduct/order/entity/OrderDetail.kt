@@ -3,12 +3,13 @@ package com.smartfoodnet.fnproduct.order.entity
 import com.smartfoodnet.common.entity.BaseEntity
 import com.smartfoodnet.fnproduct.order.model.OrderStatus
 import com.smartfoodnet.fnproduct.store.entity.StoreProduct
-import io.swagger.annotations.ApiModelProperty
+import org.hibernate.annotations.Where
 import java.time.LocalDateTime
 import javax.persistence.*
 
 @Entity
 @Table(name = "order_detail")
+@Where(clause = "deleted_at is NULL")
 class OrderDetail(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,10 +34,14 @@ class OrderDetail(
     @Column(name = "ordered_at")
     var orderedAt: LocalDateTime? = null,
 
+    @Column(name = "collected_at")
+    val collectedAt: LocalDateTime? = null,
+
     @Column(name = "order_number")
     var orderNumber: String? = null,
 
     @Column(name = "status")
+    @Enumerated(EnumType.STRING)
     var status: OrderStatus? = null,
 
     @Column(name = "claim_status")

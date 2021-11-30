@@ -19,7 +19,7 @@ data class OrderDetailModel(
     @ApiModelProperty(value = "쇼핑몰 이름")
     val storeName: String? = null,
 
-    @ApiModelProperty(value = "쇼핑몰 코드(SFN 기준 코드)")
+    @ApiModelProperty(value = "oms기준 쇼핑몰 코드")
     val omsStoreCode: String? = null,
 
     @ApiModelProperty(value = "화주사 쇼핑몰 ID")
@@ -36,6 +36,9 @@ data class OrderDetailModel(
 
     @ApiModelProperty(value = "주문일자")
     val orderedAt: LocalDateTime? = null,
+
+    @ApiModelProperty(value = "주문수집일")
+    val collectedAt: LocalDateTime? = null,
 
     @ApiModelProperty(value = "주문번호")
     val orderNumber: String? = null,
