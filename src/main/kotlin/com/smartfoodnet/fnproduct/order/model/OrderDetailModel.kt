@@ -70,6 +70,7 @@ data class OrderDetailModel(
 
     @ApiModelProperty(value = "업로드방식")
     val uploadType: String? = null
+
 ) {
     companion object {
         fun from(orderDetail: OrderDetail): OrderDetailModel {
