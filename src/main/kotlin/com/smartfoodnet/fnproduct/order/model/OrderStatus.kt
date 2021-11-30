@@ -1,7 +1,5 @@
 package com.smartfoodnet.fnproduct.order.model
 
-import com.fasterxml.jackson.annotation.JsonCreator
-
 
 enum class OrderStatus(val code: Int, val description: String) {
     NEW(0, "신규주문"),
@@ -19,5 +17,4 @@ enum class OrderStatus(val code: Int, val description: String) {
     EXCHANGE(12, "교환요청"),
     RECALL_COMPLETE(13, "반품마감"),
     EXCHANGE_COMPLETE(14, "교환마감");
-
 }
