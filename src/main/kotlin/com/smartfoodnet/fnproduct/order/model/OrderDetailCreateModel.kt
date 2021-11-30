@@ -50,7 +50,7 @@ data class OrderDetailCreateModel(
 
     @ApiModelProperty(value = "상태변경일자")
     @JsonFormat(pattern = Constants.TIMESTAMP_FORMAT)
-    val statusChangedAt: LocalDateTime? = null,
+    val statusUpdatedAt: LocalDateTime? = null,
 
     @ApiModelProperty(value = "배송방식")
     val deliveryType: String? = null,
@@ -73,19 +73,23 @@ data class OrderDetailCreateModel(
     fun toEntity(): OrderDetail {
         return run{
             OrderDetail(
-                    partnerId = partnerId,
-                    orderUniqueKey = orderUniqueKey,
-                    storeName = storeName,
-                    omsStoreCode = omsStoreCode,
-                    userStoreId = userStoreId,
-                    orderedAt = orderedAt,
-                    orderNumber = orderNumber,
-                    status = status,
-                    claimStatus = claimStatus,
-                    price = price,
-                    shippingPrice = shippingPrice,
-                    receiver = receiver?.toEntity(),
-                    uploadType = uploadType
+                partnerId = partnerId,
+                orderUniqueKey = orderUniqueKey,
+                storeName = storeName,
+                omsStoreCode = omsStoreCode,
+                userStoreId = userStoreId,
+                orderedAt = orderedAt,
+                collectedAt = collectedAt,
+                statusUpdatedAt = statusUpdatedAt,
+                orderNumber = orderNumber,
+                status = status,
+                claimStatus = claimStatus,
+                deliveryType = deliveryType,
+                expectedDeliveryDate = expectedDeliveryDate,
+                price = price,
+                shippingPrice = shippingPrice,
+                receiver = receiver?.toEntity(),
+                uploadType = uploadType
             )
         }
     }

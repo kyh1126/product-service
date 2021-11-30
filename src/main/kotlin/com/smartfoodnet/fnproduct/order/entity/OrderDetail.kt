@@ -37,6 +37,9 @@ class OrderDetail(
     @Column(name = "collected_at")
     val collectedAt: LocalDateTime? = null,
 
+    @Column(name = "status_updated_at")
+    val statusUpdatedAt: LocalDateTime? = null,
+
     @Column(name = "order_number")
     var orderNumber: String? = null,
 
