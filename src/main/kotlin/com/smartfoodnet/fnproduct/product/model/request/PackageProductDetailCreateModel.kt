@@ -8,7 +8,7 @@ import javax.validation.Valid
 import javax.validation.constraints.NotNull
 
 data class PackageProductDetailCreateModel(
-    @Valid
+    @field:Valid
     @ApiModelProperty(value = "모음상품매핑정보")
     val packageProductMappingModels: MutableList<PackageProductMappingCreateModel> = mutableListOf(),
 ) {

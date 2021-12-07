@@ -49,7 +49,7 @@ class BasicProductDetailCreateModelValidator(
         with(target) {
             if (name == null || partnerId == null) return
 
-            basicProductRepository.findByPartnerIdAndName(partnerId, name)?.let {
+            basicProductRepository.findByPartnerIdAndName(partnerId!!, name!!)?.let {
                 if (saveState == SaveState.UPDATE && it.id == id) return
 
                 errors.rejectValue(
@@ -75,14 +75,14 @@ class BasicProductDetailCreateModelValidator(
 
                 if (barcode == null || partnerId == null) return
 
-                if (barcode.toLongOrNull() == null) {
+                if (barcode!!.toLongOrNull() == null) {
                     errors.rejectValue(
                         "basicProductModel.barcode",
                         "barcode.invalid",
                         "숫자 입력만 가능합니다."
                     )
                 }
-                basicProductRepository.findByPartnerIdAndBarcode(partnerId, barcode)?.let {
+                basicProductRepository.findByPartnerIdAndBarcode(partnerId!!, barcode!!)?.let {
                     errors.rejectValue(
                         "basicProductModel.barcode",
                         "barcode.duplicate",

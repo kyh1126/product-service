@@ -53,7 +53,7 @@ class PackageProductService(
         val packageProductModel = createModel.packageProductModel
         // 상품코드 채번
         val basicProductCode = with(packageProductModel) {
-            basicProductCodeGenerator.getBasicProductCode(partnerId, type, handlingTemperature)
+            basicProductCodeGenerator.getBasicProductCode(partnerId, type!!, handlingTemperature)
         }
         // 모음상품-기본상품 매핑을 위한 기본상품(BasicProduct) 조회
         val basicProductById = getBasicProductById(createModel)
@@ -102,7 +102,7 @@ class PackageProductService(
     }
 
     private fun getBasicProductById(createModel: PackageProductDetailCreateModel) =
-        basicProductService.getBasicProducts(createModel.packageProductMappingModels.map { it.basicProductModel.id!! })
+        basicProductService.getBasicProducts(createModel.packageProductMappingModels.map { it.basicProductModel!!.id!! })
             .associateBy { it.id }
 
     private fun createOrUpdatePackageProductMappings(
@@ -111,7 +111,7 @@ class PackageProductService(
         basicProductById: Map<Long?, BasicProduct>,
     ): Set<PackageProductMapping> {
         val packageProductMappings = packageProductMappingModels.map {
-            val selectedBasicProduct = basicProductById[it.basicProductModel.id]
+            val selectedBasicProduct = basicProductById[it.basicProductModel!!.id]
                 ?: throw BaseRuntimeException(errorCode = ErrorCode.NO_ELEMENT)
             if (it.id == null) it.toEntity(selectedBasicProduct)
             else {

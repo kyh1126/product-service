@@ -10,23 +10,23 @@ data class SubsidiaryMaterialMappingCreateModel(
     @ApiModelProperty(value = "id")
     val id: Long? = null,
 
-    @NotNull
+    @field:NotNull
     @ApiModelProperty(value = "부자재(기본상품) ID")
-    val subsidiaryMaterialId: Long,
+    val subsidiaryMaterialId: Long?,
 
-    @NotNull
+    @field:NotNull
     @ApiModelProperty(value = "계절옵션 (ALL:계절무관/SUMMER:하절기)", allowableValues = "ALL,SUMMER")
-    val seasonalOption: SeasonalOption,
+    val seasonalOption: SeasonalOption?,
 
-    @NotNull
+    @field:NotNull
     @ApiModelProperty(value = "수량")
-    val quantity: Int,
+    val quantity: Int?,
 ) {
     fun toEntity(subsidiaryMaterial: BasicProduct): SubsidiaryMaterialMapping {
         return SubsidiaryMaterialMapping(
             subsidiaryMaterial = subsidiaryMaterial,
-            seasonalOption = seasonalOption,
-            quantity = quantity
+            seasonalOption = seasonalOption!!,
+            quantity = quantity!!
         )
     }
 }

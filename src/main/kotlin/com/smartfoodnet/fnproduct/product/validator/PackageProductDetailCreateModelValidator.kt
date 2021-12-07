@@ -80,7 +80,7 @@ class PackageProductDetailCreateModelValidator(
 
     private fun checkActiveYn(target: List<PackageProductMappingCreateModel>, errors: Errors) {
         val inactivatedBasicProduct =
-            target.map { it.basicProductModel }.find { it.activeYn == "N" }
+            target.map { it.basicProductModel }.find { it!!.activeYn == "N" }
         if (inactivatedBasicProduct != null) {
             errors.rejectValue(
                 "packageProductMappingModels",
@@ -129,7 +129,7 @@ class PackageProductDetailCreateModelValidator(
                 saveState,
                 errors,
                 "packageProductMappingModels",
-                packageProductMappingModels.map { it.basicProductModel },
+                packageProductMappingModels.map { it.basicProductModel!! },
                 basicProductSimpleCreateModelValidator
             )
         }

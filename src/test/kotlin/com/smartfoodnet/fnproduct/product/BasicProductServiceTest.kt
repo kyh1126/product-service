@@ -270,9 +270,9 @@ internal class BasicProductServiceTest(
     }
 
     private fun getWarehouse(basicProductCreateModel: BasicProductCreateModel) =
-        inWarehouseService.getInWarehouse(basicProductCreateModel.warehouseId)
+        inWarehouseService.getInWarehouse(basicProductCreateModel.warehouseId!!)
 
     private fun getSubsidiaryMaterialById(createModel: BasicProductDetailCreateModel) =
-        basicProductService.getBasicProducts(createModel.subsidiaryMaterialMappingModels.map { it.subsidiaryMaterialId })
+        basicProductService.getBasicProducts(createModel.subsidiaryMaterialMappingModels.map { it.subsidiaryMaterialId!! })
             .associateBy { it.id }
 }
