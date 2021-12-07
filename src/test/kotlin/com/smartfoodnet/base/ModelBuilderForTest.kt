@@ -3,6 +3,7 @@ package com.smartfoodnet.base
 import com.smartfoodnet.fnproduct.product.model.request.BasicProductCreateModel
 import com.smartfoodnet.fnproduct.product.model.request.BasicProductDetailCreateModel
 import com.smartfoodnet.fnproduct.product.model.request.SubsidiaryMaterialMappingCreateModel
+import com.smartfoodnet.fnproduct.product.model.request.TestBasicProductCreateModel
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
 import com.smartfoodnet.fnproduct.product.model.vo.SeasonalOption
@@ -38,7 +39,7 @@ fun buildBasicProductCreateModel(
     expirationDateManagementYn: String = "N",
     piecesPerBox: Int? = 2,
     boxesPerPalette: Int? = 1,
-) = BasicProductCreateModel(
+) = TestBasicProductCreateModel(
     type = type,
     partnerId = partnerId,
     name = name,
@@ -52,7 +53,7 @@ fun buildBasicProductCreateModel(
     piecesPerBox = piecesPerBox,
     boxesPerPalette = boxesPerPalette,
     activeYn = "Y"
-)
+).toModel()
 
 fun buildBasicProductSubCreateModel(
     id: Long? = 2,
@@ -63,7 +64,7 @@ fun buildBasicProductSubCreateModel(
     subsidiaryMaterialCategoryId: Long? = 1,
     handlingTemperature: HandlingTemperatureType? = null,
     warehouseId: Long = 1,
-) = BasicProductCreateModel(
+) = TestBasicProductCreateModel(
     id = id,
     type = type,
     partnerId = partnerId,
@@ -73,4 +74,4 @@ fun buildBasicProductSubCreateModel(
     handlingTemperature = handlingTemperature,
     warehouseId = warehouseId,
     activeYn = "Y"
-)
+).toModel()

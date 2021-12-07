@@ -12,66 +12,66 @@ import javax.validation.constraints.NotNull
 
 class BasicProductCreateModel {
     @ApiModelProperty(value = "id")
-    val id: Long? = null
+    var id: Long? = null
 
     @NotNull
     @ApiModelProperty(
         value = "구분 (BASIC:기본상품/CUSTOM_SUB:고객전용부자재/SUB:공통부자재/PACKAGE:모음상품)",
         allowableValues = "BASIC,CUSTOM_SUB,SUB,PACKAGE", dataType = "Enum", example = "BASIC"
     )
-    val type: BasicProductType = BasicProductType.BASIC
+    var type: BasicProductType = BasicProductType.BASIC
 
     @ApiModelProperty(value = "화주(고객사) ID", example = "1")
-    val partnerId: Long? = null
+    var partnerId: Long? = null
 
     @ApiModelProperty(value = "상품명")
-    val name: String? = null
+    var name: String? = null
 
     @ApiModelProperty(value = "상품코드")
-    val code: String? = null
+    var code: String? = null
 
     @ApiModelProperty(value = "상품바코드기재여부", allowableValues = "Y,N")
-    val barcodeYn: String = "N"
+    var barcodeYn: String = "N"
 
     @ApiModelProperty(value = "상품바코드")
-    val barcode: String? = null
+    var barcode: String? = null
 
     @ApiModelProperty(value = "상품카테고리 ID")
-    val basicProductCategoryId: Long? = null
+    var basicProductCategoryId: Long? = null
 
     @ApiModelProperty(value = "부자재카테고리 ID")
-    val subsidiaryMaterialCategoryId: Long? = null
+    var subsidiaryMaterialCategoryId: Long? = null
 
     @ApiModelProperty(
         value = "취급온도 (ROOM:상온/REFRIGERATE:냉장/FREEZE:냉동)",
         allowableValues = "ROOM,REFRIGERATE,FREEZE"
     )
-    val handlingTemperature: HandlingTemperatureType? = null
+    var handlingTemperature: HandlingTemperatureType? = null
 
     @NotNull
     @ApiModelProperty(value = "입고처 ID")
-    val warehouseId: Long? = null
+    var warehouseId: Long? = null
 
     @ApiModelProperty(value = "공급가")
-    val supplyPrice: Int? = null
+    var supplyPrice: Int? = null
 
     @ApiModelProperty(value = "단수(포장)여부", allowableValues = "Y,N")
-    val singlePackagingYn: String = "N"
+    var singlePackagingYn: String = "N"
 
     @ApiModelProperty(value = "유통기한관리여부 (default: N)", allowableValues = "Y,N")
-    val expirationDateManagementYn: String = "N"
+    var expirationDateManagementYn: String = "N"
 
     @ApiModelProperty(value = "박스입수")
-    val piecesPerBox: Int? = null
+    var piecesPerBox: Int? = null
 
     @ApiModelProperty(value = "파레트입수")
-    val boxesPerPalette: Int? = null
+    var boxesPerPalette: Int? = null
 
     @ApiModelProperty(value = "상품이미지 URL")
-    val imageUrl: String? = null
+    var imageUrl: String? = null
 
     @ApiModelProperty(value = "활성화여부 (default: N)", allowableValues = "Y,N")
-    val activeYn: String = "N"
+    var activeYn: String = "N"
 
     @JsonUnwrapped
     var expirationDateInfoModel: ExpirationDateInfoCreateModel? = null
