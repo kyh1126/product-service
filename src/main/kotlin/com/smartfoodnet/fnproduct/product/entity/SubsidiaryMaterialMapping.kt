@@ -37,8 +37,8 @@ class SubsidiaryMaterialMapping(
 ) : BaseEntity() {
     fun update(request: SubsidiaryMaterialMappingCreateModel, basicProductSub: BasicProduct) {
         subsidiaryMaterial = basicProductSub
-        seasonalOption = request.seasonalOption
-        quantity = request.quantity
+        seasonalOption = request.seasonalOption!!
+        quantity = request.quantity!!
     }
 
     fun delete() {

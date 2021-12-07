@@ -12,18 +12,18 @@ data class PackageProductMappingCreateModel(
     @ApiModelProperty(value = "모음상품 ID")
     val packageProductId: Long?,
 
-    @NotNull
+    @field:NotNull
     @ApiModelProperty(value = "기본상품정보")
-    val basicProductModel: BasicProductSimpleCreateModel,
+    val basicProductModel: BasicProductSimpleCreateModel?,
 
-    @NotNull
+    @field:NotNull
     @ApiModelProperty(value = "수량")
-    val quantity: Int,
+    val quantity: Int?,
 ) {
     fun toEntity(basicProduct: BasicProduct): PackageProductMapping {
         return PackageProductMapping(
             selectedBasicProduct = basicProduct,
-            quantity = quantity,
+            quantity = quantity!!,
         )
     }
 }

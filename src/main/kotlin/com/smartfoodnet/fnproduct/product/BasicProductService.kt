@@ -213,10 +213,10 @@ class BasicProductService(
     }
 
     private fun getWarehouse(basicProductCreateModel: BasicProductCreateModel) =
-        inWarehouseService.getInWarehouse(basicProductCreateModel.warehouseId)
+        inWarehouseService.getInWarehouse(basicProductCreateModel.warehouseId!!)
 
     private fun getSubsidiaryMaterialById(createModel: BasicProductDetailCreateModel) =
-        getBasicProducts(createModel.subsidiaryMaterialMappingModels.map { it.subsidiaryMaterialId })
+        getBasicProducts(createModel.subsidiaryMaterialMappingModels.map { it.subsidiaryMaterialId!! })
             .associateBy { it.id }
 
     private fun createOrUpdateSubsidiaryMaterialMappings(

@@ -10,7 +10,7 @@ class TestBasicProductCreateModel(
     @ApiModelProperty(value = "id")
     val id: Long? = null,
 
-    @NotNull
+    @field:NotNull
     @ApiModelProperty(
         value = "구분 (BASIC:기본상품/CUSTOM_SUB:고객전용부자재/SUB:공통부자재/PACKAGE:모음상품)",
         allowableValues = "BASIC,CUSTOM_SUB,SUB,PACKAGE", dataType = "Enum", example = "BASIC"
@@ -44,7 +44,7 @@ class TestBasicProductCreateModel(
     )
     val handlingTemperature: HandlingTemperatureType? = null,
 
-    @NotNull
+    @field:NotNull
     @ApiModelProperty(value = "입고처 ID")
     val warehouseId: Long? = null,
 
