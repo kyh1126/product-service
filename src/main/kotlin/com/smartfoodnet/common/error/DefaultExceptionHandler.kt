@@ -3,6 +3,8 @@ package com.smartfoodnet.common.error
 import com.smartfoodnet.common.error.exception.BaseRuntimeException
 import com.smartfoodnet.common.error.exception.CreateModelValidateError
 import com.smartfoodnet.common.error.exception.ErrorCode
+import com.smartfoodnet.common.utils.Log
+import org.hibernate.validator.internal.engine.path.PathImpl
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
 import org.springframework.dao.DataIntegrityViolationException
@@ -155,10 +157,16 @@ class DefaultExceptionHandler {
     @ExceptionHandler(value = [ConstraintViolationException::class])
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     fun handleConstraintViolationException(ex: ConstraintViolationException): ExceptionResponse {
+        log.error("ConstraintViolationException: ${ex.message}")
+        val filteredMessage = ex.constraintViolations?.filterNotNull()?.joinToString(", ") {
+            val leafNode = (it.propertyPath as PathImpl).leafNode
+            "${leafNode.name}: ${it.message}"
+        }
+
         return ExceptionResponse(
             serviceCode = serviceCode,
             errorCode = ErrorCode.USER_BAD_REQUEST_DEFAULT.code,
-            errorMessage = ex.message ?: ErrorCode.USER_BAD_REQUEST_DEFAULT.errorMessage
+            errorMessage = filteredMessage ?: ErrorCode.USER_BAD_REQUEST_DEFAULT.errorMessage
         )
     }
 
@@ -184,4 +192,6 @@ class DefaultExceptionHandler {
             errorMessage = ErrorCode.INTERNAL_SERVER_ERROR.errorMessage
         )
     }
+
+    companion object : Log
 }
