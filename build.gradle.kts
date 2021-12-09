@@ -6,14 +6,6 @@ plugins {
     kotlin("jvm") version "1.5.10"
     kotlin("plugin.spring") version "1.5.10"
     kotlin("plugin.jpa") version "1.5.10"
-    // Lazy 전략 사용 시 실제 객체 호출 전까지 프록시 객체 참조
-    // 프록시 객체는 Entity 클래스 확장
-    // JPA final class -> 확장 불가능 -> @ManyToOne Lazy 동작 안함
-    // kotlin class -> 기본 final, open 키워드 제공
-    // allopen plugin -> open class 로 바꿔줌
-    // 그냥 플러그인 안쓰고 클래스별로 open 붙인다고 되는게 아니다.
-    // 프로퍼티와 함수에도 open 키워드가 필요하다.
-    // https://spring.io/guides/tutorials/spring-boot-kotlin/ 해당 문서에서는 allopen 플로그인 사용 권장하고 있음
     kotlin("plugin.allopen") version "1.5.10"
     kotlin("kapt") version "1.5.10"
 }
