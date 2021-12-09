@@ -2,6 +2,7 @@ server:
   port: 4008
   servlet:
     context-path: /fresh-networks/fn-product
+logging.level.io.swagger.models.parameters.AbstractSerializableParameter: ERROR
 spring:
   data:
     web:

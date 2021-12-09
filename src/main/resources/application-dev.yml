@@ -9,6 +9,7 @@ logging:
         type:
           descriptor:
             sql: trace
+    io.swagger.models.parameters.AbstractSerializableParameter: ERROR
 spring:
   data:
     web:
