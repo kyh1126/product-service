@@ -6,7 +6,6 @@ import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.fnproduct.code.CodeService
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.product.entity.BasicProductCategory
-import com.smartfoodnet.fnproduct.product.entity.Partner
 import com.smartfoodnet.fnproduct.product.entity.SubsidiaryMaterialCategory
 import com.smartfoodnet.fnproduct.product.model.dto.CategoryDto
 import com.smartfoodnet.fnproduct.product.model.response.CategoryByLevelModel
@@ -30,7 +29,6 @@ import org.springframework.transaction.annotation.Transactional
 @UTF8AutoConfigureMockMvc
 internal class BasicProductControllerTest(
     private val codeService: CodeService,
-    private val partnerRepository: PartnerRepository,
     private val basicProductCategoryRepository: BasicProductCategoryRepository,
     private val subsidiaryMaterialCategoryRepository: SubsidiaryMaterialCategoryRepository,
     private val objectMapper: ObjectMapper,
@@ -52,16 +50,13 @@ internal class BasicProductControllerTest(
     @DisplayName("특정 화주(고객사) ID 의 기본상품 리스트 조회 api 정상적으로 조회된다")
     fun givenPartnerId_WhenGetBasicProducts_ThenReturn200_Success() {
         // given
-        // 화주(고객사) 생성
-        val partner: Partner = buildPartner()
-        partnerRepository.save(partner)
 
         val response = PageRequest.of(0, 50, Sort.by(Sort.Direction.DESC, "id"))
             .run { Page.empty<BasicProduct>(this) }
             .run { PageResponse.of(this) }
 
         // when & then
-        mockMvc.get("$basicProductControllerPath/partners/${partner.id}") {
+        mockMvc.get("$basicProductControllerPath/partners/${partnerId}") {
             contentType = MediaType.APPLICATION_JSON
             accept = MediaType.APPLICATION_JSON
         }.andExpect {

@@ -1,6 +1,6 @@
 package com.smartfoodnet.fnproduct.product.mapper
 
-import com.smartfoodnet.fnproduct.partner.PartnerService
+import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.fnproduct.product.BasicProductRepository
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional
 @Component
 @Transactional(readOnly = true)
 class BasicProductCodeGenerator(
-    private val partnerService: PartnerService,
     private val basicProductRepository: BasicProductRepository,
 ) {
     private val basicProductCodeTypes = setOf(BasicProductType.BASIC, BasicProductType.PACKAGE)
@@ -31,13 +30,21 @@ class BasicProductCodeGenerator(
         ) return null
 
         val temperatureCode = handlingTemperature.code
-        val customerNumber = partnerService.getPartner(partnerId).customerNumber
         // 00001 부터 시작
         val totalProductCount =
             basicProductRepository.countByPartnerIdAndTypeIn(partnerId, basicProductCodeTypes)
                 .run { String.format("%05d", this + 1) }
 
-        return customerNumber + type.code + temperatureCode + totalProductCount
+        return getCustomerNumber(partnerId) + type.code + temperatureCode + totalProductCount
+    }
+
+    private fun getCustomerNumber(partnerId: Long): String {
+        if (partnerId > 9999L) {
+            log.error("[BasicProductCodeGenerator] 상품코드 채번 에러, partnerId = $partnerId")
+            throw IllegalArgumentException("partnerId 는 9999 보다 작아야 합니다.")
+        }
+
+        return String.format("%04d", partnerId)
     }
 
     private fun validateNotAvailableType(type: BasicProductType): Boolean {
@@ -48,4 +55,6 @@ class BasicProductCodeGenerator(
         type: BasicProductType,
         handlingTemperature: HandlingTemperatureType
     ) = type != BasicProductType.PACKAGE && handlingTemperature == HandlingTemperatureType.MIX
+
+    companion object : Log
 }

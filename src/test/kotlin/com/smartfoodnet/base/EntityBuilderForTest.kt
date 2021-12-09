@@ -1,7 +1,9 @@
 package com.smartfoodnet.base
 
 import com.smartfoodnet.fnproduct.code.entity.Code
-import com.smartfoodnet.fnproduct.product.entity.*
+import com.smartfoodnet.fnproduct.product.entity.BasicProduct
+import com.smartfoodnet.fnproduct.product.entity.BasicProductCategory
+import com.smartfoodnet.fnproduct.product.entity.SubsidiaryMaterialCategory
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import com.smartfoodnet.fnproduct.warehouse.entity.InWarehouse
 import kotlin.random.Random
@@ -95,17 +97,16 @@ fun buildSubsidiaryMaterialCategory(): List<SubsidiaryMaterialCategory> {
 // ---------------------------------------------------------------------------------------------------------------------
 // -- Partner
 // ---------------------------------------------------------------------------------------------------------------------
-fun buildPartner() =
-    Partner(id = Random.nextLong(0, Long.MAX_VALUE), name = "(주)대호", customerNumber = "0001")
+const val partnerId = 1L
 
 // ---------------------------------------------------------------------------------------------------------------------
 // -- Warehouse
 // ---------------------------------------------------------------------------------------------------------------------
-fun buildWarehouse(partner: Partner) =
+fun buildWarehouse(partnerId: Long) =
     InWarehouse(
         id = Random.nextLong(0, Long.MAX_VALUE),
         name = "입고처(주)파이",
-        partnerId = partner.id!!,
+        partnerId = partnerId,
         postNumber = "12345",
         address = "서울시 동대문구",
         addressDetail = "101-1",
@@ -132,7 +133,7 @@ fun buildBasicProduct_SUB(
         partnerId = partnerId,
         name = name,
         subsidiaryMaterialCategory = subsidiaryMaterialCategory,
-        warehouse = buildWarehouse(buildPartner()),
+        warehouse = buildWarehouse(partnerId),
         supplyPrice = 120,
         activeYn = "Y"
     )

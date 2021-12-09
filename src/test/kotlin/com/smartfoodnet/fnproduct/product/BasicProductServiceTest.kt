@@ -2,7 +2,10 @@ package com.smartfoodnet.fnproduct.product
 
 import com.smartfoodnet.base.*
 import com.smartfoodnet.fnproduct.code.CodeService
-import com.smartfoodnet.fnproduct.product.entity.*
+import com.smartfoodnet.fnproduct.product.entity.BasicProduct
+import com.smartfoodnet.fnproduct.product.entity.BasicProductCategory
+import com.smartfoodnet.fnproduct.product.entity.SubsidiaryMaterialCategory
+import com.smartfoodnet.fnproduct.product.entity.SubsidiaryMaterialMapping
 import com.smartfoodnet.fnproduct.product.mapper.BasicProductCategoryFinder
 import com.smartfoodnet.fnproduct.product.mapper.BasicProductCodeGenerator
 import com.smartfoodnet.fnproduct.product.mapper.SubsidiaryMaterialCategoryFinder
@@ -45,9 +48,6 @@ internal class BasicProductServiceTest(
     lateinit var basicProductRepository: BasicProductRepository
 
     @MockBean
-    lateinit var partnerRepository: PartnerRepository
-
-    @MockBean
     lateinit var inWarehouseRepository: InWarehouseRepository
 
     @MockBean
@@ -56,7 +56,6 @@ internal class BasicProductServiceTest(
     @MockBean
     lateinit var subsidiaryMaterialCategoryRepository: SubsidiaryMaterialCategoryRepository
 
-    lateinit var partner: Partner
     lateinit var warehouse: InWarehouse
     private var basicProductCategories: List<BasicProductCategory> = mutableListOf()
     private var subsidiaryMaterialCategories: List<SubsidiaryMaterialCategory> = mutableListOf()
@@ -72,10 +71,8 @@ internal class BasicProductServiceTest(
             ).flatten()
         )
 
-        // 화주(고객사) 생성
-        partner = buildPartner()
         // 입고처 생성
-        warehouse = buildWarehouse(partner)
+        warehouse = buildWarehouse(partnerId)
         // 기본 상품 카테고리 생성
         basicProductCategories = buildBasicProductCategory()
         // 부자재 카테고리 생성
@@ -83,7 +80,7 @@ internal class BasicProductServiceTest(
         // 공통부자재 생성
         basicproductsSub = subsidiaryMaterialCategories.map {
             buildBasicProduct_SUB(
-                partnerId = partner.id!!,
+                partnerId = partnerId,
                 name = it.level2Category!!.keyName,
                 subsidiaryMaterialCategory = it
             )
@@ -92,7 +89,6 @@ internal class BasicProductServiceTest(
 
     @BeforeEach
     fun initEach() {
-        given(partnerRepository.findById(anyLong())).willReturn(Optional.of(partner))
         given(inWarehouseRepository.findById(anyLong())).willReturn(Optional.of(warehouse))
         given(basicProductCategoryRepository.findById(anyLong()))
             .willReturn(Optional.of(basicProductCategories.first()))
@@ -136,7 +132,7 @@ internal class BasicProductServiceTest(
             val mockCreateModel = buildBasicProductDetailCreateModel(
                 basicProductModel = buildBasicProductCreateModel(
                     type = BasicProductType.BASIC,
-                    partnerId = partner.id,
+                    partnerId = partnerId,
                     handlingTemperature = HandlingTemperatureType.FREEZE,
                 )
             ).apply { subsidiaryMaterialMappingModels.add(buildSubsidiaryMaterialMappingCreateModel) }
@@ -210,7 +206,7 @@ internal class BasicProductServiceTest(
             val mockUpdateModel = buildBasicProductDetailCreateModel(
                 basicProductModel = buildBasicProductCreateModel(
                     type = BasicProductType.BASIC,
-                    partnerId = partner.id,
+                    partnerId = partnerId,
                     handlingTemperature = HandlingTemperatureType.FREEZE,
                 )
             ).apply { subsidiaryMaterialMappingModels.add(buildSubsidiaryMaterialMappingCreateModel) }
