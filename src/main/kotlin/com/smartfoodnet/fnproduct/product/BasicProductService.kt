@@ -32,7 +32,6 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 @Transactional(readOnly = true)
 class BasicProductService(
-//    private val warehouseService: WarehouseService,
     private val inWarehouseService: InWarehouseService,
     private val basicProductRepository: BasicProductRepository,
     private val basicProductDetailCreateModelValidator: BasicProductDetailCreateModelValidator,
