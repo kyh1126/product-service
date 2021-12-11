@@ -81,6 +81,8 @@ dependencyManagement {
     }
 }
 
+ext["log4j2.version"] = "2.15.0"
+
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         freeCompilerArgs = listOf("-Xjsr305=strict")
