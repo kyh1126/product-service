@@ -68,6 +68,9 @@ dependencies {
     implementation("io.springfox:springfox-boot-starter:3.0.0")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.6.5")
 
+    //HttpClient
+    implementation("org.apache.httpcomponents:httpclient:4.5")
+
     // @Testcontainers 관련 설정
     testImplementation("org.testcontainers:mysql")
 

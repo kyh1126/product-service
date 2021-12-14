@@ -1,5 +1,6 @@
 package com.smartfoodnet.fninventory.inbound
 
+import com.smartfoodnet.apiclient.InboundApiClient
 import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.fninventory.inbound.model.request.InboundCreateModel
 import com.smartfoodnet.fninventory.inbound.model.request.InboundSearchCondition
@@ -13,14 +14,24 @@ import java.time.LocalDateTime
 
 @Service
 class InboundService(
+    val inboundApiClient: InboundApiClient,
     val inboundRepository: InboundRepository,
     val basicProductRepository: BasicProductRepository
 ) {
 
-    fun createInbound(list: List<InboundCreateModel>) {
+    fun createInbound(list: List<InboundCreateModel>){
+
+        list.forEach{
+            basicProductRepository.findByCode(it.basicProductCode!!)?:throw NoSuchElementException("기본상품을 찾을 수 없습니다")
+        }
+
         list.forEach {
+            // TODO : API 호출을 통해 NOSNOS 입고예정등록을 진행
+//            inboundApiClient.createInbound(it)
+
+            // TODO : API 호출이 성공하면 DB에 저장
             val inbound = it.toEntity()
-            inbound.basicProduct = basicProductRepository.findByCode(it.basicProductCode!!)?:throw NoSuchElementException("기본상품을 찾을 수 없습니다")
+            inbound.basicProduct = basicProductRepository.findByCode(it.basicProductCode!!)
             inboundRepository.save(inbound)
         }
     }
