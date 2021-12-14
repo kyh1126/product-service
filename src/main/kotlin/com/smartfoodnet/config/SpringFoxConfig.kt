@@ -32,7 +32,7 @@ class SpringFoxConfig(
         )
 
         return Docket(DocumentationType.SWAGGER_2)
-            .host(host)
+//            .host(host)
             .alternateTypeRules(newRule)
             .select()
             .apis(RequestHandlerSelectors.any())
