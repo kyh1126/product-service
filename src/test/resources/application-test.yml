@@ -5,7 +5,7 @@ logging:
       hibernate:
         type:
           descriptor:
-            sql: info
+            sql: trace
 spring:
   data:
     web:

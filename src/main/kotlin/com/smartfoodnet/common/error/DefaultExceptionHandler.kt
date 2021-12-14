@@ -78,7 +78,7 @@ class DefaultExceptionHandler {
 
     @ExceptionHandler(value = [DataIntegrityViolationException::class])
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    fun handleConstraintViolationException(
+    fun handleDataIntegrityViolationException(
         request: HttpServletRequest, response: HttpServletResponse,
         ex: DataIntegrityViolationException,
     ): ExceptionResponse {
@@ -157,12 +157,12 @@ class DefaultExceptionHandler {
     @ExceptionHandler(value = [ConstraintViolationException::class])
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     fun handleConstraintViolationException(ex: ConstraintViolationException): ExceptionResponse {
+        ex.printStackTrace()
         log.error("ConstraintViolationException: ${ex.message}")
         val filteredMessage = ex.constraintViolations?.filterNotNull()?.joinToString(", ") {
             val leafNode = (it.propertyPath as PathImpl).leafNode
             "${leafNode.name}: ${it.message}"
         }
-
         return ExceptionResponse(
             serviceCode = serviceCode,
             errorCode = ErrorCode.USER_BAD_REQUEST_DEFAULT.code,
@@ -173,6 +173,7 @@ class DefaultExceptionHandler {
     @ExceptionHandler(value = [TransactionSystemException::class])
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     fun handleTransactionSystemException(ex: TransactionSystemException): ExceptionResponse {
+        ex.printStackTrace()
         return ExceptionResponse(
             serviceCode = serviceCode,
             errorCode = ErrorCode.USER_BAD_REQUEST_DEFAULT.code,
@@ -193,5 +194,18 @@ class DefaultExceptionHandler {
         )
     }
 
+    @ExceptionHandler(value = [IllegalStateException::class])
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    fun handleIllegalStateException(e: IllegalStateException): ExceptionResponse {
+        e.printStackTrace()
+
+        return ExceptionResponse(
+            serviceCode = serviceCode,
+            errorCode = ErrorCode.INTERNAL_SERVER_ERROR.code,
+            errorMessage = e.message ?: ErrorCode.INTERNAL_SERVER_ERROR.errorMessage
+        )
+    }
+
     companion object : Log
+
 }
