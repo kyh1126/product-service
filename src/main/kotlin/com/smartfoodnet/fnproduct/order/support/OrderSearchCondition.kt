@@ -1,7 +1,6 @@
 package com.smartfoodnet.fnproduct.order.support
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import com.google.common.collect.Lists
 import com.querydsl.core.BooleanBuilder
 import com.querydsl.core.types.Predicate
 import com.querydsl.core.types.dsl.BooleanExpression
@@ -17,10 +16,10 @@ class OrderSearchCondition(
     var partnerId: Long? = null,
 
     @ApiModelProperty(value = "쇼핑몰 id 리스트")
-    var storeIds: List<Long>? = Lists.newArrayList(),
+    var storeIds: List<Long>? = null,
 
     @ApiModelProperty(value = "주문 상태 리스트")
-    var orderStates: List<OrderStatus>? = Lists.newArrayList(),
+    var orderStates: List<OrderStatus>? = null,
 
     @ApiModelProperty(value = "주문기간 시작일")
     var startingAt: LocalDateTime? = null,
@@ -48,8 +47,8 @@ class OrderSearchCondition(
             inOrderStates(orderStates),
             inStoreIds(storeIds),
             betweenOrderedAt(startingAt, endingAt),
-            eqBasicProductName(basicProductName),
-            eqStoreProductName(storeProductName),
+            likeBasicProductName(basicProductName),
+            likeStoreProductName(storeProductName),
             eqBasicProductId(basicProductId),
             eqStoreProductCode(storeProductCode)
         )
@@ -58,20 +57,23 @@ class OrderSearchCondition(
     private fun eqPartnerId(partnerId: Long?) = partnerId?.let { orderDetail.partnerId.eq(it) }
 
     private fun inOrderStates(orderStates: Collection<OrderStatus>?) =
-        orderDetail.status.`in`(orderStates)
+        orderStates?.let { orderDetail.status.`in`(orderStates) }
 
     private fun inStoreIds(storeIds: Collection<Long>?) =
-        orderDetail.storeId.`in`(storeIds)
+        storeIds?.let { orderDetail.storeId.`in`(storeIds) }
 
     private fun betweenOrderedAt(startingAt: LocalDateTime?, endingAt: LocalDateTime?): BooleanExpression? {
-        return orderDetail.orderedAt.between(startingAt, endingAt)
+        if (startingAt != null && endingAt != null) {
+            return orderDetail.orderedAt.between(startingAt, endingAt)
+        }
+        return null
     }
 
-    private fun eqBasicProductName(basicProductName: String?) =
-        basicProductName?.let { orderDetail.storeProduct.basicProduct.name.eq(basicProductName) }
+    private fun likeBasicProductName(basicProductName: String?) =
+        basicProductName?.let { orderDetail.storeProduct.basicProduct.name.likeIgnoreCase("%$basicProductName%") }
 
-    private fun eqStoreProductName(storeProductName: String?) =
-        storeProductName?.let { orderDetail.storeProduct.name.eq(storeProductName) }
+    private fun likeStoreProductName(storeProductName: String?) =
+        storeProductName?.let { orderDetail.storeProduct.name.likeIgnoreCase("%$storeProductName%") }
 
     private fun eqStoreProductCode(storeProductCode: String?) =
         storeProductCode?.let { orderDetail.storeProduct.storeProductCode.eq(storeProductCode) }
