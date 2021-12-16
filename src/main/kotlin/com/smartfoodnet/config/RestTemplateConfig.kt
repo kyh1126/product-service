@@ -23,7 +23,6 @@ class RestTemplateConfig(
         KeyManagementException::class
     )
     fun restTemplate(restTemplateBuilder: RestTemplateBuilder): RestTemplate {
-        println(host)
         val httpClient = HttpClientBuilder.create()
             .setMaxConnTotal(50)
             .setMaxConnPerRoute(20)

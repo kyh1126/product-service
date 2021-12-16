@@ -27,7 +27,7 @@ class InboundService(
 
         list.forEach {
             // TODO : API 호출을 통해 NOSNOS 입고예정등록을 진행
-//            inboundApiClient.createInbound(it)
+//            inboundApiClient.createInbound(it.toApiModel())
 
             // TODO : API 호출이 성공하면 DB에 저장
             val inbound = it.toEntity()

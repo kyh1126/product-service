@@ -1,4 +1,4 @@
-package com.smartfoodnet.apiclient.response
+package com.smartfoodnet.nosnos.api.inventory.model.request
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonNaming
