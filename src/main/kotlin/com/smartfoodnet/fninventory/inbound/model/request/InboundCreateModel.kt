@@ -5,8 +5,11 @@ import com.smartfoodnet.common.Constants
 import com.smartfoodnet.fninventory.inbound.entity.Inbound
 import com.smartfoodnet.fninventory.inbound.model.vo.InboundMethodType
 import com.smartfoodnet.fninventory.inbound.model.vo.InboundStatusType
+import com.smartfoodnet.nosnos.api.inventory.model.request.NosnosInboundCreateModel
+import com.smartfoodnet.nosnos.api.inventory.model.request.PlanProduct
 import io.swagger.annotations.ApiModelProperty
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotNull
 
@@ -53,4 +56,18 @@ data class InboundCreateModel(
         }
     }
 
+    fun toApiModel() : NosnosInboundCreateModel {
+        return run {
+            NosnosInboundCreateModel(
+                // TODO : 파트너 서비스 변경 후 memberID로 변경
+                memberId = 77,
+                planDate = inboundExpectedDate!!.format(DateTimeFormatter.ofPattern("yyyyMMdd")),
+                planProductList = listOf(PlanProduct(
+                    // TODO : 기본상품 -> NOSNOS 출고상품 등록시 부여받는 ProductId 입력
+                    shippingProductId = basicProductCode!!.toLong(),
+                    quantity = inboundRequestQuantity!!
+                ))
+            )
+        }
+    }
 }
