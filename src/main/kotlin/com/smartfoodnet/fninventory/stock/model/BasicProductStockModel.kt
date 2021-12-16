@@ -1,8 +1,9 @@
 package com.smartfoodnet.fnproduct.stock.model
 
+import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import io.swagger.annotations.ApiModelProperty
 
-data class StockModel (
+data class BasicProductStockModel(
     @ApiModelProperty(value = "기본상품 ID")
     val basicProductId: Long? = null,
 
@@ -26,4 +27,18 @@ data class StockModel (
 
     @ApiModelProperty(value = "점유 PLT 수")
     val occupiedPLTCount: Int? = null,
-)
+) {
+    companion object {
+        fun fromBasicProduct(basicProduct: BasicProduct): BasicProductStockModel {
+            return basicProduct.run {
+                BasicProductStockModel(
+                    basicProductId = id,
+                    basicProductName = name,
+                    basicProductCode = code,
+                    barcode = barcode,
+                    expirationDateManagementYn = expirationDateManagementYn
+                )
+            }
+        }
+    }
+}
