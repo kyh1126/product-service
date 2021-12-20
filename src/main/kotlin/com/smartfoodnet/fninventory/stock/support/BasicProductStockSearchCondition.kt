@@ -1,4 +1,4 @@
-package com.smartfoodnet.fnproduct.stock.support
+package com.smartfoodnet.fninventory.stock.support
 
 import com.querydsl.core.BooleanBuilder
 import com.querydsl.core.types.Predicate

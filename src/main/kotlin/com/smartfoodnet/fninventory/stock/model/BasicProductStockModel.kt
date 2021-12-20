@@ -1,5 +1,6 @@
-package com.smartfoodnet.fnproduct.stock.model
+package com.smartfoodnet.fninventory.stock.model
 
+import com.smartfoodnet.apiclient.response.NosnosStockModel
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import io.swagger.annotations.ApiModelProperty
 
@@ -13,6 +14,9 @@ data class BasicProductStockModel(
     @ApiModelProperty(value = "기본상품 코드")
     val basicProductCode: String? = null,
 
+    @ApiModelProperty(value = "출고상품 ID")
+    val shippingProductId: Int? = null,
+
     @ApiModelProperty(value = "상품 바코드")
     val barcode: String? = null,
 
@@ -20,13 +24,13 @@ data class BasicProductStockModel(
     val expirationDateManagementYn: String? = null,
 
     @ApiModelProperty(value = "총재고")
-    val totalStockCount: Int? = null,
+    var totalStockCount: Int? = null,
 
     @ApiModelProperty(value = "가용재고")
-    val normalStockCount: Int? = null,
+    var normalStockCount: Int? = null,
 
     @ApiModelProperty(value = "점유 PLT 수")
-    val occupiedPLTCount: Int? = null,
+    var occupiedPLTCount: Int? = null,
 ) {
     companion object {
         fun fromBasicProduct(basicProduct: BasicProduct): BasicProductStockModel {
@@ -40,5 +44,12 @@ data class BasicProductStockModel(
                 )
             }
         }
+    }
+
+    //TODO wms에서 모델 변경시 수정 필요
+    fun fillInNosnosStockValues(nosnosStockModel: NosnosStockModel) {
+        totalStockCount = nosnosStockModel.normalStock //TODO 수정필요
+        normalStockCount = nosnosStockModel.normalStock
+        //occupiedPLTCount
     }
 }

@@ -1,10 +1,10 @@
-package com.smartfoodnet.fnproduct.stock
+package com.smartfoodnet.fninventory.stock
 
 import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.fnproduct.order.model.OrderDetailModel
 import com.smartfoodnet.fnproduct.order.support.OrderSearchCondition
-import com.smartfoodnet.fnproduct.stock.model.BasicProductStockModel
-import com.smartfoodnet.fnproduct.stock.support.BasicProductStockSearchCondition
+import com.smartfoodnet.fninventory.stock.model.BasicProductStockModel
+import com.smartfoodnet.fninventory.stock.support.BasicProductStockSearchCondition
 import io.swagger.annotations.Api
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -30,6 +30,6 @@ class StockController(
         @PageableDefault(size = 50, sort = ["id"], direction = Sort.Direction.DESC) page: Pageable,
     ): PageResponse<BasicProductStockModel> {
         condition.apply { this.partnerId = partnerId }
-//        return orderService.getOrderDetail(condition, page)
+        return stockService.getBasicProductStocks(partnerId, condition, page)
     }
 }
