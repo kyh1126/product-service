@@ -10,7 +10,6 @@ import org.springframework.web.client.RestTemplate
 import java.security.KeyManagementException
 import java.security.NoSuchAlgorithmException
 import java.time.Duration
-import javax.net.ssl.SSLContext
 
 @Configuration
 class RestTemplateConfig(
@@ -31,7 +30,7 @@ class RestTemplateConfig(
         factory.setConnectTimeout(Duration.ofSeconds(3).toMillis().toInt())
         factory.setReadTimeout(Duration.ofSeconds(10).toMillis().toInt())
         return restTemplateBuilder
-            .rootUri(host)
+//            .rootUri(host)
             .requestFactory { factory }
             .build()
     }

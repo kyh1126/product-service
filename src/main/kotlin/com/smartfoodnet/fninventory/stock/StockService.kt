@@ -21,7 +21,6 @@ class StockService(
         condition: PredicateSearchCondition,
         page: Pageable
     ): PageResponse<BasicProductStockModel> {
-        //TODO check how we are going to map memberId and partnerId (are they the same?)
         val basicProducts = basicProductRepository.findAll(condition.toPredicate(), page)
         val basicProductStockModels = basicProducts.map { BasicProductStockModel.fromBasicProduct(it) }
 

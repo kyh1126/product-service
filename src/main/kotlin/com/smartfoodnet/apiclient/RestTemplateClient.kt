@@ -51,5 +51,4 @@ abstract class RestTemplateClient : Log {
         val httpEntity = HttpEntity<T>(body, getHeader())
         restTemplate.exchange(url, HttpMethod.PUT, httpEntity, CommonResponse::class.java)
     }
-
 }
