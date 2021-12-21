@@ -4,6 +4,9 @@ import com.smartfoodnet.apiclient.StockApiClient
 import com.smartfoodnet.common.model.request.PredicateSearchCondition
 import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.fninventory.stock.model.BasicProductStockModel
+import com.smartfoodnet.fninventory.stock.model.StockByBestBeforeModel
+import com.smartfoodnet.fninventory.stock.support.StockByBestBeforeRepository
+import com.smartfoodnet.fninventory.stock.support.StockByBestBeforeSearchCondition
 import com.smartfoodnet.fnproduct.product.BasicProductRepository
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -14,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional(readOnly = true)
 class StockService(
     private val basicProductRepository: BasicProductRepository,
+    private val stockByBestBeforeRepository: StockByBestBeforeRepository,
     private val stockApiClient: StockApiClient
 ) {
     fun getBasicProductStocks(
@@ -35,5 +39,26 @@ class StockService(
         }
 
         return PageResponse.of(basicProductStockModels)
+    }
+
+    fun getStocksByBestBefore(
+        partnerId: Long,
+        condition: StockByBestBeforeSearchCondition,
+        page: Pageable
+    ): PageResponse<StockByBestBeforeModel> {
+        val stocksByBestBefore = stockByBestBeforeRepository.findAll(condition.toPredicate(), page)
+        val stockByBestBeforeModel = stocksByBestBefore.map { StockByBestBeforeModel.fromStockByBestBefore(it) }
+
+        return PageResponse.of(stockByBestBeforeModel)
+    }
+
+    fun syncStocksByBestBefore() {
+        TODO("Not yet implemented")
+
+//        val nosnosStocks = stockApiClient.getStocks(
+//            partnerId = partnerId,
+//            shippingProductIds = basicProductStockModels.content.map { it.shippingProductId }
+//        )
+
     }
 }
