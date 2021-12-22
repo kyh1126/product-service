@@ -48,6 +48,15 @@ spring:
       date-time: yyyy-MM-dd HH:mm:ss
 
 sfn:
+  aws:
+    region: ap-northeast-2
+    sns:
+      endpoint: sns.ap-northeast-2.amazonaws.com
+    sqs:
+      endpoint: sqs.ap-northeast-2.amazonaws.com
+    message: # SNS, SQS
+      access-key: ${MESSAGE_ACCESS_KEY:uninitialized_message_access_key}
+      secret-key: ${MESSAGE_SECRET_KEY:uninitialized_message_secret_key}
   async:
     poolSize: 10
   swagger:
@@ -56,3 +65,10 @@ sfn:
       value: "페이지 크기 (default: ${spring.data.web.pageable.default-page-size})"
   service:
     fn-nosnos: http://localhost:8080/nosnos
+
+sqs:
+  queues:
+    fn-product:
+      basic-product-created:
+        name: ${SQS_BASIC_PRODUCT_CREATED_NAME:uninitialized}
+        arn: ${SQS_BASIC_PRODUCT_CREATED_ARN:uninitialized}
