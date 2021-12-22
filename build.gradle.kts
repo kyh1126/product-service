@@ -35,8 +35,9 @@ repositories {
 sourceSets["main"].withConvention(org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet::class) {
     kotlin.srcDir("$buildDir/generated/source/kapt/main")
 }
-//extra["testcontainersVersion"] = "1.15.3"
+
 extra["testcontainersVersion"] = "1.16.2"
+extra["springCloudAWSVersion"] = "2.3.2"
 
 tasks.getByName<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
     this.archiveFileName.set("app.jar")
@@ -74,6 +75,10 @@ dependencies {
     // @Testcontainers 관련 설정
     testImplementation("org.testcontainers:mysql")
 
+    // aws
+    implementation("io.awspring.cloud:spring-cloud-aws-messaging")
+    implementation("cloud.localstack:localstack-utils:0.2.17")
+
     // sfn common
     implementation("sfn", "sfn-excel-module", "1.0.106")
 }
@@ -81,6 +86,7 @@ dependencies {
 dependencyManagement {
     imports {
         mavenBom("org.testcontainers:testcontainers-bom:${property("testcontainersVersion")}")
+        mavenBom("io.awspring.cloud:spring-cloud-aws-dependencies:${property("springCloudAWSVersion")}")
     }
 }
 
