@@ -52,6 +52,8 @@ spring:
       date-time: yyyy-MM-dd HH:mm:ss
 
 sfn:
+  async:
+    poolSize: 10
   swagger:
     host: s-api-dev.smartfoodnet.com
     size:

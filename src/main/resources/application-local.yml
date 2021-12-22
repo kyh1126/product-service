@@ -52,6 +52,8 @@ spring:
     format:
       date-time: yyyy-MM-dd HH:mm:ss
 sfn:
+  async:
+    poolSize: 10
   swagger:
     host: localhost:4008
     size:
