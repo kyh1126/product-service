@@ -1,5 +1,8 @@
 package com.smartfoodnet.fnproduct.product
 
+import com.smartfoodnet.apiclient.MessageApiClient
+import com.smartfoodnet.apiclient.SfnTopic
+import com.smartfoodnet.apiclient.request.BasicProductCreatedModel
 import com.smartfoodnet.common.error.SaveState
 import com.smartfoodnet.common.error.ValidatorUtils
 import com.smartfoodnet.common.error.exception.BaseRuntimeException
@@ -39,6 +42,7 @@ class BasicProductService(
     private val basicProductCategoryFinder: BasicProductCategoryFinder,
     private val subsidiaryMaterialCategoryFinder: SubsidiaryMaterialCategoryFinder,
     private val basicProductCodeGenerator: BasicProductCodeGenerator,
+    private val messageApiClient: MessageApiClient,
 ) {
 
     fun getBasicProducts(
@@ -144,8 +148,16 @@ class BasicProductService(
             subsidiaryMaterialMappings = subsidiaryMaterialMappings,
             inWarehouse = inWarehouse
         )
+
         return saveBasicProduct(basicProduct)
-            .run { toBasicProductDetailModel(this, subsidiaryMaterialById) }
+            .also {
+                messageApiClient.sendMessage(
+                    destination = SfnTopic.PRODUCT_CREATED,
+                    message = BasicProductCreatedModel(it.id!!)
+                )
+            }.run {
+                toBasicProductDetailModel(this, subsidiaryMaterialById)
+            }
     }
 
     @Transactional
