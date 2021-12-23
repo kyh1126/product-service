@@ -67,6 +67,9 @@ sfn:
     host: localhost:4008
     size:
       value: "페이지 크기 (default: ${spring.data.web.pageable.default-page-size})"
+  service:
+    fn-nosnos: http://localhost:8080/nosnos
+    fn-message: http://localhost:8080/message
 
 sqs:
   queues:
