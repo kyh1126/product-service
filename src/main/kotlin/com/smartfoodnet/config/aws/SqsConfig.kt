@@ -6,13 +6,16 @@ import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.sqs.AmazonSQSAsync
 import com.amazonaws.services.sqs.AmazonSQSAsyncClientBuilder
 import io.awspring.cloud.messaging.config.QueueMessageHandlerFactory
-import io.awspring.cloud.messaging.support.NotificationMessageArgumentResolver
+import io.awspring.cloud.messaging.config.SimpleMessageListenerContainerFactory
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
+import org.springframework.core.task.AsyncTaskExecutor
 import org.springframework.messaging.converter.MappingJackson2MessageConverter
 import org.springframework.messaging.converter.MessageConverter
+import org.springframework.messaging.handler.annotation.support.PayloadMethodArgumentResolver
 import org.springframework.messaging.handler.invocation.HandlerMethodArgumentResolver
 
 @Configuration
@@ -43,11 +46,25 @@ class SqsConfig {
     }
 
     @Bean
+    fun simpleMessageListenerContainerFactory(
+        amazonSQSAsync: AmazonSQSAsync,
+        @Qualifier("taskExecutor") taskExecutor: AsyncTaskExecutor
+    ): SimpleMessageListenerContainerFactory {
+        val factory = SimpleMessageListenerContainerFactory()
+        factory.setAmazonSqs(amazonSQSAsync)
+        factory.setAutoStartup(true)
+        factory.setMaxNumberOfMessages(10)
+        factory.setWaitTimeOut(10)
+//        factory.setTaskExecutor(taskExecutor)
+        return factory;
+    }
+
+    @Bean
     fun queueMessageHandlerFactory(): QueueMessageHandlerFactory {
         val factory = QueueMessageHandlerFactory()
         factory.setArgumentResolvers(
             listOf<HandlerMethodArgumentResolver>(
-                NotificationMessageArgumentResolver(messageConverter())
+                PayloadMethodArgumentResolver(messageConverter())
             )
         )
         return factory

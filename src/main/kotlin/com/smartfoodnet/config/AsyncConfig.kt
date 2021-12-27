@@ -4,9 +4,9 @@ import com.smartfoodnet.config.log.LoggingTaskDecorator
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.core.task.AsyncTaskExecutor
 import org.springframework.scheduling.annotation.EnableAsync
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
-import java.util.concurrent.Executor
 
 @Configuration
 @EnableAsync
@@ -15,7 +15,7 @@ class AsyncConfig(
     private val poolSize: Int,
 ) {
     @Bean
-    fun taskExecutor(): Executor {
+    fun taskExecutor(): AsyncTaskExecutor {
         val taskExecutor = ThreadPoolTaskExecutor()
 
         taskExecutor.setThreadNamePrefix("QueueTask-");

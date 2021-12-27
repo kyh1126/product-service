@@ -54,8 +54,6 @@ spring:
 sfn:
   aws:
     region: ap-northeast-2
-    sns:
-      endpoint: http://localhost:4566
     sqs:
       endpoint: http://localhost:4566
     message: # SNS, SQS

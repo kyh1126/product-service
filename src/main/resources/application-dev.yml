@@ -54,8 +54,6 @@ spring:
 sfn:
   aws:
     region: ap-northeast-2
-    sns:
-      endpoint: sns.ap-northeast-2.amazonaws.com
     sqs:
       endpoint: sqs.ap-northeast-2.amazonaws.com
     message: # SNS, SQS
