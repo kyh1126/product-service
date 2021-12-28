@@ -1,5 +1,6 @@
 package com.smartfoodnet.fnproduct.product
 
+import com.smartfoodnet.apiclient.MessageApiClient
 import com.smartfoodnet.base.*
 import com.smartfoodnet.fnproduct.code.CodeService
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
@@ -55,6 +56,9 @@ internal class BasicProductServiceTest(
 
     @MockBean
     lateinit var subsidiaryMaterialCategoryRepository: SubsidiaryMaterialCategoryRepository
+
+    @MockBean
+    lateinit var messageApiClient: MessageApiClient
 
     lateinit var warehouse: InWarehouse
     private var basicProductCategories: List<BasicProductCategory> = mutableListOf()
