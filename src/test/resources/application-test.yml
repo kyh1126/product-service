@@ -45,7 +45,19 @@ spring:
     redis:
       time-to-live: 1h
 sfn:
+  aws:
+    region: ap-northeast-2
+    sqs:
+      endpoint: sqs.ap-northeast-2.amazonaws.com
+    message: # SNS, SQS
+      access-key: ${MESSAGE_ACCESS_KEY:AKIA2ZMIBSPQIF4NTP2Y}
+      secret-key: ${MESSAGE_SECRET_KEY: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}
+  async:
+    poolSize: 10
   swagger:
     host: localhost:4008
     size:
       value: "페이지 크기 (default: ${spring.data.web.pageable.default-page-size})"
+  service:
+    fn-nosnos: http://localhost:8080/nosnos
+    fn-message: http://localhost:8080/message

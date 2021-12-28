@@ -44,17 +44,34 @@ spring:
       maximumPoolSize: 10
       poolName: HikariCP
     url: ${SPRING_DATASOURCE_BASE_URL:jdbc:mysql://localhost:3306}/fn_products?serverTimezone=UTC&useCursors=false&sendStringParametersAsUnicode=false&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useSSL=false
-#    url: jdbc:mysql://localhost:3306/fn_products?serverTimezone=UTC&useCursors=false&sendStringParametersAsUnicode=false&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useSSL=false
+    #    url: jdbc:mysql://localhost:3306/fn_products?serverTimezone=UTC&useCursors=false&sendStringParametersAsUnicode=false&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useSSL=false
     username: ${SPRING_DATASOURCE_BASE_USERNAME:root}
-    password: ${SPRING_DATASOURCE_BASE_PASSWORD:1q2w3e4r}
+    password: ${SPRING_DATASOURCE_BASE_PASSWORD:root}
     driver-class-name: com.mysql.cj.jdbc.Driver
   mvc:
     format:
       date-time: yyyy-MM-dd HH:mm:ss
 sfn:
+  aws:
+    region: ap-northeast-2
+    sqs:
+      endpoint: http://localhost:4566
+    message: # SNS, SQS
+      access-key: ${MESSAGE_ACCESS_KEY:uninitialized_message_access_key}
+      secret-key: ${MESSAGE_SECRET_KEY:uninitialized_message_secret_key}
   async:
     poolSize: 10
   swagger:
     host: localhost:4008
     size:
       value: "페이지 크기 (default: ${spring.data.web.pageable.default-page-size})"
+  service:
+    fn-nosnos: http://localhost:8080/nosnos
+    fn-message: http://localhost:8080/message
+
+sqs:
+  queues:
+    fn-product:
+      basic-product-created:
+        name: ${SQS_BASIC_PRODUCT_CREATED_NAME:uninitialized}
+        arn: ${SQS_BASIC_PRODUCT_CREATED_ARN:uninitialized}

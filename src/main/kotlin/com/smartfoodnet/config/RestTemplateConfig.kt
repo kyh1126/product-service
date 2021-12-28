@@ -10,7 +10,6 @@ import org.springframework.web.client.RestTemplate
 import java.security.KeyManagementException
 import java.security.NoSuchAlgorithmException
 import java.time.Duration
-import javax.net.ssl.SSLContext
 
 @Configuration
 class RestTemplateConfig(
