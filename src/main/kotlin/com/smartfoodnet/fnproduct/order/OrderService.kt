@@ -5,6 +5,7 @@ import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.fnproduct.order.entity.OrderDetail
 import com.smartfoodnet.fnproduct.order.model.OrderDetailCreateModel
 import com.smartfoodnet.fnproduct.order.model.OrderDetailModel
+import com.smartfoodnet.fnproduct.order.model.OrderStatus
 import com.smartfoodnet.fnproduct.order.support.OrderDetailRepository
 import com.smartfoodnet.fnproduct.store.StoreProductService
 import org.springframework.data.domain.Pageable
@@ -26,13 +27,17 @@ class OrderService(
         return orderDetails.map{OrderDetailModel.from (it)}
     }
 
-    fun getOrderDetail(
+    fun getOrderDetails(
         condition: PredicateSearchCondition,
         page: Pageable
     ): PageResponse<OrderDetailModel> {
         return orderDetailRepository.findAll(condition.toPredicate(), page)
             .map(OrderDetailModel::from)
             .run { PageResponse.of(this) }
+    }
+
+    fun getOrderDetails(partnerId: Long, status: OrderStatus): List<OrderDetail>?{
+        return orderDetailRepository.findAllByPartnerIdAndStatus(partnerId, status)
     }
 
     private fun convert(orderDetailModel: OrderDetailCreateModel): OrderDetail {
