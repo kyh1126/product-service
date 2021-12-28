@@ -22,6 +22,9 @@ data class BasicProductModel(
     @ApiModelProperty(value = "화주(고객사) ID")
     val partnerId: Long?,
 
+    @ApiModelProperty(value = "출고상품 ID (nosnos)")
+    val shippingProductId: Long? = null,
+
     @ApiModelProperty(value = "상품명")
     var name: String?,
 
@@ -92,6 +95,7 @@ data class BasicProductModel(
                     id = id,
                     type = type,
                     partnerId = partnerId,
+                    shippingProductId = shippingProductId,
                     name = if (type == BasicProductType.SUB) level2CategoryName else name,
                     code = code,
                     barcodeYn = barcodeYn,

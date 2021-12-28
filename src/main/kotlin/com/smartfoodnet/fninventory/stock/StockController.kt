@@ -2,8 +2,6 @@ package com.smartfoodnet.fninventory.stock
 
 import com.smartfoodnet.common.model.response.CommonResponse
 import com.smartfoodnet.common.model.response.PageResponse
-import com.smartfoodnet.fnproduct.order.model.OrderDetailModel
-import com.smartfoodnet.fnproduct.order.support.OrderSearchCondition
 import com.smartfoodnet.fninventory.stock.model.BasicProductStockModel
 import com.smartfoodnet.fninventory.stock.model.StockByBestBeforeModel
 import com.smartfoodnet.fninventory.stock.support.BasicProductStockSearchCondition
@@ -53,9 +51,8 @@ class StockController(
     @GetMapping("best-before/synchronize")
     fun syncStocksByBestBefore(
     ): CommonResponse{
-        stockService.syncStocksByBestBefore()
+        val partnerId = 77L
+        stockService.syncStocksByBestBefore(partnerId)
         return CommonResponse()
     }
-
-
 }

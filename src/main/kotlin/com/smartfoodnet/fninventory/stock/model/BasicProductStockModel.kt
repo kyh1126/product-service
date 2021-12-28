@@ -15,7 +15,7 @@ data class BasicProductStockModel(
     val basicProductCode: String? = null,
 
     @ApiModelProperty(value = "출고상품 ID")
-    val shippingProductId: Int? = null,
+    val shippingProductId: Long? = null,
 
     @ApiModelProperty(value = "상품 바코드")
     val barcode: String? = null,

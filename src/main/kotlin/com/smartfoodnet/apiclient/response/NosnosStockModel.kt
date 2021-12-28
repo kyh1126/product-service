@@ -6,10 +6,10 @@ import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
 
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy::class)
-@ApiModel(value = "입고등록조회 모델")
+@ApiModel(value = "노스노스 재고 모델")
 data class NosnosStockModel(
     @ApiModelProperty(value = "출고상품 ID", example = "454")
-    val shippingProductId: Int? = null,
+    val shippingProductId: Long? = null,
     @ApiModelProperty(value = "입고 재고", example = "77")
     val receivingStock: Int? = null,
     @ApiModelProperty(value = "출고가능 재고", example = "454")
@@ -24,7 +24,5 @@ data class NosnosStockModel(
     val returnStock: Int? = null,
     @ApiModelProperty(value = "보관 재고", example = "77")
     val keepingStock: Int? = null,
-) {
-
-}
+)
 

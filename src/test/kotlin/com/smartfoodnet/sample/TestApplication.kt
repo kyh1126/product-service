@@ -20,5 +20,4 @@ class TestApplication {
         val stocks = stockApiClient.getStocks(77, shippingProductIds)
         println(stocks)
     }
-
 }

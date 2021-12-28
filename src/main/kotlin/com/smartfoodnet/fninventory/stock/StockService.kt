@@ -52,13 +52,10 @@ class StockService(
         return PageResponse.of(stockByBestBeforeModel)
     }
 
-    fun syncStocksByBestBefore() {
-        TODO("Not yet implemented")
+    fun syncStocksByBestBefore(partnerId: Long) {
+        val basicProducts = basicProductRepository.findAllByPartnerId(partnerId)
+        val shippingProductIds = basicProducts?.map { it.shippingProductId }
 
-//        val nosnosStocks = stockApiClient.getStocks(
-//            partnerId = partnerId,
-//            shippingProductIds = basicProductStockModels.content.map { it.shippingProductId }
-//        )
 
     }
 }

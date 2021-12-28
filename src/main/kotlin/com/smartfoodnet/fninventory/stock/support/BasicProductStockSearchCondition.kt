@@ -27,6 +27,7 @@ class BasicProductStockSearchCondition(
             eqPartnerId(partnerId),
             likeBasicProductName(basicProductName),
             eqBasicProductCode(basicProductCode),
+            eqBarcode(barcode),
             eqExpirationDateManagementYn(expirationDateManagementYn)
         )
     }
@@ -38,6 +39,9 @@ class BasicProductStockSearchCondition(
 
     private fun eqBasicProductCode(basicProductCode: String?) =
         basicProductCode?.let { basicProduct.code.eq(it) }
+
+    private fun eqBarcode(barcode: String?) =
+        barcode?.let { basicProduct.barcode.eq(it) }
 
     private fun eqExpirationDateManagementYn(expirationDateManagementYn: String?) =
         expirationDateManagementYn?.let { basicProduct.expirationDateManagementYn.eq(it) }
