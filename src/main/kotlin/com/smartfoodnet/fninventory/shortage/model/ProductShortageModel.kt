@@ -18,6 +18,9 @@ data class ProductShortageModel(
     @ApiModelProperty(value = "결품 영향 주문 수")
     val shortageOrderCount: Int? = null,
 
+    @ApiModelProperty(value = "결품 영향 주문 금약")
+    val totalShortageOrderPrice: Double? = null,
+
     @ApiModelProperty(value = "총 주문 수량")
     val totalOrderCount: Int? = null,
 

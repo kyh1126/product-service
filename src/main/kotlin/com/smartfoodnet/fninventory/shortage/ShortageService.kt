@@ -27,16 +27,22 @@ class ShortageService(
         val productShortageModels = mutableListOf<ProductShortageModel>()
 
         nosnosStocks?.forEach{
-            val orderCount = orderDetails?.filter { orderDetail ->
+            val orderDetailsByBasicProduct = orderDetails?.filter { orderDetail ->
                 orderDetail.storeProduct?.basicProduct?.shippingProductId?.equals(it.shippingProductId) ?: false
-            }?.size ?: 0
+            }
 
-            if(orderCount > it.normalStock!!) {
+            val totalOrderCount = orderDetailsByBasicProduct?.sumOf { it.count ?: 1 }  ?: 0
+
+            val totalShortagePrice = orderDetailsByBasicProduct?.sumOf { it.price ?: 0.0  }
+
+            if(totalOrderCount > it.normalStock!!) {
                 productShortageModels.add(
                     ProductShortageModel(
-                        totalOrderCount = orderCount,
                         availableStockCount = it.normalStock,
-                        shortageCount = orderCount - it.normalStock
+                        shortageCount = totalOrderCount - it.normalStock,
+                        shortageOrderCount = orderDetailsByBasicProduct?.size ?: 0,
+                        totalShortageOrderPrice = totalShortagePrice,
+                        totalOrderCount = totalOrderCount
                     )
                 )
             }
