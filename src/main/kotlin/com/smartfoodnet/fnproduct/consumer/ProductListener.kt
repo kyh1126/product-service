@@ -19,12 +19,13 @@ class ProductListener(
     private val messageGroupId = MESSAGE_GROUP_ID.value
     private val firstReceivedTime = APPROXIMATE_FIRST_RECEIVE_TIMESTAMP.value
 
-    @SqsListener(
-        value = ["\${sqs.queues.fn-product.basic-product-created.name}"],
-        deletionPolicy = SqsMessageDeletionPolicy.NEVER
-    )
-    fun basicProductCreated(
-        message: String,
+    @Transactional
+//    @SqsListener(
+//        value = ["\${sqs.queues.fn-product.basic-product-created.name}"],
+//        deletionPolicy = SqsMessageDeletionPolicy.NEVER
+//    )
+    fun receiveMessage(
+        @Payload message: String,
         @Headers headers: Map<String, String>,
         ack: Acknowledgment
     ) {
