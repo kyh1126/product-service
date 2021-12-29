@@ -1,6 +1,7 @@
 package com.smartfoodnet.fninventory.shortage
 
 import com.smartfoodnet.apiclient.StockApiClient
+import com.smartfoodnet.apiclient.response.NosnosStockModel
 import com.smartfoodnet.fninventory.shortage.model.ProductShortageModel
 import com.smartfoodnet.fninventory.shortage.model.ShortageOrderProjectionModel
 import com.smartfoodnet.fnproduct.order.OrderService
@@ -13,9 +14,10 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional(readOnly = true)
 class ShortageService(
     private val orderService: OrderService,
-    private val stockApiClient: StockApiClient,
-    private val orderDetailRepository: OrderDetailRepository
+    private val stockApiClient: StockApiClient
 ) {
+    private val API_CALL_LIST_SIZE = 50
+
     fun getProductShortages_back(partnerId: Long): List<ProductShortageModel> {
         val orderDetails = orderService.getOrderDetails(partnerId = partnerId, status = OrderStatus.NEW)
         val shippingProductIds = orderDetails?.map {
@@ -58,12 +60,19 @@ class ShortageService(
 
         val shortageProjections = orderService.getShortageProjectionModel(partnerId = partnerId, status = OrderStatus.NEW) ?: return listOf()
 
-        val nosnosStocks = stockApiClient.getStocks(
-            partnerId = partnerId,
-            shippingProductIds = shortageProjections?.map {
-                it.shippingProductId
-            }
-        )
+        val arrShortageProjections = shortageProjections.chunked(API_CALL_LIST_SIZE)
+
+        val nosnosStocks = mutableListOf<NosnosStockModel>()
+
+        arrShortageProjections.forEach { shortageProjections
+            val nosnosStock = stockApiClient.getStocks(
+                partnerId = partnerId,
+                shippingProductIds = shortageProjections?.map {
+                    it.shippingProductId
+                }
+            ) ?: listOf()
+            nosnosStocks.addAll(nosnosStock)
+        }
 
         val productShortageModels = mutableListOf<ProductShortageModel>()
 
