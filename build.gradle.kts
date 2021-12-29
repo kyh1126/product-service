@@ -37,7 +37,7 @@ sourceSets["main"].withConvention(org.jetbrains.kotlin.gradle.plugin.KotlinSourc
 }
 
 extra["testcontainersVersion"] = "1.16.2"
-extra["springCloudAWSVersion"] = "2.3.2"
+extra["springCloudAWSVersion"] = "2.3.3"
 
 tasks.getByName<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
     this.archiveFileName.set("app.jar")
@@ -77,6 +77,7 @@ dependencies {
 
     // aws
     implementation("io.awspring.cloud:spring-cloud-aws-messaging")
+    implementation("io.awspring.cloud:spring-cloud-aws-autoconfigure")
     implementation("cloud.localstack:localstack-utils:0.2.17")
 
     // sfn common
