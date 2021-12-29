@@ -6,6 +6,7 @@ import com.smartfoodnet.fnproduct.order.entity.OrderDetail
 import com.smartfoodnet.fnproduct.order.model.OrderDetailCreateModel
 import com.smartfoodnet.fnproduct.order.model.OrderDetailModel
 import com.smartfoodnet.fnproduct.order.model.OrderStatus
+import com.smartfoodnet.fninventory.shortage.model.ShortageOrderProjectionModel
 import com.smartfoodnet.fnproduct.order.support.OrderDetailRepository
 import com.smartfoodnet.fnproduct.store.StoreProductService
 import org.springframework.data.domain.Pageable
@@ -38,6 +39,10 @@ class OrderService(
 
     fun getOrderDetails(partnerId: Long, status: OrderStatus): List<OrderDetail>?{
         return orderDetailRepository.findAllByPartnerIdAndStatus(partnerId, status)
+    }
+
+    fun getShortageProjectionModel(partnerId: Long, status: OrderStatus): List<ShortageOrderProjectionModel>?{
+        return orderDetailRepository.findAllByPartnerIdAndStatusGroupByProductId(partnerId,status)
     }
 
     private fun convert(orderDetailModel: OrderDetailCreateModel): OrderDetail {

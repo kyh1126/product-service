@@ -1,6 +1,8 @@
 package com.smartfoodnet.fninventory.shortage
 
 import com.smartfoodnet.fninventory.shortage.model.ProductShortageModel
+import com.smartfoodnet.fnproduct.order.model.OrderStatus
+import com.smartfoodnet.fnproduct.order.support.OrderDetailRepository
 import io.swagger.annotations.Api
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -12,7 +14,10 @@ import org.springframework.web.bind.annotation.RestController
 @Api(description = "결품 관련 API")
 @RestController
 @RequestMapping("shortage")
-class ShortageController (private val shortageService: ShortageService){
+class ShortageController (
+    private val shortageService: ShortageService,
+    private val orderDetailRepository: OrderDetailRepository
+    ){
     @Operation(summary = "특정 화주(고객사) ID 의 결품현황 리스트 조회")
     @GetMapping("partners/{partnerId}")
     fun getProductShortages(
@@ -21,4 +26,13 @@ class ShortageController (private val shortageService: ShortageService){
     ): List<ProductShortageModel> {
         return shortageService.getProductShortages(partnerId)
     }
+
+    @GetMapping("test/tttt")
+    fun gettest(){
+        println(OrderStatus.NEW)
+        val aa = orderDetailRepository.findAllByPartnerIdAndStatusGroupByProductId(104,OrderStatus.NEW)
+        println(aa.toString())
+
+    }
+
 }
