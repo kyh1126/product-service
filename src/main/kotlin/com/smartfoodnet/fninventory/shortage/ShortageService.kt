@@ -2,8 +2,10 @@ package com.smartfoodnet.fninventory.shortage
 
 import com.smartfoodnet.apiclient.StockApiClient
 import com.smartfoodnet.fninventory.shortage.model.ProductShortageModel
+import com.smartfoodnet.fninventory.shortage.model.ShortageOrderProjectionModel
 import com.smartfoodnet.fnproduct.order.OrderService
 import com.smartfoodnet.fnproduct.order.model.OrderStatus
+import com.smartfoodnet.fnproduct.order.support.OrderDetailRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -11,9 +13,10 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional(readOnly = true)
 class ShortageService(
     private val orderService: OrderService,
-    private val stockApiClient: StockApiClient
+    private val stockApiClient: StockApiClient,
+    private val orderDetailRepository: OrderDetailRepository
 ) {
-    fun getProductShortages(partnerId: Long): List<ProductShortageModel> {
+    fun getProductShortages_back(partnerId: Long): List<ProductShortageModel> {
         val orderDetails = orderService.getOrderDetails(partnerId = partnerId, status = OrderStatus.NEW)
         val shippingProductIds = orderDetails?.map {
             it.storeProduct?.basicProduct?.shippingProductId
@@ -41,8 +44,42 @@ class ShortageService(
                         availableStockCount = it.normalStock,
                         shortageCount = totalOrderCount - it.normalStock,
                         shortageOrderCount = orderDetailsByBasicProduct?.size ?: 0,
-                        totalShortageOrderPrice = totalShortagePrice,
+                        totalShortagePrice = totalShortagePrice,
                         totalOrderCount = totalOrderCount
+                    )
+                )
+            }
+        }
+
+        return productShortageModels
+    }
+
+    fun getProductShortages(partnerId: Long): List<ProductShortageModel> {
+
+        val shortageProjections = orderService.getShortageProjectionModel(partnerId = partnerId, status = OrderStatus.NEW) ?: return listOf()
+
+        val nosnosStocks = stockApiClient.getStocks(
+            partnerId = partnerId,
+            shippingProductIds = shortageProjections?.map {
+                it.shippingProductId
+            }
+        )
+
+        val productShortageModels = mutableListOf<ProductShortageModel>()
+
+        nosnosStocks?.forEach{
+            val shortageProjection = shortageProjections.filter { projection ->
+                projection.shippingProductId?.equals(it.shippingProductId) ?: false
+            }.firstOrNull() ?: return@forEach
+
+            if((shortageProjection?.totalOrderCount ?: 0) > it.normalStock!!) {
+                productShortageModels.add(
+                    ProductShortageModel(
+                        availableStockCount = it.normalStock,
+                        shortageCount = shortageProjection.totalOrderCount?.minus(it.normalStock),
+                        shortageOrderCount = shortageProjection.shortageOrderCount?.toInt(),
+                        totalShortagePrice = shortageProjection.totalShortagePrice,
+                        totalOrderCount = shortageProjection.totalOrderCount
                     )
                 )
             }

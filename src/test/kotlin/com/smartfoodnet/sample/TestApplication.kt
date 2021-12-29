@@ -14,7 +14,7 @@ class TestApplication {
 
     @Test
     fun wmsStockTest() {
-        val shippingProductIds = Lists.newArrayList<Int>();
+        val shippingProductIds = Lists.newArrayList<Long>();
         shippingProductIds.add(4947)
         shippingProductIds.add(4948)
         val stocks = stockApiClient.getStocks(77, shippingProductIds)

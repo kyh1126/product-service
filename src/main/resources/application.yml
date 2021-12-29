@@ -54,3 +54,4 @@ sfn:
       value: "페이지 크기 (default: ${spring.data.web.pageable.default-page-size})"
   service:
     fn-nosnos : http://localhost:8080/nosnos
+    fn-warehouse-management-service : ${FN_WMS_BASE_URL:http://localhost:4001}/fresh-networks/fn-warehouse-service
