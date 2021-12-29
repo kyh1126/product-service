@@ -52,7 +52,7 @@ class SqsConfig {
         factory.setWaitTimeOut(20) // queue 에 메세지가 없을 때, 메시지가 들어올 때까지 Long polling 하는 시간
         factory.setMaxNumberOfMessages(10)
         factory.setTaskExecutor(taskExecutor)
-        return factory;
+        return factory
     }
 }
 
