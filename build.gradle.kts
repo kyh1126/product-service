@@ -70,7 +70,7 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.6.5")
 
     //HttpClient
-    implementation("org.apache.httpcomponents:httpclient:4.5")
+    implementation("org.apache.httpcomponents:httpclient:4.5.13")
 
     // @Testcontainers 관련 설정
     testImplementation("org.testcontainers:mysql")
