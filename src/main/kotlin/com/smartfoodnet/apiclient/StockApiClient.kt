@@ -1,5 +1,6 @@
 package com.smartfoodnet.apiclient
 
+import com.fasterxml.jackson.core.type.TypeReference
 import com.smartfoodnet.apiclient.response.CommonDataListModel
 import com.smartfoodnet.apiclient.response.NosnosStockModel
 import org.springframework.beans.factory.annotation.Value
@@ -9,12 +10,9 @@ import org.springframework.web.util.UriComponentsBuilder
 
 @Component
 class StockApiClient(
-    @Value("\${sfn.service.fn-nosnos}") override val host: String,
+    @Value("\${sfn.service.fn-warehouse-management-service}") val baseUrl: String,
     override val restTemplate: RestTemplate
-) : RestTemplateClient(host, restTemplate) {
-    //    val baseUrl = "fn-warehouse-service.sfn-dev"
-    val baseUrl = "http://localhost:4001/fresh-networks/fn-warehouse-service"
-
+) : RestTemplateClient(baseUrl, restTemplate) {
     fun getStocks(shippingProductId: Long): List<NosnosStockModel>? {
         return get(baseUrl + "/stock/${shippingProductId}")
     }
@@ -27,8 +25,8 @@ class StockApiClient(
         }
 
         val uri = uriBuilder.build().toString()
-        val stocksDataModel = get<CommonDataListModel<NosnosStockModel>>(uri)
-        return stocksDataModel?.dataList
+        val stocksDataModel = getSimple<CommonDataListModel<NosnosStockModel>>(uri = uri)
+        return objectMapper.convertValue(stocksDataModel?.dataList, object: TypeReference<List<NosnosStockModel>>(){})
     }
 
 
