@@ -27,13 +27,11 @@ import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
-import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestConstructor
 import org.springframework.test.util.ReflectionTestUtils
 import java.util.*
 import kotlin.random.Random
 
-@ActiveProfiles("test")
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @EnableAutoConfiguration
