@@ -5,18 +5,13 @@ import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.sqs.AmazonSQSAsync
 import com.amazonaws.services.sqs.AmazonSQSAsyncClientBuilder
-import io.awspring.cloud.messaging.config.QueueMessageHandlerFactory
 import io.awspring.cloud.messaging.config.SimpleMessageListenerContainerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
-import org.springframework.core.task.AsyncTaskExecutor
-import org.springframework.messaging.converter.MappingJackson2MessageConverter
-import org.springframework.messaging.converter.MessageConverter
-import org.springframework.messaging.handler.annotation.support.PayloadMethodArgumentResolver
-import org.springframework.messaging.handler.invocation.HandlerMethodArgumentResolver
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 
 @Configuration
 class SqsConfig {
@@ -48,34 +43,14 @@ class SqsConfig {
     @Bean
     fun simpleMessageListenerContainerFactory(
         amazonSQSAsync: AmazonSQSAsync,
-        @Qualifier("taskExecutor") taskExecutor: AsyncTaskExecutor
+        @Qualifier("taskExecutor") taskExecutor: ThreadPoolTaskExecutor
     ): SimpleMessageListenerContainerFactory {
         val factory = SimpleMessageListenerContainerFactory()
         factory.setAmazonSqs(amazonSQSAsync)
-        factory.setAutoStartup(true)
+        factory.setWaitTimeOut(20) // queue 에 메세지가 없을 때, 메시지가 들어올 때까지 Long polling 하는 시간
         factory.setMaxNumberOfMessages(10)
-        factory.setWaitTimeOut(10)
-//        factory.setTaskExecutor(taskExecutor)
+        factory.setTaskExecutor(taskExecutor)
         return factory;
-    }
-
-    @Bean
-    fun queueMessageHandlerFactory(): QueueMessageHandlerFactory {
-        val factory = QueueMessageHandlerFactory()
-        factory.setArgumentResolvers(
-            listOf<HandlerMethodArgumentResolver>(
-                PayloadMethodArgumentResolver(messageConverter())
-            )
-        )
-        return factory
-    }
-
-    @Bean
-    protected fun messageConverter(): MessageConverter {
-        return MappingJackson2MessageConverter().apply {
-            this.serializedPayloadClass = String::class.java
-            this.isStrictContentTypeMatch = false
-        }
     }
 }
 
