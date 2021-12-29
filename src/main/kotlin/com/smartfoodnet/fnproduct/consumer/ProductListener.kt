@@ -5,9 +5,8 @@ import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.config.aws.MessageAttribute.APPROXIMATE_FIRST_RECEIVE_TIMESTAMP
 import com.smartfoodnet.config.aws.MessageAttribute.MESSAGE_GROUP_ID
 import io.awspring.cloud.messaging.listener.Acknowledgment
-import io.awspring.cloud.messaging.listener.SqsMessageDeletionPolicy
-import io.awspring.cloud.messaging.listener.annotation.SqsListener
 import org.springframework.messaging.handler.annotation.Headers
+import org.springframework.messaging.handler.annotation.Payload
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
