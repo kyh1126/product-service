@@ -1,23 +1,12 @@
 package com.smartfoodnet.fninventory.inbound
 
-import com.smartfoodnet.base.*
+import com.smartfoodnet.base.AbstractTest
 import com.smartfoodnet.common.utils.Log
-import com.smartfoodnet.fninventory.inbound.model.request.InboundCreateModel
-import com.smartfoodnet.fninventory.inbound.model.vo.InboundMethodType
-import com.smartfoodnet.fnproduct.product.BasicProductRepository
-import com.smartfoodnet.fnproduct.product.entity.BasicProduct
-import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
-import org.junit.jupiter.api.*
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.BDDMockito.*
-import org.mockito.junit.jupiter.MockitoExtension
-import org.springframework.boot.test.mock.mockito.MockBean
-import org.springframework.test.context.ActiveProfiles
+import org.junit.jupiter.api.MethodOrderer
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.TestMethodOrder
 import org.springframework.test.context.TestConstructor
-import java.time.LocalDateTime
 
-@ActiveProfiles("test")
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(value = MethodOrderer.OrderAnnotation::class)
@@ -59,7 +48,7 @@ class InboundServiceTest(
 //        assertEquals(inbound.inboundMethod, InboundMethodType.DELIVERY)
 //    }
 
-//    @Test
+    //    @Test
 //    @DisplayName("입고등록 및 현황 - 검색 조건 포함 조회")
 //    fun testGetInboundIncludeCondition() {
 //        val formatter = DateTimeFormatter.ofPattern(Constants.TIMESTAMP_FORMAT)

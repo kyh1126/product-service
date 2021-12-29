@@ -8,9 +8,10 @@ import com.smartfoodnet.common.utils.Log
 import io.awspring.cloud.messaging.config.QueueMessageHandlerFactory
 import io.awspring.cloud.messaging.config.SimpleMessageListenerContainerFactory
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
+import org.springframework.context.annotation.Profile
 import org.springframework.messaging.converter.MappingJackson2MessageConverter
 import org.springframework.messaging.converter.MessageConverter
 import org.springframework.messaging.handler.annotation.support.PayloadMethodArgumentResolver
@@ -18,7 +19,8 @@ import org.springframework.messaging.handler.invocation.HandlerMethodArgumentRes
 import org.testcontainers.containers.localstack.LocalStackContainer
 import org.testcontainers.utility.DockerImageName
 
-@TestConfiguration
+@Configuration
+@Profile("test") // 여기서 test profile 일 경우 설정 (SqsConfig 는 test profile 아닐 경우에만 설정)
 class LocalStackConfig {
     @Value("\${sfn.aws.region}")
     private val region: String? = null
