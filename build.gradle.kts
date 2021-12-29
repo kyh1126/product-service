@@ -74,7 +74,8 @@ dependencies {
 
     // @Testcontainers 관련 설정
     testImplementation("org.testcontainers:mysql")
-
+    testImplementation("org.testcontainers:localstack")
+    
     // aws
     implementation("io.awspring.cloud:spring-cloud-aws-messaging")
     implementation("io.awspring.cloud:spring-cloud-aws-autoconfigure")

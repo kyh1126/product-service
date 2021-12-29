@@ -11,9 +11,11 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
+import org.springframework.context.annotation.Profile
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 
 @Configuration
+@Profile("!test")
 class SqsConfig {
     @Value("\${sfn.aws.sqs.endpoint}")
     private val endpoint: String? = null
@@ -50,7 +52,7 @@ class SqsConfig {
         factory.setWaitTimeOut(20) // queue 에 메세지가 없을 때, 메시지가 들어올 때까지 Long polling 하는 시간
         factory.setMaxNumberOfMessages(10)
         factory.setTaskExecutor(taskExecutor)
-        return factory;
+        return factory
     }
 }
 
