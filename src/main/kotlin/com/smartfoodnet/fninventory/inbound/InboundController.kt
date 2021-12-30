@@ -39,40 +39,12 @@ class InboundController(
     }
 
     @GetMapping("partner/{partnerId}/details/{expectedDetailId}")
-    @Operation(summary = "입고상세내역 조회")
+    @Operation(summary = "입고내역 조회")
     fun getInboundDetail(
         @Parameter(description = "고객사 ID", example = "14") @PathVariable partnerId: Long,
         @Parameter(description = "입고예정 상세번호", example = "3") @PathVariable expectedDetailId: Long
     ) = inboundService.getInboundActualDetail(partnerId, expectedDetailId)
 
-
-
-
-//    @Operation(summary = "입고 취소")
-//    @PatchMapping("{inboundId}")
-//    fun cancelInbound(@PathVariable inboundId: Long) {
-//        inboundService.cancelInbound(inboundId)
-//    }
-//
-//    @Operation(summary = "단건 입고 조회")
-//    @GetMapping("{inboundId}")
-//    fun getInbound(@PathVariable inboundId: Long) = inboundService.getInbound(inboundId)
-//
-//    @Operation(summary = "복수건 입고 조회")
-//    @GetMapping("partnerId/{partnerId}")
-//    fun getInbounds(
-//        @Parameter(description = "고객사 ID", example = "1") @PathVariable partnerId: Long,
-//        @ModelAttribute condition: InboundSearchCondition,
-//        @PageableDefault(size = 50, sort = ["id"], direction = Sort.Direction.DESC) page: Pageable
-//    ): PageResponse<InboundModel> {
-//        condition.partnerId = partnerId
-//        return inboundService.getInbounds(condition, page)
-//    }
-//
-//    @Operation(summary = "입고 정보 상세")
-//    @GetMapping("{inboundId}/detail")
-//    fun getInboundDetails(@PathVariable inboundId: Long) =
-//        inboundDetailService.getDetail(inboundId)
 
     companion object : Log
 }

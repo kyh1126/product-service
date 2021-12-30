@@ -1,10 +1,11 @@
 package com.smartfoodnet.fninventory.inbound.model.dto
 
 import com.fasterxml.jackson.annotation.JsonFormat
+import com.querydsl.core.annotations.QueryProjection
 import com.smartfoodnet.common.Constants
 import java.time.LocalDateTime
 
-data class GetInboundActualDetail (
+data class GetInboundActualDetail @QueryProjection constructor(
     val inboundActualId: Long,
     val inboundExpectedId: Long,
     @JsonFormat(pattern = Constants.TIMESTAMP_FORMAT)
