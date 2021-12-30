@@ -4,6 +4,7 @@ import com.querydsl.core.BooleanBuilder
 import com.querydsl.core.types.Projections
 import com.smartfoodnet.config.Querydsl4RepositorySupport
 import com.smartfoodnet.fninventory.inbound.entity.Inbound
+import com.smartfoodnet.fninventory.inbound.entity.InboundExpectedDetail
 import com.smartfoodnet.fninventory.inbound.entity.QInbound.inbound
 import com.smartfoodnet.fninventory.inbound.entity.QInboundActualDetail.inboundActualDetail
 import com.smartfoodnet.fninventory.inbound.entity.QInboundExpectedDetail.inboundExpectedDetail
@@ -16,14 +17,16 @@ import com.smartfoodnet.fnproduct.product.entity.QBasicProduct.basicProduct
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 
-class InboundRepositoryImpl : InboundCustom, Querydsl4RepositorySupport(Inbound::class.java) {
+class InboundRepositoryImpl
+    : InboundRepositoryCustom, Querydsl4RepositorySupport(Inbound::class.java) {
+
     override fun findInbounds(
         condition: InboundSearchCondition,
         page: Pageable
     ): Page<GetInboundParent> {
         return applyPagination(page) {
-            it.from(inboundExpectedDetail)
-                .innerJoin(inboundExpectedDetail.inbound, inbound)
+            it.from(inbound)
+                .innerJoin(inbound.expectedList, inboundExpectedDetail)
                 .leftJoin(inboundExpectedDetail.basicProduct, basicProduct)
                 .where(
                     // 고객사 ID는 필수
