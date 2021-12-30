@@ -38,12 +38,12 @@ class InboundController(
         return inboundService.getInbound(condition.apply { this.partnerId = partnerId }, page)
     }
 
-//    @GetMapping("partner/{partnerId}/details/{expectedDetailId}")
-//    @Operation(summary = "입고예정 상세내역 조회")
-//    fun getInboundDetail(
-//        @Parameter(description = "고객사 ID", example = "14") @PathVariable partnerId: Long,
-//        @Parameter(description = "입고예정 상세번호", example = "3") @PathVariable expectedDetailId: Long
-//    ) = inboundService.getInboundDetail(partnerId, expectedDetailId)
+    @GetMapping("partner/{partnerId}/details/{expectedDetailId}")
+    @Operation(summary = "입고상세내역 조회")
+    fun getInboundDetail(
+        @Parameter(description = "고객사 ID", example = "14") @PathVariable partnerId: Long,
+        @Parameter(description = "입고예정 상세번호", example = "3") @PathVariable expectedDetailId: Long
+    ) = inboundService.getInboundActualDetail(partnerId, expectedDetailId)
 
 
 

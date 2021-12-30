@@ -18,6 +18,9 @@ class InboundExpectedDetail(
     @JoinColumn(name = "inbound_id")
     var inbound: Inbound? = null,
 
+    @OneToMany(mappedBy = "inboundExpectedDetail")
+    val inboundActualDetail: List<InboundActualDetail>? = null,
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "basic_product_id", columnDefinition = "BIGINT UNSIGNED")
     var basicProduct: BasicProduct? = null,

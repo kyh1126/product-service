@@ -39,4 +39,8 @@ class InboundService(
         return PageResponse.of(list, parent.totalElements, parent.pageable.pageNumber, list.size, page.sort)
     }
 
+    fun getInboundActualDetail(partnerId: Long, expectedId: Long)
+        = inboundRepository.findInboundActualDetail(partnerId, expectedId)
+
+
 }

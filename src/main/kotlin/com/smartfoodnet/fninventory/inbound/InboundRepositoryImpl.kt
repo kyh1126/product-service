@@ -7,6 +7,7 @@ import com.smartfoodnet.fninventory.inbound.entity.Inbound
 import com.smartfoodnet.fninventory.inbound.entity.QInbound.inbound
 import com.smartfoodnet.fninventory.inbound.entity.QInboundActualDetail.inboundActualDetail
 import com.smartfoodnet.fninventory.inbound.entity.QInboundExpectedDetail.inboundExpectedDetail
+import com.smartfoodnet.fninventory.inbound.model.dto.GetInboundActualDetail
 import com.smartfoodnet.fninventory.inbound.model.dto.GetInboundSumDetail
 import com.smartfoodnet.fninventory.inbound.model.dto.GetInboundParent
 import com.smartfoodnet.fninventory.inbound.model.request.InboundSearchCondition
@@ -94,5 +95,32 @@ class InboundRepositoryImpl : InboundCustom, Querydsl4RepositorySupport(Inbound:
                     inboundActualDetail.expirationDate.count()
                 )
             ).fetch()
+    }
+
+    override fun findInboundActualDetail(
+        partnerId: Long,
+        expectedId: Long
+    ): List<GetInboundActualDetail> {
+        return queryFactory.from(inbound)
+            .innerJoin(inbound.expectedList, inboundExpectedDetail)
+            .innerJoin(inboundExpectedDetail.inboundActualDetail, inboundActualDetail)
+            .where(
+                inbound.partnerId.eq(partnerId),
+                inboundExpectedDetail.id.eq(expectedId)
+            )
+            .select(
+                Projections.constructor(
+                    GetInboundActualDetail::class.java,
+                    inboundActualDetail.id,
+                    inboundExpectedDetail.id,
+                    inboundActualDetail.actualInboundDate,
+                    inboundActualDetail.actualQuantity,
+                    inboundActualDetail.boxQuantity,
+                    inboundActualDetail.palletQuantity,
+                    inboundActualDetail.manufactureDate,
+                    inboundActualDetail.expirationDate
+                )
+            ).fetch()
+
     }
 }
