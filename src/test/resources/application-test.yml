@@ -67,4 +67,3 @@ sqs:
     fn-product:
       basic-product-created:
         name: basic-product-created-test.fifo
-        arn: uninitialized
