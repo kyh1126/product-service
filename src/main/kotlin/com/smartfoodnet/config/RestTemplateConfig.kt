@@ -30,7 +30,7 @@ class RestTemplateConfig(
         factory.setConnectTimeout(Duration.ofSeconds(3).toMillis().toInt())
         factory.setReadTimeout(Duration.ofSeconds(10).toMillis().toInt())
         return restTemplateBuilder
-            .rootUri(host)
+//            .rootUri(host)
             .requestFactory { factory }
             .build()
     }

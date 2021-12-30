@@ -37,7 +37,7 @@ sourceSets["main"].withConvention(org.jetbrains.kotlin.gradle.plugin.KotlinSourc
 }
 
 extra["testcontainersVersion"] = "1.16.2"
-extra["springCloudAWSVersion"] = "2.3.2"
+extra["springCloudAWSVersion"] = "2.3.3"
 
 tasks.getByName<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
     this.archiveFileName.set("app.jar")
@@ -70,13 +70,15 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.6.5")
 
     //HttpClient
-    implementation("org.apache.httpcomponents:httpclient:4.5")
+    implementation("org.apache.httpcomponents:httpclient:4.5.13")
 
     // @Testcontainers 관련 설정
     testImplementation("org.testcontainers:mysql")
-
+    testImplementation("org.testcontainers:localstack")
+    
     // aws
     implementation("io.awspring.cloud:spring-cloud-aws-messaging")
+    implementation("io.awspring.cloud:spring-cloud-aws-autoconfigure")
     implementation("cloud.localstack:localstack-utils:0.2.17")
 
     // sfn common

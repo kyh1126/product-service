@@ -66,6 +66,9 @@ class OrderDetail(
     @Column(name = "shipping_price")
     var shippingPrice: Double? = null,
 
+    @Column(name = "count")
+    var count: Int? = null,
+
     @Embedded
     var receiver: Receiver? = null,
 
