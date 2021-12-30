@@ -25,6 +25,7 @@ class InboundService(
             val basicProduct =  basicProductRepository.findByCode(it.basicProductCode)?:throw NoSuchElementException("기본상품(${it.basicProductCode})을 찾을 수 없습니다.")
             inbound.addExptecdItem(it.toEntity(basicProduct))
         }
+
         inboundRepository.save(inbound)
     }
 
