@@ -1,9 +1,8 @@
 package com.smartfoodnet.fninventory.inbound.entity
 
 import com.smartfoodnet.common.entity.BaseEntity
-import com.smartfoodnet.fninventory.inbound.model.vo.InboundMethodType
+import com.smartfoodnet.fninventory.inbound.model.request.InboundExpectedModel
 import com.smartfoodnet.fninventory.inbound.model.vo.InboundStatusType
-import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import java.time.LocalDateTime
 import javax.persistence.*
 
@@ -25,32 +24,24 @@ import javax.persistence.*
 class Inbound(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "inbound_id", columnDefinition = "BIGINT UNSIGNED")
-    var id: Long? = null,
+    val id: Long? = null,
 
-    var partnerId: Long? = null,
+    val partnerId: Long? = null,
 
-    var expectedDate: LocalDateTime? = null,
+    val expectedDate: LocalDateTime? = null,
 
-    var registrationNo: String? = null,
-
-    @Enumerated(EnumType.STRING)
-    var status: InboundStatusType? = null,
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "basic_product_id", columnDefinition = "BIGINT UNSIGNED")
-    var basicProduct: BasicProduct? = null,
-
-    var requestQuantity: Long? = null,
-
-    var actualQuantity: Long? = null,
+    val registrationNo: String? = null,
+    val registrationId: Long?= null,
 
     @Enumerated(EnumType.STRING)
-    var method: InboundMethodType? = null,
+    val status: InboundStatusType = InboundStatusType.EXPECTED,
 
-    var deliveryName: String? = null,
+    @OneToMany(mappedBy = "inbound", cascade = [CascadeType.PERSIST])
+    val expectedList : MutableList<InboundExpectedDetail> = mutableListOf()
 
-    var trackingNo: String? = null
-
-): BaseEntity() {
-    //
+): BaseEntity(){
+    fun addExptecdItem(item: InboundExpectedDetail){
+        expectedList.add(item)
+        item.inbound = this
+    }
 }
