@@ -17,6 +17,15 @@ class StockApiClient(
         return get(baseUrl + "/stock/${shippingProductId}")
     }
 
+    fun getStocksByBestBefore(shippingProductIds: List<Long>): List<NosnosStockModel>? {
+        var uriBuilder = UriComponentsBuilder.fromUriString("${baseUrl}/stocks_by_best_before").queryParam("shippingProductIds", shippingProductIds)
+
+        val uri = uriBuilder.build().toString()
+        val stocksDataModel = getSimple<CommonDataListModel<NosnosStockModel>>(uri = uri)
+        return objectMapper.convertValue(stocksDataModel?.dataList, object: TypeReference<List<NosnosStockModel>>(){})
+        return get(baseUrl + "/stock/${shippingProductIds}")
+    }
+
     fun getStocks(partnerId: Long, shippingProductIds: List<Long?>?): List<NosnosStockModel>? {
         var uriBuilder = UriComponentsBuilder.fromUriString("${baseUrl}/stock").queryParam("memberId", partnerId)
 

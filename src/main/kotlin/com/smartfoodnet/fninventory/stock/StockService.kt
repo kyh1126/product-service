@@ -20,6 +20,12 @@ class StockService(
     private val stockByBestBeforeRepository: StockByBestBeforeRepository,
     private val stockApiClient: StockApiClient
 ) {
+    //유통기한 관리 여부
+    private val EXPIRATION_DATEMANAGEMENT_YN="Y"
+
+    //nosnos api call List Size
+    private val API_CALL_LIST_SIZE = 50
+
     fun getBasicProductStocks(
         partnerId: Long,
         condition: PredicateSearchCondition,
@@ -53,8 +59,15 @@ class StockService(
     }
 
     fun syncStocksByBestBefore(partnerId: Long) {
-        val basicProducts = basicProductRepository.findAllByPartnerId(partnerId)
-        val shippingProductIds = basicProducts?.map { it.shippingProductId }
+        val basicProducts = basicProductRepository.findByExpirationDateManagementYnAndActiveYn(EXPIRATION_DATEMANAGEMENT_YN, EXPIRATION_DATEMANAGEMENT_YN)
+        val shippingProductIds = basicProducts?.map {it.shippingProductId }
+        val arrShippingProductIds = shippingProductIds?.chunked(API_CALL_LIST_SIZE) ?: return
+
+        arrShippingProductIds.forEach {idChunk ->
+            val nosnosStocks = stockApiClient.getStocksByBestBefore(
+                idChunk as List<Long>
+            )
+        }
 
 
     }
