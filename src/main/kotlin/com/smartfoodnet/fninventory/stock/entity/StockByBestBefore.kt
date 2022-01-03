@@ -32,7 +32,7 @@ class StockByBestBefore(
     var shippingProductId: Long,
 
     @Column(name = "best_before")
-    var bestBefore: Int? = null,
+    var bestBefore: Float? = null,
 
     @Column(name = "manufacture_date")
     var manufactureDate: LocalDateTime? = null,

@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Duration
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 
@@ -62,6 +63,7 @@ class StockService(
     }
 
     //TODO: 추후 상품 개수가 많아질 경우 파트너별로 잘라서 작업 고려
+    //TODO: 리팩토링 고려
     fun syncStocksByBestBefore(partnerId: Long) {
         val basicProducts = basicProductRepository.findByExpirationDateManagementYnAndActiveYn(EXPIRATION_DATEMANAGEMENT_YN, EXPIRATION_DATEMANAGEMENT_YN)
         val arrBasicPoducts = basicProducts?.chunked(API_CALL_LIST_SIZE) ?: return
@@ -79,22 +81,36 @@ class StockService(
                 val basicProduct = basicProductChunk.find { it.shippingProductId?.equals(nosnosStockByExpirationDate.shippingProductId) ?: false }
 
                 nosnosStockByExpirationDate.stocksByExpirationDate?.forEach { stockByExpirationDate ->
-//                    val stockByBestBefore = StockByBestBefore(
-//                            partnerId = partnerId,
-//                            basicProduct = basicProduct!!,
-//                            shippingProductId = nosnosStockByExpirationDate.shippingProductId!!,
-//                            bestBefore = null,
-//                            manufactureDate = basicProduct.expirationDateInfo.expirationDate
-//                    )
+                    val manufacturedDate = basicProduct?.expirationDateInfo?.expirationDate?.toLong()?.let {
+                        stockByExpirationDate.expirationDate?.minusDays(it)
+                    }
+
+                    val stockByBestBefore = StockByBestBefore(
+                            partnerId = partnerId,
+                            basicProduct = basicProduct!!,
+                            shippingProductId = nosnosStockByExpirationDate.shippingProductId!!,
+                            bestBefore = calculateBestBefore(stockByExpirationDate.expirationDate!!, basicProduct.expirationDateInfo!!.expirationDate!!),
+                            manufactureDate = manufacturedDate,
+                            expirationDate = stockByExpirationDate.expirationDate,
+                            totalStockCount = null,
+                            availableStockCount = stockByExpirationDate.normalStock,
+                            collectedDate = LocalDate.now()
+                    )
+
+                    stocksByBestBefore.add(stockByBestBefore)
                 }
             }
 
+            stockByBestBeforeRepository.saveAll(stocksByBestBefore)
         }
     }
 
     private fun calculateBestBefore(expirationDate: LocalDateTime, manufacturedBefore: Int): Float {
         val today = LocalDateTime.now()
         val duration = Duration.between(today, expirationDate).toDays()
+
+        if(duration < 0)
+            return 0f
 
         return duration.div(manufacturedBefore.toFloat())
     }
