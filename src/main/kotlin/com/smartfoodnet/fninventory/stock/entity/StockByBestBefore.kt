@@ -8,6 +8,7 @@ import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
 import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureTypeConverter
 import com.smartfoodnet.fnproduct.warehouse.entity.InWarehouse
 import org.hibernate.annotations.Where
+import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.persistence.*
 
@@ -44,6 +45,9 @@ class StockByBestBefore(
 
     @Column(name = "available_stock_count")
     var availableStockCount: Int? = null,
+
+    @Column(name = "collected_date")
+    var collectedDate: LocalDate
 
 ) : BaseEntity() {
 
