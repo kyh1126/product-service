@@ -15,6 +15,8 @@ class OrderDetailRepositoryImpl : Querydsl4RepositorySupport(OrderDetail::class.
         return select(Projections.fields(
             ShortageOrderProjectionModel::class.java,
             basicProduct.id.`as`("basicProductId"),
+            basicProduct.name.`as`("basicProductName"),
+            basicProduct.code.`as`("basicProductCode"),
             basicProduct.id.count().`as`("shortageOrderCount"),
             basicProduct.shippingProductId,
             orderDetail.count.sum().`as`("totalOrderCount"),
