@@ -156,7 +156,16 @@ class BasicProductService(
 
                 // nosnos 쪽 출고상품, 판매상품 생성
                 if (it.type in nosnosCallBasicProductType) {
-                    wmsApiClient.createShippingProduct(PreShippingProductModel.fromEntity(it))
+                    val createShippingProduct =
+                        wmsApiClient.createShippingProduct(PreShippingProductModel.fromEntity(it))
+                            ?: throw BaseRuntimeException(errorMessage = "출고상품 생성 실패, 상품코드 : ${it.code}")
+
+                    with(createShippingProduct) {
+                        it.shippingProductId = shippingProductId
+                        it.productCode = productCode
+                        it.salesProductId = salesProductId
+                        it.salesProductCode = salesProductCode
+                    }
                 }
             }.run {
                 toBasicProductDetailModel(this, subsidiaryMaterialById)
