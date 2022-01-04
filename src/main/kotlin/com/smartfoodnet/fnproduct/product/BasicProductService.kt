@@ -1,6 +1,7 @@
 package com.smartfoodnet.fnproduct.product
 
-import com.smartfoodnet.apiclient.MessageApiClient
+import com.smartfoodnet.apiclient.WmsApiClient
+import com.smartfoodnet.apiclient.request.PreShippingProductModel
 import com.smartfoodnet.common.error.SaveState
 import com.smartfoodnet.common.error.ValidatorUtils
 import com.smartfoodnet.common.error.exception.BaseRuntimeException
@@ -24,6 +25,7 @@ import com.smartfoodnet.fnproduct.product.model.request.SubsidiaryMaterialMappin
 import com.smartfoodnet.fnproduct.product.model.response.BasicProductDetailModel
 import com.smartfoodnet.fnproduct.product.model.response.BasicProductModel
 import com.smartfoodnet.fnproduct.product.model.response.CategoryByLevelModel
+import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import com.smartfoodnet.fnproduct.product.validator.BasicProductDetailCreateModelValidator
 import com.smartfoodnet.fnproduct.warehouse.InWarehouseService
 import org.springframework.data.domain.Pageable
@@ -40,8 +42,9 @@ class BasicProductService(
     private val basicProductCategoryFinder: BasicProductCategoryFinder,
     private val subsidiaryMaterialCategoryFinder: SubsidiaryMaterialCategoryFinder,
     private val basicProductCodeGenerator: BasicProductCodeGenerator,
-    private val messageApiClient: MessageApiClient,
+    private val wmsApiClient: WmsApiClient,
 ) {
+    val nosnosCallBasicProductType = listOf(BasicProductType.BASIC, BasicProductType.CUSTOM_SUB)
 
     fun getBasicProducts(
         condition: PredicateSearchCondition,
@@ -149,12 +152,12 @@ class BasicProductService(
 
         return saveBasicProduct(basicProduct)
             .also {
-//                messageApiClient.sendMessage(
-//                    destination = SfnTopic.PRODUCT_CREATED,
-//                    message = BasicProductCreatedModel(it.id!!)
-//                )
+//                messageApiClient.sendMessage(destination = SfnTopic.PRODUCT_CREATED, message = BasicProductCreatedModel(it.id!!))
 
-                // TODO: nosnos 쪽 POST request 하기
+                // nosnos 쪽 출고상품, 판매상품 생성
+                if (it.type in nosnosCallBasicProductType) {
+                    wmsApiClient.createShippingProduct(PreShippingProductModel.fromEntity(it))
+                }
             }.run {
                 toBasicProductDetailModel(this, subsidiaryMaterialById)
             }
@@ -202,6 +205,14 @@ class BasicProductService(
             subsidiaryMaterials,
             inWarehouse
         )
+
+        // nosnos 쪽 상품 수정
+        if (basicProduct.type in nosnosCallBasicProductType) {
+            wmsApiClient.updateShippingProduct(
+                basicProduct.shippingProductId!!,
+                PreShippingProductModel.fromEntity(basicProduct)
+            )
+        }
 
         return toBasicProductDetailModel(basicProduct, subsidiaryMaterialById)
     }

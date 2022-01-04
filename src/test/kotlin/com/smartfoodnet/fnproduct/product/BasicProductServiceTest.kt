@@ -1,6 +1,6 @@
 package com.smartfoodnet.fnproduct.product
 
-import com.smartfoodnet.apiclient.MessageApiClient
+import com.smartfoodnet.apiclient.WmsApiClient
 import com.smartfoodnet.base.*
 import com.smartfoodnet.fnproduct.code.CodeService
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
@@ -56,7 +56,7 @@ internal class BasicProductServiceTest(
     lateinit var subsidiaryMaterialCategoryRepository: SubsidiaryMaterialCategoryRepository
 
     @MockBean
-    lateinit var messageApiClient: MessageApiClient
+    lateinit var wmsApiClient: WmsApiClient
 
     lateinit var warehouse: InWarehouse
     private var basicProductCategories: List<BasicProductCategory> = mutableListOf()
@@ -170,6 +170,8 @@ internal class BasicProductServiceTest(
                 subsidiaryMaterialMappings = subsidiaryMaterialMappings!!,
                 inWarehouse = warehouse
             ).apply { id = productId }
+            mockBasicProduct.shippingProductId = 1L
+
             given(basicProductRepository.save(any())).willReturn(mockBasicProduct)
             given(basicProductRepository.findById(productId))
                 .willReturn(Optional.of(mockBasicProduct))
@@ -241,6 +243,7 @@ internal class BasicProductServiceTest(
                 subsidiaryMaterialMappings = subsidiaryMaterialMappings!!,
                 inWarehouse = warehouse
             ).apply { id = productId }
+            mockBasicProduct.shippingProductId = 1L
 
             // when
             val actualBasicProductDetailModel =

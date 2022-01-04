@@ -25,9 +25,6 @@ class BasicProduct(
     @Column(name = "partner_id", columnDefinition = "BIGINT UNSIGNED")
     var partnerId: Long? = null,
 
-    @Column(name = "shipping_product_id", columnDefinition = "BIGINT UNSIGNED")
-    var shippingProductId: Long? = null,
-
     @Column(name = "name")
     var name: String? = null,
 
@@ -85,6 +82,18 @@ class BasicProduct(
 
     @Column(name = "active_yn")
     var activeYn: String = "N",
+
+    @Column(name = "shipping_product_id", columnDefinition = "BIGINT UNSIGNED")
+    var shippingProductId: Long? = null,
+
+    @Column(name = "product_code")
+    var productCode: String? = null,
+
+    @Column(name = "sales_product_id", columnDefinition = "BIGINT UNSIGNED")
+    var salesProductId: Long? = null,
+
+    @Column(name = "sales_product_code")
+    var salesProductCode: String? = null,
 ) : BaseEntity() {
     fun addSubsidiaryMaterialMappings(subsidiaryMaterialMapping: SubsidiaryMaterialMapping) {
         subsidiaryMaterialMappings.add(subsidiaryMaterialMapping)
