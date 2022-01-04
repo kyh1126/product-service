@@ -39,6 +39,7 @@ data class BasicProductStockModel(
                     basicProductId = id,
                     basicProductName = name,
                     basicProductCode = code,
+                    shippingProductId = shippingProductId,
                     barcode = barcode,
                     expirationDateManagementYn = expirationDateManagementYn
                 )
