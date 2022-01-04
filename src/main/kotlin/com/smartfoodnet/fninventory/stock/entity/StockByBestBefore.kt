@@ -46,6 +46,9 @@ class StockByBestBefore(
     @Column(name = "available_stock_count")
     var availableStockCount: Int? = null,
 
+    @Column(name = "total_new_orders_count")
+    var totalNewOrdersCount: Int? = null,
+
     @Column(name = "collected_date")
     var collectedDate: LocalDate
 

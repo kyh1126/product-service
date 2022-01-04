@@ -33,6 +33,9 @@ class ShortageService(
             if ((shortageProjection.totalOrderCount ?: 0) > it.normalStock!!) {
                 productShortageModels.add(
                     ProductShortageModel(
+                        basicProductId = shortageProjection.basicProductId,
+                        basicProductName = shortageProjection.basicProductName,
+                        basicProductCode = shortageProjection.basicProductCode,
                         availableStockCount = it.normalStock,
                         shortageCount = shortageProjection.totalOrderCount?.minus(it.normalStock),
                         shortageOrderCount = shortageProjection.shortageOrderCount?.toInt(),

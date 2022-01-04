@@ -10,6 +10,8 @@ import com.smartfoodnet.fninventory.stock.model.BasicProductStockModel
 import com.smartfoodnet.fninventory.stock.model.StockByBestBeforeModel
 import com.smartfoodnet.fninventory.stock.support.StockByBestBeforeRepository
 import com.smartfoodnet.fninventory.stock.support.StockByBestBeforeSearchCondition
+import com.smartfoodnet.fnproduct.order.OrderService
+import com.smartfoodnet.fnproduct.order.model.OrderStatus
 import com.smartfoodnet.fnproduct.product.BasicProductRepository
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import org.springframework.data.domain.Pageable
@@ -25,7 +27,8 @@ import java.time.LocalDateTime
 class StockService(
     private val basicProductRepository: BasicProductRepository,
     private val stockByBestBeforeRepository: StockByBestBeforeRepository,
-    private val wmsApiClient: WmsApiClient
+    private val wmsApiClient: WmsApiClient,
+    private val orderService: OrderService
 ) {
     //유통기한 관리 여부
     private val EXPIRATION_DATEMANAGEMENT_YN = "Y"
@@ -94,10 +97,13 @@ class StockService(
                     return
                 }
 
+                val orderCount = orderService.getOrderCountByProductIdAndStatus(basicProduct.id!!, OrderStatus.NEW) ?: 0
+
                 nosnosStockByExpirationDate.stocksByExpirationDate?.forEach { stockByExpirationDate ->
                     val stockByBestBefore = buildStockByBestBefore(
                         basicProduct,
                         stockByExpirationDate,
+                        orderCount
                     )
 
                     stocksByBestBefore.add(stockByBestBefore)
@@ -110,7 +116,8 @@ class StockService(
 
     private fun buildStockByBestBefore(
         basicProduct: BasicProduct,
-        stockByExpirationDate: StockByExpirationDate
+        stockByExpirationDate: StockByExpirationDate,
+        orderCount: Int
     ): StockByBestBefore {
         val manufacturedDate = basicProduct.expirationDateInfo?.expirationDate?.toLong()?.let {
             stockByExpirationDate.expirationDate?.minusDays(it)
@@ -128,6 +135,7 @@ class StockService(
             expirationDate = stockByExpirationDate.expirationDate,
             totalStockCount = null,
             availableStockCount = stockByExpirationDate.normalStock,
+            totalNewOrdersCount = orderCount,
             collectedDate = LocalDate.now()
         )
     }

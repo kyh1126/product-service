@@ -45,6 +45,10 @@ class OrderService(
         return orderDetailRepository.findAllByPartnerIdAndStatusGroupByProductId(partnerId,status)
     }
 
+    fun getOrderCountByProductIdAndStatus(productId: Long, status: OrderStatus): Int? {
+        return orderDetailRepository.getCountByProductIdAndStatusGroupByProductId(productId, status)
+    }
+
     private fun convert(orderDetailModel: OrderDetailCreateModel): OrderDetail {
         val orderDetail: OrderDetail = orderDetailModel.toEntity()
 
