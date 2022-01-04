@@ -37,6 +37,9 @@ data class BasicProductModel(
     @ApiModelProperty(value = "상품바코드")
     var barcode: String? = null,
 
+    @ApiModelProperty(value = "상품카테고리 ID")
+    var basicProductCategoryId: Long? = null,
+
     @ApiModelProperty(value = "상품카테고리명")
     var basicProductCategoryName: String? = null,
 
@@ -100,6 +103,7 @@ data class BasicProductModel(
                     code = code,
                     barcodeYn = barcodeYn,
                     barcode = barcode,
+                    basicProductCategoryId = basicProductCategory?.id,
                     basicProductCategoryName = basicProductCategory?.let {
                         listOf(
                             it.level1Category.keyName,
