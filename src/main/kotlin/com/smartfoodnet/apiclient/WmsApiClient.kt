@@ -11,15 +11,15 @@ import org.springframework.web.util.UriComponentsBuilder
 
 @Component
 class StockApiClient(
-        @Value("\${sfn.service.fn-warehouse-management-service}") val baseUrl: String,
-        override val restTemplate: RestTemplate
-) : RestTemplateClient(baseUrl, restTemplate) {
+    @Value("\${sfn.service.fn-warehouse-management-service}") override val host : String,
+    override val restTemplate: RestTemplate
+) : RestTemplateClient(host, restTemplate) {
     fun getStocks(shippingProductId: Long): List<NosnosStockModel>? {
-        return get(baseUrl + "/stock/${shippingProductId}")
+        return get(host + "/stock/${shippingProductId}")
     }
 
     fun getStocksByExpirationDate(shippingProductIds: List<Long>): List<NosnosExpirationDateStockModel>? {
-        val uriBuilder = UriComponentsBuilder.fromUriString("${baseUrl}/stocks_by_best_before").queryParam("shippingProductIds", shippingProductIds)
+        val uriBuilder = UriComponentsBuilder.fromUriString("/stocks_by_best_before").queryParam("shippingProductIds", shippingProductIds)
 
         val uri = uriBuilder.build().toString()
         val stocksDataModel = getSimple<CommonDataListModel<NosnosStockModel>>(uri = uri)
@@ -27,7 +27,7 @@ class StockApiClient(
     }
 
     fun getStocks(partnerId: Long, shippingProductIds: List<Long?>?): List<NosnosStockModel>? {
-        var uriBuilder = UriComponentsBuilder.fromUriString("${baseUrl}/stock").queryParam("memberId", partnerId)
+        var uriBuilder = UriComponentsBuilder.fromUriString("/stock").queryParam("memberId", partnerId)
 
         if (shippingProductIds != null) {
             uriBuilder = uriBuilder.queryParam("shippingProductIds", shippingProductIds)

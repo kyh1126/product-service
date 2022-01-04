@@ -1,14 +1,18 @@
 package com.smartfoodnet.fninventory.stock
 
 import com.smartfoodnet.apiclient.StockApiClient
+import com.smartfoodnet.apiclient.response.NosnosExpirationDateStockModel
+import com.smartfoodnet.apiclient.response.StockByExpirationDate
 import com.smartfoodnet.common.model.request.PredicateSearchCondition
 import com.smartfoodnet.common.model.response.PageResponse
+import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.fninventory.stock.entity.StockByBestBefore
 import com.smartfoodnet.fninventory.stock.model.BasicProductStockModel
 import com.smartfoodnet.fninventory.stock.model.StockByBestBeforeModel
 import com.smartfoodnet.fninventory.stock.support.StockByBestBeforeRepository
 import com.smartfoodnet.fninventory.stock.support.StockByBestBeforeSearchCondition
 import com.smartfoodnet.fnproduct.product.BasicProductRepository
+import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -20,9 +24,9 @@ import java.time.LocalDateTime
 @Service
 @Transactional(readOnly = true)
 class StockService(
-        private val basicProductRepository: BasicProductRepository,
-        private val stockByBestBeforeRepository: StockByBestBeforeRepository,
-        private val stockApiClient: StockApiClient
+    private val basicProductRepository: BasicProductRepository,
+    private val stockByBestBeforeRepository: StockByBestBeforeRepository,
+    private val stockApiClient: StockApiClient
 ) {
     //유통기한 관리 여부
     private val EXPIRATION_DATEMANAGEMENT_YN = "Y"
@@ -31,16 +35,16 @@ class StockService(
     private val API_CALL_LIST_SIZE = 50
 
     fun getBasicProductStocks(
-            partnerId: Long,
-            condition: PredicateSearchCondition,
-            page: Pageable
+        partnerId: Long,
+        condition: PredicateSearchCondition,
+        page: Pageable
     ): PageResponse<BasicProductStockModel> {
         val basicProducts = basicProductRepository.findAll(condition.toPredicate(), page)
         val basicProductStockModels = basicProducts.map { BasicProductStockModel.fromBasicProduct(it) }
 
         val nosnosStocks = stockApiClient.getStocks(
-                partnerId = partnerId,
-                shippingProductIds = basicProductStockModels.content.map { it.shippingProductId }
+            partnerId = partnerId,
+            shippingProductIds = basicProductStockModels.content.map { it.shippingProductId }
         )
 
         basicProductStockModels.forEach { model ->
@@ -52,9 +56,9 @@ class StockService(
     }
 
     fun getStocksByBestBefore(
-            partnerId: Long,
-            condition: StockByBestBeforeSearchCondition,
-            page: Pageable
+        partnerId: Long,
+        condition: StockByBestBeforeSearchCondition,
+        page: Pageable
     ): PageResponse<StockByBestBeforeModel> {
         val stocksByBestBefore = stockByBestBeforeRepository.findAll(condition.toPredicate(), page)
         val stockByBestBeforeModel = stocksByBestBefore.map { StockByBestBeforeModel.fromStockByBestBefore(it) }
@@ -65,36 +69,32 @@ class StockService(
     //TODO: 추후 상품 개수가 많아질 경우 파트너별로 잘라서 작업 고려
     //TODO: 리팩토링 고려
     fun syncStocksByBestBefore(partnerId: Long) {
-        val basicProducts = basicProductRepository.findByExpirationDateManagementYnAndActiveYn(EXPIRATION_DATEMANAGEMENT_YN, EXPIRATION_DATEMANAGEMENT_YN)
-        val arrBasicPoducts = basicProducts?.chunked(API_CALL_LIST_SIZE) ?: return
+        val basicProducts =
+            basicProductRepository.findByExpirationDateManagementYnAndActiveYn(EXPIRATION_DATEMANAGEMENT_YN, "Y")
+        val basicProductsChunks = basicProducts?.chunked(API_CALL_LIST_SIZE) ?: return
 
-        arrBasicPoducts.forEach { basicProductChunk ->
-            val shippingProductIds = basicProductChunk.map { it.shippingProductId }
-
+        basicProductsChunks.forEach { basicProductChunk ->
             val nosnosStocksByExpirationDate = stockApiClient.getStocksByExpirationDate(
-                    shippingProductIds as List<Long>
+                basicProductChunk.map { it.shippingProductId } as List<Long>
             )
 
             val stocksByBestBefore = mutableListOf<StockByBestBefore>()
 
-            nosnosStocksByExpirationDate?.forEach{ nosnosStockByExpirationDate ->
-                val basicProduct = basicProductChunk.find { it.shippingProductId?.equals(nosnosStockByExpirationDate.shippingProductId) ?: false }
+            nosnosStocksByExpirationDate?.forEach { nosnosStockByExpirationDate ->
+                val basicProduct = basicProductChunk.find {
+                    it.shippingProductId?.equals(nosnosStockByExpirationDate.shippingProductId) ?: false
+                }
+
+                if (basicProduct == null) {
+                    log.error("error: shippingProductId = [${nosnosStockByExpirationDate.shippingProductId}] does not exist.")
+                    return
+                }
 
                 nosnosStockByExpirationDate.stocksByExpirationDate?.forEach { stockByExpirationDate ->
-                    val manufacturedDate = basicProduct?.expirationDateInfo?.expirationDate?.toLong()?.let {
-                        stockByExpirationDate.expirationDate?.minusDays(it)
-                    }
-
-                    val stockByBestBefore = StockByBestBefore(
-                            partnerId = partnerId,
-                            basicProduct = basicProduct!!,
-                            shippingProductId = nosnosStockByExpirationDate.shippingProductId!!,
-                            bestBefore = calculateBestBefore(stockByExpirationDate.expirationDate!!, basicProduct.expirationDateInfo!!.expirationDate!!),
-                            manufactureDate = manufacturedDate,
-                            expirationDate = stockByExpirationDate.expirationDate,
-                            totalStockCount = null,
-                            availableStockCount = stockByExpirationDate.normalStock,
-                            collectedDate = LocalDate.now()
+                    val stockByBestBefore = buildStockByBestBefore(
+                        basicProduct,
+                        stockByExpirationDate,
+                        nosnosStockByExpirationDate
                     )
 
                     stocksByBestBefore.add(stockByBestBefore)
@@ -105,13 +105,39 @@ class StockService(
         }
     }
 
+    private fun buildStockByBestBefore(
+        basicProduct: BasicProduct,
+        stockByExpirationDate: StockByExpirationDate
+    ): StockByBestBefore {
+        val manufacturedDate = basicProduct.expirationDateInfo?.expirationDate?.toLong()?.let {
+            stockByExpirationDate.expirationDate?.minusDays(it)
+        }
+
+        return StockByBestBefore(
+            partnerId = basicProduct.partnerId!!,
+            basicProduct = basicProduct,
+            shippingProductId = basicProduct.shippingProductId!!,
+            bestBefore = calculateBestBefore(
+                stockByExpirationDate.expirationDate!!,
+                basicProduct.expirationDateInfo!!.expirationDate!!
+            ),
+            manufactureDate = manufacturedDate,
+            expirationDate = stockByExpirationDate.expirationDate,
+            totalStockCount = null,
+            availableStockCount = stockByExpirationDate.normalStock,
+            collectedDate = LocalDate.now()
+        )
+    }
+
     private fun calculateBestBefore(expirationDate: LocalDateTime, manufacturedBefore: Int): Float {
         val today = LocalDateTime.now()
         val duration = Duration.between(today, expirationDate).toDays()
 
-        if(duration < 0)
+        if (duration < 0)
             return 0f
 
         return duration.div(manufacturedBefore.toFloat())
     }
+
+    companion object : Log
 }
