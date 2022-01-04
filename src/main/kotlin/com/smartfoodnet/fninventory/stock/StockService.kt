@@ -46,7 +46,7 @@ class StockService(
 
         val nosnosStocks = wmsApiClient.getStocks(
             partnerId = partnerId,
-            shippingProductIds = basicProductStockModels.content.map { it.shippingProductId }
+            shippingProductIds = basicProductStockModels.content.mapNotNull { it.shippingProductId }
         )
 
         basicProductStockModels.forEach { model ->
