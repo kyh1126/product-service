@@ -8,66 +8,32 @@ import com.smartfoodnet.fninventory.inbound.model.vo.InboundStatusType
 import com.smartfoodnet.nosnos.api.inventory.model.request.NosnosInboundCreateModel
 import com.smartfoodnet.nosnos.api.inventory.model.request.PlanProduct
 import io.swagger.annotations.ApiModelProperty
+import org.springframework.validation.annotation.Validated
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import javax.validation.Valid
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotNull
 
 data class InboundCreateModel(
 
-    @ApiModelProperty(value = "화주(고객사) ID", example = "1")
+    @ApiModelProperty(value = "화주(고객사) ID", example = "14")
     @field:NotNull(message = "화주(고객사) ID를 입력하세요")
     val partnerId: Long? = null,
 
-    @ApiModelProperty(value = "기본상품코드", example = "0001AB00003")
-    @field:NotBlank(message = "기본상품코드를 입력하세요")
-    val basicProductCode: String? = null,
-
-    @ApiModelProperty(value = "입고예정수량", example = "10")
-    @field:NotNull
-    val inboundRequestQuantity: Long? = null,
-
     @ApiModelProperty(value = "입고예정일자", example = "2021-12-03 13:22:33")
     @JsonFormat(pattern = Constants.TIMESTAMP_FORMAT)
-    val inboundExpectedDate: LocalDateTime? = null,
+    val expectedDate: LocalDateTime? = null,
 
-    @ApiModelProperty(value = "입고방식", example = "DELIVERY")
-    @field:NotNull
-    val inboundMethod: InboundMethodType? = null,
+    @ApiModelProperty(value = "입고예정 기본 상품 리스트")
+    @field:Valid
+    val expectedList: List<InboundExpectedModel> = listOf()
 
-    @ApiModelProperty(value = "택배사", example = "SFN택배")
-    val deliveryName: String? = null,
+){
+    fun toEntity() = Inbound(
+        partnerId = partnerId,
+        expectedDate = expectedDate,
+        status = InboundStatusType.EXPECTED
+    )
 
-    @ApiModelProperty(value = "택배송장번호", example = "123456789")
-    val trackingNo: String? = null
-) {
-
-    fun toEntity(): Inbound {
-        return run {
-            Inbound(
-                partnerId = partnerId,
-                expectedDate = inboundExpectedDate,
-                status = InboundStatusType.EXPECTED,
-                method = inboundMethod,
-                requestQuantity = inboundRequestQuantity,
-                deliveryName = deliveryName,
-                trackingNo = trackingNo
-            )
-        }
-    }
-
-    fun toApiModel() : NosnosInboundCreateModel {
-        return run {
-            NosnosInboundCreateModel(
-                // TODO : 파트너 서비스 변경 후 memberID로 변경
-                memberId = 77,
-                planDate = inboundExpectedDate!!.format(DateTimeFormatter.ofPattern("yyyyMMdd")),
-                planProductList = listOf(PlanProduct(
-                    // TODO : 기본상품 -> NOSNOS 출고상품 등록시 부여받는 ProductId 입력
-                    shippingProductId = basicProductCode!!.toLong(),
-                    quantity = inboundRequestQuantity!!
-                ))
-            )
-        }
-    }
 }

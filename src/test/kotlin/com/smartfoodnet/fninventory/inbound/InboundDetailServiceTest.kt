@@ -1,22 +1,13 @@
 package com.smartfoodnet.fninventory.inbound
 
-import com.smartfoodnet.fninventory.inbound.entity.InboundDetail
-import com.smartfoodnet.fninventory.inbound.model.request.InboundCreateModel
-import com.smartfoodnet.fninventory.inbound.model.vo.InboundMethodType
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDateTime
 
 @SpringBootTest
-@ActiveProfiles("dev")
+@ActiveProfiles("test")
 class InboundDetailServiceTest @Autowired constructor(
     val inboundService: InboundService,
-    val inboundDetailService: InboundDetailService,
 ) {
 
 //    @BeforeEach

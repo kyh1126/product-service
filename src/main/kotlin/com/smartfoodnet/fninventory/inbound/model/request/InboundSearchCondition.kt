@@ -8,7 +8,7 @@ import com.smartfoodnet.fninventory.inbound.model.vo.ProductSearchType
 import io.swagger.annotations.ApiModelProperty
 import java.time.LocalDateTime
 
-class InboundSearchCondition(
+data class InboundSearchCondition(
     @ApiModelProperty(value = "고객사 ID", example = "1", hidden = true)
     @JsonIgnore
     var partnerId: Long? = null,
@@ -17,11 +17,11 @@ class InboundSearchCondition(
     @JsonFormat(pattern = Constants.TIMESTAMP_FORMAT)
     var fromDate: LocalDateTime,
 
-    @ApiModelProperty(value = "검색 종료 일자", example = "2021-12-07 23:59:59")
+    @ApiModelProperty(value = "검색 종료 일자", example = "2021-12-31 23:59:59")
     @JsonFormat(pattern = Constants.TIMESTAMP_FORMAT)
     var toDate: LocalDateTime,
 
-    @ApiModelProperty(value = "입고상태", example = "REQUEST")
+    @ApiModelProperty(value = "입고상태", example = "EXPECTED")
     var statusType: InboundStatusType? = null,
 
     @ApiModelProperty(value = "상품별검색")
