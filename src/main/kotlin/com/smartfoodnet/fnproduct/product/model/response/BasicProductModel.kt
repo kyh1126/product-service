@@ -72,7 +72,7 @@ data class BasicProductModel(
     var piecesPerBox: Int? = null,
 
     @ApiModelProperty(value = "파레트입수")
-    var boxesPerPalette: Int? = null,
+    var piecesPerPalette: Int? = null,
 
     @ApiModelProperty(value = "상품이미지 URL")
     var imageUrl: String? = null,
@@ -122,7 +122,7 @@ data class BasicProductModel(
                         ExpirationDateInfoModel.fromEntity(it)
                     },
                     piecesPerBox = piecesPerBox,
-                    boxesPerPalette = boxesPerPalette,
+                    piecesPerPalette = piecesPerPalette,
                     imageUrl = imageUrl,
                     activeYn = activeYn,
                     createdAt = createdAt,

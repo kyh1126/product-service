@@ -71,8 +71,8 @@ class BasicProduct(
     @Column(name = "pieces_per_box")
     var piecesPerBox: Int? = null,
 
-    @Column(name = "boxes_per_palette")
-    var boxesPerPalette: Int? = null,
+    @Column(name = "pieces_per_palette")
+    var piecesPerPalette: Int? = null,
 
     @Column(name = "image_url")
     var imageUrl: String? = null,
@@ -109,7 +109,7 @@ class BasicProduct(
         expirationDateManagementYn = request.expirationDateManagementYn
         expirationDateInfo = request.expirationDateInfoModel?.toEntity()
         piecesPerBox = request.piecesPerBox
-        boxesPerPalette = request.boxesPerPalette
+        piecesPerPalette = request.piecesPerPalette
         imageUrl = request.imageUrl
 
         // 단방향

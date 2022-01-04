@@ -110,7 +110,7 @@ internal class BasicProductDetailCreateModelValidatorTest {
             singlePackagingYn = "",
             expirationDateManagementYn = "",
             piecesPerBox = null,
-            boxesPerPalette = null
+            piecesPerPalette = null
         )
         return getInput(basicProductModel)
     }

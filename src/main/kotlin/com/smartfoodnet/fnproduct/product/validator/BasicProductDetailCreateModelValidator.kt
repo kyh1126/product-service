@@ -193,7 +193,7 @@ class BasicProductDetailCreateModelValidator(
                 expirationDateManagementYn
             )
             validateEmpty(errors, "basicProductModel.piecesPerBox", "박스입수", piecesPerBox)
-            validateEmpty(errors, "basicProductModel.boxesPerPalette", "파레트입수", boxesPerPalette)
+            validateEmpty(errors, "basicProductModel.piecesPerPalette", "파레트입수", piecesPerPalette)
         }
 
         validateEmpty(
@@ -217,7 +217,7 @@ class BasicProductDetailCreateModelValidator(
             validateEmpty(errors, "basicProductModel.name", "상품명", name)
             validateEmpty(errors, "basicProductModel.barcodeYn", "상품바코드기재여부", barcodeYn)
             validateEmpty(errors, "basicProductModel.piecesPerBox", "박스입수", piecesPerBox)
-            validateEmpty(errors, "basicProductModel.boxesPerPalette", "파레트입수", boxesPerPalette)
+            validateEmpty(errors, "basicProductModel.piecesPerPalette", "파레트입수", piecesPerPalette)
         }
     }
 }

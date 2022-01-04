@@ -68,7 +68,7 @@ class BasicProductCreateModel {
     var piecesPerBox: Int? = null
 
     @ApiModelProperty(value = "파레트입수")
-    var boxesPerPalette: Int? = null
+    var piecesPerPalette: Int? = null
 
     @ApiModelProperty(value = "상품이미지 URL")
     var imageUrl: String? = null
@@ -101,7 +101,7 @@ class BasicProductCreateModel {
             expirationDateManagementYn = expirationDateManagementYn,
             expirationDateInfo = expirationDateInfoModel?.toEntity(),
             piecesPerBox = piecesPerBox,
-            boxesPerPalette = boxesPerPalette,
+            piecesPerPalette = piecesPerPalette,
             imageUrl = imageUrl,
             activeYn = activeYn
         )
