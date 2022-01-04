@@ -51,8 +51,7 @@ class StockController(
     @GetMapping("best-before/synchronize")
     fun syncStocksByBestBefore(
     ): CommonResponse{
-        val partnerId = 77L
-        stockService.syncStocksByBestBefore(partnerId)
+        stockService.syncStocksByBestBefore()
         return CommonResponse()
     }
 }

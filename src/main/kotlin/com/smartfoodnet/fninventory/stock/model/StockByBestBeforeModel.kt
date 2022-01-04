@@ -6,7 +6,9 @@ import com.smartfoodnet.common.Constants
 import com.smartfoodnet.fninventory.stock.entity.StockByBestBefore
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import io.swagger.annotations.ApiModelProperty
+import java.time.LocalDate
 import java.time.LocalDateTime
+import javax.persistence.Column
 
 data class StockByBestBeforeModel(
     @ApiModelProperty(value = "기본상품 ID")
@@ -25,7 +27,7 @@ data class StockByBestBeforeModel(
     val barcode: String? = null,
 
     @ApiModelProperty(value = "상미기한")
-    val bestBefore: Int? = null,
+    val bestBefore: Float? = null,
 
     @ApiModelProperty(value = "제조일자")
     @JsonFormat(pattern = Constants.TIMESTAMP_FORMAT)
@@ -42,6 +44,9 @@ data class StockByBestBeforeModel(
     @ApiModelProperty(value = "가용재고")
     var availableStockCount: Int? = null,
 
+    @ApiModelProperty(value = "수집날짜")
+    var collectedDate: LocalDate
+
     ) {
     companion object {
         fun fromStockByBestBefore(stockByBestBefore: StockByBestBefore): StockByBestBeforeModel {
@@ -57,6 +62,7 @@ data class StockByBestBeforeModel(
                     expirationDate = expirationDate,
                     totalStockCount = totalStockCount,
                     availableStockCount = availableStockCount,
+                    collectedDate = collectedDate
                 )
             }
         }

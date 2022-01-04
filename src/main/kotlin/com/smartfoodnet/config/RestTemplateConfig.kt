@@ -1,7 +1,6 @@
 package com.smartfoodnet.config
 
 import org.apache.http.impl.client.HttpClientBuilder
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -12,10 +11,7 @@ import java.security.NoSuchAlgorithmException
 import java.time.Duration
 
 @Configuration
-class RestTemplateConfig(
-    @Value("\${sfn.service.fn-nosnos}")
-    val host: String
-) {
+class RestTemplateConfig {
     @Bean
     @Throws(
         NoSuchAlgorithmException::class,
@@ -30,7 +26,6 @@ class RestTemplateConfig(
         factory.setConnectTimeout(Duration.ofSeconds(3).toMillis().toInt())
         factory.setReadTimeout(Duration.ofSeconds(10).toMillis().toInt())
         return restTemplateBuilder
-//            .rootUri(host)
             .requestFactory { factory }
             .build()
     }

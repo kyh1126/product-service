@@ -10,4 +10,5 @@ interface BasicProductRepository : JpaRepository<BasicProduct, Long>, BasicProdu
     fun findByPartnerIdAndBarcode(partnerId: Long, barcode: String): BasicProduct?
     fun findByPartnerIdAndName(partnerId: Long, name: String): BasicProduct?
     fun findAllByPartnerId(partnerId: Long): List<BasicProduct>?
+    fun findByExpirationDateManagementYnAndActiveYn(expirationDateManagementYn: String, activeYn: String):List<BasicProduct>?
 }
