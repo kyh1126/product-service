@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat
 import com.smartfoodnet.apiclient.response.NosnosStockModel
 import com.smartfoodnet.common.Constants
 import com.smartfoodnet.fninventory.stock.entity.StockByBestBefore
-import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import io.swagger.annotations.ApiModelProperty
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -44,6 +43,9 @@ data class StockByBestBeforeModel(
     @ApiModelProperty(value = "가용재고")
     var availableStockCount: Int? = null,
 
+    @ApiModelProperty(value = "총 주문 수량(미출고)")
+    var totalNewOrdersCount: Int? = null,
+
     @ApiModelProperty(value = "수집날짜")
     var collectedDate: LocalDate
 
@@ -62,6 +64,7 @@ data class StockByBestBeforeModel(
                     expirationDate = expirationDate,
                     totalStockCount = totalStockCount,
                     availableStockCount = availableStockCount,
+                    totalNewOrdersCount = totalNewOrdersCount,
                     collectedDate = collectedDate
                 )
             }
