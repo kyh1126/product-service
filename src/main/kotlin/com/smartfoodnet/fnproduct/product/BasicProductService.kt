@@ -1,8 +1,6 @@
 package com.smartfoodnet.fnproduct.product
 
 import com.smartfoodnet.apiclient.MessageApiClient
-import com.smartfoodnet.apiclient.SfnTopic
-import com.smartfoodnet.apiclient.request.BasicProductCreatedModel
 import com.smartfoodnet.common.error.SaveState
 import com.smartfoodnet.common.error.ValidatorUtils
 import com.smartfoodnet.common.error.exception.BaseRuntimeException
@@ -151,10 +149,12 @@ class BasicProductService(
 
         return saveBasicProduct(basicProduct)
             .also {
-                messageApiClient.sendMessage(
-                    destination = SfnTopic.PRODUCT_CREATED,
-                    message = BasicProductCreatedModel(it.id!!)
-                )
+//                messageApiClient.sendMessage(
+//                    destination = SfnTopic.PRODUCT_CREATED,
+//                    message = BasicProductCreatedModel(it.id!!)
+//                )
+
+                // TODO: nosnos 쪽 POST request 하기
             }.run {
                 toBasicProductDetailModel(this, subsidiaryMaterialById)
             }
