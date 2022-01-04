@@ -25,6 +25,9 @@ class BasicProduct(
     @Column(name = "partner_id", columnDefinition = "BIGINT UNSIGNED")
     var partnerId: Long? = null,
 
+    @Column(name = "shipping_product_id", columnDefinition = "BIGINT UNSIGNED")
+    var shippingProductId: Long? = null,
+
     @Column(name = "name")
     var name: String? = null,
 

@@ -65,6 +65,9 @@ data class OrderDetailCreateModel(
     @ApiModelProperty(value = "배송비")
     val shippingPrice: Double? = null,
 
+    @ApiModelProperty(value = "수량")
+    val count: Int? = null,
+
     val receiver: ReceiverModel? = null,
 
     @ApiModelProperty(value = "업로드방식")
@@ -88,6 +91,7 @@ data class OrderDetailCreateModel(
                 expectedDeliveryDate = expectedDeliveryDate,
                 price = price,
                 shippingPrice = shippingPrice,
+                count = count,
                 receiver = receiver?.toEntity(),
                 uploadType = uploadType
             )

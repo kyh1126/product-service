@@ -64,6 +64,9 @@ data class OrderDetailModel(
     @ApiModelProperty(value = "배송비")
     val shippingPrice: Double? = null,
 
+    @ApiModelProperty(value = "수량")
+    var count: Int? = null,
+
     val receiver: ReceiverModel? = null,
 
     val sender: SenderModel? = null,
@@ -76,28 +79,29 @@ data class OrderDetailModel(
         fun from(orderDetail: OrderDetail): OrderDetailModel {
             return orderDetail.run {
                 OrderDetailModel(
-                        id = id,
-                        partnerId = partnerId,
-                        orderUniqueKey = orderUniqueKey,
-                        loadStatus = null,
-                        storeName = storeName,
-                        storeId = storeId,
-                        userStoreId = userStoreId,
-                        storeProductName = storeProduct?.name,
-                        storeProductCode = storeProduct?.storeProductCode,
-                        storeProductOptionName = storeProduct?.optionName,
-                        orderedAt = orderedAt,
-                        orderNumber = orderNumber,
-                        status = status,
-                        claimStatus = claimStatus,
-                        deliveryType = deliveryType,
-                        expectedDeliveryDate = expectedDeliveryDate,
-                        storeProductId = storeProduct?.id,
-                        price = price,
-                        receiver = receiver?.let { ReceiverModel.from(it) },
-                        sender = sender?.let { SenderModel.from(it) },
-                        shippingPrice = shippingPrice,
-                        uploadType = uploadType
+                    id = id,
+                    partnerId = partnerId,
+                    orderUniqueKey = orderUniqueKey,
+                    loadStatus = null,
+                    storeName = storeName,
+                    storeId = storeId,
+                    userStoreId = userStoreId,
+                    storeProductName = storeProduct?.name,
+                    storeProductCode = storeProduct?.storeProductCode,
+                    storeProductOptionName = storeProduct?.optionName,
+                    orderedAt = orderedAt,
+                    orderNumber = orderNumber,
+                    status = status,
+                    claimStatus = claimStatus,
+                    deliveryType = deliveryType,
+                    expectedDeliveryDate = expectedDeliveryDate,
+                    storeProductId = storeProduct?.id,
+                    price = price,
+                    count = count,
+                    receiver = receiver?.let { ReceiverModel.from(it) },
+                    sender = sender?.let { SenderModel.from(it) },
+                    shippingPrice = shippingPrice,
+                    uploadType = uploadType
 
                 )
             }

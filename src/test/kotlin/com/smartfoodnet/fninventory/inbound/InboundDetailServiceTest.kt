@@ -8,7 +8,6 @@ import org.springframework.test.context.ActiveProfiles
 @ActiveProfiles("test")
 class InboundDetailServiceTest @Autowired constructor(
     val inboundService: InboundService,
-    val inboundDetailService: InboundDetailService,
 ) {
 
 //    @BeforeEach

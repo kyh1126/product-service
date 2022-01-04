@@ -1,60 +1,47 @@
 package com.smartfoodnet.fninventory.inbound
 
-import com.smartfoodnet.apiclient.InboundApiClient
 import com.smartfoodnet.common.model.response.PageResponse
+import com.smartfoodnet.fninventory.inbound.model.dto.GetInbound
+import com.smartfoodnet.fninventory.inbound.model.dto.GetInboundParent
 import com.smartfoodnet.fninventory.inbound.model.request.InboundCreateModel
 import com.smartfoodnet.fninventory.inbound.model.request.InboundSearchCondition
-import com.smartfoodnet.fninventory.inbound.model.response.InboundModel
-import com.smartfoodnet.fninventory.inbound.model.vo.InboundStatusType
 import com.smartfoodnet.fnproduct.product.BasicProductRepository
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDateTime
+import kotlin.streams.toList
 
 @Service
+@Transactional(readOnly = true)
 class InboundService(
-    val inboundApiClient: InboundApiClient,
     val inboundRepository: InboundRepository,
     val basicProductRepository: BasicProductRepository
-) {
-
-    fun createInbound(list: List<InboundCreateModel>){
-
-        list.forEach{
-            basicProductRepository.findByCode(it.basicProductCode!!)?:throw NoSuchElementException("기본상품을 찾을 수 없습니다")
-        }
-
-        list.forEach {
-            // TODO : API 호출을 통해 NOSNOS 입고예정등록을 진행
-//            inboundApiClient.createInbound(it.toApiModel())
-
-            // TODO : API 호출이 성공하면 DB에 저장
-            val inbound = it.toEntity()
-            inbound.basicProduct = basicProductRepository.findByCode(it.basicProductCode!!)
-            inboundRepository.save(inbound)
-        }
-    }
-
+){
     @Transactional
-    fun cancelInbound(inboundId: Long) {
-        val inbound = inboundRepository.findById(inboundId).get()
-        if (inbound.status != InboundStatusType.EXPECTED){
-            throw IllegalStateException("입고예정 상태에서만 취소가 가능합니다")
+    fun createInbound(createModel: InboundCreateModel){
+        val inbound = createModel.toEntity()
+        createModel.expectedList.forEach {
+            val basicProduct =  basicProductRepository.findByCode(it.basicProductCode)?:throw NoSuchElementException("기본상품(${it.basicProductCode})을 찾을 수 없습니다.")
+            inbound.addExptecdItem(it.toEntity(basicProduct))
         }
-        inbound.status = InboundStatusType.CANCEL
-        inbound.deletedAt = LocalDateTime.now()
+
+        inboundRepository.save(inbound)
     }
 
-    fun getInbound(inboundId: Long): InboundModel {
-        val inbound = inboundRepository.findById(inboundId).get()
-        return InboundModel.fromEntity(inbound)
+    fun getInbound(condition: InboundSearchCondition, page: Pageable) : PageResponse<GetInbound>?{
+        val parent = inboundRepository.findInbounds(condition, page)
+        val actualDetail = inboundRepository.findSumActualDetail(parent.content.map { it.inboundExpectedId }).associateBy { it.inboundExpectedId }
+
+        val list = parent.content.map{
+            GetInbound.toDtoWithMerge(it, actualDetail[it.inboundExpectedId])
+        }
+
+        return PageResponse.of(list, parent.totalElements, parent.pageable.pageNumber, list.size, page.sort)
     }
 
-    fun getInbounds(condition: InboundSearchCondition, page: Pageable): PageResponse<InboundModel> {
-        return inboundRepository.findByPartnerId(condition, page)
-            .map(InboundModel::fromEntity)
-            .run { PageResponse.of(this) }
-    }
+    fun getInboundActualDetail(partnerId: Long, expectedId: Long)
+        = inboundRepository.findInboundActualDetail(partnerId, expectedId)
+
 
 }

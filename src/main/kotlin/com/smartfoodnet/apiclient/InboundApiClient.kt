@@ -11,7 +11,4 @@ class InboundApiClient(
     override val restTemplate: RestTemplate
 ) : RestTemplateClient(host, restTemplate) {
 
-    fun getInbound(receivingPlanId: Long): GetInboundModel? {
-        return get("/inventory/${receivingPlanId}")
-    }
 }

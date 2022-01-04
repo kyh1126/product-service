@@ -35,6 +35,6 @@ class OrderController(
         @PageableDefault(size = 50, sort = ["id"], direction = Sort.Direction.DESC) page: Pageable,
     ): PageResponse<OrderDetailModel> {
         condition.apply { this.partnerId = partnerId }
-        return orderService.getOrderDetail(condition, page)
+        return orderService.getOrderDetails(condition, page)
     }
 }
