@@ -38,7 +38,7 @@ fun buildBasicProductCreateModel(
     singlePackagingYn: String = "N",
     expirationDateManagementYn: String = "N",
     piecesPerBox: Int? = 2,
-    boxesPerPalette: Int? = 1,
+    piecesPerPalette: Int? = 1,
 ) = TestBasicProductCreateModel(
     type = type,
     partnerId = partnerId,
@@ -51,7 +51,7 @@ fun buildBasicProductCreateModel(
     singlePackagingYn = singlePackagingYn,
     expirationDateManagementYn = expirationDateManagementYn,
     piecesPerBox = piecesPerBox,
-    boxesPerPalette = boxesPerPalette,
+    piecesPerPalette = piecesPerPalette,
     activeYn = "Y"
 ).toModel()
 

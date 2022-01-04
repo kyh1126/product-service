@@ -61,7 +61,7 @@ class TestBasicProductCreateModel(
     val piecesPerBox: Int? = null,
 
     @ApiModelProperty(value = "파레트입수")
-    val boxesPerPalette: Int? = null,
+    val piecesPerPalette: Int? = null,
 
     @ApiModelProperty(value = "상품이미지 URL")
     val imageUrl: String? = null,
@@ -89,7 +89,7 @@ class TestBasicProductCreateModel(
             it.singlePackagingYn = singlePackagingYn
             it.expirationDateManagementYn = expirationDateManagementYn
             it.piecesPerBox = piecesPerBox
-            it.boxesPerPalette = boxesPerPalette
+            it.piecesPerPalette = piecesPerPalette
             it.imageUrl = imageUrl
             it.activeYn = activeYn
             it.expirationDateInfoModel = expirationDateInfoModel
