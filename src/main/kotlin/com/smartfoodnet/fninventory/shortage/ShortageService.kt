@@ -1,6 +1,6 @@
 package com.smartfoodnet.fninventory.shortage
 
-import com.smartfoodnet.apiclient.StockApiClient
+import com.smartfoodnet.apiclient.WmsApiClient
 import com.smartfoodnet.apiclient.response.NosnosStockModel
 import com.smartfoodnet.fninventory.shortage.model.ProductShortageModel
 import com.smartfoodnet.fnproduct.order.OrderService
@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional(readOnly = true)
 class ShortageService(
     private val orderService: OrderService,
-    private val stockApiClient: StockApiClient
+    private val wmsApiClient: WmsApiClient
 ) {
     private val API_CALL_LIST_SIZE = 50
 
@@ -51,7 +51,7 @@ class ShortageService(
 
         val arrShippingProductIds = shippingProductIds.chunked(API_CALL_LIST_SIZE)
         arrShippingProductIds.forEach { idChunks ->
-            val stocks = stockApiClient.getStocks(
+            val stocks = wmsApiClient.getStocks(
                 partnerId = partnerId,
                 shippingProductIds = idChunks
             ) ?: listOf()

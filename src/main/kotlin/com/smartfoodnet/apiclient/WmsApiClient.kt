@@ -10,7 +10,7 @@ import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
 
 @Component
-class StockApiClient(
+class WmsApiClient(
     @Value("\${sfn.service.fn-warehouse-management-service}") override val host : String,
     override val restTemplate: RestTemplate
 ) : RestTemplateClient(host, restTemplate) {
