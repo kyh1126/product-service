@@ -55,7 +55,7 @@ sfn:
   aws:
     region: ap-northeast-2
     sqs:
-      endpoint: http://localhost:4566
+      endpoint: sqs.ap-northeast-2.amazonaws.com
     message: # SNS, SQS
       access-key: ${MESSAGE_ACCESS_KEY:uninitialized_message_access_key}
       secret-key: ${MESSAGE_SECRET_KEY:uninitialized_message_secret_key}
