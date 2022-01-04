@@ -22,9 +22,6 @@ data class BasicProductModel(
     @ApiModelProperty(value = "화주(고객사) ID")
     val partnerId: Long?,
 
-    @ApiModelProperty(value = "출고상품 ID (nosnos)")
-    val shippingProductId: Long? = null,
-
     @ApiModelProperty(value = "상품명")
     var name: String?,
 
@@ -80,6 +77,18 @@ data class BasicProductModel(
     @ApiModelProperty(value = "활성화여부 (default: N)", allowableValues = "Y,N")
     val activeYn: String,
 
+    @ApiModelProperty(value = "출고상품 ID (nosnos)")
+    val shippingProductId: Long? = null,
+
+    @ApiModelProperty(value = "상품코드 (nosnos)")
+    var productCode: String? = null,
+
+    @ApiModelProperty(value = "판매상품 ID (nosnos)")
+    var salesProductId: Long? = null,
+
+    @ApiModelProperty(value = "판매상품 코드 (nosnos)")
+    var salesProductCode: String? = null,
+
     @ApiModelProperty(value = "생성시간")
     @JsonFormat(pattern = Constants.TIMESTAMP_FORMAT)
     val createdAt: LocalDateTime? = null,
@@ -98,7 +107,6 @@ data class BasicProductModel(
                     id = id,
                     type = type,
                     partnerId = partnerId,
-                    shippingProductId = shippingProductId,
                     name = if (type == BasicProductType.SUB) level2CategoryName else name,
                     code = code,
                     barcodeYn = barcodeYn,
@@ -125,6 +133,10 @@ data class BasicProductModel(
                     piecesPerPalette = piecesPerPalette,
                     imageUrl = imageUrl,
                     activeYn = activeYn,
+                    shippingProductId = shippingProductId,
+                    productCode = productCode,
+                    salesProductId = salesProductId,
+                    salesProductCode = salesProductCode,
                     createdAt = createdAt,
                     updatedAt = updatedAt
                 )
