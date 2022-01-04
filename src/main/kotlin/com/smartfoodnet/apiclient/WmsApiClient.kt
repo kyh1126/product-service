@@ -14,10 +14,6 @@ class WmsApiClient(
     @Value("\${sfn.service.fn-warehouse-management-service}") override val host : String,
     override val restTemplate: RestTemplate
 ) : RestTemplateClient(host, restTemplate) {
-    fun getStocks(shippingProductId: Long): List<NosnosStockModel>? {
-        return get(host + "/stock/${shippingProductId}")
-    }
-
     fun getStocksByExpirationDate(shippingProductIds: List<Long>): List<NosnosExpirationDateStockModel>? {
         val uriBuilder = UriComponentsBuilder.fromUriString("/stocks_by_best_before").queryParam("shippingProductIds", shippingProductIds)
 

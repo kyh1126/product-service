@@ -55,7 +55,7 @@ abstract class RestTemplateClient(
         val httpEntity = HttpEntity<Any>(getHeader())
 
         val res = restTemplate.exchange(
-            uri,
+            getUrlString(uri),
             HttpMethod.GET,
             httpEntity,
             CommonResponse::class.java

@@ -69,7 +69,6 @@ class StockService(
     }
 
     //TODO: 추후 상품 개수가 많아질 경우 파트너별로 잘라서 작업 고려
-    //TODO: 리팩토링 고려
     fun syncStocksByBestBefore() {
         val basicProducts =
             basicProductRepository.findByExpirationDateManagementYnAndActiveYn(
@@ -135,7 +134,7 @@ class StockService(
 
     private fun calculateBestBefore(expirationDate: LocalDateTime, manufacturedBefore: Int): Float {
         val today = LocalDateTime.now()
-        val duration = Duration.between(today, expirationDate).toDays()
+        val duration = Duration.between(today.toLocalDate().atStartOfDay(), expirationDate.toLocalDate().atStartOfDay()).toDays()
 
         if (duration < 0)
             return 0f
