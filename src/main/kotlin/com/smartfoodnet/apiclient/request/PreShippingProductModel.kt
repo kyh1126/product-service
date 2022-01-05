@@ -51,7 +51,8 @@ data class PreShippingProductModel(
                     memberId = partnerId!!,
                     productCode = code,
                     productName = name!!,
-                    categoryId = convertYnToInt(singlePackagingYn),
+                    // TODO: 단수(포장)여부로 못 넣는듯, 0, 1 둘다 먹지 않는다. 확인 후 제거 or fix 예정 (https://smartfoodnet.atlassian.net/jira/software/c/projects/FSE/boards/15/backlog?view=detail&selectedIssue=FSE-737&quickFilter=23&issueLimit=100)
+                    categoryId = null,//convertYnToInt(singlePackagingYn),
                     upc = barcode,
                     singleEta = piecesPerBox,
                     paletCount = piecesPerPalette,
