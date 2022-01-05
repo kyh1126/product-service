@@ -1,6 +1,8 @@
 package com.smartfoodnet.fnproduct.product
 
 import com.smartfoodnet.apiclient.WmsApiClient
+import com.smartfoodnet.apiclient.request.PreShippingProductModel
+import com.smartfoodnet.apiclient.response.PostShippingProductModel
 import com.smartfoodnet.base.*
 import com.smartfoodnet.fnproduct.code.CodeService
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
@@ -163,15 +165,26 @@ internal class BasicProductServiceTest(
                     subsidiaryMaterialById
                 )
 
-            val mockBasicProduct = mockCreateModel.toEntity(
-                code = basicProductCode,
-                basicProductCategory = basicProductCategory,
-                subsidiaryMaterialCategory = subsidiaryMaterialCategory,
-                subsidiaryMaterialMappings = subsidiaryMaterialMappings!!,
-                inWarehouse = warehouse
+            val mockBasicProduct = getBasicProduct(
+                basicProductCode!!,
+                mockCreateModel,
+                basicProductCategory,
+                subsidiaryMaterialCategory,
+                subsidiaryMaterialMappings,
+                warehouse
             ).apply { id = productId }
-            mockBasicProduct.shippingProductId = 1L
 
+            val postShippingProductModel = PostShippingProductModel(
+                shippingProductId = 1L,
+                productCode = basicProductCode!!,
+                salesProductId = null,
+                salesProductCode = null
+            )
+            given(
+                wmsApiClient.createShippingProduct(
+                    PreShippingProductModel.fromEntity(mockBasicProduct)
+                )
+            ).willReturn(postShippingProductModel)
             given(basicProductRepository.save(any())).willReturn(mockBasicProduct)
             given(basicProductRepository.findById(productId))
                 .willReturn(Optional.of(mockBasicProduct))
@@ -236,14 +249,14 @@ internal class BasicProductServiceTest(
                     subsidiaryMaterialById
                 )
 
-            val mockBasicProduct = mockUpdateModel.toEntity(
-                code = basicProductCode,
-                basicProductCategory = basicProductCategory,
-                subsidiaryMaterialCategory = subsidiaryMaterialCategory,
-                subsidiaryMaterialMappings = subsidiaryMaterialMappings!!,
-                inWarehouse = warehouse
+            val mockBasicProduct = getBasicProduct(
+                basicProductCode!!,
+                mockUpdateModel,
+                basicProductCategory,
+                subsidiaryMaterialCategory,
+                subsidiaryMaterialMappings,
+                warehouse
             ).apply { id = productId }
-            mockBasicProduct.shippingProductId = 1L
 
             // when
             val actualBasicProductDetailModel =
@@ -255,6 +268,26 @@ internal class BasicProductServiceTest(
                 BasicProductDetailModel.fromEntity(mockBasicProduct, subsidiaryMaterialById),
                 actualBasicProductDetailModel
             )
+        }
+    }
+
+    private fun getBasicProduct(
+        basicProductCode: String,
+        mockUpdateModel: BasicProductDetailCreateModel,
+        basicProductCategory: BasicProductCategory?,
+        subsidiaryMaterialCategory: SubsidiaryMaterialCategory?,
+        subsidiaryMaterialMappings: Set<SubsidiaryMaterialMapping>?,
+        warehouse: InWarehouse
+    ): BasicProduct {
+        return mockUpdateModel.toEntity(
+            code = basicProductCode,
+            basicProductCategory = basicProductCategory,
+            subsidiaryMaterialCategory = subsidiaryMaterialCategory,
+            subsidiaryMaterialMappings = subsidiaryMaterialMappings!!,
+            inWarehouse = warehouse
+        ).apply {
+            this.shippingProductId = 1L
+            this.productCode = basicProductCode
         }
     }
 
