@@ -43,10 +43,10 @@ class WmsApiClient(
     }
 
     fun createShippingProduct(preModel: PreShippingProductModel): PostShippingProductModel? {
-        return post("/shipping/products/shipping_product", preModel)
+        return post("/shipping/products", preModel)
     }
 
     fun updateShippingProduct(shippingProductId: Long, preModel: PreShippingProductModel) {
-        return put("/shipping/products", preModel)
+        return put("/shipping/products/$shippingProductId", preModel)
     }
 }
