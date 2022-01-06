@@ -3,6 +3,7 @@ package com.smartfoodnet.apiclient.request
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 import com.smartfoodnet.apiclient.dto.AddBarcode
+import com.smartfoodnet.common.convertYnToInt
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import io.swagger.annotations.ApiModelProperty
 
@@ -59,12 +60,10 @@ data class PreShippingProductModel(
                     useExpireDate = convertYnToInt(expirationDateInfo?.expirationDateWriteYn),
                     expireDateByMakeDate = expirationDateInfo?.expirationDate,
                     useMakeDate = convertYnToInt(expirationDateInfo?.manufactureDateWriteYn),
-                    status = 1,
+                    status = convertYnToInt(activeYn),
                     addSalesProduct = 1
                 )
             }
         }
-
-        private fun convertYnToInt(yn: String?) = if (yn == "Y") 1 else 0
     }
 }

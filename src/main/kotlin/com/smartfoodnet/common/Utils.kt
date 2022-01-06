@@ -40,6 +40,7 @@ fun copyNonNullProperty(source: Any, target: Any) {
     BeanUtils.copyProperties(source, target, *getNullPropertyNames(source))
 }
 
+fun convertYnToInt(yn: String?) = if (yn == "Y") 1 else 0
 
 /**
  * Kotlin 에서, 일반적인 경우 런타임에 generic parameter 를 확인할 방법은 없다.
