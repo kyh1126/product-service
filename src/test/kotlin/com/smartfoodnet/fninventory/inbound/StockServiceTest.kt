@@ -1,6 +1,6 @@
 package com.smartfoodnet.fninventory.inbound
 
-import com.smartfoodnet.apiclient.WmsFeignClient
+import com.smartfoodnet.apiclient.WmsClient
 import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.fninventory.stock.StockService
 import com.smartfoodnet.fnproduct.product.model.request.BasicProductSearchCondition
@@ -24,7 +24,7 @@ class StockServiceTest(
 //    : AbstractTest()
 {
     @Autowired
-    lateinit var wmsFeignClient: WmsFeignClient
+    lateinit var wmsClient: WmsClient
 
     @Autowired
     lateinit var stockService: StockService
@@ -32,7 +32,7 @@ class StockServiceTest(
 
     @Test
     fun feignClientTest() {
-        println(wmsFeignClient.getStocks(42L, listOf(3508,3506)))
+        println(wmsClient.getStocks(42L, listOf(3508,3506)))
     }
 
     @Test
