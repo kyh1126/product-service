@@ -1,7 +1,7 @@
 package com.smartfoodnet.fninventory.stock
 
 import com.smartfoodnet.apiclient.WmsApiClient
-import com.smartfoodnet.apiclient.response.StockByExpirationDate
+import com.smartfoodnet.apiclient.response.NosnosExpirationDateStockModel
 import com.smartfoodnet.common.model.request.PredicateSearchCondition
 import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.common.utils.Log
@@ -47,7 +47,7 @@ class StockService(
         val basicProducts = basicProductRepository.findAll(condition.toPredicate(), page)
         val basicProductStockModels = basicProducts.map { BasicProductStockModel.fromBasicProduct(it) }
 
-        val nosnosStocks = wmsApiClient.getStocks(
+        val nosnosStocks = wmsApiClient.getStocksFeign(
             partnerId = partnerId,
             shippingProductIds = basicProductStockModels.content.mapNotNull { it.shippingProductId }
         )
@@ -71,10 +71,20 @@ class StockService(
         return PageResponse.of(stockByBestBeforeModel)
     }
 
-    //TODO: 추후 상품 개수가 많아질 경우 파트너별로 잘라서 작업 고려
     fun syncStocksByBestBefore() {
+        val partnerIds =
+            basicProductRepository.getPartnerIdsFromBasicProduct(
+                EXPIRATION_DATEMANAGEMENT_YN,
+                IS_ACTIVE_YN
+            )
+
+        partnerIds?.forEach { syncStocksByBestBeforeByPartner(it) }
+    }
+
+    fun syncStocksByBestBeforeByPartner(partnerId: Long) {
         val basicProducts =
-            basicProductRepository.findByExpirationDateManagementYnAndActiveYn(
+            basicProductRepository.findByPartnerIdAndExpirationDateManagementYnAndActiveYn(
+                partnerId,
                 EXPIRATION_DATEMANAGEMENT_YN,
                 IS_ACTIVE_YN
             )
@@ -82,6 +92,7 @@ class StockService(
 
         basicProductsChunks.forEach { basicProductChunk ->
             val nosnosStocksByExpirationDate = wmsApiClient.getStocksByExpirationDate(
+                partnerId,
                 basicProductChunk.map { it.shippingProductId } as List<Long>
             )
 
@@ -99,15 +110,13 @@ class StockService(
 
                 val orderCount = orderService.getOrderCountByProductIdAndStatus(basicProduct.id!!, OrderStatus.NEW) ?: 0
 
-                nosnosStockByExpirationDate.stocksByExpirationDate?.forEach { stockByExpirationDate ->
-                    val stockByBestBefore = buildStockByBestBefore(
-                        basicProduct,
-                        stockByExpirationDate,
-                        orderCount
-                    )
+                val stockByBestBefore = buildStockByBestBefore(
+                    basicProduct,
+                    nosnosStockByExpirationDate,
+                    orderCount
+                )
 
-                    stocksByBestBefore.add(stockByBestBefore)
-                }
+                stocksByBestBefore.add(stockByBestBefore)
             }
 
             stockByBestBeforeRepository.saveAll(stocksByBestBefore)
@@ -116,11 +125,11 @@ class StockService(
 
     private fun buildStockByBestBefore(
         basicProduct: BasicProduct,
-        stockByExpirationDate: StockByExpirationDate,
+        nosnosStockByExpirationDate: NosnosExpirationDateStockModel,
         orderCount: Int
     ): StockByBestBefore {
         val manufacturedDate = basicProduct.expirationDateInfo?.expirationDate?.toLong()?.let {
-            stockByExpirationDate.expirationDate?.minusDays(it)
+            nosnosStockByExpirationDate.expirationDate?.minusDays(it)
         }
 
         return StockByBestBefore(
@@ -128,13 +137,13 @@ class StockService(
             basicProduct = basicProduct,
             shippingProductId = basicProduct.shippingProductId!!,
             bestBefore = calculateBestBefore(
-                stockByExpirationDate.expirationDate!!,
+                nosnosStockByExpirationDate.expirationDate!!,
                 basicProduct.expirationDateInfo!!.expirationDate!!
             ),
             manufactureDate = manufacturedDate,
-            expirationDate = stockByExpirationDate.expirationDate,
-            totalStockCount = null,
-            availableStockCount = stockByExpirationDate.normalStock,
+            expirationDate = nosnosStockByExpirationDate.expirationDate,
+            totalStockCount = nosnosStockByExpirationDate.totalStock,
+            availableStockCount = nosnosStockByExpirationDate.normalStock,
             totalNewOrdersCount = orderCount,
             collectedDate = LocalDate.now()
         )
@@ -142,7 +151,8 @@ class StockService(
 
     private fun calculateBestBefore(expirationDate: LocalDateTime, manufacturedBefore: Int): Float {
         val today = LocalDateTime.now()
-        val duration = Duration.between(today.toLocalDate().atStartOfDay(), expirationDate.toLocalDate().atStartOfDay()).toDays()
+        val duration =
+            Duration.between(today.toLocalDate().atStartOfDay(), expirationDate.toLocalDate().atStartOfDay()).toDays()
 
         if (duration < 0)
             return 0f

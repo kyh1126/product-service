@@ -9,7 +9,6 @@ import com.smartfoodnet.fnproduct.order.model.OrderStatus
 import com.smartfoodnet.fnproduct.product.entity.QBasicProduct.basicProduct
 
 class OrderDetailRepositoryImpl : Querydsl4RepositorySupport(OrderDetail::class.java), OrderDetailCustom {
-
     override fun findAllByPartnerIdAndStatusGroupByProductId(
         partnerId: Long,
         status: OrderStatus
@@ -40,5 +39,4 @@ class OrderDetailRepositoryImpl : Querydsl4RepositorySupport(OrderDetail::class.
             .groupBy(basicProduct.id)
             .fetchOne()
     }
-
 }

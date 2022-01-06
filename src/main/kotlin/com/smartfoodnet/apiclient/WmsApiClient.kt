@@ -14,10 +14,12 @@ import org.springframework.web.util.UriComponentsBuilder
 @Component
 class WmsApiClient(
     @Value("\${sfn.service.fn-warehouse-management-service}") override val host: String,
-    override val restTemplate: RestTemplate
+    override val restTemplate: RestTemplate,
+    private val feignClient: WmsFeignClient
 ) : RestTemplateClient(host, restTemplate) {
-    fun getStocksByExpirationDate(shippingProductIds: List<Long>): List<NosnosExpirationDateStockModel>? {
-        val uriBuilder = UriComponentsBuilder.fromUriString("/stocks_by_best_before")
+    fun getStocksByExpirationDate(partnerId: Long, shippingProductIds: List<Long>): List<NosnosExpirationDateStockModel>? {
+        val uriBuilder = UriComponentsBuilder.fromUriString("/stock/expire")
+            .queryParam("memberId", partnerId)
             .queryParam("shippingProductIds", shippingProductIds)
 
         val uri = uriBuilder.build().toString()
@@ -37,6 +39,21 @@ class WmsApiClient(
 
         val uri = uriBuilder.build().toString()
         val stocksDataModel = getSimple<CommonDataListModel<NosnosStockModel>>(uri = uri)
+        return objectMapper.convertValue(
+            stocksDataModel?.dataList,
+            object : TypeReference<List<NosnosStockModel>>() {})
+    }
+
+    fun getStocksFeign(partnerId: Long, shippingProductIds: List<Long?>?): List<NosnosStockModel>? {
+        var uriBuilder =
+            UriComponentsBuilder.fromUriString("/stock").queryParam("memberId", partnerId)
+
+        if (shippingProductIds != null) {
+            uriBuilder = uriBuilder.queryParam("shippingProductIds", shippingProductIds)
+        }
+
+        val uri = uriBuilder.build().toString()
+        val stocksDataModel = feignClient.getStocks(partnerId, shippingProductIds).payload
         return objectMapper.convertValue(
             stocksDataModel?.dataList,
             object : TypeReference<List<NosnosStockModel>>() {})

@@ -70,3 +70,16 @@ sqs:
     fn-product:
       basic-product-created:
         name: ${SQS_BASIC_PRODUCT_CREATED_NAME:uninitialized}
+
+
+feign:
+  httpclient:
+    enabled: true
+    max-connections: 200
+    max-connections-per-route: 150
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 10000
+        loggerLevel: full

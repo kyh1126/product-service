@@ -26,9 +26,9 @@ class ShortageService(
         val productShortageModels = mutableListOf<ProductShortageModel>()
 
         nosnosStocks.forEach {
-            val shortageProjection = shortageProjections.filter { projection ->
+            val shortageProjection = shortageProjections.firstOrNull { projection ->
                 projection.shippingProductId?.equals(it.shippingProductId) ?: false
-            }.firstOrNull() ?: return@forEach
+            } ?: return@forEach
 
             if ((shortageProjection.totalOrderCount ?: 0) > it.normalStock!!) {
                 productShortageModels.add(
