@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming
 import com.smartfoodnet.apiclient.dto.AddBarcode
 import com.smartfoodnet.common.convertYnToInt
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
+import com.smartfoodnet.fnproduct.product.model.vo.BasicProductPackageType
 import io.swagger.annotations.ApiModelProperty
 
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy::class)
@@ -52,8 +53,7 @@ data class PreShippingProductModel(
                     memberId = partnerId!!,
                     productCode = code,
                     productName = name!!,
-                    // TODO: 단수(포장)여부로 못 넣는듯, 0, 1 둘다 먹지 않는다. 확인 후 제거 or fix 예정 (https://smartfoodnet.atlassian.net/jira/software/c/projects/FSE/boards/15/backlog?view=detail&selectedIssue=FSE-737&quickFilter=23&issueLimit=100)
-                    categoryId = null,//convertYnToInt(singlePackagingYn),
+                    manageCode1 = BasicProductPackageType.fromSinglePackagingYn(singlePackagingYn).text,
                     upc = barcode,
                     singleEta = piecesPerBox,
                     paletCount = piecesPerPalette,
