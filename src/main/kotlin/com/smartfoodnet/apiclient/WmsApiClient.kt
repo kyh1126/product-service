@@ -1,6 +1,7 @@
 package com.smartfoodnet.apiclient
 
 import com.fasterxml.jackson.core.type.TypeReference
+import com.smartfoodnet.apiclient.request.PreSalesProductModel
 import com.smartfoodnet.apiclient.request.PreShippingProductModel
 import com.smartfoodnet.apiclient.response.CommonDataListModel
 import com.smartfoodnet.apiclient.response.NosnosExpirationDateStockModel
@@ -48,5 +49,9 @@ class WmsApiClient(
 
     fun updateShippingProduct(shippingProductId: Long, preModel: PreShippingProductModel) {
         return put("/shipping/products/$shippingProductId", preModel)
+    }
+
+    fun updateSalesProduct(shippingProductId: Long, preModel: PreSalesProductModel) {
+        return put("/sales/products/$shippingProductId", preModel)
     }
 }

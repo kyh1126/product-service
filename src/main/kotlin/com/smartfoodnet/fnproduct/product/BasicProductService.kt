@@ -1,6 +1,7 @@
 package com.smartfoodnet.fnproduct.product
 
 import com.smartfoodnet.apiclient.WmsApiClient
+import com.smartfoodnet.apiclient.request.PreSalesProductModel
 import com.smartfoodnet.apiclient.request.PreShippingProductModel
 import com.smartfoodnet.common.error.SaveState
 import com.smartfoodnet.common.error.ValidatorUtils
@@ -220,6 +221,11 @@ class BasicProductService(
             wmsApiClient.updateShippingProduct(
                 basicProduct.shippingProductId!!,
                 PreShippingProductModel.fromEntity(basicProduct)
+            )
+
+            wmsApiClient.updateSalesProduct(
+                basicProduct.salesProductId!!,
+                PreSalesProductModel.fromEntity(basicProduct)
             )
         }
 
