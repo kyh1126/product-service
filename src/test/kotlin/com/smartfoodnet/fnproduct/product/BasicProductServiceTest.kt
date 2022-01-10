@@ -177,8 +177,8 @@ internal class BasicProductServiceTest(
             val postShippingProductModel = PostShippingProductModel(
                 shippingProductId = 1L,
                 productCode = basicProductCode!!,
-                salesProductId = null,
-                salesProductCode = null
+                salesProductId = 1L,
+                salesProductCode = basicProductCode
             )
             given(
                 wmsApiClient.createShippingProduct(
@@ -287,7 +287,9 @@ internal class BasicProductServiceTest(
             inWarehouse = warehouse
         ).apply {
             this.shippingProductId = 1L
+            this.salesProductId = 1L
             this.productCode = basicProductCode
+            this.salesProductCode = basicProductCode
         }
     }
 
