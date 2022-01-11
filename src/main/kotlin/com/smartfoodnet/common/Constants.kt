@@ -6,4 +6,5 @@ object Constants {
     const val DATE_FORMAT = "yyyy-MM-dd"
     const val TIMESTAMP_FORMAT = "yyyy-MM-dd HH:mm:ss"
     const val TIMEZONE = "Asia/Seoul"
+    const val NOSNOS_DATE_FORMAT = "yyyyMMdd"
 }

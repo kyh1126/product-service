@@ -4,6 +4,7 @@ import com.smartfoodnet.apiclient.WmsClient
 import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.fninventory.stock.StockService
 import com.smartfoodnet.fnproduct.product.model.request.BasicProductSearchCondition
+import org.junit.Ignore
 import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -14,6 +15,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestConstructor
 
+@Ignore
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(value = MethodOrderer.OrderAnnotation::class)

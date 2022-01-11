@@ -1,5 +1,6 @@
 package com.smartfoodnet.fninventory.stock
 
+import com.smartfoodnet.common.Constants
 import com.smartfoodnet.common.model.response.CommonResponse
 import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.fninventory.stock.model.BasicProductStockModel
@@ -12,7 +13,9 @@ import io.swagger.v3.oas.annotations.Parameter
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.web.PageableDefault
+import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.web.bind.annotation.*
+import java.time.LocalDate
 
 
 @Api(description = "재고 관련 API")
@@ -45,6 +48,18 @@ class StockController(
     ): PageResponse<StockByBestBeforeModel> {
         condition.apply { this.partnerId = partnerId }
         return stockService.getStocksByBestBefore(partnerId, condition, page)
+    }
+
+    @Operation(summary = "특정 상품별 최근 일주일 재고 이동 내역 리스트")
+    @GetMapping("move")
+    fun getStockMoveEvents(
+        @Parameter(description = "기본상품 ID")
+        @RequestParam basicProductId: Long,
+        @Parameter(description = "기준 날짜")
+        @DateTimeFormat(pattern = Constants.NOSNOS_DATE_FORMAT)
+        @RequestParam effectiveDate: LocalDate?
+    ): Any {
+        return stockService.getStockMoveEvents(basicProductId = basicProductId, effectiveDate = effectiveDate)
     }
 
     @Operation(summary = "상미기한별 재고 배치 작업")

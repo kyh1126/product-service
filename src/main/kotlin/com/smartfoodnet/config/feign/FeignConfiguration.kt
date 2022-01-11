@@ -1,7 +1,5 @@
 package com.smartfoodnet.config.feign
 
-import feign.QueryMapEncoder
-import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @Configuration
@@ -37,10 +35,10 @@ class FeignConfiguration{
     /**
      * query string snake case 적용
      */
-    @Bean
-    fun queryMapEncoder() : QueryMapEncoder{
-        return SnakeCaseQueryMap()
-    }
+//    @Bean
+//    fun queryMapEncoder() : QueryMapEncoder{
+//        return SnakeCaseQueryMap()
+//    }
 
     /**
      * 요청시 Header에 인증정보 추가
