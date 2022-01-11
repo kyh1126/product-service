@@ -29,7 +29,6 @@ class StockService(
     private val stockByBestBeforeRepository: StockByBestBeforeRepository,
     private val wmsApiClient: WmsApiClient,
     private val orderService: OrderService,
-    private val wmsApiClient: WmsApiClient
 ) {
     //유통기한 관리 여부
     private val EXPIRATION_DATEMANAGEMENT_YN = "Y"

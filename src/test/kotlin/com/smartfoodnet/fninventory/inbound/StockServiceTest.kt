@@ -4,16 +4,14 @@ import com.smartfoodnet.apiclient.WmsApiClient
 import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.fninventory.stock.StockService
 import com.smartfoodnet.fnproduct.product.model.request.BasicProductSearchCondition
-import org.junit.jupiter.api.MethodOrderer
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.TestMethodOrder
+import org.junit.jupiter.api.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.PageRequest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestConstructor
 
+@Disabled
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(value = MethodOrderer.OrderAnnotation::class)
