@@ -54,6 +54,7 @@ data class PreShippingProductModel(
                     productCode = code,
                     productName = name!!,
                     manageCode1 = BasicProductPackageType.fromSinglePackagingYn(singlePackagingYn).text,
+                    manageCode2 = handlingTemperature?.desc,
                     upc = barcode,
                     singleEta = piecesPerBox,
                     paletCount = piecesPerPalette,

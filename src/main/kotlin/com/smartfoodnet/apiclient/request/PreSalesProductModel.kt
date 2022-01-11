@@ -27,8 +27,8 @@ data class PreSalesProductModel(
                 PreSalesProductModel(
                     memberId = partnerId!!,
                     salesProductCode = salesProductCode!!,
-                    // TODO: 출고상품이랑 sync 를 맞출지, 아니면 status 만 관리하는 식으로 수정할지 차후 결정 시 그 부분에 따라 재반영 예정
                     manageCode1 = BasicProductPackageType.fromSinglePackagingYn(singlePackagingYn).text,
+                    manageCode2 = handlingTemperature?.desc,
                     productName = name!!,
                     status = convertYnToInt(activeYn),
                     useDisplayPeriod = convertYnToInt(expirationDateInfo?.expirationDateWriteYn),
