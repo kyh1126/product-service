@@ -30,7 +30,7 @@ class ShortageController (
     @GetMapping("test/tttt")
     fun gettest(){
         println(OrderStatus.NEW)
-        val aa = orderDetailRepository.findAllByPartnerIdAndStatusGroupByProductId(104,OrderStatus.NEW)
+        val aa = orderDetailRepository.getCountByProductIdAndStatusGroupByProductId(38,OrderStatus.NEW)
         println(aa.toString())
 
     }

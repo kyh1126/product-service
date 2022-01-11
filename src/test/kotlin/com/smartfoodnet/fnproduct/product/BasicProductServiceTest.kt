@@ -1,5 +1,6 @@
 package com.smartfoodnet.fnproduct.product
 
+import com.smartfoodnet.apiclient.CommonResponse
 import com.smartfoodnet.apiclient.WmsApiClient
 import com.smartfoodnet.apiclient.request.PreShippingProductModel
 import com.smartfoodnet.apiclient.response.PostShippingProductModel
@@ -184,7 +185,7 @@ internal class BasicProductServiceTest(
                 wmsApiClient.createShippingProduct(
                     PreShippingProductModel.fromEntity(mockBasicProduct)
                 )
-            ).willReturn(postShippingProductModel)
+            ).willReturn(CommonResponse(postShippingProductModel))
             given(basicProductRepository.save(any())).willReturn(mockBasicProduct)
             given(basicProductRepository.findById(productId))
                 .willReturn(Optional.of(mockBasicProduct))

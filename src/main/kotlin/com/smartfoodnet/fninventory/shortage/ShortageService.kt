@@ -18,7 +18,8 @@ class ShortageService(
 
     fun getProductShortages(partnerId: Long): List<ProductShortageModel> {
         val shortageProjections =
-            orderService.getShortageProjectionModel(partnerId = partnerId, status = OrderStatus.NEW) ?: return listOf()
+            orderService.getShortageProjectionModel(partnerId = partnerId, status = OrderStatus.NEW)
+                ?: return listOf()
         val shippingProductIds = shortageProjections.map { it.shippingProductId }
 
         val nosnosStocks = getNosnosStocksByChunk(partnerId, shippingProductIds)
@@ -26,13 +27,16 @@ class ShortageService(
         val productShortageModels = mutableListOf<ProductShortageModel>()
 
         nosnosStocks.forEach {
-            val shortageProjection = shortageProjections.filter { projection ->
+            val shortageProjection = shortageProjections.firstOrNull { projection ->
                 projection.shippingProductId?.equals(it.shippingProductId) ?: false
-            }.firstOrNull() ?: return@forEach
+            } ?: return@forEach
 
             if ((shortageProjection.totalOrderCount ?: 0) > it.normalStock!!) {
                 productShortageModels.add(
                     ProductShortageModel(
+                        basicProductId = shortageProjection.basicProductId,
+                        basicProductName = shortageProjection.basicProductName,
+                        basicProductCode = shortageProjection.basicProductCode,
                         availableStockCount = it.normalStock,
                         shortageCount = shortageProjection.totalOrderCount?.minus(it.normalStock),
                         shortageOrderCount = shortageProjection.shortageOrderCount?.toInt(),
@@ -46,7 +50,10 @@ class ShortageService(
         return productShortageModels
     }
 
-    private fun getNosnosStocksByChunk(partnerId: Long, shippingProductIds: List<Long?>): List<NosnosStockModel> {
+    private fun getNosnosStocksByChunk(
+        partnerId: Long,
+        shippingProductIds: List<Long?>
+    ): List<NosnosStockModel> {
         val nosnosStocks = mutableListOf<NosnosStockModel>()
 
         val arrShippingProductIds = shippingProductIds.chunked(API_CALL_LIST_SIZE)
@@ -54,7 +61,7 @@ class ShortageService(
             val stocks = wmsApiClient.getStocks(
                 partnerId = partnerId,
                 shippingProductIds = idChunks
-            ) ?: listOf()
+            ).payload?.dataList ?: listOf()
 
             nosnosStocks.addAll(stocks)
         }

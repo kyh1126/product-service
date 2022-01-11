@@ -4,8 +4,6 @@ import com.smartfoodnet.fninventory.inbound.model.dto.GetInboundParent
 import com.smartfoodnet.fninventory.inbound.model.vo.InboundStatusType
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
-import java.util.stream.Collectors
-import java.util.stream.Collectors.toList
 import kotlin.streams.toList
 
 class CodeTest {
@@ -22,5 +20,17 @@ class CodeTest {
         }.toList()
 
         println(list1)
+    }
+
+    @Test
+    fun chunkTest() {
+        val list = mutableListOf<Int>()
+        for (i in 0 .. 10) {
+            list.add(i)
+        }
+
+        val chunk = list.chunked(100)
+
+        println(chunk)
     }
 }

@@ -1,57 +1,44 @@
 package com.smartfoodnet.apiclient
 
-import com.fasterxml.jackson.core.type.TypeReference
 import com.smartfoodnet.apiclient.request.PreSalesProductModel
 import com.smartfoodnet.apiclient.request.PreShippingProductModel
 import com.smartfoodnet.apiclient.response.CommonDataListModel
 import com.smartfoodnet.apiclient.response.NosnosExpirationDateStockModel
 import com.smartfoodnet.apiclient.response.NosnosStockModel
 import com.smartfoodnet.apiclient.response.PostShippingProductModel
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.stereotype.Component
-import org.springframework.web.client.RestTemplate
-import org.springframework.web.util.UriComponentsBuilder
+import org.springframework.cloud.openfeign.FeignClient
+import org.springframework.web.bind.annotation.*
 
-@Component
-class WmsApiClient(
-    @Value("\${sfn.service.fn-warehouse-management-service}") override val host: String,
-    override val restTemplate: RestTemplate
-) : RestTemplateClient(host, restTemplate) {
-    fun getStocksByExpirationDate(shippingProductIds: List<Long>): List<NosnosExpirationDateStockModel>? {
-        val uriBuilder = UriComponentsBuilder.fromUriString("/stocks_by_best_before")
-            .queryParam("shippingProductIds", shippingProductIds)
+@FeignClient(
+    name = "wmsApiClient",
+    url = "\${sfn.service.fn-warehouse-management-service}"
+)
+interface WmsApiClient {
+    @GetMapping("stock")
+    fun getStocks(
+        @RequestParam(name = "memberId") partnerId: Long,
+        @RequestParam shippingProductIds: List<Long?>?
+    ): CommonResponse<CommonDataListModel<NosnosStockModel>>
 
-        val uri = uriBuilder.build().toString()
-        val stocksDataModel = getSimple<CommonDataListModel<NosnosStockModel>>(uri = uri)
-        return objectMapper.convertValue(
-            stocksDataModel?.dataList,
-            object : TypeReference<List<NosnosExpirationDateStockModel>>() {})
-    }
+    @GetMapping("/stock/expire")
+    fun getStocksByExpirationDate(
+        @RequestParam(name = "memberId") partnerId: Long,
+        @RequestParam shippingProductIds: List<Long?>?
+    ): CommonResponse<CommonDataListModel<NosnosExpirationDateStockModel>>
 
-    fun getStocks(partnerId: Long, shippingProductIds: List<Long?>?): List<NosnosStockModel>? {
-        var uriBuilder =
-            UriComponentsBuilder.fromUriString("/stock").queryParam("memberId", partnerId)
+    @PostMapping("shipping/products")
+    fun createShippingProduct(preModel: PreShippingProductModel): CommonResponse<PostShippingProductModel>
 
-        if (shippingProductIds != null) {
-            uriBuilder = uriBuilder.queryParam("shippingProductIds", shippingProductIds)
-        }
+    @PutMapping("shipping/products/{shippingProductId}")
+    fun updateShippingProduct(
+        @PathVariable shippingProductId: Long,
+        preModel: PreShippingProductModel
+    )
 
-        val uri = uriBuilder.build().toString()
-        val stocksDataModel = getSimple<CommonDataListModel<NosnosStockModel>>(uri = uri)
-        return objectMapper.convertValue(
-            stocksDataModel?.dataList,
-            object : TypeReference<List<NosnosStockModel>>() {})
-    }
-
-    fun createShippingProduct(preModel: PreShippingProductModel): PostShippingProductModel? {
-        return post("/shipping/products", preModel)
-    }
-
-    fun updateShippingProduct(shippingProductId: Long, preModel: PreShippingProductModel) {
-        return put("/shipping/products/$shippingProductId", preModel)
-    }
-
-    fun updateSalesProduct(shippingProductId: Long, preModel: PreSalesProductModel) {
-        return put("/sales/products/$shippingProductId", preModel)
-    }
+    @PutMapping("sales/products/{salesProductId}")
+    fun updateSalesProduct(@PathVariable salesProductId: Long, preModel: PreSalesProductModel)
 }
+
+data class CommonResponse<T>(
+    val payload: T? = null,
+)

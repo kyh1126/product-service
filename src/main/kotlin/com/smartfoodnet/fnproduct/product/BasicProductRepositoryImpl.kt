@@ -20,4 +20,11 @@ class BasicProductRepositoryImpl : Querydsl4RepositorySupport(BasicProduct::clas
     private fun eqPartnerId(partnerId: Long?) = partnerId?.let { basicProduct.partnerId.eq(it) }
 
     private fun inType(types: Collection<BasicProductType>) = basicProduct.type.`in`(types)
+
+    override fun getPartnerIdsFromBasicProduct(expirationDateManagementYn: String, activeYn: String): List<Long>? {
+        return select(basicProduct.partnerId)
+            .from(basicProduct)
+            .groupBy(basicProduct.partnerId)
+            .fetch()
+    }
 }

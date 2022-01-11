@@ -12,11 +12,12 @@ data class NosnosExpirationDateStockModel(
     @ApiModelProperty(value = "출고상품 ID", example = "454")
     val shippingProductId: Long? = null,
 
-    @ApiModelProperty(value = "유통기한별 재고 리스트")
-    val stocksByExpirationDate: List<StockByExpirationDate>? = null
-)
-
-data class StockByExpirationDate(
+    @ApiModelProperty(value = "유통기한")
     val expirationDate: LocalDateTime? = null,
-    val normalStock: Int? = null
+
+    @ApiModelProperty(value = "가용재고")
+    val normalStock: Int? = null,
+
+    @ApiModelProperty(value = "총재고")
+    val totalStock: Int? = null
 )
