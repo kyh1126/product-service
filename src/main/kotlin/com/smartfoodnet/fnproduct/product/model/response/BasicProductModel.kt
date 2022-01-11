@@ -49,6 +49,9 @@ data class BasicProductModel(
     )
     var handlingTemperature: HandlingTemperatureType? = null,
 
+    @ApiModelProperty(value = "입고처 ID")
+    var warehouseId: Long? = null,
+
     @ApiModelProperty(value = "입고처명")
     var warehouseName: String? = null,
 
@@ -122,6 +125,7 @@ data class BasicProductModel(
                         SubsidiaryMaterialCategoryModel.fromEntity(it)
                     },
                     handlingTemperature = handlingTemperature,
+                    warehouseId = warehouse?.id,
                     warehouseName = warehouse?.name,
                     supplyPrice = supplyPrice,
                     singlePackagingYn = singlePackagingYn,
