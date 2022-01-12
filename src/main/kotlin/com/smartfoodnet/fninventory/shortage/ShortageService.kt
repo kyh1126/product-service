@@ -1,6 +1,6 @@
 package com.smartfoodnet.fninventory.shortage
 
-import com.smartfoodnet.apiclient.WmsClient
+import com.smartfoodnet.apiclient.WmsApiClient
 import com.smartfoodnet.apiclient.response.NosnosStockModel
 import com.smartfoodnet.fninventory.shortage.model.ProductShortageModel
 import com.smartfoodnet.fnproduct.order.OrderService
@@ -12,13 +12,14 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional(readOnly = true)
 class ShortageService(
     private val orderService: OrderService,
-    private val wmsClient: WmsClient
+    private val wmsApiClient: WmsApiClient
 ) {
     private val API_CALL_LIST_SIZE = 50
 
     fun getProductShortages(partnerId: Long): List<ProductShortageModel> {
         val shortageProjections =
-            orderService.getShortageProjectionModel(partnerId = partnerId, status = OrderStatus.NEW) ?: return listOf()
+            orderService.getShortageProjectionModel(partnerId = partnerId, status = OrderStatus.NEW)
+                ?: return listOf()
         val shippingProductIds = shortageProjections.map { it.shippingProductId }
 
         val nosnosStocks = getNosnosStocksByChunk(partnerId, shippingProductIds)
@@ -49,12 +50,15 @@ class ShortageService(
         return productShortageModels
     }
 
-    private fun getNosnosStocksByChunk(partnerId: Long, shippingProductIds: List<Long?>): List<NosnosStockModel> {
+    private fun getNosnosStocksByChunk(
+        partnerId: Long,
+        shippingProductIds: List<Long?>
+    ): List<NosnosStockModel> {
         val nosnosStocks = mutableListOf<NosnosStockModel>()
 
         val arrShippingProductIds = shippingProductIds.chunked(API_CALL_LIST_SIZE)
         arrShippingProductIds.forEach { idChunks ->
-            val stocks = wmsClient.getStocks(
+            val stocks = wmsApiClient.getStocks(
                 partnerId = partnerId,
                 shippingProductIds = idChunks
             ).payload?.dataList ?: listOf()

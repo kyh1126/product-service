@@ -1,29 +1,25 @@
 package com.smartfoodnet.fninventory.inbound
 
-import com.smartfoodnet.apiclient.WmsClient
+import com.smartfoodnet.apiclient.WmsApiClient
 import com.smartfoodnet.apiclient.request.InboundWorkReadModel
 import com.smartfoodnet.apiclient.response.CommonDataListModel
 import com.smartfoodnet.apiclient.response.GetInboundWorkModel
 import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.fninventory.inbound.model.dto.GetInbound
-import com.smartfoodnet.fninventory.inbound.model.dto.GetInboundParent
 import com.smartfoodnet.fninventory.inbound.model.request.InboundCreateModel
 import com.smartfoodnet.fninventory.inbound.model.request.InboundSearchCondition
 import com.smartfoodnet.fnproduct.product.BasicProductRepository
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import kotlin.math.exp
-import kotlin.streams.toList
 
 @Service
 @Transactional(readOnly = true)
 class InboundService(
     val inboundRepository: InboundRepository,
     val basicProductRepository: BasicProductRepository,
-    val wmsClient: WmsClient
+    val wmsApiClient: WmsApiClient
 ) : Log {
 
     @Transactional
@@ -70,7 +66,7 @@ class InboundService(
             page = page
         )
 
-        return wmsClient.getInboundWork(params).payload
+        return wmsApiClient.getInboundWork(params).payload
     }
 
 }

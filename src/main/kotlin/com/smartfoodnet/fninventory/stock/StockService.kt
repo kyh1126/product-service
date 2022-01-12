@@ -1,7 +1,6 @@
 package com.smartfoodnet.fninventory.stock
 
 import com.smartfoodnet.apiclient.WmsApiClient
-import com.smartfoodnet.apiclient.WmsClient
 import com.smartfoodnet.apiclient.response.NosnosExpirationDateStockModel
 import com.smartfoodnet.common.model.request.PredicateSearchCondition
 import com.smartfoodnet.common.model.response.PageResponse
@@ -30,7 +29,6 @@ class StockService(
     private val stockByBestBeforeRepository: StockByBestBeforeRepository,
     private val wmsApiClient: WmsApiClient,
     private val orderService: OrderService,
-    private val wmsClient: WmsClient
 ) {
     //유통기한 관리 여부
     private val EXPIRATION_DATEMANAGEMENT_YN = "Y"
@@ -47,15 +45,17 @@ class StockService(
         page: Pageable
     ): PageResponse<BasicProductStockModel> {
         val basicProducts = basicProductRepository.findAll(condition.toPredicate(), page)
-        val basicProductStockModels = basicProducts.map { BasicProductStockModel.fromBasicProduct(it) }
+        val basicProductStockModels =
+            basicProducts.map { BasicProductStockModel.fromBasicProduct(it) }
 
-        val nosnosStocks = wmsClient.getStocks(
+        val nosnosStocks = wmsApiClient.getStocks(
             partnerId = partnerId,
             shippingProductIds = basicProductStockModels.content.mapNotNull { it.shippingProductId }
         ).payload?.dataList ?: listOf()
 
         basicProductStockModels.forEach { model ->
-            val nosnosStock = nosnosStocks.firstOrNull { it.shippingProductId == model.shippingProductId }
+            val nosnosStock =
+                nosnosStocks.firstOrNull { it.shippingProductId == model.shippingProductId }
             nosnosStock?.let { model.fillInNosnosStockValues(nosnosStock) }
         }
 
@@ -68,7 +68,8 @@ class StockService(
         page: Pageable
     ): PageResponse<StockByBestBeforeModel> {
         val stocksByBestBefore = stockByBestBeforeRepository.findAll(condition.toPredicate(), page)
-        val stockByBestBeforeModel = stocksByBestBefore.map { StockByBestBeforeModel.fromStockByBestBefore(it) }
+        val stockByBestBeforeModel =
+            stocksByBestBefore.map { StockByBestBeforeModel.fromStockByBestBefore(it) }
 
         return PageResponse.of(stockByBestBeforeModel)
     }
@@ -93,7 +94,7 @@ class StockService(
         val basicProductsChunks = basicProducts?.chunked(API_CALL_LIST_SIZE) ?: return
 
         basicProductsChunks.forEach { basicProductChunk ->
-            val nosnosStocksByExpirationDate = wmsClient.getStocksByExpirationDate(
+            val nosnosStocksByExpirationDate = wmsApiClient.getStocksByExpirationDate(
                 partnerId,
                 basicProductChunk.map { it.shippingProductId } as List<Long>
             ).payload?.dataList ?: listOf()
@@ -102,7 +103,8 @@ class StockService(
 
             nosnosStocksByExpirationDate.forEach { nosnosStockByExpirationDate ->
                 val basicProduct = basicProductChunk.find {
-                    it.shippingProductId?.equals(nosnosStockByExpirationDate.shippingProductId) ?: false
+                    it.shippingProductId?.equals(nosnosStockByExpirationDate.shippingProductId)
+                        ?: false
                 }
 
                 if (basicProduct == null) {
@@ -110,7 +112,10 @@ class StockService(
                     return
                 }
 
-                val orderCount = orderService.getOrderCountByProductIdAndStatus(basicProduct.id!!, OrderStatus.NEW) ?: 0
+                val orderCount = orderService.getOrderCountByProductIdAndStatus(
+                    basicProduct.id!!,
+                    OrderStatus.NEW
+                ) ?: 0
 
                 val stockByBestBefore = buildStockByBestBefore(
                     basicProduct,
@@ -154,7 +159,10 @@ class StockService(
     private fun calculateBestBefore(expirationDate: LocalDateTime, manufacturedBefore: Int): Float {
         val today = LocalDateTime.now()
         val duration =
-            Duration.between(today.toLocalDate().atStartOfDay(), expirationDate.toLocalDate().atStartOfDay()).toDays()
+            Duration.between(
+                today.toLocalDate().atStartOfDay(),
+                expirationDate.toLocalDate().atStartOfDay()
+            ).toDays()
 
         if (duration < 0)
             return 0f

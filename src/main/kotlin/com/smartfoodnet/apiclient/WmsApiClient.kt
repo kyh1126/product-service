@@ -1,21 +1,49 @@
 package com.smartfoodnet.apiclient
 
+import com.smartfoodnet.apiclient.request.InboundWorkReadModel
+import com.smartfoodnet.apiclient.request.PreSalesProductModel
 import com.smartfoodnet.apiclient.request.PreShippingProductModel
-import com.smartfoodnet.apiclient.response.PostShippingProductModel
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.stereotype.Component
-import org.springframework.web.client.RestTemplate
+import com.smartfoodnet.apiclient.response.*
+import org.springframework.cloud.openfeign.FeignClient
+import org.springframework.cloud.openfeign.SpringQueryMap
+import org.springframework.web.bind.annotation.*
 
-@Component
-class WmsApiClient(
-    @Value("\${sfn.service.fn-warehouse-management-service}") override val host: String,
-    override val restTemplate: RestTemplate
-) : RestTemplateClient(host, restTemplate) {
-    fun createShippingProduct(preModel: PreShippingProductModel): PostShippingProductModel? {
-        return post("/shipping/products", preModel)
-    }
+@FeignClient(
+    name = "wmsApiClient",
+    url = "\${sfn.service.fn-warehouse-management-service}"
+)
+interface WmsApiClient {
+    @GetMapping("stock")
+    fun getStocks(
+        @RequestParam(name = "memberId") partnerId: Long,
+        @RequestParam shippingProductIds: List<Long?>?
+    ): CommonResponse<CommonDataListModel<NosnosStockModel>>
 
-    fun updateShippingProduct(shippingProductId: Long, preModel: PreShippingProductModel) {
-        return put("/shipping/products/$shippingProductId", preModel)
-    }
+    @GetMapping("/stock/expire")
+    fun getStocksByExpirationDate(
+        @RequestParam(name = "memberId") partnerId: Long,
+        @RequestParam shippingProductIds: List<Long?>?
+    ): CommonResponse<CommonDataListModel<NosnosExpirationDateStockModel>>
+
+    @PostMapping("shipping/products")
+    fun createShippingProduct(preModel: PreShippingProductModel): CommonResponse<PostShippingProductModel>
+
+    @PutMapping("shipping/products/{shippingProductId}")
+    fun updateShippingProduct(
+        @PathVariable shippingProductId: Long,
+        preModel: PreShippingProductModel
+    )
+
+    @PutMapping("sales/products/{salesProductId}")
+    fun updateSalesProduct(@PathVariable salesProductId: Long, preModel: PreSalesProductModel)
+
+    @GetMapping("inventory/inbounds/work")
+    fun getInboundWork(
+        @SpringQueryMap inboundWorkReadModel : InboundWorkReadModel
+    ) : CommonResponse<CommonDataListModel<GetInboundWorkModel>>
+
 }
+
+data class CommonResponse<T>(
+    val payload: T? = null,
+)

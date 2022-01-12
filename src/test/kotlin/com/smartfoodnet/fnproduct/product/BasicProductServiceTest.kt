@@ -1,5 +1,6 @@
 package com.smartfoodnet.fnproduct.product
 
+import com.smartfoodnet.apiclient.CommonResponse
 import com.smartfoodnet.apiclient.WmsApiClient
 import com.smartfoodnet.apiclient.request.PreShippingProductModel
 import com.smartfoodnet.apiclient.response.PostShippingProductModel
@@ -177,14 +178,14 @@ internal class BasicProductServiceTest(
             val postShippingProductModel = PostShippingProductModel(
                 shippingProductId = 1L,
                 productCode = basicProductCode!!,
-                salesProductId = null,
-                salesProductCode = null
+                salesProductId = 1L,
+                salesProductCode = basicProductCode
             )
             given(
                 wmsApiClient.createShippingProduct(
                     PreShippingProductModel.fromEntity(mockBasicProduct)
                 )
-            ).willReturn(postShippingProductModel)
+            ).willReturn(CommonResponse(postShippingProductModel))
             given(basicProductRepository.save(any())).willReturn(mockBasicProduct)
             given(basicProductRepository.findById(productId))
                 .willReturn(Optional.of(mockBasicProduct))
@@ -287,7 +288,9 @@ internal class BasicProductServiceTest(
             inWarehouse = warehouse
         ).apply {
             this.shippingProductId = 1L
+            this.salesProductId = 1L
             this.productCode = basicProductCode
+            this.salesProductCode = basicProductCode
         }
     }
 

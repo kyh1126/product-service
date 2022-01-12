@@ -1,6 +1,6 @@
 package com.smartfoodnet.fninventory.inbound
 
-import com.smartfoodnet.apiclient.WmsClient
+import com.smartfoodnet.apiclient.WmsApiClient
 import com.smartfoodnet.apiclient.request.InboundWorkReadModel
 import com.smartfoodnet.apiclient.response.CommonDataListModel
 import com.smartfoodnet.apiclient.response.GetInboundWorkModel
@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class InboundJobService(
-    val wmsClient: WmsClient,
+    val wmsApiClient: WmsApiClient,
     val inboundUnplannedRepository: InboundUnplannedRepository,
     val inboundRepository: InboundRepository
 ) : Log{
@@ -38,7 +38,7 @@ class InboundJobService(
             endDt = basicDt,
             page = page
         )
-        return wmsClient.getInboundWork(params).payload!!
+        return wmsApiClient.getInboundWork(params).payload!!
     }
 
     private fun inboundWorkProcess(partnerId: Long, dataList: List<GetInboundWorkModel>){

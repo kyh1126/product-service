@@ -1,6 +1,7 @@
 package com.smartfoodnet.fnproduct.product
 
 import com.smartfoodnet.apiclient.WmsApiClient
+import com.smartfoodnet.apiclient.request.PreSalesProductModel
 import com.smartfoodnet.apiclient.request.PreShippingProductModel
 import com.smartfoodnet.common.error.SaveState
 import com.smartfoodnet.common.error.ValidatorUtils
@@ -157,7 +158,7 @@ class BasicProductService(
                 // nosnos 쪽 출고상품, 판매상품 생성
                 if (it.type in nosnosCallBasicProductType) {
                     val createShippingProduct =
-                        wmsApiClient.createShippingProduct(PreShippingProductModel.fromEntity(it))
+                        wmsApiClient.createShippingProduct(PreShippingProductModel.fromEntity(it)).payload
                             ?: throw BaseRuntimeException(errorMessage = "출고상품 생성 실패, 상품코드 : ${it.code}")
 
                     with(createShippingProduct) {
@@ -220,6 +221,11 @@ class BasicProductService(
             wmsApiClient.updateShippingProduct(
                 basicProduct.shippingProductId!!,
                 PreShippingProductModel.fromEntity(basicProduct)
+            )
+
+            wmsApiClient.updateSalesProduct(
+                basicProduct.salesProductId!!,
+                PreSalesProductModel.fromEntity(basicProduct)
             )
         }
 
