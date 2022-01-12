@@ -3,10 +3,10 @@ package com.smartfoodnet.fnproduct.product
 import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.fnproduct.product.model.request.BasicProductDetailCreateModel
 import com.smartfoodnet.fnproduct.product.model.request.BasicProductSearchCondition
+import com.smartfoodnet.fnproduct.product.model.request.SubsidiaryMaterialSearchCondition
 import com.smartfoodnet.fnproduct.product.model.response.BasicProductDetailModel
 import com.smartfoodnet.fnproduct.product.model.response.BasicProductModel
 import com.smartfoodnet.fnproduct.product.model.response.CategoryByLevelModel
-import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import io.swagger.annotations.Api
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -34,15 +34,14 @@ class BasicProductController(private val basicProductService: BasicProductServic
         return basicProductService.getBasicProducts(condition, page)
     }
 
-    @Operation(summary = "공통 부자재 리스트 조회")
+    @Operation(summary = "부자재 리스트 조회")
     @GetMapping("sub")
-    fun getBasicProductsSub(
+    fun getSubsidiaryMaterials(
+        @Parameter(description = "검색조건")
+        @ModelAttribute condition: SubsidiaryMaterialSearchCondition,
         @PageableDefault(size = 50, sort = ["id"], direction = Sort.Direction.DESC) page: Pageable,
     ): List<CategoryByLevelModel> {
-        val searchCondition =
-            BasicProductSearchCondition().apply { types = setOf(BasicProductType.SUB) }
-
-        return basicProductService.getBasicProductSubs(condition = searchCondition, page = page)
+        return basicProductService.getSubsidiaryMaterials(condition = condition, page = page)
     }
 
     @Operation(summary = "기본상품 상세 조회")
