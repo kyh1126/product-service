@@ -31,7 +31,6 @@ data class PreSalesProductModel(
                     manageCode2 = handlingTemperature?.desc,
                     productName = name!!,
                     status = convertYnToInt(activeYn),
-                    useDisplayPeriod = convertYnToInt(expirationDateInfo?.expirationDateWriteYn),
                 )
             }
         }
