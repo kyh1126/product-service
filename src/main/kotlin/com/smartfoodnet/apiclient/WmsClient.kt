@@ -1,9 +1,12 @@
 package com.smartfoodnet.apiclient
 
+import com.smartfoodnet.apiclient.request.InboundWorkReadModel
 import com.smartfoodnet.apiclient.response.CommonDataListModel
+import com.smartfoodnet.apiclient.response.GetInboundWorkModel
 import com.smartfoodnet.apiclient.response.NosnosExpirationDateStockModel
 import com.smartfoodnet.apiclient.response.NosnosStockModel
 import org.springframework.cloud.openfeign.FeignClient
+import org.springframework.cloud.openfeign.SpringQueryMap
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
 
@@ -23,6 +26,11 @@ interface WmsClient {
         @RequestParam(name = "memberId") partnerId: Long,
         @RequestParam shippingProductIds: List<Long?>?
     ): CommonResponse<CommonDataListModel<NosnosExpirationDateStockModel>>
+
+    @GetMapping("inventory/inbounds/work")
+    fun getInboundWork(
+        @SpringQueryMap inboundWorkReadModel : InboundWorkReadModel
+    ) : CommonResponse<CommonDataListModel<GetInboundWorkModel>>
 
 }
 

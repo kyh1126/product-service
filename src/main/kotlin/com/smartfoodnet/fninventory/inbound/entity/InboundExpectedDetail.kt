@@ -18,8 +18,8 @@ class InboundExpectedDetail(
     @JoinColumn(name = "inbound_id")
     var inbound: Inbound? = null,
 
-    @OneToMany(mappedBy = "inboundExpectedDetail")
-    val inboundActualDetail: List<InboundActualDetail>? = null,
+    @OneToMany(mappedBy = "inboundExpectedDetail", cascade = [CascadeType.PERSIST])
+    val inboundActualDetail: MutableList<InboundActualDetail>? = mutableListOf(),
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "basic_product_id", columnDefinition = "BIGINT UNSIGNED")

@@ -13,4 +13,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import org.springframework.data.querydsl.QuerydslPredicateExecutor
 import java.util.*
 
-interface InboundRepository: JpaRepository<Inbound, Long>, InboundRepositoryCustom, QuerydslPredicateExecutor<Inbound>
+interface InboundRepository: JpaRepository<Inbound, Long>, InboundRepositoryCustom, QuerydslPredicateExecutor<Inbound>{
+    @EntityGraph(attributePaths = ["expectedList", "expectedList.basicProduct"])
+    fun findByRegistrationId(receivingPlanId : Long) : Optional<Inbound>
+}

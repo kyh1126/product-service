@@ -19,6 +19,7 @@ data class GetInboundParent @QueryProjection constructor(
     val basicProductCode: String? = null,
     val basicProductName : String? = null,
     val inboundMethod: InboundMethodType? = null,
+    @JsonFormat(pattern = Constants.TIMESTAMP_FORMAT)
     val inboundExpectedDate: LocalDateTime? = null,
     val requestQuantity: Long? = null
 )
