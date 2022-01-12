@@ -120,6 +120,7 @@ class BasicProduct(
         piecesPerBox = request.piecesPerBox
         piecesPerPalette = request.piecesPerPalette
         imageUrl = request.imageUrl
+        activeYn = request.activeYn
 
         // 단방향
         basicProductCategory = basicProductCategoryRequest
