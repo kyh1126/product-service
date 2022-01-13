@@ -58,13 +58,42 @@ data class PreShippingProductModel(
                     upc = barcode,
                     singleEta = piecesPerBox,
                     paletCount = piecesPerPalette,
-                    useExpireDate = convertYnToInt(expirationDateInfo?.expirationDateWriteYn),
-                    expireDateByMakeDate = expirationDateInfo?.expirationDate,
-                    useMakeDate = convertYnToInt(expirationDateInfo?.manufactureDateWriteYn),
+                    useExpireDate = convertWithExpirationDateManagementYn(
+                        expirationDateManagementYn,
+                        expirationDateInfo?.expirationDateWriteYn
+                    ),
+                    expireDateByMakeDate = convertWithExpirationDateManagementYn(
+                        expirationDateManagementYn,
+                        expirationDateInfo?.expirationDate
+                    ),
+                    useMakeDate = convertWithExpirationDateManagementYn(
+                        expirationDateManagementYn,
+                        expirationDateInfo?.manufactureDateWriteYn
+                    ),
                     status = convertYnToInt(activeYn),
                     addSalesProduct = 1
                 )
             }
+        }
+
+        private fun convertWithExpirationDateManagementYn(
+            expirationDateManagementYn: String,
+            yn: String?
+        ): Int {
+            if (expirationDateManagementYn == "N") {
+                return 0
+            }
+            return convertYnToInt(yn)
+        }
+
+        private fun convertWithExpirationDateManagementYn(
+            expirationDateManagementYn: String,
+            yn: Int?
+        ): Int {
+            if (expirationDateManagementYn == "N") {
+                return 0
+            }
+            return yn ?: 0
         }
     }
 }

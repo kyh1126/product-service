@@ -10,11 +10,12 @@ data class CategoryDto(
     companion object {
         fun fromEntity(categoryId: Long?, category: Code?): CategoryDto? {
             return category?.run {
-                CategoryDto(
-                    value = categoryId,
-                    label = keyName
-                )
+                CategoryDto(value = categoryId, label = keyName)
             }
+        }
+
+        fun from(categoryId: Long?, name: String?): CategoryDto {
+            return CategoryDto(value = categoryId, label = name)
         }
     }
 }

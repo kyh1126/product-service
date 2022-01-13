@@ -60,20 +60,34 @@ class BasicProductService(
         return basicProductRepository.findAllById(ids)
     }
 
-    fun getBasicProductSubs(
+    fun getSubsidiaryMaterials(
         condition: PredicateSearchCondition,
         page: Pageable
     ): List<CategoryByLevelModel> {
-        val basicProductSubIdsByCategoryId = getBasicProducts(condition, page).payload
-            .groupBy({ it.subsidiaryMaterialCategory!!.id!! }, { it.id })
+        val subsidiaryMaterials = getBasicProducts(condition, page).payload
+        val result = mutableListOf<CategoryByLevelModel>()
 
-        // level2 카테고리에 기본상품 id 를 넣어준다.
-        return getSubsidiaryMaterialCategories().map {
-            it.children.map {
-                it.value = basicProductSubIdsByCategoryId[it.value]?.first()
+        // 공통부자재
+        val subs = subsidiaryMaterials.filter { it.type == BasicProductType.SUB }
+        if (subs.isNotEmpty()) {
+            val subIdsByCategoryId =
+                subs.groupBy({ it.subsidiaryMaterialCategory!!.id!! }, { it.id })
+            val subModels = getSubsidiaryMaterialCategories().map {
+                // level2 카테고리에 기본상품 id 를 넣어준다.
+                it.children.map { it.value = subIdsByCategoryId[it.value]?.first() }
+                it
             }
-            it
+            result.addAll(subModels)
         }
+
+        // 고객전용부자재
+        val customSubs = subsidiaryMaterials.filter { it.type == BasicProductType.CUSTOM_SUB }
+        if (customSubs.isNotEmpty()) {
+            val customSubModels = CategoryByLevelModel.fromModel(customSubs)
+            result.add(customSubModels)
+        }
+
+        return result
     }
 
     fun getBasicProduct(productId: Long): BasicProductDetailModel {

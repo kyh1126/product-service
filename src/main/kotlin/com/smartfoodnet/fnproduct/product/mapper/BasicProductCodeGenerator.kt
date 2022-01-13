@@ -17,7 +17,8 @@ import org.springframework.transaction.annotation.Transactional
 class BasicProductCodeGenerator(
     private val basicProductRepository: BasicProductRepository,
 ) {
-    private val basicProductCodeTypes = setOf(BasicProductType.BASIC, BasicProductType.PACKAGE)
+    private val basicProductCodeTypes =
+        setOf(BasicProductType.BASIC, BasicProductType.PACKAGE, BasicProductType.CUSTOM_SUB)
 
     fun getBasicProductCode(
         partnerId: Long?,
