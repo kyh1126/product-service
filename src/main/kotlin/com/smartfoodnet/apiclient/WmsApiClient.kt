@@ -3,7 +3,6 @@ package com.smartfoodnet.apiclient
 import com.smartfoodnet.apiclient.request.PreSalesProductModel
 import com.smartfoodnet.apiclient.request.PreShippingProductModel
 import com.smartfoodnet.apiclient.response.*
-import io.swagger.annotations.ApiModelProperty
 import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.cloud.openfeign.SpringQueryMap
 import org.springframework.web.bind.annotation.*
@@ -33,9 +32,8 @@ interface WmsApiClient {
 
     @GetMapping("/stock/daily")
     fun getDailyCloseStock(
-        @SpringQueryMap stockDefaultModel: StockDefaultModel,
-        @PathVariable processDate : String
-    ): CommonResponse<CommonDataListModel<NosnosStockMoveEventModel>>
+        @SpringQueryMap dailyCloseStockRequestModel: DailyCloseStockRequestModel,
+    ): CommonResponse<CommonDataListModel<NosnosDailyCloseStockModel>>
 
     @PostMapping("shipping/products")
     fun createShippingProduct(preModel: PreShippingProductModel): CommonResponse<PostShippingProductModel>
@@ -55,17 +53,14 @@ data class CommonResponse<T>(
 )
 
 data class StockDefaultModel (
-    @ApiModelProperty(value="고객사 ID", example = "77", required = true)
     val memberId : Long,
-    @ApiModelProperty(value="출고상품 ID")
     val shippingProductIds : List<Int>? = null,
-    @ApiModelProperty(value="페이지 번호", example = "1")
     val page : Int = 1
 )
 
 data class DailyCloseStockRequestModel(
     val memberId : Long,
     val closingDate : String,
-    val shippingProductIds : List<Int>? = null,
+    val shippingProductIds : List<Long>? = null,
     val page: Int? = 1
 )

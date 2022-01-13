@@ -24,6 +24,7 @@ data class NosnosStockMoveEventModel(
     val endExpireDate: LocalDate? = null,
     val startLocType: Int? = null,
     val endLocType: Int? = null,
+    val moveType: Int? = null,
     val moveQuantity: Int? = null,
     val memo: String? = null,
 )

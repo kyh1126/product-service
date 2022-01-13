@@ -1,11 +1,13 @@
 package com.smartfoodnet.fninventory.stock
 
+import com.smartfoodnet.apiclient.DailyCloseStockRequestModel
 import com.smartfoodnet.apiclient.StockDefaultModel
 import com.smartfoodnet.apiclient.WmsApiClient
 import com.smartfoodnet.apiclient.response.CommonDataListModel
 import com.smartfoodnet.apiclient.response.NosnosExpirationDateStockModel
 import com.smartfoodnet.apiclient.response.NosnosStockMoveEventModel
 import com.smartfoodnet.common.Constants
+import com.smartfoodnet.common.error.exception.ExternalApiError
 import com.smartfoodnet.common.error.exception.UserRequestError
 import com.smartfoodnet.common.model.request.PredicateSearchCondition
 import com.smartfoodnet.common.model.response.PageResponse
@@ -90,8 +92,13 @@ class StockService(
         val basicProduct = basicProductRepository.findByIdOrNull(basicProductId)
             ?: throw UserRequestError(errorMessage = "기본 상품이 존재하지 않습니다.")
 
-        var totalStock = 1000L
-        var availableStock = 800L
+        val dailyCloseStockModel = wmsApiClient.getDailyCloseStock(
+            DailyCloseStockRequestModel(
+                memberId = basicProduct.partnerId!!,
+                closingDate = effectiveDate!!.format(DateTimeFormatter.ofPattern(Constants.NOSNOS_DATE_FORMAT)),
+                shippingProductIds = listOf(basicProductId)
+            )
+        ).payload?.dataList?.firstOrNull() ?: throw ExternalApiError(errorMessage = "상품의 마감재고를 불러오는데 실패하였습니다.")
 
         val moveEvents = getNosnosStockMoveEventsByWeek(basicProduct, effectiveDate ?: LocalDate.now())
 
@@ -111,14 +118,27 @@ class StockService(
             )
         }.toMutableList()
 
-        moveEventModels.reversed().forEach{
+        var totalStockCount = dailyCloseStockModel.totalQuantity
+        var availableStockCount = dailyCloseStockModel.normalStock
 
+        moveEventModels.reversed().forEach{
+            totalStockCount = totalStockCount?.plus(it.moveQuantity!!.times(effectOnTotalStockCount(it)))
+            availableStockCount = availableStockCount?.plus(it.moveQuantity!!.times(effectOnTotalStockCount(it)))
+
+            it.totalStockCount = totalStockCount
+            it.availableStockCount = availableStockCount
         }
 
-        return
+        return moveEventModels
     }
 
+    fun effectOnTotalStockCount(stockMoveEventModel: StockMoveEventModel): Int {
+        return 0
+    }
 
+    fun effectOnAvailableStockCount(stockMoveEventModel: StockMoveEventModel): Int {
+        return -1
+    }
 
     fun getNosnosStockMoveEventsByWeek(
         basicProduct: BasicProduct,

@@ -19,7 +19,11 @@ class StockMoveEvent(
     var partnerId: Long,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "basic_product_id", columnDefinition = "BIGINT UNSIGNED", foreignKey = ForeignKey(name = "fk_stock_by_best_before__basic_product"))
+    @JoinColumn(
+        name = "basic_product_id",
+        columnDefinition = "BIGINT UNSIGNED",
+        foreignKey = ForeignKey(name = "fk_stock_by_best_before__basic_product")
+    )
     var basicProduct: BasicProduct,
 
     @Column(name = "shipping_product_id", columnDefinition = "BIGINT UNSIGNED")
@@ -45,8 +49,16 @@ class StockMoveEvent(
 
 }
 
-enum class MoveEventType {
-    INBOUND,
-    OUTBOUND
+enum class MoveEventType(val num: Int) {
+    STOCK_ADJUST_INBOUND(1),
+    STOCK_ADJUST_CARRY_OUT(2),
+    CARRY_OUT(3),
+    WAREHOUSE_INBOUND(4),
+    CANCELLED_INBOUND(5),
+    INBOUND(6),
+    RETURN_INBOUND(7),
+    OUTBOUND(8),
+    DEFECTIVE(9),
+    STOCK_MOVE(10)
 }
 
