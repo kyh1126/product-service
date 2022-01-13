@@ -8,7 +8,7 @@ logging:
       hibernate:
         type:
           descriptor:
-            sql: trace
+            sql: warn
     io.swagger.models.parameters.AbstractSerializableParameter: ERROR
 spring:
   data:
