@@ -5,6 +5,7 @@ import com.smartfoodnet.common.model.response.CommonResponse
 import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.fninventory.stock.model.BasicProductStockModel
 import com.smartfoodnet.fninventory.stock.model.StockByBestBeforeModel
+import com.smartfoodnet.fninventory.stock.model.StockMoveEventModel
 import com.smartfoodnet.fninventory.stock.support.BasicProductStockSearchCondition
 import com.smartfoodnet.fninventory.stock.support.StockByBestBeforeSearchCondition
 import io.swagger.annotations.Api
@@ -58,7 +59,7 @@ class StockController(
         @Parameter(description = "기준 날짜")
         @DateTimeFormat(pattern = Constants.NOSNOS_DATE_FORMAT)
         @RequestParam effectiveDate: LocalDate?
-    ): Any {
+    ): List<StockMoveEventModel> {
         return stockService.getStockMoveEvents(basicProductId = basicProductId, effectiveDate = effectiveDate)
     }
 

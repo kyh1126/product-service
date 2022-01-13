@@ -13,6 +13,7 @@ import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.fninventory.stock.entity.StockByBestBefore
 import com.smartfoodnet.fninventory.stock.model.BasicProductStockModel
 import com.smartfoodnet.fninventory.stock.model.StockByBestBeforeModel
+import com.smartfoodnet.fninventory.stock.model.StockMoveEventModel
 import com.smartfoodnet.fninventory.stock.support.StockByBestBeforeRepository
 import com.smartfoodnet.fninventory.stock.support.StockByBestBeforeSearchCondition
 import com.smartfoodnet.fnproduct.order.OrderService
@@ -85,12 +86,39 @@ class StockService(
     fun getStockMoveEvents(
         basicProductId: Long,
         effectiveDate: LocalDate?
-    ): Any {
+    ): List<StockMoveEventModel> {
         val basicProduct = basicProductRepository.findByIdOrNull(basicProductId)
             ?: throw UserRequestError(errorMessage = "기본 상품이 존재하지 않습니다.")
 
-        return getNosnosStockMoveEventsByWeek(basicProduct, effectiveDate ?: LocalDate.now())
+        var totalStock = 1000L
+        var availableStock = 800L
+
+        val moveEvents = getNosnosStockMoveEventsByWeek(basicProduct, effectiveDate ?: LocalDate.now())
+
+        val moveEventModels = moveEvents.map {
+            StockMoveEventModel(
+                basicProductId = basicProductId,
+                basicProductName = basicProduct.name,
+                basicProductCode = basicProduct.code,
+                shippingProductId = basicProduct.shippingProductId,
+                barcode = basicProduct.barcode,
+                expirationDateManagementYn = basicProduct.expirationDateManagementYn,
+                moveQuantity = it.moveQuantity,
+                moveEventType = null,
+                availableStockCount = null,
+                totalStockCount = null,
+                processedAt = it.historyDate
+            )
+        }.toMutableList()
+
+        moveEventModels.reversed().forEach{
+
+        }
+
+        return
     }
+
+
 
     fun getNosnosStockMoveEventsByWeek(
         basicProduct: BasicProduct,

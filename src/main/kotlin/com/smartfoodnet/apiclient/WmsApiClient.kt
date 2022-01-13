@@ -31,6 +31,12 @@ interface WmsApiClient {
         @PathVariable processDate : String
     ): CommonResponse<CommonDataListModel<NosnosStockMoveEventModel>>
 
+    @GetMapping("/stock/daily")
+    fun getDailyCloseStock(
+        @SpringQueryMap stockDefaultModel: StockDefaultModel,
+        @PathVariable processDate : String
+    ): CommonResponse<CommonDataListModel<NosnosStockMoveEventModel>>
+
     @PostMapping("shipping/products")
     fun createShippingProduct(preModel: PreShippingProductModel): CommonResponse<PostShippingProductModel>
 
@@ -55,4 +61,11 @@ data class StockDefaultModel (
     val shippingProductIds : List<Int>? = null,
     @ApiModelProperty(value="페이지 번호", example = "1")
     val page : Int = 1
+)
+
+data class DailyCloseStockRequestModel(
+    val memberId : Long,
+    val closingDate : String,
+    val shippingProductIds : List<Int>? = null,
+    val page: Int? = 1
 )
