@@ -53,15 +53,6 @@ class BasicProductController(private val basicProductService: BasicProductServic
         return basicProductService.getBasicProduct(productId)
     }
 
-    @Operation(summary = "기본상품 카테고리 조회")
-    @GetMapping("categories")
-    fun getBasicProductCategories(
-        @Parameter(description = "대분류명") @RequestParam(required = false) level1CategoryName: String?,
-        @Parameter(description = "중분류명") @RequestParam(required = false) level2CategoryName: String?,
-    ): List<CategoryByLevelModel> {
-        return basicProductService.getBasicProductCategories(level1CategoryName, level2CategoryName)
-    }
-
     @java.lang.Deprecated(forRemoval = true)
     @Operation(summary = "부자재 카테고리 조회")
     @GetMapping("subsidiary-material-categories")
