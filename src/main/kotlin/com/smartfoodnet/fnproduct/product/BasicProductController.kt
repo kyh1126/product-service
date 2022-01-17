@@ -82,4 +82,10 @@ class BasicProductController(private val basicProductService: BasicProductServic
         return basicProductService.updateBasicProduct(productId, basicProductDetailCreateModel)
     }
 
+    fun getBasicProductCategories(
+        level1CategoryName: String?,
+        level2CategoryName: String?
+    ): List<CategoryByLevelModel> {
+        return basicProductService.getBasicProductCategories(level1CategoryName, level2CategoryName)
+    }
 }

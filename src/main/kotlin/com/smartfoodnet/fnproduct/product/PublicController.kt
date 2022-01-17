@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController
 @Api(tags = ["Public API"])
 @RestController
 @RequestMapping("public")
-class PublicController(private val basicProductService: BasicProductService) {
+class PublicController(private val basicProductController: BasicProductController) {
 
     @Operation(summary = "기본상품 카테고리 조회", tags = ["Public API", "basic-product-controller"])
     @GetMapping("basic-products/categories")
@@ -20,6 +20,9 @@ class PublicController(private val basicProductService: BasicProductService) {
         @Parameter(description = "대분류명") @RequestParam(required = false) level1CategoryName: String?,
         @Parameter(description = "중분류명") @RequestParam(required = false) level2CategoryName: String?,
     ): List<CategoryByLevelModel> {
-        return basicProductService.getBasicProductCategories(level1CategoryName, level2CategoryName)
+        return basicProductController.getBasicProductCategories(
+            level1CategoryName,
+            level2CategoryName
+        )
     }
 }
