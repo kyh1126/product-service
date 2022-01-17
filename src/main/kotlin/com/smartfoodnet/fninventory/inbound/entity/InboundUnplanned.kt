@@ -10,6 +10,7 @@ import javax.persistence.*
 class InboundUnplanned(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id : Long? = null,
+//    val uniqueId : String,
     val partnerId : Long,
     val workDate : LocalDateTime,
     val workType : Int,

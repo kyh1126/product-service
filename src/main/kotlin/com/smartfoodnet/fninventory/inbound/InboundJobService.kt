@@ -5,6 +5,7 @@ import com.smartfoodnet.apiclient.request.InboundWorkReadModel
 import com.smartfoodnet.apiclient.response.CommonDataListModel
 import com.smartfoodnet.apiclient.response.GetInboundWorkModel
 import com.smartfoodnet.common.utils.Log
+import com.smartfoodnet.fninventory.inbound.entity.InboundUnplanned
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -22,10 +23,10 @@ class InboundJobService(
         inboundWorkProcess(partnerId, firstList.dataList)
 
         // 이후 데이터가 있는지 확인
-        val totalPage = firstList.totalPage
+        val totalPage = firstList.totalPage.toInt()
 
         (2..totalPage).forEach {
-            val afterList = getInboundWorkJob(partnerId, basicDt, it.toInt())
+            val afterList = getInboundWorkJob(partnerId, basicDt, it)
             inboundWorkProcess(partnerId, afterList.dataList)
         }
     }
@@ -65,9 +66,7 @@ class InboundJobService(
         // TODO : 미예정 입고 처리
         etcList.forEach {
             log.info("it -> {}",it)
-//            if (!inboundUnplannedRepository.existsByUniqueId(it.uniqueId)){
-//                inboundUnplannedRepository.save(InboundUnplanned.toEntity(partnerId, it))
-//            }
+            inboundUnplannedRepository.save(it.toUnplannedEntity(partnerId))
         }
     }
 }
