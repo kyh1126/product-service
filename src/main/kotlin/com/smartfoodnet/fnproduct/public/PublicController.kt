@@ -1,5 +1,6 @@
-package com.smartfoodnet.fnproduct.product
+package com.smartfoodnet.fnproduct.public
 
+import com.smartfoodnet.fnproduct.product.BasicProductController
 import com.smartfoodnet.fnproduct.product.model.response.CategoryByLevelModel
 import io.swagger.annotations.Api
 import io.swagger.v3.oas.annotations.Operation
