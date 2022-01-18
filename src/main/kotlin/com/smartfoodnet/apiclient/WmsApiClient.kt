@@ -6,6 +6,7 @@ import com.smartfoodnet.apiclient.response.CommonDataListModel
 import com.smartfoodnet.apiclient.response.NosnosExpirationDateStockModel
 import com.smartfoodnet.apiclient.response.NosnosStockModel
 import com.smartfoodnet.apiclient.response.PostShippingProductModel
+import com.smartfoodnet.common.model.response.CommonResponse
 import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.web.bind.annotation.*
 
@@ -38,7 +39,3 @@ interface WmsApiClient {
     @PutMapping("sales/products/{salesProductId}")
     fun updateSalesProduct(@PathVariable salesProductId: Long, preModel: PreSalesProductModel)
 }
-
-data class CommonResponse<T>(
-    val payload: T? = null,
-)

@@ -1,5 +1,5 @@
 package com.smartfoodnet.common.model.response
 
-class CommonResponse(
-    val payload: Any? = null,
+class CommonResponse<T>(
+    val payload: T? = null,
 )
