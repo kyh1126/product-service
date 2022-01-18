@@ -23,14 +23,6 @@ class CodeTest {
     }
 
     @Test
-    fun chunkTest() {
-        val list = mutableListOf<Int>()
-        for (i in 0 .. 10) {
-            list.add(i)
-        }
-
-        val chunk = list.chunked(100)
-
-        println(chunk)
+    fun test() {
     }
 }

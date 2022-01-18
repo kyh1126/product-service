@@ -35,6 +35,11 @@ interface WmsApiClient {
         @SpringQueryMap dailyCloseStockRequestModel: DailyCloseStockRequestModel,
     ): CommonResponse<CommonDataListModel<NosnosDailyCloseStockModel>>
 
+    @GetMapping("/stock/summary")
+    fun getDailyStockSummary(
+        @SpringQueryMap dailySummaryStockRequestModel: DailySummaryStockRequestModel,
+    ): CommonResponse<CommonDataListModel<NosnosDailyStockSummaryModel>>
+
     @PostMapping("shipping/products")
     fun createShippingProduct(preModel: PreShippingProductModel): CommonResponse<PostShippingProductModel>
 
@@ -61,6 +66,13 @@ data class StockDefaultModel (
 data class DailyCloseStockRequestModel(
     val memberId : Long,
     val closingDate : String,
+    val shippingProductIds : List<Long>? = null,
+    val page: Int? = 1
+)
+
+data class DailySummaryStockRequestModel(
+    val memberId : Long,
+    val stockDate : String,
     val shippingProductIds : List<Long>? = null,
     val page: Int? = 1
 )
