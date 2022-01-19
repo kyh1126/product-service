@@ -3,6 +3,8 @@ package com.smartfoodnet.fninventory.stock
 import com.smartfoodnet.apiclient.DailyCloseStockRequestModel
 import com.smartfoodnet.apiclient.DailySummaryStockRequestModel
 import com.smartfoodnet.apiclient.WmsApiClient
+import com.smartfoodnet.apiclient.response.NosnosDailyCloseStockModel
+import com.smartfoodnet.apiclient.response.NosnosDailyStockSummaryModel
 import com.smartfoodnet.apiclient.response.NosnosExpirationDateStockModel
 import com.smartfoodnet.common.Constants
 import com.smartfoodnet.common.Constants.API_CALL_LIST_SIZE
@@ -16,6 +18,7 @@ import com.smartfoodnet.fnproduct.order.OrderService
 import com.smartfoodnet.fnproduct.order.model.OrderStatus
 import com.smartfoodnet.fnproduct.product.BasicProductRepository
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
+import feign.FeignException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Duration
@@ -47,7 +50,7 @@ class StockScheduledService(
 
             partnerIds?.forEach { partnerId ->
                 val basicProducts =
-                    basicProductRepository.findByPartnerIdAndActiveYn(
+                    basicProductRepository.findByPartnerIdAndActiveYnAndShippingProductIdIsNotNull(
                         partnerId,
                         IS_ACTIVE_YN
                     )
@@ -71,31 +74,47 @@ class StockScheduledService(
         effectiveDate: LocalDate
     ) {
 
-        val dailyCloseStockModels = wmsApiClient.getDailyCloseStock(
-            DailyCloseStockRequestModel(
-                memberId = partnerId,
-                closingDate = effectiveDate.format(DateTimeFormatter.ofPattern(Constants.NOSNOS_DATE_FORMAT)),
-                shippingProductIds = basicProducts.map { it.shippingProductId!! }
-            )
-        ).payload?.dataList
+        val dailyCloseStockModels: List<NosnosDailyCloseStockModel>?
 
-        val stockSummaryModels = wmsApiClient.getDailyStockSummary(
-            DailySummaryStockRequestModel(
-                memberId = partnerId,
-                stockDate = effectiveDate.format(DateTimeFormatter.ofPattern(Constants.NOSNOS_DATE_FORMAT)),
-                shippingProductIds = basicProducts.map { it.shippingProductId!! },
-                page = 1
-            )
-        ).payload?.dataList
+        try {
+            dailyCloseStockModels = wmsApiClient.getDailyCloseStock(
+                DailyCloseStockRequestModel(
+                    memberId = partnerId,
+                    closingDate = effectiveDate.format(DateTimeFormatter.ofPattern(Constants.NOSNOS_DATE_FORMAT)),
+                    shippingProductIds = basicProducts.map { it.shippingProductId!! }
+                )
+            ).payload?.dataList
+        }catch (e:FeignException){
+            return
+        }
+
+        val stockSummaryModels = try {
+            wmsApiClient.getDailyStockSummary(
+                DailySummaryStockRequestModel(
+                    memberId = partnerId,
+                    stockDate = effectiveDate.format(DateTimeFormatter.ofPattern(Constants.NOSNOS_DATE_FORMAT)),
+                    shippingProductIds = basicProducts.map { it.shippingProductId!! },
+                    page = 1
+                )
+            ).payload?.dataList
+        } catch (e: Exception) {
+            basicProducts.map {
+                NosnosDailyStockSummaryModel(
+                    shippingProductId = it.shippingProductId,
+                    stockDate = effectiveDate.format(DateTimeFormatter.ofPattern(Constants.NOSNOS_DATE_FORMAT))
+                )
+            }
+        }
 
         val dailyStockSummaries = mutableListOf<DailyStockSummary>()
 
         dailyCloseStockModels?.forEach { closeStock ->
             val summary = stockSummaryModels?.firstOrNull { it.shippingProductId == closeStock.shippingProductId }
+            val basicProduct = basicProducts.firstOrNull { it.shippingProductId == closeStock.shippingProductId }!!
             val dailyStockSummary = DailyStockSummary(
                 partnerId = partnerId,
-                basicProduct = basicProducts.firstOrNull { it.shippingProductId == closeStock.shippingProductId }!!,
-                shippingProductId = summary?.shippingProductId ?: 0,
+                basicProduct = basicProduct,
+                shippingProductId = summary?.shippingProductId ?: basicProduct.shippingProductId!!,
                 inboundQuantity = summary?.receivingQuantity ?: 0,
                 outboundQuantity = summary?.shipoutQuantity ?: 0,
                 returnQuantity = summary?.returnQuantity ?: 0,
@@ -121,7 +140,7 @@ class StockScheduledService(
     fun syncStocksByBestBefore() {
         val partnerIds =
             basicProductRepository.getPartnerIdsFromBasicProduct(
-                Constants.EXPIRATION_DATEMANAGEMENT_YN,
+                Constants.EXPIRATION_DATE_MANAGEMENT_YN,
                 IS_ACTIVE_YN
             )
 
@@ -132,7 +151,7 @@ class StockScheduledService(
         val basicProducts =
             basicProductRepository.findByPartnerIdAndExpirationDateManagementYnAndActiveYn(
                 partnerId,
-                Constants.EXPIRATION_DATEMANAGEMENT_YN,
+                Constants.EXPIRATION_DATE_MANAGEMENT_YN,
                 IS_ACTIVE_YN
             )
         val basicProductsChunks = basicProducts?.chunked(API_CALL_LIST_SIZE) ?: return

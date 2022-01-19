@@ -8,7 +8,7 @@ object Constants {
     const val TIMEZONE = "Asia/Seoul"
     const val NOSNOS_DATE_FORMAT = "yyyyMMdd"
     const val STARTING_FROM = 100L
-    const val EXPIRATION_DATEMANAGEMENT_YN = "Y"
-    const val IS_ACTIVE_YN = "N"
+    const val EXPIRATION_DATE_MANAGEMENT_YN = "Y"
+    const val IS_ACTIVE_YN = "Y"
     const val API_CALL_LIST_SIZE = 50 //nosnos api call List Size
 }

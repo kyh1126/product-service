@@ -62,8 +62,17 @@ class StockController(
         return stockService.getDailyStockSummaries(condition, page)
     }
 
+    @Operation(summary = "특정 상품별 최근 일주일 재고 이동 내역 리스트")
+    @PostMapping("summary/by-days/{days}")
+    fun saveDailyStockSummariesByDays(
+        @Parameter(description = "화주(고객사) ID", required = true)
+        @PathVariable days: Long
+    ){
+        stockScheduledService.saveDailyStockSummariesByDays(days)
+    }
+
     @Operation(summary = "상미기한별 재고 배치 작업")
-    @GetMapping("best-before/synchronize")
+    @PostMapping("best-before/synchronize")
     fun syncStocksByBestBefore(
     ): CommonResponse{
         stockScheduledService.syncStocksByBestBefore()

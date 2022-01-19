@@ -26,7 +26,8 @@ class BasicProductRepositoryImpl : Querydsl4RepositorySupport(BasicProduct::clas
             .from(basicProduct)
             .where(
                 basicProduct.expirationDateManagementYn.eq(expirationDateManagementYn),
-                basicProduct.activeYn.eq(activeYn)
+                basicProduct.activeYn.eq(activeYn),
+                basicProduct.partnerId.isNotNull
             )
             .groupBy(basicProduct.partnerId)
             .fetch()
@@ -35,7 +36,7 @@ class BasicProductRepositoryImpl : Querydsl4RepositorySupport(BasicProduct::clas
     override fun getPartnerIdsFromBasicProduct(activeYn: String): List<Long>? {
         return select(basicProduct.partnerId)
             .from(basicProduct)
-            .where(basicProduct.activeYn.eq(activeYn))
+            .where(basicProduct.activeYn.eq(activeYn), basicProduct.partnerId.isNotNull)
             .groupBy(basicProduct.partnerId)
             .fetch()
     }
