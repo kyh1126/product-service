@@ -5,7 +5,7 @@ import com.smartfoodnet.apiclient.request.InboundWorkReadModel
 import com.smartfoodnet.apiclient.response.CommonDataListModel
 import com.smartfoodnet.apiclient.response.GetInboundWorkModel
 import com.smartfoodnet.common.utils.Log
-import com.smartfoodnet.fninventory.inbound.entity.InboundUnplanned
+import com.smartfoodnet.fnproduct.product.BasicProductRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -13,7 +13,8 @@ import org.springframework.transaction.annotation.Transactional
 class InboundJobService(
     val wmsApiClient: WmsApiClient,
     val inboundUnplannedRepository: InboundUnplannedRepository,
-    val inboundRepository: InboundRepository
+    val inboundRepository: InboundRepository,
+    val basicProductRepository : BasicProductRepository
 ) : Log{
 
     @Transactional
@@ -54,19 +55,23 @@ class InboundJobService(
         expectedList.forEach {
             val receivingPlanId : Long = it.receiving_plan_id!!
             val inboundExpectedDetail = inboundRepository.findInboundExpectedWithBasicProduct(receivingPlanId, it.shipping_product_id)
-
             inboundExpectedDetail?.inboundActualDetail?.add(it.toEntity(inboundExpectedDetail, inboundExpectedDetail.basicProduct!!))
-
-            log.info("receiving_plan_id -> {}, expire_date -> {}, quantity -> {}\twork_type-> {}", it.receiving_plan_id, it.expire_date, it.quantity, it.work_type)
+//            log.info("receiving_plan_id -> {}, expire_date -> {}, quantity -> {}\twork_type-> {}", it.receiving_plan_id, it.expire_date, it.quantity, it.work_type)
         }
     }
 
     private fun etcListProcess(partnerId: Long, etcList: List<GetInboundWorkModel>){
-        log.info("etcList -> {}", etcList.size)
-        // TODO : 미예정 입고 처리
+//        log.info("etcList -> {}", etcList.size)
         etcList.forEach {
             log.info("it -> {}",it)
-            inboundUnplannedRepository.save(it.toUnplannedEntity(partnerId))
+
+            if (!inboundUnplannedRepository.existsByUniqueId(it.uniqueId)) {
+                val basicProduct = basicProductRepository.findByShippingProductId(it.shipping_product_id)
+                inboundUnplannedRepository.save(it.toUnplannedEntity(partnerId, basicProduct))
+            } else {
+                log.warn("duplicate data -> {}", it)
+            }
+
         }
     }
 }

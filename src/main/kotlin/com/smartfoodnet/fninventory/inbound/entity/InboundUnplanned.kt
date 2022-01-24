@@ -1,20 +1,23 @@
 package com.smartfoodnet.fninventory.inbound.entity
 
 import com.smartfoodnet.apiclient.response.GetInboundWorkModel
+import com.smartfoodnet.common.entity.BaseEntity
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import java.time.LocalDateTime
 import javax.persistence.*
 
 @Entity
-@Table(name = "inbound_unplanned")
+@Table(
+    name = "inbound_unplanned"
+)
 class InboundUnplanned(
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id : Long? = null,
-//    val uniqueId : String,
+    @Id
+    val uniqueId : String,
     val partnerId : Long,
     val workDate : LocalDateTime,
     val workType : Int,
     val receivingType : Int,
+    val shippingProdcutId : Long,
     @ManyToOne
     @JoinColumn(name = "basic_product_id")
     val basicProduct : BasicProduct? = null,
@@ -27,4 +30,4 @@ class InboundUnplanned(
     @Lob
     val memo : String? = null,
     val workerId : Long? = null
-)
+) : BaseEntity()

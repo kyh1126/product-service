@@ -3,4 +3,6 @@ package com.smartfoodnet.fninventory.inbound
 import com.smartfoodnet.fninventory.inbound.entity.InboundUnplanned
 import org.springframework.data.jpa.repository.JpaRepository
 
-interface InboundUnplannedRepository : JpaRepository<InboundUnplanned, Long>
+interface InboundUnplannedRepository : JpaRepository<InboundUnplanned, String>{
+    fun existsByUniqueId(uniqueId : String) : Boolean
+}
