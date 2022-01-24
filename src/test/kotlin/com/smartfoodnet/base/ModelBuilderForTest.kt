@@ -29,6 +29,7 @@ fun buildBasicProductDetailCreateModel(
 fun buildBasicProductCreateModel(
     type: BasicProductType = BasicProductType.BASIC,
     partnerId: Long? = 1,
+    partnerCode: String? = "0001",
     name: String? = "테스트 기본상품",
     barcodeYn: String = "N",
     basicProductCategoryId: Long? = 1,
@@ -42,6 +43,7 @@ fun buildBasicProductCreateModel(
 ) = TestBasicProductCreateModel(
     type = type,
     partnerId = partnerId,
+    partnerCode = partnerCode,
     name = name,
     barcodeYn = barcodeYn,
     basicProductCategoryId = basicProductCategoryId,

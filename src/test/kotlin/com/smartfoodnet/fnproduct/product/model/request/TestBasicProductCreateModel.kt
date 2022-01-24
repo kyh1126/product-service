@@ -20,6 +20,9 @@ class TestBasicProductCreateModel(
     @ApiModelProperty(value = "화주(고객사) ID", example = "1")
     val partnerId: Long? = null,
 
+    @ApiModelProperty(value = "화주(고객사) 코드", example = "0001")
+    val partnerCode: String? = null,
+
     @ApiModelProperty(value = "상품명")
     val name: String? = null,
 
@@ -77,6 +80,7 @@ class TestBasicProductCreateModel(
             it.id = id
             it.type = type
             it.partnerId = partnerId
+            it.partnerCode = partnerCode
             it.name = name
             it.code = code
             it.barcodeYn = barcodeYn

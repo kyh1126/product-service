@@ -21,11 +21,11 @@ class BasicProductCodeGenerator(
         setOf(BasicProductType.BASIC, BasicProductType.PACKAGE, BasicProductType.CUSTOM_SUB)
 
     fun getBasicProductCode(
-        partnerId: Long?,
+        partnerId: Long,
+        partnerCode: String,
         type: BasicProductType,
-        handlingTemperature: HandlingTemperatureType?,
+        handlingTemperature: HandlingTemperatureType,
     ): String? {
-        if (partnerId == null || handlingTemperature == null) return null
         if (validateNotAvailableType(type)
             || validateNotAvailableTemperatureType(type, handlingTemperature)
         ) return null
@@ -36,16 +36,15 @@ class BasicProductCodeGenerator(
             basicProductRepository.countByPartnerIdAndTypeIn(partnerId, basicProductCodeTypes)
                 .run { String.format("%05d", this + 1) }
 
-        return getCustomerNumber(partnerId) + type.code + temperatureCode + totalProductCount
+        return getCustomerNumber(partnerCode) + type.code + temperatureCode + totalProductCount
     }
 
-    private fun getCustomerNumber(partnerId: Long): String {
-        if (partnerId > 9999L) {
-            log.error("[BasicProductCodeGenerator] 상품코드 채번 에러, partnerId = $partnerId")
-            throw IllegalArgumentException("partnerId 는 9999 보다 작아야 합니다.")
+    private fun getCustomerNumber(partnerCode: String): String {
+        if (partnerCode.length != 4) {
+            log.error("[BasicProductCodeGenerator] 상품코드 채번 에러, partnerCode = $partnerCode")
+            throw IllegalArgumentException("partnerCode 는 4자리여야 합니다.")
         }
-
-        return String.format("%04d", partnerId)
+        return partnerCode
     }
 
     private fun validateNotAvailableType(type: BasicProductType): Boolean {

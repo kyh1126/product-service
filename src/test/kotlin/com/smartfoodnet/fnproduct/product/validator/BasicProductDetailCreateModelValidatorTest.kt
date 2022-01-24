@@ -67,6 +67,7 @@ internal class BasicProductDetailCreateModelValidatorTest {
                 val expectedMessage = listOf(
                     "CreateModelValidateErrorMessage: ",
                     "화주(고객사) ID 값은 null 이 아닌 값을 입력해주세요.",
+                    "화주(고객사) 코드 값은 null 이 아닌 값을 입력해주세요.",
                     "상품명 값을 입력해주세요.",
                     "상품바코드기재여부 값을 입력해주세요.",
                     "취급온도 값은 null 이 아닌 값을 입력해주세요.",
@@ -102,6 +103,7 @@ internal class BasicProductDetailCreateModelValidatorTest {
     private fun getInvalidInput_checkRequiredFieldsBasicType(): BasicProductDetailCreateModel {
         val basicProductModel = buildBasicProductCreateModel(
             partnerId = null,
+            partnerCode = null,
             name = "",
             barcodeYn = "",
             type = BasicProductType.BASIC,

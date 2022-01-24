@@ -20,6 +20,9 @@ class BasicProductSimpleCreateModel {
     @ApiModelProperty(value = "화주(고객사) ID")
     val partnerId: Long? = null
 
+    @ApiModelProperty(value = "화주(고객사) 코드")
+    val partnerCode: String? = null
+
     @ApiModelProperty(value = "상품명")
     val name: String? = null
 

@@ -24,6 +24,9 @@ class BasicProductCreateModel {
     @ApiModelProperty(value = "화주(고객사) ID", example = "1")
     var partnerId: Long? = null
 
+    @ApiModelProperty(value = "화주(고객사) 코드", example = "0001")
+    var partnerCode: String? = null
+
     @ApiModelProperty(value = "출고상품 ID (nosnos)")
     val shippingProductId: Long? = null
 
