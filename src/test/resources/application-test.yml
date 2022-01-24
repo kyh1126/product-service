@@ -16,7 +16,6 @@ spring:
     allow-bean-definition-overriding: true  # Bean 오버라이딩 활성화
   jpa:
     database-platform: org.hibernate.dialect.MySQL8Dialect
-    generate-ddl: false
     open-in-view: false
     hibernate:
       ddl-auto: update

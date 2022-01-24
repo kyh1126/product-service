@@ -24,7 +24,6 @@ spring:
       maxRequestSize: 10MB
   jpa:
     database-platform: org.hibernate.dialect.MySQL8Dialect
-    generate-ddl: false
     open-in-view: false
     hibernate:
       ddl-auto: update
