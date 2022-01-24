@@ -12,7 +12,7 @@ import javax.persistence.*
 )
 class InboundUnplanned(
     @Id
-    val uniqueId : String,
+    val receivingWorkHistoryId : Long,
     val partnerId : Long,
     val workDate : LocalDateTime,
     val workType : Int,

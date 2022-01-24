@@ -41,6 +41,16 @@ class InboundController(
         return inboundService.getInbound(condition.apply { this.partnerId = partnerId }, page)
     }
 
+    @GetMapping("partner/{partnerId}/unplanned")
+    @Operation(summary = "미예정 입고조회")
+    fun getInboundUnplanned(
+        @Parameter(description = "고객사 ID", example = "14") @PathVariable partnerId : Long,
+        @ModelAttribute condition: InboundSearchCondition,
+        @PageableDefault(size = 50, sort = ["id"], direction = Sort.Direction.DESC) page: Pageable
+    ){
+
+    }
+
     @GetMapping("partner/{partnerId}/details/{expectedDetailId}")
     @Operation(summary = "입고내역 조회")
     fun getInboundDetail(

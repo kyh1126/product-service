@@ -15,6 +15,7 @@ import kotlin.math.exp
 
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy::class)
 data class GetInboundWorkModel(
+    val receivingWorkHistoryId : Long,
     @JsonFormat(pattern = Constants.TIMESTAMP_FORMAT)
     val work_date : LocalDateTime,
     val work_type : Int,
@@ -30,8 +31,6 @@ data class GetInboundWorkModel(
     val worker_member_id : Long? = null,
     val work_memo : String? = null
 ){
-    val uniqueId :String = "${work_date.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))}_${work_type}_${receiving_type}_${shipping_product_id}_${quantity}"
-
     fun toEntity(inboundExpectedDetail: InboundExpectedDetail, basicProduct : BasicProduct) : InboundActualDetail {
 
         val expireMakeDate = convertExpireAndMakeDate(basicProduct)
@@ -49,7 +48,7 @@ data class GetInboundWorkModel(
 
     fun toUnplannedEntity(partnerId: Long, basicProduct: BasicProduct?): InboundUnplanned{
         return InboundUnplanned(
-            uniqueId = uniqueId,
+            receivingWorkHistoryId = receivingWorkHistoryId,
             partnerId = partnerId,
             shippingProdcutId = shipping_product_id,
             basicProduct = basicProduct,

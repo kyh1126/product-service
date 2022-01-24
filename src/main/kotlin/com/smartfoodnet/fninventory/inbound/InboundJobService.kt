@@ -33,7 +33,6 @@ class InboundJobService(
     }
 
     private fun getInboundWorkJob(partnerId: Long, basicDt: String, page: Int): CommonDataListModel<GetInboundWorkModel> {
-        // TODO : 스케줄러로 돌아가는 로직 구현
         val params = InboundWorkReadModel(
             memberId = partnerId,
             startDt = basicDt,
@@ -44,28 +43,21 @@ class InboundJobService(
     }
 
     private fun inboundWorkProcess(partnerId: Long, dataList: List<GetInboundWorkModel>){
-        // TODO : 입고예정검수와 그 외 상태들을 분리하여 구현
         expectedListProcess(partnerId, dataList.filter { it.receiving_type == 1 })
         etcListProcess(partnerId, dataList.filter { it.receiving_type != 1 })
     }
 
     private fun expectedListProcess(partnerId: Long, expectedList : List<GetInboundWorkModel>){
-        log.info("expectedList -> {}", expectedList.size)
-        // TODO : 입고예정 등록번호 확인하여 실 입고 처리를 해야함
         expectedList.forEach {
             val receivingPlanId : Long = it.receiving_plan_id!!
             val inboundExpectedDetail = inboundRepository.findInboundExpectedWithBasicProduct(receivingPlanId, it.shipping_product_id)
             inboundExpectedDetail?.inboundActualDetail?.add(it.toEntity(inboundExpectedDetail, inboundExpectedDetail.basicProduct!!))
-//            log.info("receiving_plan_id -> {}, expire_date -> {}, quantity -> {}\twork_type-> {}", it.receiving_plan_id, it.expire_date, it.quantity, it.work_type)
         }
     }
 
     private fun etcListProcess(partnerId: Long, etcList: List<GetInboundWorkModel>){
-//        log.info("etcList -> {}", etcList.size)
         etcList.forEach {
-            log.info("it -> {}",it)
-
-            if (!inboundUnplannedRepository.existsByUniqueId(it.uniqueId)) {
+            if (!inboundUnplannedRepository.existsByReceivingWorkHistoryId(it.receivingWorkHistoryId)) {
                 val basicProduct = basicProductRepository.findByShippingProductId(it.shipping_product_id)
                 inboundUnplannedRepository.save(it.toUnplannedEntity(partnerId, basicProduct))
             } else {
