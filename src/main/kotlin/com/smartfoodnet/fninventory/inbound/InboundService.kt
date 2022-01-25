@@ -29,14 +29,12 @@ class InboundService(
     fun createInbound(createModel: InboundCreateModel){
         val inbound = createModel.toEntity()
         createModel.expectedList.forEach {
-//            val basicProduct = getBasicProduct(it.basicProductCode)
             val basicProduct = getBasicProduct(it.basicProductId)
             inbound.addExptecdItem(it.toEntity(basicProduct))
         }
 
         // TODO : 노스노스 전송
         val planProductList : List<PlanProduct> = createModel.expectedList.map {
-//            val basicProduct = getBasicProduct(it.basicProductCode)
             val basicProduct = getBasicProduct(it.basicProductId)
             PlanProduct(basicProduct.shippingProductId!!, it.requestQuantity)
         }
@@ -61,8 +59,6 @@ class InboundService(
     private fun getBasicProduct(basicProductId : Long) : BasicProduct {
         return basicProductRepository.findById(basicProductId).get()
     }
-
-
 
     fun getInbound(condition: InboundSearchCondition, page: Pageable) : PageResponse<GetInbound>?{
         val parent = inboundRepository.findInbounds(condition, page)
