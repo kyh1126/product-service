@@ -26,6 +26,8 @@ class BasicProductDetailCreateModelValidator(
         errors: Errors
     ) {
         val basicProductModel = target.basicProductModel
+        if (checkType(basicProductModel, errors)) return
+
         when (basicProductModel.type) {
             BasicProductType.BASIC -> checkRequiredFieldsBasicType(target, errors)
             BasicProductType.CUSTOM_SUB -> checkRequiredFieldsCustomSubType(target, errors)
@@ -39,6 +41,16 @@ class BasicProductDetailCreateModelValidator(
         checkExpirationDateInfo(basicProductModel, errors)
 
         checkTemperatureType(basicProductModel, errors)
+    }
+
+    private fun checkType(target: BasicProductCreateModel, errors: Errors): Boolean {
+        val isPackageType = target.type == BasicProductType.PACKAGE
+        if (isPackageType) {
+            errors.rejectValue(
+                "basicProductModel.type", "type.invalid", "모음상품은 불가합니다."
+            )
+        }
+        return isPackageType
     }
 
     private fun checkDuplicateName(
@@ -149,7 +161,7 @@ class BasicProductDetailCreateModelValidator(
         with(target) {
             if (handlingTemperature == null) return
 
-            if (type != BasicProductType.PACKAGE && handlingTemperature == HandlingTemperatureType.MIX) {
+            if (handlingTemperature == HandlingTemperatureType.MIX) {
                 errors.reject("basicProductModel", "취급온도-혼합은 모음상품 구분만 선택 가능합니다.")
             }
         }
