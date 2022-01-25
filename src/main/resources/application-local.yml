@@ -4,12 +4,7 @@ server:
     context-path: /fresh-networks/fn-product
 logging:
   level:
-    org:
-      hibernate:
-        type:
-          descriptor:
-            sql: off
-#            sql: trace
+    org.hibernate.type.descriptor.sql: trace
     io.swagger.models.parameters.AbstractSerializableParameter: ERROR
 spring:
   data:
@@ -34,7 +29,6 @@ spring:
           release_mode: on_close
         dialect:
           storage-engine: innodb
-#          format_sql: true
         show_sql: true
 #        format_sql: true
   datasource:
