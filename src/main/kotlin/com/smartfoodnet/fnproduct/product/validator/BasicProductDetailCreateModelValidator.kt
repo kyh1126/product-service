@@ -94,13 +94,6 @@ class BasicProductDetailCreateModelValidator(
                         "숫자 입력만 가능합니다."
                     )
                 }
-                basicProductRepository.findByPartnerIdAndBarcode(partnerId!!, barcode!!)?.let {
-                    errors.rejectValue(
-                        "basicProductModel.barcode",
-                        "barcode.duplicate",
-                        "사용중인 상품바코드가 있습니다."
-                    )
-                }
             }
         }
     }
