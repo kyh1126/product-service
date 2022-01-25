@@ -4,6 +4,7 @@ import com.smartfoodnet.apiclient.request.InboundWorkReadModel
 import com.smartfoodnet.apiclient.request.PreSalesProductModel
 import com.smartfoodnet.apiclient.request.PreShippingProductModel
 import com.smartfoodnet.apiclient.response.*
+import com.smartfoodnet.common.model.response.CommonResponse
 import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.cloud.openfeign.SpringQueryMap
 import org.springframework.web.bind.annotation.*
@@ -43,7 +44,3 @@ interface WmsApiClient {
     ) : CommonResponse<CommonDataListModel<GetInboundWorkModel>>
 
 }
-
-data class CommonResponse<T>(
-    val payload: T? = null,
-)

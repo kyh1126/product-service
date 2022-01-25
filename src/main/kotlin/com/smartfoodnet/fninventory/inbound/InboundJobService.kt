@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional
 class InboundJobService(
     val wmsApiClient: WmsApiClient,
     val inboundUnplannedRepository: InboundUnplannedRepository,
+    val inboundActualDetailRepository: InboundActualDetailRepository,
     val inboundRepository: InboundRepository,
     val basicProductRepository : BasicProductRepository
 ) : Log{
@@ -43,22 +44,33 @@ class InboundJobService(
     }
 
     private fun inboundWorkProcess(partnerId: Long, dataList: List<GetInboundWorkModel>){
-        expectedListProcess(partnerId, dataList.filter { it.receiving_type == 1 })
-        etcListProcess(partnerId, dataList.filter { it.receiving_type != 1 })
+        expectedListProcess(partnerId, dataList.filter { it.receivingType == 1 })
+        etcListProcess(partnerId, dataList.filter { it.receivingType != 1 })
     }
 
     private fun expectedListProcess(partnerId: Long, expectedList : List<GetInboundWorkModel>){
         expectedList.forEach {
-            val receivingPlanId : Long = it.receiving_plan_id!!
-            val inboundExpectedDetail = inboundRepository.findInboundExpectedWithBasicProduct(receivingPlanId, it.shipping_product_id)
-            inboundExpectedDetail?.inboundActualDetail?.add(it.toEntity(inboundExpectedDetail, inboundExpectedDetail.basicProduct!!))
+            val historyId = it.receivingWorkHistoryId
+            if (!inboundActualDetailRepository.existsByReceivingWorkHistoryId(historyId)) {
+                val receivingPlanId: Long = it.receivingPlanId!!
+                val inboundExpectedDetail = inboundRepository.findInboundExpectedWithBasicProduct(
+                    receivingPlanId,
+                    it.shippingProductId
+                )
+                inboundExpectedDetail?.inboundActualDetail?.add(
+                    it.toEntity(
+                        inboundExpectedDetail,
+                        inboundExpectedDetail.basicProduct!!
+                    )
+                )
+            }
         }
     }
 
     private fun etcListProcess(partnerId: Long, etcList: List<GetInboundWorkModel>){
         etcList.forEach {
             if (!inboundUnplannedRepository.existsByReceivingWorkHistoryId(it.receivingWorkHistoryId)) {
-                val basicProduct = basicProductRepository.findByShippingProductId(it.shipping_product_id)
+                val basicProduct = basicProductRepository.findByShippingProductId(it.shippingProductId)
                 inboundUnplannedRepository.save(it.toUnplannedEntity(partnerId, basicProduct))
             } else {
                 log.warn("duplicate data -> {}", it)

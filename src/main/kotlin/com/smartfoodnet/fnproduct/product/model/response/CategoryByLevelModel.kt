@@ -2,6 +2,7 @@ package com.smartfoodnet.fnproduct.product.model.response
 
 import com.smartfoodnet.fnproduct.code.entity.Code
 import com.smartfoodnet.fnproduct.product.model.dto.CategoryDto
+import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import io.swagger.annotations.ApiModelProperty
 
 data class CategoryByLevelModel(
@@ -24,6 +25,13 @@ data class CategoryByLevelModel(
                     children = children.filterNotNull().toSet()
                 )
             }
+        }
+
+        fun fromModel(children: List<BasicProductModel>): CategoryByLevelModel {
+            return CategoryByLevelModel(
+                label = BasicProductType.CUSTOM_SUB.desc,
+                children = children.map { CategoryDto.from(it.id, it.name) }.toSet()
+            )
         }
     }
 }

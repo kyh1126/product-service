@@ -30,7 +30,7 @@ class ResponseHandler : ResponseBodyAdvice<Any> {
     ): Any? {
         return if (body != null
             && (body is ExceptionResponse
-                    || body is CommonResponse
+                    || body is CommonResponse<*>
                     || body is PageResponse<*>
                     || request.uri.path.contains("swagger")
                     || request.uri.path.contains("api-docs"))

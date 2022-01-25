@@ -15,6 +15,9 @@ class InboundActualDetail(
     @JoinColumn(name = "expected_detail_id", columnDefinition = "BIGINT UNSIGNED")
     var inboundExpectedDetail: InboundExpectedDetail,
 
+    @Column(unique = true)
+    val receivingWorkHistoryId : Long,
+
     val actualQuantity: Long? = null,
 
     val boxQuantity: Long? = null,

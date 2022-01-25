@@ -22,8 +22,8 @@ class InboundUnplanned(
     @JoinColumn(name = "basic_product_id")
     val basicProduct : BasicProduct? = null,
     val quantity : Int,
-    val makeDate : String? = null,
-    val expireDate : String? = null,
+    val makeDate : LocalDateTime? = null,
+    val expireDate : LocalDateTime? = null,
     val locationId : Int? = null,
     val boxQuantity : Int? = null,
     val palletQuantity : Int? = null,

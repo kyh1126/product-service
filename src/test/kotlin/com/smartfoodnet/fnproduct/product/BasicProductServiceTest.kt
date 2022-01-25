@@ -1,10 +1,10 @@
 package com.smartfoodnet.fnproduct.product
 
-import com.smartfoodnet.apiclient.CommonResponse
 import com.smartfoodnet.apiclient.WmsApiClient
 import com.smartfoodnet.apiclient.request.PreShippingProductModel
 import com.smartfoodnet.apiclient.response.PostShippingProductModel
 import com.smartfoodnet.base.*
+import com.smartfoodnet.common.model.response.CommonResponse
 import com.smartfoodnet.fnproduct.code.CodeService
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.product.entity.BasicProductCategory
