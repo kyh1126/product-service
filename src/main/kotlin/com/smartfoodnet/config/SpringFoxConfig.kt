@@ -35,7 +35,7 @@ class SpringFoxConfig(
 //            .host(host)
             .alternateTypeRules(newRule)
             .select()
-            .apis(RequestHandlerSelectors.any())
+            .apis(RequestHandlerSelectors.basePackage("com.smartfoodnet"))
             .paths(PathSelectors.any())
             .build()
             .apiInfo(apiInfo())

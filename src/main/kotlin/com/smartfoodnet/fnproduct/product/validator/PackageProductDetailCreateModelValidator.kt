@@ -108,6 +108,7 @@ class PackageProductDetailCreateModelValidator(
             }
 
             validateNull(errors, "packageProductModel.partnerId", "화주(고객사) ID", partnerId)
+            validateEmpty(errors, "basicProductModel.partnerCode", "화주(고객사) 코드", partnerCode)
             validateEmpty(errors, "packageProductModel.name", "상품명", name)
             validateEmpty(errors, "packageProductModel.barcodeYn", "상품바코드기재여부", barcodeYn)
             validateEmpty(

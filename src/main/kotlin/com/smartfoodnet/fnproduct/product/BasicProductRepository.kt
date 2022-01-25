@@ -19,4 +19,5 @@ interface BasicProductRepository : JpaRepository<BasicProduct, Long>, BasicProdu
         partnerId: Long,
         activeYn: String
     ): List<BasicProduct>?
+    fun findByShippingProductId(shippingProductId : Long) : BasicProduct?
 }

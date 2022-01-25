@@ -17,7 +17,6 @@ spring:
       maxRequestSize: 10MB
   jpa:
     database-platform: org.hibernate.dialect.MySQL8Dialect
-    generate-ddl: false
     open-in-view: false
     hibernate:
       ddl-auto: none
@@ -30,7 +29,6 @@ spring:
           release_mode: on_close
         dialect:
           storage-engine: innodb
-          format_sql: true
         show_sql: false
         format_sql: false
   datasource:
@@ -60,8 +58,8 @@ sfn:
     size:
       value: "페이지 크기 (default: ${spring.data.web.pageable.default-page-size})"
   service:
-    fn-message: ${FN_MESSAGE_BASE_URL:http://fn-message.sfn-dev:4011/fresh-networks/fn-message}
-    fn-warehouse-management-service: ${FN_WMS_BASE_URL:http://fn-warehouse-service.sfn-dev:4001}/fresh-networks/fn-warehouse-service
+    fn-message: ${FN_MESSAGE_SERVICE:http://fn-message.sfn-dev:4011/fresh-networks/fn-message}
+    fn-warehouse-management-service: ${FN_WAREHOUSE_SERVICE:http://fn-warehouse-service.sfn-dev:4001}/fresh-networks/fn-warehouse-service
 
 sqs:
   queues:

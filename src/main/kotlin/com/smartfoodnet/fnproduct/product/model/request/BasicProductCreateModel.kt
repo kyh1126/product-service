@@ -24,6 +24,9 @@ class BasicProductCreateModel {
     @ApiModelProperty(value = "화주(고객사) ID", example = "1")
     var partnerId: Long? = null
 
+    @ApiModelProperty(value = "화주(고객사) 코드", example = "0001")
+    var partnerCode: String? = null
+
     @ApiModelProperty(value = "출고상품 ID (nosnos)")
     val shippingProductId: Long? = null
 
@@ -58,9 +61,6 @@ class BasicProductCreateModel {
     @ApiModelProperty(value = "공급가")
     var supplyPrice: Int? = null
 
-    @ApiModelProperty(value = "단수(포장)여부", allowableValues = "Y,N")
-    var singlePackagingYn: String = "N"
-
     @ApiModelProperty(value = "유통기한관리여부 (default: N)", allowableValues = "Y,N")
     var expirationDateManagementYn: String = "N"
 
@@ -73,8 +73,8 @@ class BasicProductCreateModel {
     @ApiModelProperty(value = "상품이미지 URL")
     var imageUrl: String? = null
 
-    @ApiModelProperty(value = "활성화여부 (default: N)", allowableValues = "Y,N")
-    var activeYn: String = "N"
+    @ApiModelProperty(value = "활성화여부 (default: Y)", allowableValues = "Y,N")
+    var activeYn: String = "Y"
 
     @JsonUnwrapped
     var expirationDateInfoModel: ExpirationDateInfoCreateModel? = null
@@ -97,7 +97,6 @@ class BasicProductCreateModel {
             handlingTemperature = handlingTemperature,
             warehouse = inWarehouse,
             supplyPrice = supplyPrice,
-            singlePackagingYn = singlePackagingYn,
             expirationDateManagementYn = expirationDateManagementYn,
             expirationDateInfo = expirationDateInfoModel?.toEntity(),
             piecesPerBox = piecesPerBox,

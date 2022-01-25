@@ -1,9 +1,11 @@
 package com.smartfoodnet.fninventory.inbound
 
+import com.smartfoodnet.apiclient.request.InboundWorkReadModel
+import com.smartfoodnet.apiclient.response.CommonDataListModel
+import com.smartfoodnet.apiclient.response.GetInboundWorkModel
 import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.fninventory.inbound.model.dto.GetInbound
-import com.smartfoodnet.fninventory.inbound.model.dto.GetInboundParent
 import com.smartfoodnet.fninventory.inbound.model.request.InboundCreateModel
 import com.smartfoodnet.fninventory.inbound.model.request.InboundSearchCondition
 import io.swagger.annotations.Api
@@ -19,7 +21,8 @@ import javax.validation.Valid
 @RestController
 @RequestMapping("inbounds")
 class InboundController(
-    val inboundService: InboundService
+    val inboundService: InboundService,
+    val inboundJobService: InboundJobService
 ){
 
     @PostMapping
@@ -38,6 +41,16 @@ class InboundController(
         return inboundService.getInbound(condition.apply { this.partnerId = partnerId }, page)
     }
 
+    @GetMapping("partner/{partnerId}/unplanned")
+    @Operation(summary = "미예정 입고조회")
+    fun getInboundUnplanned(
+        @Parameter(description = "고객사 ID", example = "14") @PathVariable partnerId : Long,
+        @ModelAttribute condition: InboundSearchCondition,
+        @PageableDefault(size = 50, sort = ["id"], direction = Sort.Direction.DESC) page: Pageable
+    ){
+
+    }
+
     @GetMapping("partner/{partnerId}/details/{expectedDetailId}")
     @Operation(summary = "입고내역 조회")
     fun getInboundDetail(
@@ -45,6 +58,24 @@ class InboundController(
         @Parameter(description = "입고예정 상세번호", example = "3") @PathVariable expectedDetailId: Long
     ) = inboundService.getInboundActualDetail(partnerId, expectedDetailId)
 
+    @GetMapping("partner/{partnerId}/work")
+    @Operation(summary = "입고작업 내역 조회")
+    fun getInboundWork(
+        @PathVariable partnerId: Long,
+        @RequestParam startDt : String,
+        @RequestParam endDt : String,
+        @RequestParam(defaultValue = "1") page : Int
+    ) : CommonDataListModel<GetInboundWorkModel>? {
+        return inboundService.getInboundWork(partnerId, startDt, endDt, page)
+    }
+
+    @GetMapping("partner/{partnerId}/work/job")
+    fun getInboundWorkSchedule(
+        @PathVariable partnerId: Long,
+        @RequestParam basicDt : String
+    ){
+        inboundJobService.inboundWorkJob(partnerId, basicDt)
+    }
 
     companion object : Log
 }

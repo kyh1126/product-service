@@ -36,7 +36,7 @@ data class BasicProductSimpleModel(
     )
     var handlingTemperature: HandlingTemperatureType? = null,
 
-    @ApiModelProperty(value = "활성화여부 (default: N)", allowableValues = "Y,N")
+    @ApiModelProperty(value = "활성화여부", allowableValues = "Y,N")
     val activeYn: String,
 ) {
 

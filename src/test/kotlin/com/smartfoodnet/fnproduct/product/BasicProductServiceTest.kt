@@ -1,10 +1,10 @@
 package com.smartfoodnet.fnproduct.product
 
-import com.smartfoodnet.apiclient.CommonResponse
 import com.smartfoodnet.apiclient.WmsApiClient
 import com.smartfoodnet.apiclient.request.PreShippingProductModel
 import com.smartfoodnet.apiclient.response.PostShippingProductModel
 import com.smartfoodnet.base.*
+import com.smartfoodnet.common.model.response.CommonResponse
 import com.smartfoodnet.fnproduct.code.CodeService
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.product.entity.BasicProductCategory
@@ -138,6 +138,7 @@ internal class BasicProductServiceTest(
                 basicProductModel = buildBasicProductCreateModel(
                     type = BasicProductType.BASIC,
                     partnerId = partnerId,
+                    partnerCode = partnerCode,
                     handlingTemperature = HandlingTemperatureType.FREEZE,
                 )
             ).apply { subsidiaryMaterialMappingModels.add(buildSubsidiaryMaterialMappingCreateModel) }
@@ -145,7 +146,12 @@ internal class BasicProductServiceTest(
             // 저장 가능한 Entity 로 변환
             val basicProductCreateModel = mockCreateModel.basicProductModel
             basicProductCode = with(basicProductCreateModel) {
-                basicProductCodeGenerator.getBasicProductCode(partnerId, type, handlingTemperature)
+                basicProductCodeGenerator.getBasicProductCode(
+                    partnerId!!,
+                    partnerCode!!,
+                    type,
+                    handlingTemperature!!
+                )
             }
             // BasicProductCategory: 있는거 조회해서 넘겨야함
             val basicProductCategory = getBasicProductCategory(basicProductCreateModel)
@@ -225,6 +231,7 @@ internal class BasicProductServiceTest(
                 basicProductModel = buildBasicProductCreateModel(
                     type = BasicProductType.BASIC,
                     partnerId = partnerId,
+                    partnerCode = partnerCode,
                     handlingTemperature = HandlingTemperatureType.FREEZE,
                 )
             ).apply { subsidiaryMaterialMappingModels.add(buildSubsidiaryMaterialMappingCreateModel) }

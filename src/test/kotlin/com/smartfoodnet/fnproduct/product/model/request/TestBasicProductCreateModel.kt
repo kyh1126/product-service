@@ -20,6 +20,9 @@ class TestBasicProductCreateModel(
     @ApiModelProperty(value = "화주(고객사) ID", example = "1")
     val partnerId: Long? = null,
 
+    @ApiModelProperty(value = "화주(고객사) 코드", example = "0001")
+    val partnerCode: String? = null,
+
     @ApiModelProperty(value = "상품명")
     val name: String? = null,
 
@@ -51,9 +54,6 @@ class TestBasicProductCreateModel(
     @ApiModelProperty(value = "공급가")
     val supplyPrice: Int? = null,
 
-    @ApiModelProperty(value = "단수(포장)여부", allowableValues = "Y,N")
-    val singlePackagingYn: String = "N",
-
     @ApiModelProperty(value = "유통기한관리여부 (default: N)", allowableValues = "Y,N")
     val expirationDateManagementYn: String = "N",
 
@@ -66,8 +66,8 @@ class TestBasicProductCreateModel(
     @ApiModelProperty(value = "상품이미지 URL")
     val imageUrl: String? = null,
 
-    @ApiModelProperty(value = "활성화여부 (default: N)", allowableValues = "Y,N")
-    val activeYn: String = "N",
+    @ApiModelProperty(value = "활성화여부 (default: Y)", allowableValues = "Y,N")
+    val activeYn: String = "Y",
 
     @JsonUnwrapped
     var expirationDateInfoModel: ExpirationDateInfoCreateModel? = null
@@ -77,6 +77,7 @@ class TestBasicProductCreateModel(
             it.id = id
             it.type = type
             it.partnerId = partnerId
+            it.partnerCode = partnerCode
             it.name = name
             it.code = code
             it.barcodeYn = barcodeYn
@@ -86,7 +87,6 @@ class TestBasicProductCreateModel(
             it.handlingTemperature = handlingTemperature
             it.warehouseId = warehouseId
             it.supplyPrice = supplyPrice
-            it.singlePackagingYn = singlePackagingYn
             it.expirationDateManagementYn = expirationDateManagementYn
             it.piecesPerBox = piecesPerBox
             it.piecesPerPalette = piecesPerPalette

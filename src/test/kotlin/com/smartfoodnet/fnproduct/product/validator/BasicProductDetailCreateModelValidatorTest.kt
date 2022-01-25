@@ -59,7 +59,7 @@ internal class BasicProductDetailCreateModelValidatorTest {
             private val separator = "\n\t"
 
             @Test
-            @DisplayName("validate 실패한다 - partnerId, name, barcodeYn, handlingTemperature, basicProductCategory, singlePackagingYn")
+            @DisplayName("validate 실패한다 - partnerId, name, barcodeYn, handlingTemperature, basicProductCategory")
             fun checkRequiredFieldsBasicType_InvalidInput_ThenFail() {
                 // given
                 val mockCreateModel = getInvalidInput_checkRequiredFieldsBasicType()
@@ -67,14 +67,12 @@ internal class BasicProductDetailCreateModelValidatorTest {
                 val expectedMessage = listOf(
                     "CreateModelValidateErrorMessage: ",
                     "화주(고객사) ID 값은 null 이 아닌 값을 입력해주세요.",
+                    "화주(고객사) 코드 값은 null 이 아닌 값을 입력해주세요.",
                     "상품명 값을 입력해주세요.",
                     "상품바코드기재여부 값을 입력해주세요.",
                     "취급온도 값은 null 이 아닌 값을 입력해주세요.",
-                    "상품카테고리 ID 값은 null 이 아닌 값을 입력해주세요.",
-                    "단수(포장)여부 값을 입력해주세요.",
                     "유통기한관리여부 값을 입력해주세요.",
                     "박스입수 값은 null 이 아닌 값을 입력해주세요.",
-                    "파레트입수 값은 null 이 아닌 값을 입력해주세요."
                 ).joinToString(separator, "", separator)
 
                 // when & then
@@ -102,15 +100,14 @@ internal class BasicProductDetailCreateModelValidatorTest {
     private fun getInvalidInput_checkRequiredFieldsBasicType(): BasicProductDetailCreateModel {
         val basicProductModel = buildBasicProductCreateModel(
             partnerId = null,
+            partnerCode = null,
             name = "",
             barcodeYn = "",
             type = BasicProductType.BASIC,
             handlingTemperature = null,
             basicProductCategoryId = null,
-            singlePackagingYn = "",
             expirationDateManagementYn = "",
             piecesPerBox = null,
-            piecesPerPalette = null
         )
         return getInput(basicProductModel)
     }

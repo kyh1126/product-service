@@ -44,7 +44,11 @@ class StockController(
         @PathVariable partnerId: Long,
         @Parameter(description = "검색조건")
         @ModelAttribute condition: StockByBestBeforeSearchCondition,
-        @PageableDefault(size = 50, sort = ["bestBefore"], direction = Sort.Direction.DESC) page: Pageable,
+        @PageableDefault(
+            size = 50,
+            sort = ["bestBefore"],
+            direction = Sort.Direction.DESC
+        ) page: Pageable,
     ): PageResponse<StockByBestBeforeModel> {
         condition.apply { this.partnerId = partnerId }
         return stockService.getStocksByBestBefore(partnerId, condition, page)
@@ -74,8 +78,8 @@ class StockController(
     @Operation(summary = "상미기한별 재고 배치 작업")
     @PostMapping("best-before/synchronize")
     fun syncStocksByBestBefore(
-    ): CommonResponse{
-        stockScheduledService.syncStocksByBestBefore()
+    ): CommonResponse<Unit> {
+        stockService.syncStocksByBestBefore()
         return CommonResponse()
     }
 }

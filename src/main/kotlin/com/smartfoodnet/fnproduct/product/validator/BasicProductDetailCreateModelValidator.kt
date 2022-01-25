@@ -26,6 +26,8 @@ class BasicProductDetailCreateModelValidator(
         errors: Errors
     ) {
         val basicProductModel = target.basicProductModel
+        if (checkType(basicProductModel, errors)) return
+
         when (basicProductModel.type) {
             BasicProductType.BASIC -> checkRequiredFieldsBasicType(target, errors)
             BasicProductType.CUSTOM_SUB -> checkRequiredFieldsCustomSubType(target, errors)
@@ -39,6 +41,16 @@ class BasicProductDetailCreateModelValidator(
         checkExpirationDateInfo(basicProductModel, errors)
 
         checkTemperatureType(basicProductModel, errors)
+    }
+
+    private fun checkType(target: BasicProductCreateModel, errors: Errors): Boolean {
+        val isPackageType = target.type == BasicProductType.PACKAGE
+        if (isPackageType) {
+            errors.rejectValue(
+                "basicProductModel.type", "type.invalid", "모음상품은 불가합니다."
+            )
+        }
+        return isPackageType
     }
 
     private fun checkDuplicateName(
@@ -80,13 +92,6 @@ class BasicProductDetailCreateModelValidator(
                         "basicProductModel.barcode",
                         "barcode.invalid",
                         "숫자 입력만 가능합니다."
-                    )
-                }
-                basicProductRepository.findByPartnerIdAndBarcode(partnerId!!, barcode!!)?.let {
-                    errors.rejectValue(
-                        "basicProductModel.barcode",
-                        "barcode.duplicate",
-                        "사용중인 상품바코드가 있습니다."
                     )
                 }
             }
@@ -149,7 +154,7 @@ class BasicProductDetailCreateModelValidator(
         with(target) {
             if (handlingTemperature == null) return
 
-            if (type != BasicProductType.PACKAGE && handlingTemperature == HandlingTemperatureType.MIX) {
+            if (handlingTemperature == HandlingTemperatureType.MIX) {
                 errors.reject("basicProductModel", "취급온도-혼합은 모음상품 구분만 선택 가능합니다.")
             }
         }
@@ -166,6 +171,7 @@ class BasicProductDetailCreateModelValidator(
             if (type != BasicProductType.BASIC) return
 
             validateNull(errors, "basicProductModel.partnerId", "화주(고객사) ID", partnerId)
+            validateEmpty(errors, "basicProductModel.partnerCode", "화주(고객사) 코드", partnerCode)
             validateEmpty(errors, "basicProductModel.name", "상품명", name)
             validateEmpty(errors, "basicProductModel.barcodeYn", "상품바코드기재여부", barcodeYn)
             validateEmpty(
@@ -176,24 +182,11 @@ class BasicProductDetailCreateModelValidator(
             )
             validateEmpty(
                 errors,
-                "basicProductModel.basicProductCategoryId",
-                "상품카테고리 ID",
-                basicProductCategoryId
-            )
-            validateEmpty(
-                errors,
-                "basicProductModel.singlePackagingYn",
-                "단수(포장)여부",
-                singlePackagingYn
-            )
-            validateEmpty(
-                errors,
                 "basicProductModel.expirationDateManagementYn",
                 "유통기한관리여부",
                 expirationDateManagementYn
             )
             validateEmpty(errors, "basicProductModel.piecesPerBox", "박스입수", piecesPerBox)
-            validateEmpty(errors, "basicProductModel.piecesPerPalette", "파레트입수", piecesPerPalette)
         }
 
         validateEmpty(
@@ -214,10 +207,10 @@ class BasicProductDetailCreateModelValidator(
             if (type != BasicProductType.CUSTOM_SUB) return
 
             validateNull(errors, "basicProductModel.partnerId", "화주(고객사) ID", partnerId)
+            validateEmpty(errors, "basicProductModel.partnerCode", "화주(고객사) 코드", partnerCode)
             validateEmpty(errors, "basicProductModel.name", "상품명", name)
             validateEmpty(errors, "basicProductModel.barcodeYn", "상품바코드기재여부", barcodeYn)
             validateEmpty(errors, "basicProductModel.piecesPerBox", "박스입수", piecesPerBox)
-            validateEmpty(errors, "basicProductModel.piecesPerPalette", "파레트입수", piecesPerPalette)
         }
     }
 }
