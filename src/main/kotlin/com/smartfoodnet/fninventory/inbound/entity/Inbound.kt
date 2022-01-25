@@ -16,8 +16,8 @@ class Inbound(
 
     val expectedDate: LocalDateTime? = null,
 
-    val registrationNo: String? = null,
-    val registrationId: Long?= null,
+    var registrationNo: String? = null,
+    var registrationId: Long?= null,
 
     @Lob
     val memo: String? = null,

@@ -1,6 +1,7 @@
 package com.smartfoodnet.apiclient
 
 import com.smartfoodnet.apiclient.request.InboundWorkReadModel
+import com.smartfoodnet.apiclient.request.NosnosInboundCreateModel
 import com.smartfoodnet.apiclient.request.PreSalesProductModel
 import com.smartfoodnet.apiclient.request.PreShippingProductModel
 import com.smartfoodnet.apiclient.response.*
@@ -43,4 +44,8 @@ interface WmsApiClient {
         @SpringQueryMap inboundWorkReadModel : InboundWorkReadModel
     ) : CommonResponse<CommonDataListModel<GetInboundWorkModel>>
 
+    @PostMapping("inventory/inbounds")
+    fun createInbound(
+        @RequestBody nosNosInboundCreateModel: NosnosInboundCreateModel
+    ) : CommonResponse<NosnosPostInboundModel>
 }
