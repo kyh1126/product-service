@@ -41,8 +41,8 @@ class BasicProductSimpleCreateModel {
     )
     val handlingTemperature: HandlingTemperatureType? = null
 
-    @ApiModelProperty(value = "활성화여부 (default: N)", allowableValues = "Y,N")
-    val activeYn: String = "N"
+    @ApiModelProperty(value = "활성화여부 (default: Y)", allowableValues = "Y,N")
+    val activeYn: String = "Y"
 
     fun toEntity(code: String?): BasicProduct {
         return BasicProduct(

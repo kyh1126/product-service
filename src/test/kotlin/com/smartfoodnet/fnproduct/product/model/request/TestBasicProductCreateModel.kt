@@ -66,8 +66,8 @@ class TestBasicProductCreateModel(
     @ApiModelProperty(value = "상품이미지 URL")
     val imageUrl: String? = null,
 
-    @ApiModelProperty(value = "활성화여부 (default: N)", allowableValues = "Y,N")
-    val activeYn: String = "N",
+    @ApiModelProperty(value = "활성화여부 (default: Y)", allowableValues = "Y,N")
+    val activeYn: String = "Y",
 
     @JsonUnwrapped
     var expirationDateInfoModel: ExpirationDateInfoCreateModel? = null

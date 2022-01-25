@@ -74,7 +74,7 @@ data class BasicProductModel(
     @ApiModelProperty(value = "상품이미지 URL")
     var imageUrl: String? = null,
 
-    @ApiModelProperty(value = "활성화여부 (default: N)", allowableValues = "Y,N")
+    @ApiModelProperty(value = "활성화여부", allowableValues = "Y,N")
     val activeYn: String,
 
     @ApiModelProperty(value = "출고상품 ID (nosnos)")
