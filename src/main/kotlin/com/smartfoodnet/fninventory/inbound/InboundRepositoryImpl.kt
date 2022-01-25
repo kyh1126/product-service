@@ -121,4 +121,17 @@ class InboundRepositoryImpl
             ).fetch()
 
     }
+
+    override fun findInboundExpectedWithBasicProduct(
+        receivingPlanId: Long,
+        shippingProductId: Long
+    ): InboundExpectedDetail? {
+        return selectFrom(inboundExpectedDetail)
+            .leftJoin(inboundExpectedDetail.inbound, inbound).fetchJoin()
+            .leftJoin(inboundExpectedDetail.basicProduct, basicProduct).fetchJoin()
+            .where(
+                inbound.registrationId.eq(receivingPlanId),
+                basicProduct.shippingProductId.eq(shippingProductId)
+            ).fetchOne()
+    }
 }

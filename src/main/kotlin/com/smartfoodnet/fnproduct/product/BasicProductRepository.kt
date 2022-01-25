@@ -15,4 +15,5 @@ interface BasicProductRepository : JpaRepository<BasicProduct, Long>, BasicProdu
         expirationDateManagementYn: String,
         activeYn: String
     ): List<BasicProduct>?
+    fun findByShippingProductId(shippingProductId : Long) : BasicProduct?
 }

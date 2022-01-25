@@ -1,5 +1,7 @@
 package com.smartfoodnet.fninventory.inbound
 
+import com.smartfoodnet.fninventory.inbound.entity.Inbound
+import com.smartfoodnet.fninventory.inbound.entity.InboundExpectedDetail
 import com.smartfoodnet.fninventory.inbound.model.dto.GetInboundActualDetail
 import com.smartfoodnet.fninventory.inbound.model.dto.GetInboundSumDetail
 import com.smartfoodnet.fninventory.inbound.model.dto.GetInboundParent
@@ -11,4 +13,5 @@ interface InboundRepositoryCustom {
     fun findInbounds(condition: InboundSearchCondition, page: Pageable): Page<GetInboundParent>
     fun findInboundActualDetail(partnerId: Long, expectedId: Long): List<GetInboundActualDetail>
     fun findSumActualDetail(expectedIds: List<Long>) : List<GetInboundSumDetail>
+    fun findInboundExpectedWithBasicProduct(receivingPlanId: Long, basicProductId : Long) : InboundExpectedDetail?
 }
