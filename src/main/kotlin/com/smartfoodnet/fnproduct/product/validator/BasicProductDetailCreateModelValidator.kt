@@ -189,12 +189,6 @@ class BasicProductDetailCreateModelValidator(
             )
             validateEmpty(
                 errors,
-                "basicProductModel.basicProductCategoryId",
-                "상품카테고리 ID",
-                basicProductCategoryId
-            )
-            validateEmpty(
-                errors,
                 "basicProductModel.singlePackagingYn",
                 "단수(포장)여부",
                 singlePackagingYn
