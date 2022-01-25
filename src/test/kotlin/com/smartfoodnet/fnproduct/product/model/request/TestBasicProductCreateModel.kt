@@ -54,9 +54,6 @@ class TestBasicProductCreateModel(
     @ApiModelProperty(value = "공급가")
     val supplyPrice: Int? = null,
 
-    @ApiModelProperty(value = "단수(포장)여부", allowableValues = "Y,N")
-    val singlePackagingYn: String = "N",
-
     @ApiModelProperty(value = "유통기한관리여부 (default: N)", allowableValues = "Y,N")
     val expirationDateManagementYn: String = "N",
 
@@ -90,7 +87,6 @@ class TestBasicProductCreateModel(
             it.handlingTemperature = handlingTemperature
             it.warehouseId = warehouseId
             it.supplyPrice = supplyPrice
-            it.singlePackagingYn = singlePackagingYn
             it.expirationDateManagementYn = expirationDateManagementYn
             it.piecesPerBox = piecesPerBox
             it.piecesPerPalette = piecesPerPalette

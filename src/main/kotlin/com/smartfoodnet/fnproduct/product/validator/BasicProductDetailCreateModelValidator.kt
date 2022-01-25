@@ -189,12 +189,6 @@ class BasicProductDetailCreateModelValidator(
             )
             validateEmpty(
                 errors,
-                "basicProductModel.singlePackagingYn",
-                "단수(포장)여부",
-                singlePackagingYn
-            )
-            validateEmpty(
-                errors,
                 "basicProductModel.expirationDateManagementYn",
                 "유통기한관리여부",
                 expirationDateManagementYn

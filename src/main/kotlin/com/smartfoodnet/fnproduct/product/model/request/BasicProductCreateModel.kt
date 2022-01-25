@@ -61,9 +61,6 @@ class BasicProductCreateModel {
     @ApiModelProperty(value = "공급가")
     var supplyPrice: Int? = null
 
-    @ApiModelProperty(value = "단수(포장)여부", allowableValues = "Y,N")
-    var singlePackagingYn: String = "N"
-
     @ApiModelProperty(value = "유통기한관리여부 (default: N)", allowableValues = "Y,N")
     var expirationDateManagementYn: String = "N"
 
@@ -100,7 +97,6 @@ class BasicProductCreateModel {
             handlingTemperature = handlingTemperature,
             warehouse = inWarehouse,
             supplyPrice = supplyPrice,
-            singlePackagingYn = singlePackagingYn,
             expirationDateManagementYn = expirationDateManagementYn,
             expirationDateInfo = expirationDateInfoModel?.toEntity(),
             piecesPerBox = piecesPerBox,

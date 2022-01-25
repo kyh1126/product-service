@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 import com.smartfoodnet.common.convertYnToInt
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
-import com.smartfoodnet.fnproduct.product.model.vo.BasicProductPackageType
 
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy::class)
 data class PreSalesProductModel(
@@ -27,7 +26,6 @@ data class PreSalesProductModel(
                 PreSalesProductModel(
                     memberId = partnerId!!,
                     salesProductCode = salesProductCode!!,
-                    manageCode1 = BasicProductPackageType.fromSinglePackagingYn(singlePackagingYn).text,
                     manageCode2 = handlingTemperature?.desc,
                     productName = name!!,
                     status = convertYnToInt(activeYn),
