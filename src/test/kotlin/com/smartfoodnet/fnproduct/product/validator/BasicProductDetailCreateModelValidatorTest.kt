@@ -73,7 +73,6 @@ internal class BasicProductDetailCreateModelValidatorTest {
                     "취급온도 값은 null 이 아닌 값을 입력해주세요.",
                     "유통기한관리여부 값을 입력해주세요.",
                     "박스입수 값은 null 이 아닌 값을 입력해주세요.",
-                    "파레트입수 값은 null 이 아닌 값을 입력해주세요."
                 ).joinToString(separator, "", separator)
 
                 // when & then
@@ -109,7 +108,6 @@ internal class BasicProductDetailCreateModelValidatorTest {
             basicProductCategoryId = null,
             expirationDateManagementYn = "",
             piecesPerBox = null,
-            piecesPerPalette = null
         )
         return getInput(basicProductModel)
     }
