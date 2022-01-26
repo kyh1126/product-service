@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming
 import com.smartfoodnet.apiclient.dto.AddBarcode
 import com.smartfoodnet.common.convertYnToInt
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
-import com.smartfoodnet.fnproduct.product.model.vo.BasicProductPackageType
 import io.swagger.annotations.ApiModelProperty
 
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy::class)
@@ -53,7 +52,6 @@ data class PreShippingProductModel(
                     memberId = partnerId!!,
                     productCode = code,
                     productName = name!!,
-                    manageCode1 = BasicProductPackageType.fromSinglePackagingYn(singlePackagingYn).text,
                     manageCode2 = handlingTemperature?.desc,
                     upc = barcode,
                     singleEta = piecesPerBox,

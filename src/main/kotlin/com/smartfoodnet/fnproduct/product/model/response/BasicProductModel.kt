@@ -58,9 +58,6 @@ data class BasicProductModel(
     @ApiModelProperty(value = "공급가")
     var supplyPrice: Int? = null,
 
-    @ApiModelProperty(value = "단수(포장)여부", allowableValues = "Y,N")
-    var singlePackagingYn: String,
-
     @ApiModelProperty(value = "유통기한관리여부 (default: N)", allowableValues = "Y,N")
     var expirationDateManagementYn: String,
 
@@ -77,7 +74,7 @@ data class BasicProductModel(
     @ApiModelProperty(value = "상품이미지 URL")
     var imageUrl: String? = null,
 
-    @ApiModelProperty(value = "활성화여부 (default: N)", allowableValues = "Y,N")
+    @ApiModelProperty(value = "활성화여부", allowableValues = "Y,N")
     val activeYn: String,
 
     @ApiModelProperty(value = "출고상품 ID (nosnos)")
@@ -128,7 +125,6 @@ data class BasicProductModel(
                     warehouseId = warehouse?.id,
                     warehouseName = warehouse?.name,
                     supplyPrice = supplyPrice,
-                    singlePackagingYn = singlePackagingYn,
                     expirationDateManagementYn = expirationDateManagementYn,
                     expirationDateInfoModel = expirationDateInfo?.let {
                         ExpirationDateInfoModel.fromEntity(it)

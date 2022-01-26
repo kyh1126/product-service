@@ -27,6 +27,22 @@ interface WmsApiClient {
         @RequestParam shippingProductIds: List<Long?>?
     ): CommonResponse<CommonDataListModel<NosnosExpirationDateStockModel>>
 
+    @GetMapping("/stock/history/{processDate}")
+    fun getStocksMoveEvents(
+        @SpringQueryMap stockDefaultModel: StockDefaultModel,
+        @PathVariable processDate: String
+    ): CommonResponse<CommonDataListModel<NosnosStockMoveEventModel>>
+
+    @GetMapping("/stock/daily")
+    fun getDailyCloseStock(
+        @SpringQueryMap dailyCloseStockRequestModel: DailyCloseStockRequestModel,
+    ): CommonResponse<CommonDataListModel<NosnosDailyCloseStockModel>>
+
+    @GetMapping("/stock/summary")
+    fun getDailyStockSummary(
+        @SpringQueryMap dailySummaryStockRequestModel: DailySummaryStockRequestModel,
+    ): CommonResponse<CommonDataListModel<NosnosDailyStockSummaryModel>>
+
     @PostMapping("shipping/products")
     fun createShippingProduct(preModel: PreShippingProductModel): CommonResponse<PostShippingProductModel>
 
@@ -49,3 +65,25 @@ interface WmsApiClient {
         @RequestBody nosNosInboundCreateModel: NosnosInboundCreateModel
     ) : CommonResponse<NosnosPostInboundModel>
 }
+
+data class StockDefaultModel(
+    val memberId: Long,
+    val shippingProductIds: List<Int>? = null,
+    val page: Int = 1
+)
+
+data class DailyCloseStockRequestModel(
+    val memberId: Long,
+    val closingDate: String,
+    val shippingProductIds: List<Long>? = null,
+    val page: Int? = 1
+)
+
+data class DailySummaryStockRequestModel(
+    val memberId: Long,
+    val stockDate: String,
+    val shippingProductIds: List<Long>? = null,
+    val page: Int? = 1
+)
+
+

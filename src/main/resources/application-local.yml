@@ -4,12 +4,7 @@ server:
     context-path: /fresh-networks/fn-product
 logging:
   level:
-    org:
-      hibernate:
-        type:
-          descriptor:
-            sql: off
-#            sql: trace
+    org.hibernate.type.descriptor.sql: trace
     io.swagger.models.parameters.AbstractSerializableParameter: ERROR
 spring:
   data:
@@ -25,7 +20,6 @@ spring:
       maxRequestSize: 10MB
   jpa:
     database-platform: org.hibernate.dialect.MySQL8Dialect
-    generate-ddl: false
     open-in-view: false
     hibernate:
       ddl-auto: update
@@ -35,7 +29,6 @@ spring:
           release_mode: on_close
         dialect:
           storage-engine: innodb
-#          format_sql: true
         show_sql: true
 #        format_sql: true
   datasource:
@@ -65,8 +58,8 @@ sfn:
     size:
       value: "페이지 크기 (default: ${spring.data.web.pageable.default-page-size})"
   service:
-    fn-message: ${FN_MESSAGE_BASE_URL:https://s-api-dev.smartfoodnet.com/fresh-networks/fn-message}
-    fn-warehouse-management-service: ${FN_WMS_BASE_URL:http://localhost:4001}/fresh-networks/fn-warehouse-service
+    fn-message: ${FN_MESSAGE_SERVICE:https://s-api-dev.smartfoodnet.com/fresh-networks/fn-message}
+    fn-warehouse-management-service: ${FN_WAREHOUSE_SERVICE:http://localhost:4001}
 
 
 sqs:

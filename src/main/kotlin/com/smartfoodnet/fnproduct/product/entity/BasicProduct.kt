@@ -56,9 +56,6 @@ class BasicProduct(
     @Column(name = "supply_price")
     var supplyPrice: Int? = null,
 
-    @Column(name = "single_packaging_yn")
-    var singlePackagingYn: String = "N",
-
     @Column(name = "expiration_date_management_yn")
     var expirationDateManagementYn: String = "N",
 
@@ -114,7 +111,6 @@ class BasicProduct(
     ) {
         name = request.name
         supplyPrice = request.supplyPrice
-        singlePackagingYn = request.singlePackagingYn
         expirationDateManagementYn = request.expirationDateManagementYn
         expirationDateInfo = request.expirationDateInfoModel?.toEntity()
         piecesPerBox = request.piecesPerBox

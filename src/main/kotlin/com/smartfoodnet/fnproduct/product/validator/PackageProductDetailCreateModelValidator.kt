@@ -46,7 +46,7 @@ class PackageProductDetailCreateModelValidator(
                 errors.rejectValue(
                     "packageProductModel.name",
                     "name.duplicate",
-                    "사용중인 상품명이 있습니다. 기본상품코드: $code"
+                    "사용중인 상품명이 있습니다. 기본상품코드: ${it.code}"
                 )
             }
         }
@@ -108,6 +108,7 @@ class PackageProductDetailCreateModelValidator(
             }
 
             validateNull(errors, "packageProductModel.partnerId", "화주(고객사) ID", partnerId)
+            validateEmpty(errors, "basicProductModel.partnerCode", "화주(고객사) 코드", partnerCode)
             validateEmpty(errors, "packageProductModel.name", "상품명", name)
             validateEmpty(errors, "packageProductModel.barcodeYn", "상품바코드기재여부", barcodeYn)
             validateEmpty(
