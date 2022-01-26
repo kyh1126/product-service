@@ -15,7 +15,7 @@ data class InboundExpectedModel(
     @ApiModelProperty(value = "기본상품번호", example = "101")
     val basicProductId: Long,
 
-    @ApiModelProperty(value = "기본상품코드", example = "F001AA0003")
+    @ApiModelProperty(value = "기본상품코드", example = "F001AA00003")
     @field:NotBlank(message = "기본상품코드를 입력하세요")
     val basicProductCode: String,
 
@@ -28,7 +28,7 @@ data class InboundExpectedModel(
     @field:NotNull
     val inboundMethod: InboundMethodType? = null,
 
-    @ApiModelProperty(value = "택배사 정보 기입여부", example = "false")
+    @ApiModelProperty(value = "택배사 정보 기입여부", example = "true")
     val deliveryFlag: Boolean = false,
 
     @ApiModelProperty(value = "택배사", example = "SFN택배")

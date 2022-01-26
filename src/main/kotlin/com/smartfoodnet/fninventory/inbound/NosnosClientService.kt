@@ -32,7 +32,7 @@ class NosnosClientService(
         }
 
         val trackingNumbers = inbound.expectedList.mapNotNull {
-            if (it.trackingNo.isNullOrBlank()) it.trackingNo else null
+            if (it.trackingNo.isNullOrBlank()) null else it.trackingNo
         }.joinToString { it }
 
         val nosnosInboundCreateModel = NosnosInboundCreateModel(
