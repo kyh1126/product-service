@@ -23,7 +23,7 @@ class InboundExpectedDetail(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "basic_product_id", columnDefinition = "BIGINT UNSIGNED")
-    var basicProduct: BasicProduct? = null,
+    var basicProduct: BasicProduct,
 
     val requestQuantity: Long = 0,
 

@@ -2,7 +2,7 @@ package com.smartfoodnet.apiclient.response
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonNaming
-import com.smartfoodnet.nosnos.api.inventory.model.request.PlanProduct
+import com.smartfoodnet.apiclient.request.PlanProduct
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
 

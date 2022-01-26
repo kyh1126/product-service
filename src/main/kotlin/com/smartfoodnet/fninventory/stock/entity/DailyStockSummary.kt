@@ -23,7 +23,7 @@ class DailyStockSummary(
     @JoinColumn(
         name = "basic_product_id",
         columnDefinition = "BIGINT UNSIGNED",
-        foreignKey = ForeignKey(name = "fk_stock_by_best_before__basic_product")
+        foreignKey = ForeignKey(name = "fk_daily_stock_summary__basic_product")
     )
     var basicProduct: BasicProduct,
 

@@ -12,12 +12,12 @@ class Inbound(
     @Column(name = "inbound_id", columnDefinition = "BIGINT UNSIGNED")
     val id: Long? = null,
 
-    val partnerId: Long? = null,
+    val partnerId: Long,
 
-    val expectedDate: LocalDateTime? = null,
+    val expectedDate: LocalDateTime,
 
-    val registrationNo: String? = null,
-    val registrationId: Long?= null,
+    var registrationNo: String? = null,
+    var registrationId: Long?= null,
 
     @Lob
     val memo: String? = null,

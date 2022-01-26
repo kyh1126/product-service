@@ -102,7 +102,7 @@ class InboundRepositoryImpl
     ): List<GetInboundActualDetail> {
         return queryFactory.from(inbound)
             .innerJoin(inbound.expectedList, inboundExpectedDetail)
-            .innerJoin(inboundExpectedDetail.inboundActualDetail, inboundActualDetail)
+            .leftJoin(inboundExpectedDetail.inboundActualDetail, inboundActualDetail)
             .where(
                 inbound.partnerId.eq(partnerId),
                 inboundExpectedDetail.id.eq(expectedId)

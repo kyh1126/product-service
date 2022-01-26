@@ -1,16 +1,10 @@
 package com.smartfoodnet.apiclient
 
 import com.smartfoodnet.apiclient.request.InboundWorkReadModel
+import com.smartfoodnet.apiclient.request.NosnosInboundCreateModel
 import com.smartfoodnet.apiclient.request.PreSalesProductModel
 import com.smartfoodnet.apiclient.request.PreShippingProductModel
-import com.smartfoodnet.apiclient.response.CommonDataListModel
-import com.smartfoodnet.apiclient.response.GetInboundWorkModel
-import com.smartfoodnet.apiclient.response.NosnosDailyCloseStockModel
-import com.smartfoodnet.apiclient.response.NosnosDailyStockSummaryModel
-import com.smartfoodnet.apiclient.response.NosnosExpirationDateStockModel
-import com.smartfoodnet.apiclient.response.NosnosStockModel
-import com.smartfoodnet.apiclient.response.NosnosStockMoveEventModel
-import com.smartfoodnet.apiclient.response.PostShippingProductModel
+import com.smartfoodnet.apiclient.response.*
 import com.smartfoodnet.common.model.response.CommonResponse
 import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.cloud.openfeign.SpringQueryMap
@@ -63,8 +57,13 @@ interface WmsApiClient {
 
     @GetMapping("inventory/inbounds/work")
     fun getInboundWork(
-        @SpringQueryMap inboundWorkReadModel: InboundWorkReadModel
-    ): CommonResponse<CommonDataListModel<GetInboundWorkModel>>
+        @SpringQueryMap inboundWorkReadModel : InboundWorkReadModel
+    ) : CommonResponse<CommonDataListModel<GetInboundWorkModel>>
+
+    @PostMapping("inventory/inbounds")
+    fun createInbound(
+        @RequestBody nosNosInboundCreateModel: NosnosInboundCreateModel
+    ) : CommonResponse<NosnosPostInboundModel>
 }
 
 data class StockDefaultModel(

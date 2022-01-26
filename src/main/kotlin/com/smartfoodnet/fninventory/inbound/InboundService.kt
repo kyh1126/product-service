@@ -2,6 +2,7 @@ package com.smartfoodnet.fninventory.inbound
 
 import com.smartfoodnet.apiclient.WmsApiClient
 import com.smartfoodnet.apiclient.request.InboundWorkReadModel
+import com.smartfoodnet.apiclient.request.PlanProduct
 import com.smartfoodnet.apiclient.response.CommonDataListModel
 import com.smartfoodnet.apiclient.response.GetInboundWorkModel
 import com.smartfoodnet.common.model.response.PageResponse
@@ -10,27 +11,39 @@ import com.smartfoodnet.fninventory.inbound.model.dto.GetInbound
 import com.smartfoodnet.fninventory.inbound.model.request.InboundCreateModel
 import com.smartfoodnet.fninventory.inbound.model.request.InboundSearchCondition
 import com.smartfoodnet.fnproduct.product.BasicProductRepository
+import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.lang.RuntimeException
 
 @Service
 @Transactional(readOnly = true)
 class InboundService(
     val inboundRepository: InboundRepository,
     val basicProductRepository: BasicProductRepository,
-    val wmsApiClient: WmsApiClient
+    val nosnosClientService: NosnosClientService
 ) : Log {
 
     @Transactional
     fun createInbound(createModel: InboundCreateModel){
         val inbound = createModel.toEntity()
         createModel.expectedList.forEach {
-            val basicProduct =  basicProductRepository.findByCode(it.basicProductCode)?:throw NoSuchElementException("기본상품(${it.basicProductCode})을 찾을 수 없습니다.")
+            val basicProduct = getBasicProduct(it.basicProductId)
             inbound.addExptecdItem(it.toEntity(basicProduct))
         }
 
+        nosnosClientService.sendInboundAndSetRegisterNo(inbound)
+
         inboundRepository.save(inbound)
+    }
+
+    private fun getBasicProduct(basicProductCode : String) : BasicProduct {
+        return basicProductRepository.findByCode(basicProductCode)?:throw NoSuchElementException("기본상품(${basicProductCode})을 찾을 수 없습니다.")
+    }
+
+    private fun getBasicProduct(basicProductId : Long) : BasicProduct {
+        return basicProductRepository.findById(basicProductId).get()
     }
 
     fun getInbound(condition: InboundSearchCondition, page: Pageable) : PageResponse<GetInbound>?{
@@ -57,16 +70,4 @@ class InboundService(
 
     fun getInboundActualDetail(partnerId: Long, expectedId: Long)
         = inboundRepository.findInboundActualDetail(partnerId, expectedId)
-
-    fun getInboundWork(partnerId: Long, startDt: String, endDt: String, page: Int): CommonDataListModel<GetInboundWorkModel>? {
-        val params = InboundWorkReadModel(
-            memberId = partnerId,
-            startDt = startDt,
-            endDt = endDt,
-            page = page
-        )
-
-        return wmsApiClient.getInboundWork(params).payload
-    }
-
 }
