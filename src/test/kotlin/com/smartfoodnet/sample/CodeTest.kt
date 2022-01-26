@@ -22,7 +22,18 @@ class CodeTest {
         println(list1)
     }
 
+    data class InnerDataClass(val value: String? = null)
+    data class DataClass(val innerData: InnerDataClass? = null, val num: Int? = null)
     @Test
     fun test() {
+        val a: String? = null
+        val dataClass = DataClass((InnerDataClass()))
+        fun qmarkTest(a: String, b: String) {
+            println(a)
+        }
+        qmarkTest(dataClass?.innerData?.value)
+
+
+
     }
 }

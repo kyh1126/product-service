@@ -84,7 +84,7 @@ class StockScheduledService(
                     shippingProductIds = basicProducts.map { it.shippingProductId!! }
                 )
             ).payload?.dataList
-        }catch (e:FeignException){
+        } catch (e: FeignException) {
             return
         }
 
@@ -159,19 +159,18 @@ class StockScheduledService(
         basicProductsChunks.forEach { basicProductChunk ->
             val nosnosStocksByExpirationDate = wmsApiClient.getStocksByExpirationDate(
                 partnerId,
-                basicProductChunk.map { it.shippingProductId } as List<Long>
+                basicProductChunk.map { it.shippingProductId }
             ).payload?.dataList ?: listOf()
 
             val stocksByBestBefore = mutableListOf<StockByBestBefore>()
 
             nosnosStocksByExpirationDate.forEach { nosnosStockByExpirationDate ->
                 val basicProduct = basicProductChunk.find {
-                    it.shippingProductId?.equals(nosnosStockByExpirationDate.shippingProductId)
-                        ?: false
+                    it.shippingProductId?.equals(nosnosStockByExpirationDate.shippingProductId) ?: false
                 }
 
                 if (basicProduct == null) {
-                    StockService.log.error("error: shippingProductId = [${nosnosStockByExpirationDate.shippingProductId}] does not exist.")
+                    log.error("error: shippingProductId = [${nosnosStockByExpirationDate.shippingProductId}] does not exist.")
                     return
                 }
 
@@ -207,8 +206,8 @@ class StockScheduledService(
             basicProduct = basicProduct,
             shippingProductId = basicProduct.shippingProductId!!,
             bestBefore = calculateBestBefore(
-                nosnosStockByExpirationDate.expirationDate!!,
-                basicProduct.expirationDateInfo!!.expirationDate!!
+                nosnosStockByExpirationDate.expirationDate,
+                basicProduct.expirationDateInfo?.expirationDate
             ),
             manufactureDate = manufacturedDate,
             expirationDate = nosnosStockByExpirationDate.expirationDate,
@@ -219,7 +218,11 @@ class StockScheduledService(
         )
     }
 
-    private fun calculateBestBefore(expirationDate: LocalDateTime, manufacturedBefore: Int): Float {
+    private fun calculateBestBefore(expirationDate: LocalDateTime?, manufacturedBefore: Int?): Float {
+        if(expirationDate == null || manufacturedBefore == null) {
+            return -1F
+        }
+
         val today = LocalDateTime.now()
         val duration =
             Duration.between(
