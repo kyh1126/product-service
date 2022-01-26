@@ -1,6 +1,5 @@
 package com.smartfoodnet.fninventory.inbound
 
-import com.smartfoodnet.apiclient.request.InboundWorkReadModel
 import com.smartfoodnet.apiclient.response.CommonDataListModel
 import com.smartfoodnet.apiclient.response.GetInboundWorkModel
 import com.smartfoodnet.common.model.response.PageResponse
@@ -8,6 +7,7 @@ import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.fninventory.inbound.model.dto.GetInbound
 import com.smartfoodnet.fninventory.inbound.model.request.InboundCreateModel
 import com.smartfoodnet.fninventory.inbound.model.request.InboundSearchCondition
+import com.smartfoodnet.fninventory.inbound.model.response.InboundUnplannedModel
 import io.swagger.annotations.Api
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -23,7 +23,8 @@ import javax.validation.Valid
 class InboundController(
     val inboundService: InboundService,
     val nosnosClientService: NosnosClientService,
-    val inboundJobService: InboundJobService
+    val inboundJobService: InboundJobService,
+    val inboundUnplannedService: InboundUnplannedService
 ){
 
     @PostMapping
@@ -47,10 +48,9 @@ class InboundController(
     fun getInboundUnplanned(
         @Parameter(description = "고객사 ID", example = "14") @PathVariable partnerId : Long,
         @ModelAttribute condition: InboundSearchCondition,
-        @PageableDefault(size = 50, sort = ["id"], direction = Sort.Direction.DESC) page: Pageable
-    ){
-
-    }
+        @PageableDefault(size = 50) page: Pageable
+    ): PageResponse<InboundUnplannedModel> =
+        inboundUnplannedService.getInboundUnplanned(condition.apply { this.partnerId = partnerId }, page)
 
     @GetMapping("partner/{partnerId}/details/{expectedDetailId}")
     @Operation(summary = "입고내역 조회")
