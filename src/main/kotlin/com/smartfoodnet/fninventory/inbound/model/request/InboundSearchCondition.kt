@@ -2,7 +2,11 @@ package com.smartfoodnet.fninventory.inbound.model.request
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.querydsl.core.BooleanBuilder
+import com.querydsl.core.types.Predicate
 import com.smartfoodnet.common.Constants
+import com.smartfoodnet.common.model.request.PredicateSearchCondition
+import com.smartfoodnet.fninventory.inbound.entity.QInboundUnplanned.inboundUnplanned
 import com.smartfoodnet.fninventory.inbound.model.vo.InboundStatusType
 import com.smartfoodnet.fninventory.inbound.model.vo.ProductSearchType
 import io.swagger.annotations.ApiModelProperty
@@ -29,4 +33,10 @@ data class InboundSearchCondition(
 
     @ApiModelProperty(value = "상품별검색")
     var keyword: String? = null
-)
+): PredicateSearchCondition(){
+    override fun assemblePredicate(predicate: BooleanBuilder): Predicate {
+        predicate.and(inboundUnplanned.partnerId.eq(partnerId))
+        predicate.and(inboundUnplanned.createdAt.between(fromDate, toDate))
+        return predicate
+    }
+}

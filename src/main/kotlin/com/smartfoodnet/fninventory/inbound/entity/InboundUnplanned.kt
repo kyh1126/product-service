@@ -18,7 +18,7 @@ class InboundUnplanned(
     val workType : Int,
     val receivingType : Int,
     val shippingProdcutId : Long,
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "basic_product_id")
     val basicProduct : BasicProduct? = null,
     val quantity : Int,
