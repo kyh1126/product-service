@@ -22,6 +22,7 @@ import javax.validation.Valid
 @RequestMapping("inbounds")
 class InboundController(
     val inboundService: InboundService,
+    val nosnosClientService: NosnosClientService,
     val inboundJobService: InboundJobService
 ){
 
@@ -66,7 +67,7 @@ class InboundController(
         @RequestParam endDt : String,
         @RequestParam(defaultValue = "1") page : Int
     ) : CommonDataListModel<GetInboundWorkModel>? {
-        return inboundService.getInboundWork(partnerId, startDt, endDt, page)
+        return nosnosClientService.getInboundWork(partnerId, startDt, endDt, page)
     }
 
     @GetMapping("partner/{partnerId}/work/job")

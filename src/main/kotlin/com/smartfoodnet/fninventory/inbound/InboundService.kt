@@ -22,7 +22,7 @@ import java.lang.RuntimeException
 class InboundService(
     val inboundRepository: InboundRepository,
     val basicProductRepository: BasicProductRepository,
-    val wmsApiClient: WmsApiClient
+    val nosnosClientService: NosnosClientService
 ) : Log {
 
     @Transactional
@@ -33,21 +33,7 @@ class InboundService(
             inbound.addExptecdItem(it.toEntity(basicProduct))
         }
 
-        // TODO : 노스노스 전송
-        val planProductList : List<PlanProduct> = createModel.expectedList.map {
-            val basicProduct = getBasicProduct(it.basicProductId)
-            PlanProduct(basicProduct.shippingProductId!!, it.requestQuantity)
-        }
-
-        val nosnosData = createModel.toNosNosModel(planProductList)
-        val response = wmsApiClient.createInbound(nosnosData).payload
-
-        if (response != null) {
-            inbound.registrationId = response.receivingPlanId
-            inbound.registrationNo = response.receivingPlanCode
-        } else {
-            throw RuntimeException("NOSNOS 입고예정 등록에 실패하였습니다")
-        }
+        nosnosClientService.sendInboundAndSetRegisterNo(inbound)
 
         inboundRepository.save(inbound)
     }
@@ -84,16 +70,4 @@ class InboundService(
 
     fun getInboundActualDetail(partnerId: Long, expectedId: Long)
         = inboundRepository.findInboundActualDetail(partnerId, expectedId)
-
-    fun getInboundWork(partnerId: Long, startDt: String, endDt: String, page: Int): CommonDataListModel<GetInboundWorkModel>? {
-        val params = InboundWorkReadModel(
-            memberId = partnerId,
-            startDt = startDt,
-            endDt = endDt,
-            page = page
-        )
-
-        return wmsApiClient.getInboundWork(params).payload
-    }
-
 }
