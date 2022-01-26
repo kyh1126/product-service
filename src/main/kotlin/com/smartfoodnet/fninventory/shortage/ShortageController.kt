@@ -1,7 +1,6 @@
 package com.smartfoodnet.fninventory.shortage
 
 import com.smartfoodnet.fninventory.shortage.model.ProductShortageModel
-import com.smartfoodnet.fnproduct.order.model.OrderStatus
 import com.smartfoodnet.fnproduct.order.support.OrderDetailRepository
 import io.swagger.annotations.Api
 import io.swagger.v3.oas.annotations.Operation
@@ -26,13 +25,4 @@ class ShortageController (
     ): List<ProductShortageModel> {
         return shortageService.getProductShortages(partnerId)
     }
-
-    @GetMapping("test/tttt")
-    fun gettest(){
-        println(OrderStatus.NEW)
-        val aa = orderDetailRepository.getCountByProductIdAndStatusGroupByProductId(38,OrderStatus.NEW)
-        println(aa.toString())
-
-    }
-
 }
