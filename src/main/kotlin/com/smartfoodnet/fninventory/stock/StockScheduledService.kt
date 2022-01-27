@@ -35,6 +35,7 @@ class StockScheduledService(
     private val orderService: OrderService,
     private val wmsApiClient: WmsApiClient
 ) {
+    var itemCount = 0
     /**
      * 정해진 기간동안의 dailyStockSummary를 저장한다
      * 100일의 경우 어제부터 최근 100일간의 데이터를 nosnos에서 가져와 저장함
@@ -42,31 +43,54 @@ class StockScheduledService(
      */
     @Transactional
     fun saveDailyStockSummariesByDays(days: Long) {
+        deleteDuplicateSummaries(days)
+
         val partnerIds =
             basicProductRepository.getPartnerIdsFromBasicProduct(activeYn = IS_ACTIVE_YN)
         val today = LocalDate.now()
 
+        var threadCount = 0
+
         for (i in days downTo 1) {
-            val effectiveDate = today.minusDays(i)
+            Thread {
+                val effectiveDate = today.minusDays(i)
 
-            partnerIds?.forEach { partnerId ->
-                val basicProducts =
-                    basicProductRepository.findByPartnerIdAndActiveYnAndShippingProductIdIsNotNull(
-                        partnerId,
-                        IS_ACTIVE_YN
-                    )
-                val basicProductsChunks = basicProducts?.chunked(API_CALL_LIST_SIZE) ?: return
+                partnerIds?.forEach { partnerId ->
+                    val basicProducts =
+                        basicProductRepository.findByPartnerIdAndActiveYnAndShippingProductIdIsNotNull(
+                            partnerId,
+                            IS_ACTIVE_YN
+                        )
+                    val basicProductsChunks = basicProducts?.chunked(API_CALL_LIST_SIZE) ?: return@forEach
 
-                basicProductsChunks.forEach { chunk ->
-                    saveDailyStockSummary(
-                        basicProducts = chunk,
-                        partnerId = partnerId,
-                        effectiveDate = effectiveDate
-                    )
+                    basicProductsChunks.forEach { chunk ->
+                        saveDailyStockSummary(
+                            basicProducts = chunk,
+                            partnerId = partnerId,
+                            effectiveDate = effectiveDate
+                        )
+                    }
                 }
-            }
+            }.start()
+            threadCount ++
+            println("=========================threadCount: $threadCount ============================")
+
         }
+        println("=========================threadCount: $threadCount ============================")
     }
+
+    @Transactional
+    fun deleteDuplicateSummaries(dateRange: Long) {
+        val effectiveDates = mutableListOf<LocalDate>()
+        val today = LocalDate.now()
+        val now = LocalDateTime.now()
+        for(i in 1 .. dateRange) {
+            effectiveDates.add(today.minusDays(i))
+        }
+
+        dailyStockSummaryRepository.deleteAllByEffectiveDatesIn(effectiveDates)
+    }
+
 
     @Transactional
     fun saveDailyStockSummary(
@@ -136,7 +160,9 @@ class StockScheduledService(
             dailyStockSummaries.add(dailyStockSummary)
         }
 
-        dailyStockSummaryRepository.saveAll(dailyStockSummaries)
+        val summaries = dailyStockSummaryRepository.saveAll(dailyStockSummaries)
+        itemCount += summaries.size
+        println("itemCount: $itemCount")
     }
 
     @Transactional
