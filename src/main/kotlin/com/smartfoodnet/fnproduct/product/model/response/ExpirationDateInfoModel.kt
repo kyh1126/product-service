@@ -11,7 +11,7 @@ data class ExpirationDateInfoModel(
     var expirationDateWriteYn: String? = null,
 
     @ApiModelProperty(value = "유통기한(제조일+X일)")
-    var expirationDate: Int? = null,
+    var manufactureToExpirationDate: Int? = null,
 ) {
 
     companion object {
@@ -20,7 +20,7 @@ data class ExpirationDateInfoModel(
                 ExpirationDateInfoModel(
                     manufactureDateWriteYn = manufactureDateWriteYn,
                     expirationDateWriteYn = expirationDateWriteYn,
-                    expirationDate = expirationDate,
+                    manufactureToExpirationDate = manufactureToExpirationDate,
                 )
             }
         }

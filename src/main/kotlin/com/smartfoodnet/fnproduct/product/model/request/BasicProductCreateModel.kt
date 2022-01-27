@@ -54,7 +54,6 @@ class BasicProductCreateModel {
     )
     var handlingTemperature: HandlingTemperatureType? = null
 
-    @NotNull
     @ApiModelProperty(value = "입고처 ID")
     var warehouseId: Long? = null
 

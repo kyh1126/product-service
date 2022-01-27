@@ -42,7 +42,8 @@ class StockScheduledService(
      */
     @Transactional
     fun saveDailyStockSummariesByDays(days: Long) {
-        val partnerIds = basicProductRepository.getPartnerIdsFromBasicProduct(activeYn = IS_ACTIVE_YN)
+        val partnerIds =
+            basicProductRepository.getPartnerIdsFromBasicProduct(activeYn = IS_ACTIVE_YN)
         val today = LocalDate.now()
 
         for (i in days downTo 1) {
@@ -109,8 +110,10 @@ class StockScheduledService(
         val dailyStockSummaries = mutableListOf<DailyStockSummary>()
 
         dailyCloseStockModels?.forEach { closeStock ->
-            val summary = stockSummaryModels?.firstOrNull { it.shippingProductId == closeStock.shippingProductId }
-            val basicProduct = basicProducts.firstOrNull { it.shippingProductId == closeStock.shippingProductId }!!
+            val summary =
+                stockSummaryModels?.firstOrNull { it.shippingProductId == closeStock.shippingProductId }
+            val basicProduct =
+                basicProducts.firstOrNull { it.shippingProductId == closeStock.shippingProductId }!!
             val dailyStockSummary = DailyStockSummary(
                 partnerId = partnerId,
                 basicProduct = basicProduct,
@@ -166,7 +169,8 @@ class StockScheduledService(
 
             nosnosStocksByExpirationDate.forEach { nosnosStockByExpirationDate ->
                 val basicProduct = basicProductChunk.find {
-                    it.shippingProductId?.equals(nosnosStockByExpirationDate.shippingProductId) ?: false
+                    it.shippingProductId?.equals(nosnosStockByExpirationDate.shippingProductId)
+                        ?: false
                 }
 
                 if (basicProduct == null) {
@@ -197,9 +201,10 @@ class StockScheduledService(
         nosnosStockByExpirationDate: NosnosExpirationDateStockModel,
         orderCount: Int
     ): StockByBestBefore {
-        val manufacturedDate = basicProduct.expirationDateInfo?.expirationDate?.toLong()?.let {
-            nosnosStockByExpirationDate.expirationDate?.minusDays(it)
-        }
+        val manufacturedDate =
+            basicProduct.expirationDateInfo?.manufactureToExpirationDate?.toLong()?.let {
+                nosnosStockByExpirationDate.expirationDate?.minusDays(it)
+            }
 
         return StockByBestBefore(
             partnerId = basicProduct.partnerId!!,
@@ -207,7 +212,7 @@ class StockScheduledService(
             shippingProductId = basicProduct.shippingProductId!!,
             bestBefore = calculateBestBefore(
                 nosnosStockByExpirationDate.expirationDate,
-                basicProduct.expirationDateInfo?.expirationDate
+                basicProduct.expirationDateInfo?.manufactureToExpirationDate
             ),
             manufactureDate = manufacturedDate,
             expirationDate = nosnosStockByExpirationDate.expirationDate,
@@ -218,8 +223,11 @@ class StockScheduledService(
         )
     }
 
-    private fun calculateBestBefore(expirationDate: LocalDateTime?, manufacturedBefore: Int?): Float {
-        if(expirationDate == null || manufacturedBefore == null) {
+    private fun calculateBestBefore(
+        expirationDate: LocalDateTime?,
+        manufacturedBefore: Int?
+    ): Float {
+        if (expirationDate == null || manufacturedBefore == null) {
             return -1F
         }
 
