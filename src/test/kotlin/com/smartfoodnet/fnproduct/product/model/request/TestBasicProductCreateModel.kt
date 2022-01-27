@@ -47,7 +47,6 @@ class TestBasicProductCreateModel(
     )
     val handlingTemperature: HandlingTemperatureType? = null,
 
-    @field:NotNull
     @ApiModelProperty(value = "입고처 ID")
     val warehouseId: Long? = null,
 
