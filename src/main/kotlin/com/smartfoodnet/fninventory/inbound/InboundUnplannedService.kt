@@ -2,6 +2,7 @@ package com.smartfoodnet.fninventory.inbound
 
 import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.fninventory.inbound.model.request.InboundSearchCondition
+import com.smartfoodnet.fninventory.inbound.model.request.InboundUnplannedSearchCondition
 import com.smartfoodnet.fninventory.inbound.model.response.InboundUnplannedModel
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -14,7 +15,7 @@ class InboundUnplannedService(
     val inboundUnplannedRepository: InboundUnplannedRepository
 ) {
     fun getInboundUnplanned(
-        condition: InboundSearchCondition,
+        condition: InboundUnplannedSearchCondition,
         page: Pageable
     ): PageResponse<InboundUnplannedModel> {
         return inboundUnplannedRepository.findInboundUnplanned(condition, page)
