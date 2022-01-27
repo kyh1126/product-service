@@ -138,6 +138,8 @@ class StockScheduledService(
 
     @Transactional
     fun syncStocksByBestBefore() {
+        deleteDuplicateBestBefore()
+
         val partnerIds =
             basicProductRepository.getPartnerIdsFromBasicProduct(
                 Constants.EXPIRATION_DATE_MANAGEMENT_YN,
@@ -145,6 +147,12 @@ class StockScheduledService(
             )
 
         partnerIds?.forEach { syncStocksByBestBeforeByPartner(it) }
+    }
+
+    private fun deleteDuplicateBestBefore() {
+        val duplicatedItems = stockByBestBeforeRepository.findAllByCollectedDate(LocalDate.now())
+        val now = LocalDateTime.now()
+        duplicatedItems?.forEach { it.deletedAt = now }
     }
 
     private fun syncStocksByBestBeforeByPartner(partnerId: Long) {
@@ -206,11 +214,11 @@ class StockScheduledService(
             basicProduct = basicProduct,
             shippingProductId = basicProduct.shippingProductId!!,
             bestBefore = calculateBestBefore(
-                nosnosStockByExpirationDate.expirationDate,
+                nosnosStockByExpirationDate.expirationDate?.atStartOfDay(),
                 basicProduct.expirationDateInfo?.expirationDate
             ),
-            manufactureDate = manufacturedDate,
-            expirationDate = nosnosStockByExpirationDate.expirationDate,
+            manufactureDate = manufacturedDate?.atStartOfDay(),
+            expirationDate = nosnosStockByExpirationDate.expirationDate?.atStartOfDay(),
             totalStockCount = nosnosStockByExpirationDate.totalStock,
             availableStockCount = nosnosStockByExpirationDate.normalStock,
             totalNewOrdersCount = orderCount,
@@ -233,7 +241,7 @@ class StockScheduledService(
         if (duration < 0)
             return 0f
 
-        return duration.div(manufacturedBefore.toFloat())
+        return duration.div(manufacturedBefore.toFloat()) * 100
     }
 
     companion object : Log
