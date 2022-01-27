@@ -27,13 +27,7 @@ class InboundRepositoryImpl
                 .innerJoin(inbound.expectedList, inboundExpectedDetail)
                 .leftJoin(inboundExpectedDetail.basicProduct, basicProduct)
                 .where(
-                    // 고객사 ID는 필수
-                    inbound.partnerId.eq(condition.partnerId),
-                    // 일자 필수(년월일 ~ 년월일)
-                    inbound.createdAt.between(condition.fromDate, condition.toDate),
-                    // 검색조건에 따라 조건 필드가 달라짐
-                    // 입고등록번호, 기본상품명, 기본상품코드
-                    productSearchPredicate(condition)
+                    condition.toPredicate()
                 )
                 .select(
                     QGetInboundParent(
@@ -52,25 +46,6 @@ class InboundRepositoryImpl
                     )
                 )
         }
-    }
-
-    private fun productSearchPredicate(inboundSearchCondition: InboundSearchCondition): BooleanBuilder {
-
-        val builder = BooleanBuilder()
-
-        if (inboundSearchCondition.statusType != null){
-            builder.and(inbound.status.eq(inboundSearchCondition.statusType))
-        }
-
-        if (!inboundSearchCondition.keyword.isNullOrBlank()) {
-            when (inboundSearchCondition.productSearchType) {
-                BASIC_PRODUCT_CODE -> builder.and(inboundExpectedDetail.basicProduct.code.contains(inboundSearchCondition.keyword))
-                BASIC_PRODUCT_NAME -> builder.and(inboundExpectedDetail.basicProduct.name.contains(inboundSearchCondition.keyword))
-                INBOUND_REGISTRATION_NO -> builder.and(inbound.registrationNo.contains(inboundSearchCondition.keyword))
-            }
-        }
-
-        return builder
     }
 
     override fun findSumActualDetail(expectedIds: List<Long>): List<GetInboundSumDetail> {
