@@ -13,6 +13,7 @@ data class InboundUnplannedModel(
     val inboundStatusType: String?,
     val basicProductName : String? = null,
     val basicProductCode : String? = null,
+    @JsonFormat(pattern = Constants.TIMESTAMP_FORMAT)
     val actualInboundDate: LocalDateTime,
     val actualQuantity: Long,
     val boxQuantity: Long? = null,
