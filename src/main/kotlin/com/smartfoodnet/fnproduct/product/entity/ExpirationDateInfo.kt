@@ -11,6 +11,6 @@ class ExpirationDateInfo(
     @Column(name = "expiration_date_write_yn")
     var expirationDateWriteYn: String = "N",
 
-    @Column(name = "expiration_date")
-    var expirationDate: Int? = null,
+    @Column(name = "manufacture_to_expiration_date")
+    var manufactureToExpirationDate: Int? = null,
 )

@@ -62,7 +62,7 @@ data class PreShippingProductModel(
                     ),
                     expireDateByMakeDate = convertWithExpirationDateManagementYn(
                         expirationDateManagementYn,
-                        expirationDateInfo?.expirationDate
+                        expirationDateInfo?.manufactureToExpirationDate
                     ),
                     useMakeDate = convertWithExpirationDateManagementYn(
                         expirationDateManagementYn,

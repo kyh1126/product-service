@@ -133,12 +133,12 @@ class BasicProductDetailCreateModelValidator(
                             errors,
                             "basicProductModel.expirationDateInfoModel.expirationDate",
                             "유통기한(제조일+X일)",
-                            expirationDate
+                            manufactureToExpirationDate
                         )
                     }
                 }
                 "N" -> {
-                    if (manufactureDateWriteYn == "N" || expirationDate == null) {
+                    if (manufactureDateWriteYn == "N" || manufactureToExpirationDate == null) {
                         errors.reject(
                             "basicProductModel.expirationDateInfoModel",
                             "유통기한기재여부가 'N' 이면 제조일자기재여부는 'Y', 유통기한(제조일+X일)도 값이 있어야 합니다."
