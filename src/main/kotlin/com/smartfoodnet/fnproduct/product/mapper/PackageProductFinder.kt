@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional
 
 @Component
 @Transactional(readOnly = true)
-class BasicProductFinder(
+class PackageProductFinder(
     private val packageProductMappingRepository: PackageProductMappingRepository,
 ) {
     fun getPackageProductByBasicProduct(basicProductId: Long): BasicProduct? {

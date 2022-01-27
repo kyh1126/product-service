@@ -52,4 +52,12 @@ class SubsidiaryMaterialSearchCondition : PredicateSearchCondition() {
                 types.map { it.basicProductType }
         }
     }
+
+    companion object {
+        fun subCondition(): SubsidiaryMaterialSearchCondition {
+            val condition = SubsidiaryMaterialSearchCondition()
+            condition.types = setOf(SubsidiaryMaterialType.SUB)
+            return condition
+        }
+    }
 }

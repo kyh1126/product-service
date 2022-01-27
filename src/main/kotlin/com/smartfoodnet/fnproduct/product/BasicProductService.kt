@@ -17,7 +17,7 @@ import com.smartfoodnet.fnproduct.product.entity.SubsidiaryMaterialCategory
 import com.smartfoodnet.fnproduct.product.entity.SubsidiaryMaterialMapping
 import com.smartfoodnet.fnproduct.product.mapper.BasicProductCategoryFinder
 import com.smartfoodnet.fnproduct.product.mapper.BasicProductCodeGenerator
-import com.smartfoodnet.fnproduct.product.mapper.BasicProductFinder
+import com.smartfoodnet.fnproduct.product.mapper.PackageProductFinder
 import com.smartfoodnet.fnproduct.product.mapper.SubsidiaryMaterialCategoryFinder
 import com.smartfoodnet.fnproduct.product.model.dto.CategoryDto
 import com.smartfoodnet.fnproduct.product.model.request.BasicProductCreateModel
@@ -39,7 +39,7 @@ class BasicProductService(
     private val inWarehouseService: InWarehouseService,
     private val basicProductRepository: BasicProductRepository,
     private val basicProductDetailCreateModelValidator: BasicProductDetailCreateModelValidator,
-    private val basicProductFinder: BasicProductFinder,
+    private val packageProductFinder: PackageProductFinder,
     private val basicProductCategoryFinder: BasicProductCategoryFinder,
     private val subsidiaryMaterialCategoryFinder: SubsidiaryMaterialCategoryFinder,
     private val basicProductCodeGenerator: BasicProductCodeGenerator,
@@ -134,7 +134,17 @@ class BasicProductService(
     }
 
     @Transactional
-    fun createBasicProduct(createModel: BasicProductDetailCreateModel): BasicProductDetailModel {
+    fun createBasicProductWithNosnos(createModel: BasicProductDetailCreateModel): BasicProductDetailModel {
+        val savedBasicProduct = createBasicProduct(createModel).also {
+            // nosnos 쪽 출고상품, 판매상품 생성
+            createNosnosProduct(it)
+        }
+        val subsidiaryMaterialById = getSubsidiaryMaterialById(createModel)
+        return toBasicProductDetailModel(savedBasicProduct, subsidiaryMaterialById)
+    }
+
+    @Transactional
+    fun createBasicProduct(createModel: BasicProductDetailCreateModel): BasicProduct {
         ValidatorUtils.validateAndThrow(basicProductDetailCreateModelValidator, createModel)
 
         val basicProductCreateModel = createModel.basicProductModel
@@ -169,27 +179,7 @@ class BasicProductService(
             subsidiaryMaterialMappings = subsidiaryMaterialMappings,
             inWarehouse = inWarehouse
         )
-
         return saveBasicProduct(basicProduct)
-            .also {
-//                messageApiClient.sendMessage(destination = SfnTopic.PRODUCT_CREATED, message = BasicProductCreatedModel(it.id!!))
-
-                // nosnos 쪽 출고상품, 판매상품 생성
-                if (it.type in nosnosCallBasicProductType) {
-                    val createShippingProduct =
-                        wmsApiClient.createShippingProduct(PreShippingProductModel.fromEntity(it)).payload
-                            ?: throw BaseRuntimeException(errorMessage = "출고상품 생성 실패, 상품코드 : ${it.code}")
-
-                    with(createShippingProduct) {
-                        it.shippingProductId = shippingProductId
-                        it.productCode = productCode
-                        it.salesProductId = salesProductId
-                        it.salesProductCode = salesProductCode
-                    }
-                }
-            }.run {
-                toBasicProductDetailModel(this, subsidiaryMaterialById)
-            }
     }
 
     @Transactional
@@ -256,6 +246,24 @@ class BasicProductService(
         return basicProductRepository.save(basicProduct)
     }
 
+    private fun createNosnosProduct(basicProduct: BasicProduct): BasicProduct {
+        // messageApiClient.sendMessage(destination = SfnTopic.PRODUCT_CREATED, message = BasicProductCreatedModel(it.id!!))
+
+        if (basicProduct.type in nosnosCallBasicProductType) {
+            val createShippingProduct =
+                wmsApiClient.createShippingProduct(PreShippingProductModel.fromEntity(basicProduct)).payload
+                    ?: throw BaseRuntimeException(errorMessage = "출고상품 생성 실패, 상품코드 : ${basicProduct.code}")
+
+            with(createShippingProduct) {
+                basicProduct.shippingProductId = shippingProductId
+                basicProduct.productCode = productCode
+                basicProduct.salesProductId = salesProductId
+                basicProduct.salesProductCode = salesProductCode
+            }
+        }
+        return basicProduct
+    }
+
     private fun getBasicProductCategory(basicProductCreateModel: BasicProductCreateModel): BasicProductCategory? {
         return (basicProductCreateModel.basicProductCategoryId)?.let {
             basicProductCategoryFinder.getBasicProductCategory(it)
@@ -304,7 +312,7 @@ class BasicProductService(
     ) {
         if (request.activeYn == "Y") return
 
-        basicProductFinder.getPackageProductByBasicProduct(basicProduct.id!!)?.let {
+        packageProductFinder.getPackageProductByBasicProduct(basicProduct.id!!)?.let {
             if (it.activeYn == "N") return
             it.inactivate()
             log.info("기본상품(${basicProduct.id})에 의한 모음상품(${it.id}) 비활성화")

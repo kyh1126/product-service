@@ -131,7 +131,7 @@ class BasicProductDetailCreateModelValidator(
                     if (manufactureDateWriteYn == "N") {
                         validateNull(
                             errors,
-                            "basicProductModel.expirationDateInfoModel.expirationDate",
+                            "basicProductModel.expirationDateInfoModel.manufactureToExpirationDate",
                             "유통기한(제조일+X일)",
                             manufactureToExpirationDate
                         )
