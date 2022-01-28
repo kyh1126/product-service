@@ -107,7 +107,7 @@ class BasicProduct(
         basicProductCategoryRequest: BasicProductCategory?,
         subsidiaryMaterialCategoryRequest: SubsidiaryMaterialCategory?,
         subsidiaryMaterialMappingRequests: Set<SubsidiaryMaterialMapping>,
-        warehouseRequest: InWarehouse,
+        warehouseRequest: InWarehouse?,
     ) {
         name = request.name
         supplyPrice = request.supplyPrice
