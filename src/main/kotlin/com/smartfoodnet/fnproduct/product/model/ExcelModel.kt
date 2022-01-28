@@ -1,5 +1,6 @@
 package com.smartfoodnet.fnproduct.product.model
 
+import com.smartfoodnet.apiclient.response.PartnerIdPairModel
 import com.smartfoodnet.fnproduct.product.model.request.BasicProductCreateModel
 import com.smartfoodnet.fnproduct.product.model.request.BasicProductDetailCreateModel
 import com.smartfoodnet.fnproduct.product.model.request.ExpirationDateInfoCreateModel
@@ -37,7 +38,7 @@ data class BasicProductExcelModel(
 ) : ExcelModel {
     fun toBasicProductDetailCreateModel(
         defaultBasicProductSubId: Long,
-        partnerId: Long
+        partnerModel: PartnerIdPairModel
     ): BasicProductDetailCreateModel {
         val subsidiaryMaterialMappingCreateModel = SubsidiaryMaterialMappingCreateModel(
             subsidiaryMaterialId = defaultBasicProductSubId,
@@ -47,7 +48,8 @@ data class BasicProductExcelModel(
 
         val basicProductModel = BasicProductCreateModel().also {
             it.type = BasicProductType.BASIC
-            it.partnerId = partnerId
+            it.partnerId = partnerModel.partnerId
+            it.partnerCode = partnerModel.partnerCode
             it.shippingProductId = shippingProductId
             it.name = productName
             it.barcodeYn = if (barcode.isNullOrEmpty()) "N" else "Y"

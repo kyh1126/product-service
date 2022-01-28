@@ -39,9 +39,11 @@ class MigrationService(
 
         val wb = ExcelReadUtils.extractSimple(fileName, file.inputStream)
         excelMapper.toBasicProductExcelModel(wb).forEach {
-            val partnerId = partnerModelMap[it.memberId]!!.partnerId
             basicProductService.createBasicProduct(
-                it.toBasicProductDetailCreateModel(defaultSubsidiaryMaterialId, partnerId)
+                it.toBasicProductDetailCreateModel(
+                    defaultSubsidiaryMaterialId,
+                    partnerModelMap[it.memberId]!!
+                )
             )
         }
     }
