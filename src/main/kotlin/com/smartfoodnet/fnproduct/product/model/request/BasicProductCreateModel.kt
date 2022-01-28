@@ -82,7 +82,7 @@ class BasicProductCreateModel {
         code: String?,
         basicProductCategory: BasicProductCategory?,
         subsidiaryMaterialCategory: SubsidiaryMaterialCategory?,
-        inWarehouse: InWarehouse,
+        inWarehouse: InWarehouse?,
     ): BasicProduct {
         return BasicProduct(
             type = type,
