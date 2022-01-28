@@ -91,7 +91,7 @@ class BasicProductDetailCreateModelValidator(
                     errors.rejectValue(
                         "basicProductModel.barcode",
                         "barcode.invalid",
-                        "숫자 입력만 가능합니다."
+                        "바코드 값은 숫자 입력만 가능합니다."
                     )
                 }
             }
