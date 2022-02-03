@@ -134,6 +134,14 @@ class BasicProductService(
     }
 
     @Transactional
+    fun createBasicProductWithNosnosMigration(createModel: BasicProductDetailCreateModel) {
+        val createdBasicProduct = createBasicProduct(createModel)
+        with(createModel) {
+            createdBasicProduct.shippingProductId = basicProductModel.shippingProductId
+        }
+    }
+
+    @Transactional
     fun createBasicProductWithNosnos(createModel: BasicProductDetailCreateModel): BasicProductDetailModel {
         val savedBasicProduct = createBasicProduct(createModel).also {
             // nosnos 쪽 출고상품, 판매상품 생성
@@ -141,45 +149,6 @@ class BasicProductService(
         }
         val subsidiaryMaterialById = getSubsidiaryMaterialById(createModel)
         return toBasicProductDetailModel(savedBasicProduct, subsidiaryMaterialById)
-    }
-
-    @Transactional
-    fun createBasicProduct(createModel: BasicProductDetailCreateModel): BasicProduct {
-        ValidatorUtils.validateAndThrow(basicProductDetailCreateModelValidator, createModel)
-
-        val basicProductCreateModel = createModel.basicProductModel
-        // 상품코드 채번
-        val basicProductCode = with(basicProductCreateModel) {
-            basicProductCodeGenerator.getBasicProductCode(
-                partnerId!!,
-                partnerCode!!,
-                type,
-                handlingTemperature!!
-            )
-        }
-        // 기본상품 카테고리 조회
-        val basicProductCategory = getBasicProductCategory(basicProductCreateModel)
-        // (공통)부자재 카테고리 조회
-        val subsidiaryMaterialCategory = getSubsidiaryMaterialCategory(basicProductCreateModel)
-        // 입고처 조회
-        val inWarehouse = getWarehouse(basicProductCreateModel)
-        // 기본상품-부자재 매핑을 위한 부자재(BasicProduct) 조회
-        val subsidiaryMaterialById = getSubsidiaryMaterialById(createModel)
-
-        // 기본상품-부자재 매핑 저장
-        val subsidiaryMaterialMappings = createOrUpdateSubsidiaryMaterialMappings(
-            subsidiaryMaterialMappingModels = createModel.subsidiaryMaterialMappingModels,
-            subsidiaryMaterialById = subsidiaryMaterialById
-        )
-
-        val basicProduct = createModel.toEntity(
-            code = basicProductCode,
-            basicProductCategory = basicProductCategory,
-            subsidiaryMaterialCategory = subsidiaryMaterialCategory,
-            subsidiaryMaterialMappings = subsidiaryMaterialMappings,
-            inWarehouse = inWarehouse
-        )
-        return saveBasicProduct(basicProduct)
     }
 
     @Transactional
@@ -244,6 +213,56 @@ class BasicProductService(
     @Transactional
     fun saveBasicProduct(basicProduct: BasicProduct): BasicProduct {
         return basicProductRepository.save(basicProduct)
+    }
+
+    @Transactional
+    fun updateProductCode(shippingProductId: Long): BasicProduct {
+        return getBasicProductByShippingProductId(shippingProductId).also {
+            it.updateProductCode(it.code!!)
+        }
+    }
+
+    private fun getBasicProductByShippingProductId(shippingProductId: Long): BasicProduct {
+        return basicProductRepository.findByShippingProductId(shippingProductId)
+            ?: throw NoSuchElementException("기본상품(shippingProductId:${shippingProductId}) 값이 없습니다.")
+    }
+
+    private fun createBasicProduct(createModel: BasicProductDetailCreateModel): BasicProduct {
+        ValidatorUtils.validateAndThrow(basicProductDetailCreateModelValidator, createModel)
+
+        val basicProductCreateModel = createModel.basicProductModel
+        // 상품코드 채번
+        val basicProductCode = with(basicProductCreateModel) {
+            basicProductCodeGenerator.getBasicProductCode(
+                partnerId!!,
+                partnerCode!!,
+                type,
+                handlingTemperature!!
+            )
+        }
+        // 기본상품 카테고리 조회
+        val basicProductCategory = getBasicProductCategory(basicProductCreateModel)
+        // (공통)부자재 카테고리 조회
+        val subsidiaryMaterialCategory = getSubsidiaryMaterialCategory(basicProductCreateModel)
+        // 입고처 조회
+        val inWarehouse = getWarehouse(basicProductCreateModel)
+        // 기본상품-부자재 매핑을 위한 부자재(BasicProduct) 조회
+        val subsidiaryMaterialById = getSubsidiaryMaterialById(createModel)
+
+        // 기본상품-부자재 매핑 저장
+        val subsidiaryMaterialMappings = createOrUpdateSubsidiaryMaterialMappings(
+            subsidiaryMaterialMappingModels = createModel.subsidiaryMaterialMappingModels,
+            subsidiaryMaterialById = subsidiaryMaterialById
+        )
+
+        val basicProduct = createModel.toEntity(
+            code = basicProductCode,
+            basicProductCategory = basicProductCategory,
+            subsidiaryMaterialCategory = subsidiaryMaterialCategory,
+            subsidiaryMaterialMappings = subsidiaryMaterialMappings,
+            inWarehouse = inWarehouse
+        )
+        return saveBasicProduct(basicProduct)
     }
 
     private fun createNosnosProduct(basicProduct: BasicProduct): BasicProduct {

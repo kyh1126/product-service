@@ -28,11 +28,11 @@ class PackageProductMappingRepositoryImpl :
                     eqPartnerId(condition.partnerId),
                     eqActiveYn(condition.activeYn),
                     when (condition.searchType) {
-                        PACKAGE_NAME -> eqName(condition.searchKeyword, packageProduct)
-                        PACKAGE_CODE -> eqCode(condition.searchKeyword, packageProduct)
-                        NAME -> eqName(condition.searchKeyword)
-                        CODE -> eqCode(condition.searchKeyword)
-                        BARCODE -> eqBarcode(condition.searchKeyword)
+                        PACKAGE_NAME -> containsName(condition.searchKeyword, packageProduct)
+                        PACKAGE_CODE -> containsCode(condition.searchKeyword, packageProduct)
+                        NAME -> containsName(condition.searchKeyword)
+                        CODE -> containsCode(condition.searchKeyword)
+                        BARCODE -> containsBarcode(condition.searchKeyword)
                         else -> null
                     }
                 )
@@ -43,12 +43,13 @@ class PackageProductMappingRepositoryImpl :
 
     private fun eqActiveYn(activeYn: String?) = activeYn?.let { packageProduct.activeYn.eq(it) }
 
-    private fun eqBarcode(barcode: String?) = barcode?.let { basicProduct.barcode.eq(it) }
+    private fun containsBarcode(barcode: String?) =
+        barcode?.let { basicProduct.barcode.contains(it) }
 
-    private fun eqName(name: String?, target: QBasicProduct = basicProduct) =
-        name?.let { target.name.eq(it) }
+    private fun containsName(name: String?, target: QBasicProduct = basicProduct) =
+        name?.let { target.name.contains(it) }
 
-    private fun eqCode(code: String?, target: QBasicProduct = basicProduct) =
-        code?.let { target.code.eq(it) }
+    private fun containsCode(code: String?, target: QBasicProduct = basicProduct) =
+        code?.let { target.code.contains(it) }
 
 }
