@@ -1,8 +1,10 @@
 package com.smartfoodnet.fnproduct.product
 
+import com.smartfoodnet.common.model.response.CommonResponse
 import io.swagger.annotations.Api
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
@@ -19,7 +21,10 @@ class MigrationController(private val migrationService: MigrationService) {
         @RequestParam("fileName", required = false) fileName: String?,
         @Parameter(name = "file", description = "파일")
         @RequestPart("file", required = false) file: MultipartFile?
-    ) = migrationService.excelToBasicProduct(fileName, file)
+    ): CommonResponse<String> {
+        migrationService.excelToBasicProduct(fileName, file)
+        return CommonResponse(HttpStatus.OK.reasonPhrase)
+    }
 
     @Operation(summary = "[Step 2] 출고상품 엑셀로 출고상품 product-code 업데이트 작업")
     @PostMapping(value = ["excel/product-code"], consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
@@ -28,7 +33,10 @@ class MigrationController(private val migrationService: MigrationService) {
         @RequestParam("fileName", required = false) fileName: String?,
         @Parameter(name = "file", description = "파일")
         @RequestPart("file", required = false) file: MultipartFile?
-    ) = migrationService.updateProductCode(fileName, file)
+    ): CommonResponse<String> {
+        migrationService.updateProductCode(fileName, file)
+        return CommonResponse(HttpStatus.OK.reasonPhrase)
+    }
 
 
 }
