@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component
 import org.springframework.test.context.ActiveProfiles
 
 @SpringBootTest
-@ActiveProfiles("local")
+@ActiveProfiles("test")
 class CodeTest {
 
     @Autowired
@@ -17,7 +17,7 @@ class CodeTest {
     @Test
     fun test() {
         println("Before, in test: " + Thread.currentThread())
-        for(i in 0 .. 10) {
+        for (i in 0..10) {
             a.async()
         }
         println("After, in test: " + Thread.currentThread())
@@ -28,7 +28,7 @@ class CodeTest {
 class Sample {
     @Async("taskExecutor")
     fun async() {
-            println("In async: " + Thread.currentThread())
-            Thread.sleep(3000)
+        println("In async: " + Thread.currentThread())
+        Thread.sleep(3000)
     }
 }
