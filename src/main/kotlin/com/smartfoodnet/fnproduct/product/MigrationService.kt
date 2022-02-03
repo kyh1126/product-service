@@ -41,8 +41,13 @@ class MigrationService(
     }
 
     @Transactional
-    fun updateProductCode(fileName: String?, file: MultipartFile?): Any {
-        TODO("Not yet implemented")
+    fun updateProductCode(fileName: String?, file: MultipartFile?) {
+        if (file == null) throw IllegalArgumentException("엑셀 파일을 선택해주세요")
+
+        val wb = ExcelReadUtils.extractSimple(fileName, file.inputStream)
+        excelMapper.toBasicProductExcelModel(wb).forEach {
+            basicProductService.updateProductCode(it.shippingProductId)
+        }
     }
 
     private fun getDefaultSubsidiaryMaterialId(): Long {

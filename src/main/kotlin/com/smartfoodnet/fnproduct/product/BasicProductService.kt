@@ -215,6 +215,20 @@ class BasicProductService(
         return basicProductRepository.save(basicProduct)
     }
 
+    @Transactional
+    fun updateProductCode(shippingProductId: Long) {
+        val basicProduct = basicProductRepository.findByShippingProductId(shippingProductId)
+            ?: throw NoSuchElementException("기본상품(shippingProductId:${shippingProductId}) 값이 없습니다.")
+
+        // nosnos 쪽 출고상품 productCode 업데이트
+        wmsApiClient.updateShippingProduct(
+            basicProduct.shippingProductId!!,
+            PreShippingProductModel.fromEntity(basicProduct)
+        )
+
+        basicProduct.updateProductCode(basicProduct.code!!)
+    }
+
     private fun createBasicProduct(createModel: BasicProductDetailCreateModel): BasicProduct {
         ValidatorUtils.validateAndThrow(basicProductDetailCreateModelValidator, createModel)
 

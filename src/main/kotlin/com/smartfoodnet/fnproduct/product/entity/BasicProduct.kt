@@ -142,4 +142,8 @@ class BasicProduct(
     fun inactivate() {
         activeYn = "N"
     }
+
+    fun updateProductCode(code: String) {
+        productCode = code
+    }
 }
