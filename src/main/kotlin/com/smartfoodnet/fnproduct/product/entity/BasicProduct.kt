@@ -145,5 +145,6 @@ class BasicProduct(
 
     fun updateProductCode(code: String) {
         productCode = code
+        salesProductCode = code
     }
 }

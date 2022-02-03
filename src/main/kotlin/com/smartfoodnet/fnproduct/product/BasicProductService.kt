@@ -60,6 +60,21 @@ class BasicProductService(
         return basicProductRepository.findAllById(ids)
     }
 
+    fun getBasicProductsByShippingProductId(shippingProductIds: Collection<Long>): List<BasicProduct> {
+        return basicProductRepository.findAllByShippingProductIdIn(shippingProductIds)
+            .ifEmpty { throw NoSuchElementException("기본상품(shippingProductIds:${shippingProductIds}) 값이 없습니다.") }
+    }
+
+    fun getBasicProduct(productId: Long): BasicProductDetailModel {
+        val basicProduct = getBasicProducts(listOf(productId)).first()
+        // 기본상품-부자재 매핑을 위한 부자재(BasicProduct) 조회
+        val subsidiaryMaterialById =
+            getBasicProducts(basicProduct.subsidiaryMaterialMappings.map { it.subsidiaryMaterial.id!! })
+                .associateBy { it.id }
+
+        return toBasicProductDetailModel(basicProduct, subsidiaryMaterialById)
+    }
+
     fun getSubsidiaryMaterials(
         condition: PredicateSearchCondition,
         page: Pageable
@@ -88,16 +103,6 @@ class BasicProductService(
         }
 
         return result
-    }
-
-    fun getBasicProduct(productId: Long): BasicProductDetailModel {
-        val basicProduct = getBasicProducts(listOf(productId)).first()
-        // 기본상품-부자재 매핑을 위한 부자재(BasicProduct) 조회
-        val subsidiaryMaterialById =
-            getBasicProducts(basicProduct.subsidiaryMaterialMappings.map { it.subsidiaryMaterial.id!! })
-                .associateBy { it.id }
-
-        return toBasicProductDetailModel(basicProduct, subsidiaryMaterialById)
     }
 
     fun getBasicProductCategories(

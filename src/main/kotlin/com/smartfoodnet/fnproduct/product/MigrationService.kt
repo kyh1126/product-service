@@ -3,6 +3,7 @@ package com.smartfoodnet.fnproduct.product
 import com.smartfoodnet.apiclient.PartnerApiClient
 import com.smartfoodnet.apiclient.WmsApiClient
 import com.smartfoodnet.apiclient.request.CommonCreateBulkModel
+import com.smartfoodnet.apiclient.request.PreSalesProductModel
 import com.smartfoodnet.apiclient.request.PreShippingProductSimpleModel
 import com.smartfoodnet.fnproduct.product.mapper.BasicProductExcelModelMapper
 import com.smartfoodnet.fnproduct.product.model.BasicProductExcelModel
@@ -27,7 +28,7 @@ class MigrationService(
     private val defaultSubsidiaryMaterialName = "없음"
 
     @Transactional
-    fun excelToBasicProduct(fileName: String?, file: MultipartFile?) {
+    fun excelToBasicProducts(fileName: String?, file: MultipartFile?) {
         val defaultSubsidiaryMaterialId = getDefaultSubsidiaryMaterialId()
         val partnerModelMap =
             partnerApiClient.loadAllPartners().payload!!.associateBy { it.memberId }
@@ -44,9 +45,9 @@ class MigrationService(
 
     @Transactional
     fun updateProductCode(fileName: String?, file: MultipartFile?) {
-        val basicProductExcelModel = getBasicProductExcelModel(fileName, file)
-        val memberId = basicProductExcelModel.first().memberId
-        val basicProducts = basicProductExcelModel.map {
+        val basicProductExcelModels = getBasicProductExcelModel(fileName, file)
+        val memberId = basicProductExcelModels.first().memberId
+        val basicProducts = basicProductExcelModels.map {
             basicProductService.updateProductCode(it.shippingProductId)
         }
 
@@ -56,6 +57,26 @@ class MigrationService(
                 member_id = memberId,
                 requestDataList = basicProducts.map {
                     PreShippingProductSimpleModel.fromEntity(it)
+                }
+            )
+        )
+    }
+
+    @Transactional
+    fun createNosnosSalesProducts(fileName: String?, file: MultipartFile?) {
+        val basicProductExcelModels = getBasicProductExcelModel(fileName, file)
+        val memberId = basicProductExcelModels.first().memberId
+        val shippingProductIds = basicProductExcelModels.map { it.shippingProductId }
+
+        val basicProducts =
+            basicProductService.getBasicProductsByShippingProductId(shippingProductIds)
+
+        // nosnos 쪽 판매상품 일괄 등록
+        wmsApiClient.createSalesProducts(
+            CommonCreateBulkModel(
+                member_id = memberId,
+                requestDataList = basicProducts.map {
+                    PreSalesProductModel.fromEntity(it)
                 }
             )
         )
