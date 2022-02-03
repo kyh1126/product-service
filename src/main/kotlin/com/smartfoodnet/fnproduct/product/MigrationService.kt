@@ -1,7 +1,11 @@
 package com.smartfoodnet.fnproduct.product
 
 import com.smartfoodnet.apiclient.PartnerApiClient
+import com.smartfoodnet.apiclient.WmsApiClient
+import com.smartfoodnet.apiclient.request.CommonCreateBulkModel
+import com.smartfoodnet.apiclient.request.PreShippingProductSimpleModel
 import com.smartfoodnet.fnproduct.product.mapper.BasicProductExcelModelMapper
+import com.smartfoodnet.fnproduct.product.model.BasicProductExcelModel
 import com.smartfoodnet.fnproduct.product.model.request.SubsidiaryMaterialSearchCondition
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.PageRequest
@@ -18,19 +22,17 @@ class MigrationService(
     private val excelMapper: BasicProductExcelModelMapper,
     private val basicProductService: BasicProductService,
     private val partnerApiClient: PartnerApiClient,
+    private val wmsApiClient: WmsApiClient
 ) {
     private val defaultSubsidiaryMaterialName = "없음"
 
     @Transactional
     fun excelToBasicProduct(fileName: String?, file: MultipartFile?) {
-        if (file == null) throw IllegalArgumentException("엑셀 파일을 선택해주세요")
-
         val defaultSubsidiaryMaterialId = getDefaultSubsidiaryMaterialId()
         val partnerModelMap =
             partnerApiClient.loadAllPartners().payload!!.associateBy { it.memberId }
 
-        val wb = ExcelReadUtils.extractSimple(fileName, file.inputStream)
-        excelMapper.toBasicProductExcelModel(wb).forEach {
+        getBasicProductExcelModel(fileName, file).forEach {
             basicProductService.createBasicProductWithNosnosMigration(
                 it.toBasicProductDetailCreateModel(
                     defaultSubsidiaryMaterialId,
@@ -42,12 +44,31 @@ class MigrationService(
 
     @Transactional
     fun updateProductCode(fileName: String?, file: MultipartFile?) {
+        val basicProductExcelModel = getBasicProductExcelModel(fileName, file)
+        val memberId = basicProductExcelModel.first().memberId
+        val basicProducts = basicProductExcelModel.map {
+            basicProductService.updateProductCode(it.shippingProductId)
+        }
+
+        // nosnos 쪽 출고상품 productCode 업데이트
+        wmsApiClient.updateShippingProducts(
+            CommonCreateBulkModel(
+                member_id = memberId,
+                requestDataList = basicProducts.map {
+                    PreShippingProductSimpleModel.fromEntity(it)
+                }
+            )
+        )
+    }
+
+    private fun getBasicProductExcelModel(
+        fileName: String?,
+        file: MultipartFile?
+    ): List<BasicProductExcelModel> {
         if (file == null) throw IllegalArgumentException("엑셀 파일을 선택해주세요")
 
         val wb = ExcelReadUtils.extractSimple(fileName, file.inputStream)
-        excelMapper.toBasicProductExcelModel(wb).forEach {
-            basicProductService.updateProductCode(it.shippingProductId)
-        }
+        return excelMapper.toBasicProductExcelModel(wb)
     }
 
     private fun getDefaultSubsidiaryMaterialId(): Long {
