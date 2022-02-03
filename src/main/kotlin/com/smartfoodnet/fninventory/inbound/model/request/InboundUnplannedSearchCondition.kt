@@ -6,8 +6,6 @@ import com.querydsl.core.BooleanBuilder
 import com.querydsl.core.types.Predicate
 import com.smartfoodnet.common.Constants
 import com.smartfoodnet.common.model.request.PredicateSearchCondition
-import com.smartfoodnet.fninventory.inbound.entity.QInbound
-import com.smartfoodnet.fninventory.inbound.entity.QInboundExpectedDetail
 import com.smartfoodnet.fninventory.inbound.entity.QInboundUnplanned.inboundUnplanned
 import com.smartfoodnet.fninventory.inbound.model.vo.InboundStatusAdvanceType
 import com.smartfoodnet.fninventory.inbound.model.vo.InboundStatusType
@@ -15,7 +13,7 @@ import com.smartfoodnet.fninventory.inbound.model.vo.ProductSearchType
 import io.swagger.annotations.ApiModelProperty
 import java.time.LocalDateTime
 
-data class InboundSearchCondition(
+data class InboundUnplannedSearchCondition(
     @ApiModelProperty(value = "고객사 ID", example = "1", hidden = true)
     @JsonIgnore
     var partnerId: Long? = null,
@@ -28,8 +26,8 @@ data class InboundSearchCondition(
     @JsonFormat(pattern = Constants.TIMESTAMP_FORMAT)
     val toDate: LocalDateTime,
 
-    @ApiModelProperty(value = "입고상태", example = "EXPECTED")
-    val statusType: InboundStatusType? = null,
+    @ApiModelProperty(value = "입고상태", example = "INBOUND")
+    val statusType: InboundStatusAdvanceType? = null,
 
     @ApiModelProperty(value = "상품별검색")
     val productSearchType: ProductSearchType? = null,
@@ -41,15 +39,22 @@ data class InboundSearchCondition(
         predicate.and(inboundUnplanned.partnerId.eq(partnerId))
         predicate.and(inboundUnplanned.createdAt.between(fromDate, toDate))
 
-        if (statusType != null){
-            predicate.and(QInbound.inbound.status.eq(statusType))
+        if (statusType != null) {
+            predicate.and(inboundUnplanned.workType.eq(statusType.code))
         }
-
         if (!keyword.isNullOrBlank()) {
             when (productSearchType) {
-                ProductSearchType.BASIC_PRODUCT_CODE -> predicate.and(QInboundExpectedDetail.inboundExpectedDetail.basicProduct.code.contains(keyword))
-                ProductSearchType.BASIC_PRODUCT_NAME -> predicate.and(QInboundExpectedDetail.inboundExpectedDetail.basicProduct.name.contains(keyword))
-                ProductSearchType.INBOUND_REGISTRATION_NO -> predicate.and(QInbound.inbound.registrationNo.contains(keyword))
+                ProductSearchType.BASIC_PRODUCT_CODE -> predicate.and(
+                    inboundUnplanned.basicProduct.code.contains(
+                        keyword
+                    )
+                )
+                ProductSearchType.BASIC_PRODUCT_NAME -> predicate.and(
+                    inboundUnplanned.basicProduct.name.contains(
+                        keyword
+                    )
+                )
+                ProductSearchType.INBOUND_REGISTRATION_NO -> throw IllegalArgumentException("입고예정등록 번호로 검색이 불가능합니다")
             }
         }
 

@@ -9,7 +9,7 @@ import io.swagger.annotations.ApiModelProperty
 import java.time.LocalDate
 
 class DailyStockSummarySearchCondition(
-    @ApiModelProperty(value = "고객 ID")
+    @ApiModelProperty(hidden = true)
     var partnerId: Long? = null,
 
     @ApiModelProperty(value = "기본상품 ID")

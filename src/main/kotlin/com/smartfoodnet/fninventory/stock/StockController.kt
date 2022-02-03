@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController
 @Api(description = "재고 관련 API")
 @RestController
 @RequestMapping("stock")
-class StockController(
+open class StockController(
     private val stockService: StockService,
     private val stockScheduledService: StockScheduledService
 ) {
@@ -71,10 +71,10 @@ class StockController(
         return stockService.getDailyStockSummaries(condition, page)
     }
 
-    @Operation(summary = "특정 상품별 최근 일주일 재고 이동 내역 리스트")
+    @Operation(summary = "특정 상품별 최근 x일 재고 이동 내역 리스트 저장 배치작업")
     @PostMapping("summary/by-days/{days}")
     fun saveDailyStockSummariesByDays(
-        @Parameter(description = "화주(고객사) ID", required = true)
+        @Parameter(description = "데이터 저장 기간", required = true)
         @PathVariable days: Long
     ){
         stockScheduledService.saveDailyStockSummariesByDays(days)
