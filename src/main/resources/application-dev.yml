@@ -29,7 +29,7 @@ spring:
           release_mode: on_close
         dialect:
           storage-engine: innodb
-        show_sql: false
+        show_sql: true
   #        format_sql: true
   datasource:
     hikari:

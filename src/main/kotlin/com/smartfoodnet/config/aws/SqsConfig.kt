@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Profile
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 
 @Configuration
-@Profile("!test & !local & !dev") // local 에서 SQS 관련 테스트를 해볼 경우 !local 제외
+@Profile("!test & !local") // local 에서 SQS 관련 테스트를 해볼 경우 !local 제외
 class SqsConfig {
     @Value("\${sfn.aws.sqs.endpoint}")
     private val endpoint: String? = null

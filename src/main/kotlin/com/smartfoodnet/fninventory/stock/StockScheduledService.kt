@@ -19,12 +19,15 @@ import com.smartfoodnet.fnproduct.order.model.OrderStatus
 import com.smartfoodnet.fnproduct.product.BasicProductRepository
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import feign.FeignException
+import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.Future
 
 @Service
 @Transactional(readOnly = true)
@@ -35,7 +38,6 @@ class StockScheduledService(
     private val orderService: OrderService,
     private val wmsApiClient: WmsApiClient
 ) {
-    var itemCount = 0
     /**
      * 정해진 기간동안의 dailyStockSummary를 저장한다
      * 100일의 경우 어제부터 최근 100일간의 데이터를 nosnos에서 가져와 저장함
@@ -49,42 +51,33 @@ class StockScheduledService(
             basicProductRepository.getPartnerIdsFromBasicProduct(activeYn = IS_ACTIVE_YN)
         val today = LocalDate.now()
 
-        var threadCount = 0
-
         for (i in days downTo 1) {
-            Thread {
-                val effectiveDate = today.minusDays(i)
+            val effectiveDate = today.minusDays(i)
 
-                partnerIds?.forEach { partnerId ->
-                    val basicProducts =
-                        basicProductRepository.findByPartnerIdAndActiveYnAndShippingProductIdIsNotNull(
-                            partnerId,
-                            IS_ACTIVE_YN
-                        )
-                    val basicProductsChunks = basicProducts?.chunked(API_CALL_LIST_SIZE) ?: return@forEach
+            partnerIds?.forEach { partnerId ->
+                val basicProducts =
+                    basicProductRepository.findByPartnerIdAndActiveYnAndShippingProductIdIsNotNull(
+                        partnerId,
+                        IS_ACTIVE_YN
+                    )
+                val basicProductsChunks = basicProducts?.chunked(API_CALL_LIST_SIZE) ?: return@forEach
 
-                    basicProductsChunks.forEach { chunk ->
-                        saveDailyStockSummary(
-                            basicProducts = chunk,
-                            partnerId = partnerId,
-                            effectiveDate = effectiveDate
-                        )
-                    }
+                basicProductsChunks.forEach { chunk ->
+                    saveDailyStockSummary(
+                        basicProducts = chunk,
+                        partnerId = partnerId,
+                        effectiveDate = effectiveDate
+                    )
                 }
-            }.start()
-            threadCount ++
-            println("=========================threadCount: $threadCount ============================")
-
+            }
         }
-        println("=========================threadCount: $threadCount ============================")
     }
 
     @Transactional
     fun deleteDuplicateSummaries(dateRange: Long) {
         val effectiveDates = mutableListOf<LocalDate>()
         val today = LocalDate.now()
-        val now = LocalDateTime.now()
-        for(i in 1 .. dateRange) {
+        for (i in 1..dateRange) {
             effectiveDates.add(today.minusDays(i))
         }
 
@@ -98,7 +91,6 @@ class StockScheduledService(
         partnerId: Long,
         effectiveDate: LocalDate
     ) {
-
         val dailyCloseStockModels: List<NosnosDailyCloseStockModel>?
 
         try {
@@ -160,9 +152,7 @@ class StockScheduledService(
             dailyStockSummaries.add(dailyStockSummary)
         }
 
-        val summaries = dailyStockSummaryRepository.saveAll(dailyStockSummaries)
-        itemCount += summaries.size
-        println("itemCount: $itemCount")
+        dailyStockSummaryRepository.saveAll(dailyStockSummaries)
     }
 
     @Transactional
