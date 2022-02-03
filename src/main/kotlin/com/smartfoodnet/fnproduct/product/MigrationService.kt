@@ -25,21 +25,13 @@ class MigrationService(
     fun excelToBasicProduct(fileName: String?, file: MultipartFile?) {
         if (file == null) throw IllegalArgumentException("엑셀 파일을 선택해주세요")
 
-        val categoryByLevelModel = basicProductService.getSubsidiaryMaterials(
-            condition = SubsidiaryMaterialSearchCondition.subCondition(),
-            page = PageRequest.ofSize(maxPageSize)
-        ).flatMap {
-            it.children.filter { it.label == defaultSubsidiaryMaterialName }
-        }.firstOrNull() ?: throw  NoSuchElementException("디폴트 부자재 값이 없습니다.")
-
-        val defaultSubsidiaryMaterialId = categoryByLevelModel.value!!
-
+        val defaultSubsidiaryMaterialId = getDefaultSubsidiaryMaterialId()
         val partnerModelMap =
             partnerApiClient.loadAllPartners().payload!!.associateBy { it.memberId }
 
         val wb = ExcelReadUtils.extractSimple(fileName, file.inputStream)
         excelMapper.toBasicProductExcelModel(wb).forEach {
-            basicProductService.createBasicProduct(
+            basicProductService.createBasicProductWithNosnosMigration(
                 it.toBasicProductDetailCreateModel(
                     defaultSubsidiaryMaterialId,
                     partnerModelMap[it.memberId]!!
@@ -53,5 +45,14 @@ class MigrationService(
         TODO("Not yet implemented")
     }
 
+    private fun getDefaultSubsidiaryMaterialId(): Long {
+        val categoryByLevelModel = basicProductService.getSubsidiaryMaterials(
+            condition = SubsidiaryMaterialSearchCondition.subCondition(),
+            page = PageRequest.ofSize(maxPageSize)
+        ).flatMap {
+            it.children.filter { it.label == defaultSubsidiaryMaterialName }
+        }.firstOrNull() ?: throw NoSuchElementException("디폴트 부자재 값이 없습니다.")
 
+        return categoryByLevelModel.value!!
+    }
 }
