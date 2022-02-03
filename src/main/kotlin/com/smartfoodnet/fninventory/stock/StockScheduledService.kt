@@ -55,7 +55,7 @@ class StockScheduledService(
                         partnerId,
                         IS_ACTIVE_YN
                     )
-                val basicProductsChunks = basicProducts?.chunked(API_CALL_LIST_SIZE) ?: return
+                val basicProductsChunks = basicProducts.chunked(API_CALL_LIST_SIZE) ?: return
 
                 basicProductsChunks.forEach { chunk ->
                     saveDailyStockSummary(
@@ -157,7 +157,7 @@ class StockScheduledService(
                 Constants.EXPIRATION_DATE_MANAGEMENT_YN,
                 IS_ACTIVE_YN
             )
-        val basicProductsChunks = basicProducts?.chunked(API_CALL_LIST_SIZE) ?: return
+        val basicProductsChunks = basicProducts.chunked(API_CALL_LIST_SIZE) ?: return
 
         basicProductsChunks.forEach { basicProductChunk ->
             val nosnosStocksByExpirationDate = wmsApiClient.getStocksByExpirationDate(
