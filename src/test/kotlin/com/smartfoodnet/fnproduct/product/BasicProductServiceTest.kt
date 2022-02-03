@@ -200,7 +200,7 @@ internal class BasicProductServiceTest(
 
             // when
             val actualBasicProductDetailModel =
-                basicProductService.createBasicProduct(mockCreateModel)
+                basicProductService.createBasicProductWithNosnos(mockCreateModel)
 
             // then
             assertNotNull(BasicProductDetailModel)
