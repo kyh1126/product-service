@@ -15,13 +15,13 @@ data class PackageProductDetailCreateModel(
     @NotNull
     @Valid
     @JsonUnwrapped
-    lateinit var packageProductModel: BasicProductSimpleCreateModel
+    lateinit var packageProductModel: BasicProductPackageCreateModel
 
     fun toEntity(
-        code: String? = null,
+        code: String,
         packageProductMappings: Set<PackageProductMapping> = setOf()
     ): BasicProduct {
         return packageProductModel.toEntity(code)
-            .apply { packageProductMappings.forEach(this::addPackageProductMappings) }
+            .apply { packageProductMappings.forEach(::addPackageProductMappings) }
     }
 }

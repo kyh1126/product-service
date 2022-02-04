@@ -13,6 +13,8 @@ import com.smartfoodnet.fnproduct.product.model.request.PackageProductMappingCre
 import com.smartfoodnet.fnproduct.product.model.request.PackageProductMappingSearchCondition
 import com.smartfoodnet.fnproduct.product.model.response.PackageProductDetailModel
 import com.smartfoodnet.fnproduct.product.model.response.PackageProductMappingDetailModel
+import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
+import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
 import com.smartfoodnet.fnproduct.product.validator.PackageProductDetailCreateModelValidator
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -26,7 +28,6 @@ class PackageProductService(
     private val packageProductDetailCreateModelValidator: PackageProductDetailCreateModelValidator,
     private val basicProductCodeGenerator: BasicProductCodeGenerator,
 ) {
-
     fun getPackageProducts(
         condition: PackageProductMappingSearchCondition,
         page: Pageable
@@ -56,8 +57,8 @@ class PackageProductService(
             basicProductCodeGenerator.getBasicProductCode(
                 partnerId!!,
                 partnerCode!!,
-                type!!,
-                handlingTemperature!!
+                BasicProductType.PACKAGE,
+                HandlingTemperatureType.MIX
             )
         }
         // 모음상품-기본상품 매핑을 위한 기본상품(BasicProduct) 조회
@@ -70,7 +71,7 @@ class PackageProductService(
         )
 
         val basicProduct = createModel.toEntity(
-            code = basicProductCode,
+            code = basicProductCode!!,
             packageProductMappings = packageProductMappings
         )
         return basicProductService.saveBasicProduct(basicProduct)
@@ -101,13 +102,17 @@ class PackageProductService(
             basicProductById
         )
 
-        packageProduct.update(updateModel.packageProductModel, packageProductMappings)
+        val basicProductPackageCreateModel = updateModel.packageProductModel
+        packageProduct.update(
+            basicProductPackageCreateModel.name!!,
+            packageProductMappings
+        )
 
         return toPackageProductDetailModel(packageProduct, basicProductById)
     }
 
     private fun getBasicProductById(createModel: PackageProductDetailCreateModel) =
-        basicProductService.getBasicProducts(createModel.packageProductMappingModels.map { it.basicProductModel!!.id!! })
+        basicProductService.getBasicProducts(createModel.packageProductMappingModels.map { it.basicProductId })
             .associateBy { it.id }
 
     private fun createOrUpdatePackageProductMappings(
@@ -116,7 +121,7 @@ class PackageProductService(
         basicProductById: Map<Long?, BasicProduct>,
     ): Set<PackageProductMapping> {
         val packageProductMappings = packageProductMappingModels.map {
-            val selectedBasicProduct = basicProductById[it.basicProductModel!!.id]
+            val selectedBasicProduct = basicProductById[it.basicProductId]
                 ?: throw BaseRuntimeException(errorCode = ErrorCode.NO_ELEMENT)
             if (it.id == null) it.toEntity(selectedBasicProduct)
             else {
