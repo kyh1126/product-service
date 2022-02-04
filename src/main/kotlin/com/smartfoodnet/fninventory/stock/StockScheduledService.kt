@@ -74,13 +74,12 @@ class StockScheduledService(
     fun deleteDuplicateSummaries(dateRange: Long) {
         val effectiveDates = mutableListOf<LocalDate>()
         val today = LocalDate.now()
-        for (i in 1..dateRange) {
+        for (i in 1 .. dateRange) {
             effectiveDates.add(today.minusDays(i))
         }
 
         dailyStockSummaryRepository.deleteAllByEffectiveDatesIn(effectiveDates)
     }
-
 
     @Transactional
     fun saveDailyStockSummary(
