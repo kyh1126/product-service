@@ -127,12 +127,12 @@ internal class BasicProductServiceTest(
         @DisplayName("추가 성공한다")
         fun createBasicProduct_ValidInput_ThenSuccess() {
             // given
-            val firstSubBasicProduct = basicproductsSub.first()
-            given(basicProductRepository.findAllById(listOf(firstSubBasicProduct.id)))
-                .willReturn(listOf(firstSubBasicProduct))
+            val firstBasicProductSub = basicproductsSub.first()
+            given(basicProductRepository.findAllById(listOf(firstBasicProductSub.id)))
+                .willReturn(listOf(firstBasicProductSub))
 
             val buildSubsidiaryMaterialMappingCreateModel =
-                buildSubsidiaryMaterialMappingCreateModel(subsidiaryMaterialId = firstSubBasicProduct.id!!)
+                buildSubsidiaryMaterialMappingCreateModel(subsidiaryMaterialId = firstBasicProductSub.id!!)
 
             val mockCreateModel = buildBasicProductDetailCreateModel(
                 basicProductModel = buildBasicProductCreateModel(
@@ -220,12 +220,12 @@ internal class BasicProductServiceTest(
             }
 
             // 부자재 수정
-            val secondSubBasicProduct = basicproductsSub[1]
-            given(basicProductRepository.findAllById(listOf(secondSubBasicProduct.id)))
-                .willReturn(listOf(secondSubBasicProduct))
+            val secondBasicProductSub = basicproductsSub[1]
+            given(basicProductRepository.findAllById(listOf(secondBasicProductSub.id)))
+                .willReturn(listOf(secondBasicProductSub))
 
             val buildSubsidiaryMaterialMappingCreateModel =
-                buildSubsidiaryMaterialMappingCreateModel(subsidiaryMaterialId = secondSubBasicProduct.id!!)
+                buildSubsidiaryMaterialMappingCreateModel(subsidiaryMaterialId = secondBasicProductSub.id!!)
 
             val mockUpdateModel = buildBasicProductDetailCreateModel(
                 basicProductModel = buildBasicProductCreateModel(
