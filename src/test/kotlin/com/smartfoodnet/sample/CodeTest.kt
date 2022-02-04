@@ -7,20 +7,12 @@ import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
 import org.springframework.test.context.ActiveProfiles
 
-@SpringBootTest
-@ActiveProfiles("local")
 class CodeTest {
-
-    @Autowired
-    lateinit var a: Sample
-
     @Test
     fun test() {
-        println("Before, in test: " + Thread.currentThread())
-        for(i in 0 .. 10) {
-            a.async()
+        for (i in 1 downTo 1) {
+            println("hi")
         }
-        println("After, in test: " + Thread.currentThread())
     }
 }
 

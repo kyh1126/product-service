@@ -1,21 +1,20 @@
 package com.smartfoodnet.fninventory.shortage
 
-import com.smartfoodnet.apiclient.WmsApiClient
 import com.smartfoodnet.apiclient.response.NosnosStockModel
+import com.smartfoodnet.common.Constants.API_CALL_LIST_SIZE
 import com.smartfoodnet.fninventory.shortage.model.ProductShortageModel
 import com.smartfoodnet.fnproduct.order.OrderService
 import com.smartfoodnet.fnproduct.order.model.OrderStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.util.concurrent.CompletableFuture
 
 @Service
 @Transactional(readOnly = true)
 class ShortageService(
     private val orderService: OrderService,
-    private val wmsApiClient: WmsApiClient
+    private val shortageAsyncService: ShortageAsyncService
 ) {
-    private val API_CALL_LIST_SIZE = 50
-
     fun getProductShortages(partnerId: Long): List<ProductShortageModel> {
         val shortageProjections =
             orderService.getShortageProjectionModel(partnerId = partnerId, status = OrderStatus.NEW)
@@ -32,18 +31,18 @@ class ShortageService(
             } ?: return@forEach
 
             if ((shortageProjection.totalOrderCount ?: 0) > it.normalStock!!) {
-                productShortageModels.add(
-                    ProductShortageModel(
-                        basicProductId = shortageProjection.basicProductId,
-                        basicProductName = shortageProjection.basicProductName,
-                        basicProductCode = shortageProjection.basicProductCode,
-                        availableStockCount = it.normalStock,
-                        shortageCount = shortageProjection.totalOrderCount?.minus(it.normalStock),
-                        shortageOrderCount = shortageProjection.shortageOrderCount?.toInt(),
-                        totalShortagePrice = shortageProjection.totalShortagePrice,
-                        totalOrderCount = shortageProjection.totalOrderCount
-                    )
+                val productShortageModel = ProductShortageModel(
+                    basicProductId = shortageProjection.basicProductId,
+                    basicProductName = shortageProjection.basicProductName,
+                    basicProductCode = shortageProjection.basicProductCode,
+                    availableStockCount = it.normalStock,
+                    shortageCount = shortageProjection.totalOrderCount?.minus(it.normalStock),
+                    shortageOrderCount = shortageProjection.shortageOrderCount?.toInt(),
+                    totalShortagePrice = shortageProjection.totalShortagePrice,
+                    totalOrderCount = shortageProjection.totalOrderCount
                 )
+
+                productShortageModels.add(productShortageModel)
             }
         }
 
@@ -54,19 +53,16 @@ class ShortageService(
         partnerId: Long,
         shippingProductIds: List<Long?>
     ): List<NosnosStockModel> {
-        val nosnosStocks = mutableListOf<NosnosStockModel>()
+        val shippingProductIdChunks = shippingProductIds.chunked(API_CALL_LIST_SIZE)
+        val futures = mutableListOf<CompletableFuture<List<NosnosStockModel>>>()
+        shippingProductIdChunks.forEach { shippingProductIds ->
+            val future = shortageAsyncService.getNosnosStocksAsync(partnerId = partnerId, shippingProductIds = shippingProductIds)
 
-        val arrShippingProductIds = shippingProductIds.chunked(API_CALL_LIST_SIZE)
-        arrShippingProductIds.forEach { idChunks ->
-            val stocks = wmsApiClient.getStocks(
-                partnerId = partnerId,
-                shippingProductIds = idChunks
-            ).payload?.dataList ?: listOf()
-
-            nosnosStocks.addAll(stocks)
+            futures.add(future)
         }
 
-        return nosnosStocks
-    }
+        CompletableFuture.allOf(*futures.toTypedArray())
 
+        return futures.flatMap { it.get()}
+    }
 }
