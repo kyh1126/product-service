@@ -7,6 +7,7 @@ import com.querydsl.core.types.Predicate
 import com.smartfoodnet.common.Constants
 import com.smartfoodnet.common.model.request.PredicateSearchCondition
 import com.smartfoodnet.fninventory.inbound.entity.QInbound
+import com.smartfoodnet.fninventory.inbound.entity.QInbound.inbound
 import com.smartfoodnet.fninventory.inbound.entity.QInboundExpectedDetail
 import com.smartfoodnet.fninventory.inbound.entity.QInboundUnplanned.inboundUnplanned
 import com.smartfoodnet.fninventory.inbound.model.vo.InboundStatusAdvanceType
@@ -38,18 +39,18 @@ data class InboundSearchCondition(
     val keyword: String? = null
 ): PredicateSearchCondition(){
     override fun assemblePredicate(predicate: BooleanBuilder): Predicate {
-        predicate.and(inboundUnplanned.partnerId.eq(partnerId))
-        predicate.and(inboundUnplanned.createdAt.between(fromDate, toDate))
+        predicate.and(inbound.partnerId.eq(partnerId))
+        predicate.and(inbound.createdAt.between(fromDate, toDate))
 
         if (statusType != null){
-            predicate.and(QInbound.inbound.status.eq(statusType))
+            predicate.and(inbound.status.eq(statusType))
         }
 
         if (!keyword.isNullOrBlank()) {
             when (productSearchType) {
                 ProductSearchType.BASIC_PRODUCT_CODE -> predicate.and(QInboundExpectedDetail.inboundExpectedDetail.basicProduct.code.contains(keyword))
                 ProductSearchType.BASIC_PRODUCT_NAME -> predicate.and(QInboundExpectedDetail.inboundExpectedDetail.basicProduct.name.contains(keyword))
-                ProductSearchType.INBOUND_REGISTRATION_NO -> predicate.and(QInbound.inbound.registrationNo.contains(keyword))
+                ProductSearchType.INBOUND_REGISTRATION_NO -> predicate.and(inbound.registrationNo.contains(keyword))
             }
         }
 

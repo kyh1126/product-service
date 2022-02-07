@@ -10,10 +10,13 @@ import com.smartfoodnet.fninventory.inbound.entity.QInboundActualDetail.inboundA
 import com.smartfoodnet.fninventory.inbound.entity.QInboundExpectedDetail.inboundExpectedDetail
 import com.smartfoodnet.fninventory.inbound.model.dto.*
 import com.smartfoodnet.fninventory.inbound.model.request.InboundSearchCondition
+import com.smartfoodnet.fninventory.inbound.model.vo.InboundStatusType
 import com.smartfoodnet.fninventory.inbound.model.vo.ProductSearchType.*
 import com.smartfoodnet.fnproduct.product.entity.QBasicProduct.basicProduct
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import java.time.LocalDateTime
+import java.time.LocalTime
 
 class InboundRepositoryImpl
     : InboundRepositoryCustom, Querydsl4RepositorySupport(Inbound::class.java) {
@@ -46,6 +49,14 @@ class InboundRepositoryImpl
                     )
                 )
         }
+    }
+
+    override fun findStatusExptectedInbounds(basicDate: LocalDateTime): List<Inbound> {
+        return selectFrom(inbound)
+            .where(
+                inbound.status.eq(InboundStatusType.EXPECTED),
+                inbound.expectedDate.between(basicDate.with(LocalTime.MIN), basicDate.with(LocalTime.MAX))
+            ).fetch()
     }
 
     override fun findSumActualDetail(expectedIds: List<Long>): List<GetInboundSumDetail> {

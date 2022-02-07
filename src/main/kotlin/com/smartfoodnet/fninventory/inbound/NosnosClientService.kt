@@ -5,6 +5,7 @@ import com.smartfoodnet.apiclient.request.InboundWorkReadModel
 import com.smartfoodnet.apiclient.request.NosnosInboundCreateModel
 import com.smartfoodnet.apiclient.request.PlanProduct
 import com.smartfoodnet.apiclient.response.CommonDataListModel
+import com.smartfoodnet.apiclient.response.GetInboundModel
 import com.smartfoodnet.apiclient.response.GetInboundWorkModel
 import com.smartfoodnet.fninventory.inbound.entity.Inbound
 import org.springframework.stereotype.Service
@@ -24,6 +25,20 @@ class NosnosClientService(
         )
 
         return wmsApiClient.getInboundWork(params).payload
+    }
+
+    fun getInboundWorkJob(partnerId: Long, basicDt: String, page: Int): CommonDataListModel<GetInboundWorkModel> {
+        val params = InboundWorkReadModel(
+            memberId = partnerId,
+            startDt = basicDt,
+            endDt = basicDt,
+            page = page
+        )
+        return wmsApiClient.getInboundWork(params).payload!!
+    }
+
+    fun getInbound(receivingPlanId : Long) : GetInboundModel?{
+        return wmsApiClient.getInbound(receivingPlanId).payload
     }
 
     fun sendInboundAndSetRegisterNo(inbound : Inbound){
