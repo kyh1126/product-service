@@ -64,6 +64,11 @@ interface WmsApiClient {
     fun createInbound(
         @RequestBody nosNosInboundCreateModel: NosnosInboundCreateModel
     ) : CommonResponse<NosnosPostInboundModel>
+
+    @GetMapping("inventory/inbounds/{receivingPlanId}")
+    fun getInbound(
+        @PathVariable receivingPlanId : Long
+    ) : CommonResponse<GetInboundModel>
 }
 
 data class StockDefaultModel(

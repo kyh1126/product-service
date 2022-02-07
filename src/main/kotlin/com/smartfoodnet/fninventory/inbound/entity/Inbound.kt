@@ -23,7 +23,7 @@ class Inbound(
     val memo: String? = null,
 
     @Enumerated(EnumType.STRING)
-    val status: InboundStatusType = InboundStatusType.EXPECTED,
+    var status: InboundStatusType = InboundStatusType.EXPECTED,
 
     @OneToMany(mappedBy = "inbound", cascade = [CascadeType.PERSIST])
     val expectedList : MutableList<InboundExpectedDetail> = mutableListOf()

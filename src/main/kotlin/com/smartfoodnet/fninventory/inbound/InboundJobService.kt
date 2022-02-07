@@ -3,15 +3,21 @@ package com.smartfoodnet.fninventory.inbound
 import com.smartfoodnet.apiclient.WmsApiClient
 import com.smartfoodnet.apiclient.request.InboundWorkReadModel
 import com.smartfoodnet.apiclient.response.CommonDataListModel
+import com.smartfoodnet.apiclient.response.GetInboundModel
 import com.smartfoodnet.apiclient.response.GetInboundWorkModel
+import com.smartfoodnet.common.Constants
 import com.smartfoodnet.common.utils.Log
+import com.smartfoodnet.fninventory.inbound.model.vo.InboundStatusType
 import com.smartfoodnet.fnproduct.product.BasicProductRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @Service
 class InboundJobService(
-    val wmsApiClient: WmsApiClient,
+    val nosnosClientService: NosnosClientService,
     val inboundUnplannedRepository: InboundUnplannedRepository,
     val inboundActualDetailRepository: InboundActualDetailRepository,
     val inboundRepository: InboundRepository,
@@ -21,27 +27,18 @@ class InboundJobService(
     @Transactional
     fun inboundWorkJob(partnerId: Long, basicDt: String){
         // 최초 가져오기 및 데이터 처리
-        val firstList = getInboundWorkJob(partnerId, basicDt, 1)
+        val firstList = nosnosClientService.getInboundWorkJob(partnerId, basicDt, 1)
         inboundWorkProcess(partnerId, firstList.dataList)
 
         // 이후 데이터가 있는지 확인
         val totalPage = firstList.totalPage.toInt()
 
         (2..totalPage).forEach {
-            val afterList = getInboundWorkJob(partnerId, basicDt, it)
+            val afterList = nosnosClientService.getInboundWorkJob(partnerId, basicDt, it)
             inboundWorkProcess(partnerId, afterList.dataList)
         }
     }
 
-    private fun getInboundWorkJob(partnerId: Long, basicDt: String, page: Int): CommonDataListModel<GetInboundWorkModel> {
-        val params = InboundWorkReadModel(
-            memberId = partnerId,
-            startDt = basicDt,
-            endDt = basicDt,
-            page = page
-        )
-        return wmsApiClient.getInboundWork(params).payload!!
-    }
 
     private fun inboundWorkProcess(partnerId: Long, dataList: List<GetInboundWorkModel>){
         expectedListProcess(partnerId, dataList.filter { it.receivingType == 1 })
@@ -76,6 +73,19 @@ class InboundJobService(
                 log.warn("duplicate data -> {}", it)
             }
 
+        }
+    }
+
+    @Transactional
+    fun inboundProcessCheck(basicDt: String) {
+        val paramDate = LocalDate.parse(basicDt, DateTimeFormatter.ofPattern("yyyyMMdd")).atStartOfDay()
+        val expectedList = inboundRepository.findStatusExptectedInbounds(paramDate)
+
+        expectedList.forEach {
+            val responseInboundModel = nosnosClientService.getInbound(it.registrationId!!)
+            if (responseInboundModel != null && responseInboundModel.plan_status != 2L) {
+                it.status = InboundStatusType.getInboundStatusType(responseInboundModel.plan_status.toInt())
+            }
         }
     }
 }

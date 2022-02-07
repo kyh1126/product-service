@@ -1,11 +1,19 @@
 package com.smartfoodnet.fninventory.inbound.model.vo
 
 enum class InboundStatusType(
+    val code: Int,
     val description: String
 ) {
-    EXPECTED("입고예정"),
-    COMPLETE("입고완료"),
-    CANCEL("입고취소");
+    EXPECTED(1,"입고예정"),
+    COMPLETE(3,"입고완료"),
+    CANCEL(4,"입고취소");
+
+    companion object{
+        fun getInboundStatusType(code: Int) : InboundStatusType {
+            return values().associateBy { it.code }[code]
+                ?: throw IllegalArgumentException("InboundStatusType을 찾을 수 없습니다")
+        }
+    }
 }
 
 enum class InboundStatusAdvanceType(

@@ -3,7 +3,6 @@ package com.smartfoodnet.fninventory.inbound
 import com.smartfoodnet.apiclient.response.CommonDataListModel
 import com.smartfoodnet.apiclient.response.GetInboundWorkModel
 import com.smartfoodnet.common.model.response.PageResponse
-import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.fninventory.inbound.model.dto.GetInbound
 import com.smartfoodnet.fninventory.inbound.model.request.InboundCreateModel
 import com.smartfoodnet.fninventory.inbound.model.request.InboundSearchCondition
@@ -80,5 +79,11 @@ class InboundController(
         inboundJobService.inboundWorkJob(partnerId, basicDt)
     }
 
-    companion object : Log
+    @GetMapping("/result/job")
+    @Operation(summary = "입고예정상태값 노스노스 조회 (배치용)")
+    fun getInboundResult(
+        @Parameter(description ="기준일자(yyyyMMdd)", example = "20220126") @RequestParam basicDt: String
+    ){
+        inboundJobService.inboundProcessCheck(basicDt)
+    }
 }
