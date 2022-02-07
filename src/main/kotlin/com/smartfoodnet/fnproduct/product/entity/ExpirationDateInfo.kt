@@ -13,4 +13,8 @@ class ExpirationDateInfo(
 
     @Column(name = "manufacture_to_expiration_date")
     var manufactureToExpirationDate: Int? = null,
-)
+) {
+    companion object {
+        val default = ExpirationDateInfo()
+    }
+}

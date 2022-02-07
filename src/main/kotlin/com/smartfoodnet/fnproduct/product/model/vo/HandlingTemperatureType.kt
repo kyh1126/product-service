@@ -13,6 +13,10 @@ enum class HandlingTemperatureType(val desc: String, val code: String) {
         fun fromName(name: String?): HandlingTemperatureType? {
             return values().firstOrNull { it.name == name }
         }
+
+        fun fromDesc(desc: String?): HandlingTemperatureType? {
+            return values().firstOrNull { it.desc == desc }
+        }
     }
 }
 

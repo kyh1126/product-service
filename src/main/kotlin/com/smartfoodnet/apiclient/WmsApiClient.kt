@@ -1,9 +1,6 @@
 package com.smartfoodnet.apiclient
 
-import com.smartfoodnet.apiclient.request.InboundWorkReadModel
-import com.smartfoodnet.apiclient.request.NosnosInboundCreateModel
-import com.smartfoodnet.apiclient.request.PreSalesProductModel
-import com.smartfoodnet.apiclient.request.PreShippingProductModel
+import com.smartfoodnet.apiclient.request.*
 import com.smartfoodnet.apiclient.response.*
 import com.smartfoodnet.common.model.response.CommonResponse
 import org.springframework.cloud.openfeign.FeignClient
@@ -52,13 +49,21 @@ interface WmsApiClient {
         preModel: PreShippingProductModel
     )
 
+    @PutMapping("shipping/products/bulk")
+    fun updateShippingProducts(
+        preModel: CommonCreateBulkModel<PreShippingProductSimpleModel>
+    )
+
+    @PostMapping("sales/products")
+    fun createSalesProducts(@RequestBody preModel: CommonCreateBulkModel<PreSalesProductModel>)
+
     @PutMapping("sales/products/{salesProductId}")
     fun updateSalesProduct(@PathVariable salesProductId: Long, preModel: PreSalesProductModel)
 
     @GetMapping("inventory/inbounds/work")
     fun getInboundWork(
-        @SpringQueryMap inboundWorkReadModel : InboundWorkReadModel
-    ) : CommonResponse<CommonDataListModel<GetInboundWorkModel>>
+        @SpringQueryMap inboundWorkReadModel: InboundWorkReadModel
+    ): CommonResponse<CommonDataListModel<GetInboundWorkModel>>
 
     @PostMapping("inventory/inbounds")
     fun createInbound(

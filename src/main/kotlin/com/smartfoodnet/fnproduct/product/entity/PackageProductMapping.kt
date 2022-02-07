@@ -30,7 +30,7 @@ class PackageProductMapping(
 ) : BaseEntity() {
     fun update(request: PackageProductMappingCreateModel, basicProduct: BasicProduct) {
         selectedBasicProduct = basicProduct
-        quantity = request.quantity!!
+        quantity = request.quantity
     }
 
     fun delete() {

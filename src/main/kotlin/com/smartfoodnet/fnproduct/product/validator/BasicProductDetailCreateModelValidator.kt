@@ -91,7 +91,7 @@ class BasicProductDetailCreateModelValidator(
                     errors.rejectValue(
                         "basicProductModel.barcode",
                         "barcode.invalid",
-                        "숫자 입력만 가능합니다."
+                        "바코드 값은 숫자 입력만 가능합니다."
                     )
                 }
             }
@@ -131,7 +131,7 @@ class BasicProductDetailCreateModelValidator(
                     if (manufactureDateWriteYn == "N") {
                         validateNull(
                             errors,
-                            "basicProductModel.expirationDateInfoModel.expirationDate",
+                            "basicProductModel.expirationDateInfoModel.manufactureToExpirationDate",
                             "유통기한(제조일+X일)",
                             manufactureToExpirationDate
                         )

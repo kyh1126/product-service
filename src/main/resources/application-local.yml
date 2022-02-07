@@ -38,7 +38,7 @@ spring:
     url: ${SPRING_DATASOURCE_BASE_URL:jdbc:mysql://localhost:3306}/fn_products?useCursors=false&sendStringParametersAsUnicode=false&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useSSL=false
     #    url: jdbc:mysql://localhost:3306/fn_products?serverTimezone=UTC&useCursors=false&sendStringParametersAsUnicode=false&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useSSL=false
     username: ${SPRING_DATASOURCE_BASE_USERNAME:root}
-    password: ${SPRING_DATASOURCE_BASE_PASSWORD:1qaz1qaz}
+    password: ${SPRING_DATASOURCE_BASE_PASSWORD:}
     driver-class-name: com.mysql.cj.jdbc.Driver
   mvc:
     format:
@@ -60,7 +60,7 @@ sfn:
   service:
     fn-message: ${FN_MESSAGE_SERVICE:https://s-api-dev.smartfoodnet.com/fresh-networks/fn-message}
     fn-warehouse-management-service: ${FN_WAREHOUSE_SERVICE:http://localhost:4001/fresh-networks/fn-warehouse-service}
-
+    fn-partner: ${FN_PARTNER_SERVICE:http://localhost:4007/fresh-networks/fn-partner}
 
 sqs:
   queues:

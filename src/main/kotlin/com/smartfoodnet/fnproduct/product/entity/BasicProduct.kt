@@ -2,7 +2,6 @@ package com.smartfoodnet.fnproduct.product.entity
 
 import com.smartfoodnet.common.entity.BaseEntity
 import com.smartfoodnet.fnproduct.product.model.request.BasicProductCreateModel
-import com.smartfoodnet.fnproduct.product.model.request.BasicProductSimpleCreateModel
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductTypeConverter
 import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
@@ -107,7 +106,7 @@ class BasicProduct(
         basicProductCategoryRequest: BasicProductCategory?,
         subsidiaryMaterialCategoryRequest: SubsidiaryMaterialCategory?,
         subsidiaryMaterialMappingRequests: Set<SubsidiaryMaterialMapping>,
-        warehouseRequest: InWarehouse,
+        warehouseRequest: InWarehouse?,
     ) {
         name = request.name
         supplyPrice = request.supplyPrice
@@ -128,11 +127,8 @@ class BasicProduct(
         subsidiaryMaterialMappingRequests.forEach { addSubsidiaryMaterialMappings(it) }
     }
 
-    fun update(
-        request: BasicProductSimpleCreateModel,
-        packageProductMappingRequests: Set<PackageProductMapping>,
-    ) {
-        name = request.name
+    fun update(name: String, packageProductMappingRequests: Set<PackageProductMapping>) {
+        this.name = name
 
         // 양방향
         packageProductMappings.clear()
@@ -141,5 +137,10 @@ class BasicProduct(
 
     fun inactivate() {
         activeYn = "N"
+    }
+
+    fun updateProductCode(code: String) {
+        productCode = code
+        salesProductCode = code
     }
 }

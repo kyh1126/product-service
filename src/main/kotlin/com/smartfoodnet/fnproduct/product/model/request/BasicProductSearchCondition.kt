@@ -58,9 +58,9 @@ class BasicProductSearchCondition(
 
     private fun toPredicate(searchType: SearchType) =
         when (searchType) {
-            NAME -> eqName(searchKeyword)
-            CODE -> eqCode(searchKeyword)
-            BARCODE -> eqBarcode(searchKeyword)
+            NAME -> containsName(searchKeyword)
+            CODE -> containsCode(searchKeyword)
+            BARCODE -> containsBarcode(searchKeyword)
         }
 
     private fun eqPartnerId(partnerId: Long?) = partnerId?.let { basicProduct.partnerId.eq(it) }
@@ -75,9 +75,10 @@ class BasicProductSearchCondition(
 
     private fun eqActiveYn(activeYn: String?) = activeYn?.let { basicProduct.activeYn.eq(it) }
 
-    private fun eqName(name: String?) = name?.let { basicProduct.name.eq(it) }
+    private fun containsName(name: String?) = name?.let { basicProduct.name.contains(it) }
 
-    private fun eqCode(code: String?) = code?.let { basicProduct.code.eq(it) }
+    private fun containsCode(code: String?) = code?.let { basicProduct.code.contains(it) }
 
-    private fun eqBarcode(barcode: String?) = barcode?.let { basicProduct.barcode.eq(it) }
+    private fun containsBarcode(barcode: String?) =
+        barcode?.let { basicProduct.barcode.contains(it) }
 }

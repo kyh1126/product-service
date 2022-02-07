@@ -28,7 +28,7 @@ class BasicProductCreateModel {
     var partnerCode: String? = null
 
     @ApiModelProperty(value = "출고상품 ID (nosnos)")
-    val shippingProductId: Long? = null
+    var shippingProductId: Long? = null
 
     @ApiModelProperty(value = "상품명")
     var name: String? = null
@@ -82,7 +82,7 @@ class BasicProductCreateModel {
         code: String?,
         basicProductCategory: BasicProductCategory?,
         subsidiaryMaterialCategory: SubsidiaryMaterialCategory?,
-        inWarehouse: InWarehouse,
+        inWarehouse: InWarehouse?,
     ): BasicProduct {
         return BasicProduct(
             type = type,

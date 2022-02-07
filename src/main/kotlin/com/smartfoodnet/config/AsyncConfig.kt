@@ -26,4 +26,18 @@ class AsyncConfig(
 
         return taskExecutor
     }
+
+    @Bean
+    fun shortageTaskExecutor(): ThreadPoolTaskExecutor {
+        val taskExecutor = ThreadPoolTaskExecutor()
+
+        taskExecutor.setThreadNamePrefix("ShortageTask-")
+        taskExecutor.corePoolSize = poolSize
+        taskExecutor.maxPoolSize = poolSize * 2
+        taskExecutor.setQueueCapacity(poolSize * 5)
+        taskExecutor.setTaskDecorator(LoggingTaskDecorator())
+        taskExecutor.setWaitForTasksToCompleteOnShutdown(true)
+
+        return taskExecutor
+    }
 }
