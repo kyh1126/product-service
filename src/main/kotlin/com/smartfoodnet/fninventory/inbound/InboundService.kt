@@ -1,10 +1,6 @@
 package com.smartfoodnet.fninventory.inbound
 
-import com.smartfoodnet.apiclient.WmsApiClient
-import com.smartfoodnet.apiclient.request.InboundWorkReadModel
-import com.smartfoodnet.apiclient.request.PlanProduct
-import com.smartfoodnet.apiclient.response.CommonDataListModel
-import com.smartfoodnet.apiclient.response.GetInboundWorkModel
+import com.smartfoodnet.common.error.exception.BaseRuntimeException
 import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.fninventory.inbound.model.dto.GetInbound
@@ -15,7 +11,6 @@ import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.lang.RuntimeException
 
 @Service
 @Transactional(readOnly = true)
@@ -70,4 +65,13 @@ class InboundService(
 
     fun getInboundActualDetail(partnerId: Long, expectedId: Long)
         = inboundRepository.findInboundActualDetail(partnerId, expectedId)
+
+    fun cancelInbound(inboundId : Long){
+        val inbound = inboundRepository.findById(inboundId).get()
+
+        inbound.status.isCancelPossiible()
+
+        val receivingPlanId = inbound.registrationId?: throw BaseRuntimeException(errorMessage = "입고예정등록번호를 찾을 수 없습니다")
+        nosnosClientService.cancelInbound(receivingPlanId)
+    }
 }

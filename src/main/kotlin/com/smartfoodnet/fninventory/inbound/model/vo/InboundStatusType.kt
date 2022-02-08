@@ -1,5 +1,7 @@
 package com.smartfoodnet.fninventory.inbound.model.vo
 
+import com.smartfoodnet.common.error.exception.BaseRuntimeException
+
 enum class InboundStatusType(
     val code: Int,
     val description: String
@@ -7,6 +9,13 @@ enum class InboundStatusType(
     EXPECTED(1,"입고예정"),
     COMPLETE(3,"입고완료"),
     CANCEL(4,"입고취소");
+
+    fun isCancelPossiible(){
+        when (this){
+            COMPLETE -> throw BaseRuntimeException(errorMessage = "입고완료된 내역은 취소할 수 없습니다")
+            CANCEL -> throw BaseRuntimeException(errorMessage = "이미 취소된 입고예정입니다")
+        }
+    }
 
     companion object{
         fun getInboundStatusType(code: Int) : InboundStatusType {
