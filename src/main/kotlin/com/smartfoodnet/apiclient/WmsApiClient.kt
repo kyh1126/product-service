@@ -77,6 +77,7 @@ interface WmsApiClient {
 
     @PutMapping("inventory/inbounds/{receivingPlanId}/cancel")
     fun cancelInbound(
+        @RequestParam partnerId : Long,
         @PathVariable receivingPlanId : Long
     ) : CommonResponse<Void>
 }
