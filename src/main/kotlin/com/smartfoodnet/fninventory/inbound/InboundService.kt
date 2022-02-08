@@ -6,6 +6,7 @@ import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.fninventory.inbound.model.dto.GetInbound
 import com.smartfoodnet.fninventory.inbound.model.request.InboundCreateModel
 import com.smartfoodnet.fninventory.inbound.model.request.InboundSearchCondition
+import com.smartfoodnet.fninventory.inbound.model.vo.InboundStatusType
 import com.smartfoodnet.fnproduct.product.BasicProductRepository
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import org.springframework.data.domain.Pageable
@@ -66,12 +67,16 @@ class InboundService(
     fun getInboundActualDetail(partnerId: Long, expectedId: Long)
         = inboundRepository.findInboundActualDetail(partnerId, expectedId)
 
+    @Transactional
     fun cancelInbound(inboundId : Long){
         val inbound = inboundRepository.findById(inboundId).get()
 
         inbound.status.isCancelPossiible()
 
         val receivingPlanId = inbound.registrationId?: throw BaseRuntimeException(errorMessage = "입고예정등록번호를 찾을 수 없습니다")
+
         nosnosClientService.cancelInbound(receivingPlanId)
+
+        inbound.status = InboundStatusType.CANCEL
     }
 }
