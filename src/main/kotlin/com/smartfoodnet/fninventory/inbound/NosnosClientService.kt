@@ -41,6 +41,10 @@ class NosnosClientService(
         return wmsApiClient.getInbound(receivingPlanId).payload
     }
 
+    fun cancelInbound(receivingPlanId : Long){
+        wmsApiClient.cancelInbound(receivingPlanId)
+    }
+
     fun sendInboundAndSetRegisterNo(inbound : Inbound){
         val planProductList : List<PlanProduct> = inbound.expectedList.map {
             PlanProduct(it.basicProduct.shippingProductId!!, it.requestQuantity)

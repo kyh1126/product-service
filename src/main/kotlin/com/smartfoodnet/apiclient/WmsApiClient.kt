@@ -74,6 +74,11 @@ interface WmsApiClient {
     fun getInbound(
         @PathVariable receivingPlanId : Long
     ) : CommonResponse<GetInboundModel>
+
+    @PutMapping("inventory/inbounds/{receivingPlanId}/cancel")
+    fun cancelInbound(
+        @PathVariable receivingPlanId : Long
+    ) : CommonResponse<Void>
 }
 
 data class StockDefaultModel(

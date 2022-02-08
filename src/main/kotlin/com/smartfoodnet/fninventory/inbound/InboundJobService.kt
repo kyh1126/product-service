@@ -39,7 +39,6 @@ class InboundJobService(
         }
     }
 
-
     private fun inboundWorkProcess(partnerId: Long, dataList: List<GetInboundWorkModel>){
         expectedListProcess(partnerId, dataList.filter { it.receivingType == 1 })
         etcListProcess(partnerId, dataList.filter { it.receivingType != 1 })
