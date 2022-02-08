@@ -41,8 +41,8 @@ class NosnosClientService(
         return wmsApiClient.getInbound(receivingPlanId).payload
     }
 
-    fun cancelInbound(receivingPlanId : Long){
-        wmsApiClient.cancelInbound(receivingPlanId)
+    fun cancelInbound(partnerId:Long, receivingPlanId : Long){
+        wmsApiClient.cancelInbound(partnerId, receivingPlanId)
     }
 
     fun sendInboundAndSetRegisterNo(inbound : Inbound){

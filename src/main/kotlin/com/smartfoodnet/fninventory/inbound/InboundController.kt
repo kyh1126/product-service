@@ -36,9 +36,10 @@ class InboundController(
     @PutMapping("{inboundId}/cancel")
     @Operation(summary = "입고예정 취소")
     fun cancelInbound(
+        @RequestParam partnerId: Long,
         @PathVariable inboundId : Long
     ){
-        inboundService.cancelInbound(inboundId)
+        inboundService.cancelInbound(partnerId, inboundId)
     }
 
     @GetMapping("partner/{partnerId}")
