@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming
 
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy::class)
 data class CommonCreateBulkModel<T>(
-    val member_id: Long,
+    val partnerId: Long? = null,
+    val memberId: Long? = null,
     val requestDataList: List<T>
 )
