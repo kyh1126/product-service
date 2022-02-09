@@ -54,7 +54,7 @@ class MigrationService(
         // nosnos 쪽 출고상품 productCode 업데이트
         wmsApiClient.updateShippingProducts(
             CommonCreateBulkModel(
-                member_id = memberId,
+                memberId = memberId,
                 requestDataList = basicProducts.map {
                     PreShippingProductSimpleModel.fromEntity(it)
                 }
@@ -74,7 +74,7 @@ class MigrationService(
         // nosnos 쪽 판매상품 일괄 등록
         wmsApiClient.createSalesProducts(
             CommonCreateBulkModel(
-                member_id = memberId,
+                memberId = memberId,
                 requestDataList = basicProducts.map {
                     PreSalesProductModel.fromEntity(it)
                 }
