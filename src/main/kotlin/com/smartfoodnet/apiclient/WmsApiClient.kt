@@ -54,7 +54,7 @@ interface WmsApiClient {
         preModel: CommonCreateBulkModel<PreShippingProductSimpleModel>
     )
 
-    @PostMapping("sales/products")
+    @PostMapping("sales/products/bulk")
     fun createSalesProducts(@RequestBody preModel: CommonCreateBulkModel<PreSalesProductModel>)
 
     @PutMapping("sales/products/{salesProductId}")
@@ -68,18 +68,18 @@ interface WmsApiClient {
     @PostMapping("inventory/inbounds")
     fun createInbound(
         @RequestBody nosNosInboundCreateModel: NosnosInboundCreateModel
-    ) : CommonResponse<NosnosPostInboundModel>
+    ): CommonResponse<NosnosPostInboundModel>
 
     @GetMapping("inventory/inbounds/{receivingPlanId}")
     fun getInbound(
-        @PathVariable receivingPlanId : Long
-    ) : CommonResponse<GetInboundModel>
+        @PathVariable receivingPlanId: Long
+    ): CommonResponse<GetInboundModel>
 
     @PutMapping("inventory/inbounds/{receivingPlanId}/cancel")
     fun cancelInbound(
-        @RequestParam partnerId : Long,
-        @PathVariable receivingPlanId : Long
-    ) : CommonResponse<Void>
+        @RequestParam partnerId: Long,
+        @PathVariable receivingPlanId: Long
+    ): CommonResponse<Void>
 }
 
 data class StockDefaultModel(
