@@ -71,15 +71,23 @@ class MigrationService(
         val basicProducts =
             basicProductService.getBasicProductsByShippingProductId(shippingProductIds)
 
+        val basicProductsBySalesProductCode = basicProducts.associateBy { it.salesProductCode }
+
         // nosnos 쪽 판매상품 일괄 등록
-        wmsApiClient.createSalesProducts(
+        val postSalesProductModels = wmsApiClient.createSalesProducts(
             CommonCreateBulkModel(
                 memberId = memberId,
                 requestDataList = basicProducts.map {
                     PreSalesProductModel.fromEntity(it)
                 }
             )
-        )
+        ).payload?.processedDataList
+
+        // 판매상품 id 업데이트
+        postSalesProductModels?.forEach {
+            val basicProduct = basicProductsBySalesProductCode[it.salesProductCode]
+            basicProduct?.updateSalesProductId(it.salesProductId)
+        }
     }
 
     private fun getBasicProductExcelModel(

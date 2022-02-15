@@ -55,7 +55,9 @@ interface WmsApiClient {
     )
 
     @PostMapping("sales/products/bulk")
-    fun createSalesProducts(@RequestBody preModel: CommonCreateBulkModel<PreSalesProductModel>)
+    fun createSalesProducts(
+        @RequestBody preModel: CommonCreateBulkModel<PreSalesProductModel>
+    ): CommonResponse<CommonProcessBulkModel<PostSalesProductModel>>
 
     @PutMapping("sales/products/{salesProductId}")
     fun updateSalesProduct(@PathVariable salesProductId: Long, preModel: PreSalesProductModel)

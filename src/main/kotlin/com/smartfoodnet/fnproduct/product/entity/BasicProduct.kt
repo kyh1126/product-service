@@ -143,4 +143,8 @@ class BasicProduct(
         productCode = code
         salesProductCode = code
     }
+
+    fun updateSalesProductId(salesProductId: Long) {
+        this.salesProductId = salesProductId
+    }
 }
