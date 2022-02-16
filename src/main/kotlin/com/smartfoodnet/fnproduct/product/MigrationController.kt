@@ -32,9 +32,13 @@ class MigrationController(private val migrationService: MigrationService) {
         @Parameter(description = "파일이름")
         @RequestParam("fileName", required = false) fileName: String?,
         @Parameter(name = "file", description = "파일")
-        @RequestPart("file", required = false) file: MultipartFile?
+        @RequestPart("file", required = false) file: MultipartFile?,
+        @Parameter(description = "시작 Row idx - 1 (헤더제외)")
+        @RequestParam("startIdx", required = false) startIdx: Int?,
+        @Parameter(description = "끝 Row idx - 1 (헤더제외)")
+        @RequestParam("endIdx", required = false) endIdx: Int?
     ): CommonResponse<String> {
-        migrationService.updateProductCode(fileName, file)
+        migrationService.updateProductCode(fileName, file, startIdx, endIdx)
         return CommonResponse(HttpStatus.OK.reasonPhrase)
     }
 
@@ -44,9 +48,13 @@ class MigrationController(private val migrationService: MigrationService) {
         @Parameter(description = "파일이름")
         @RequestParam("fileName", required = false) fileName: String?,
         @Parameter(name = "file", description = "파일")
-        @RequestPart("file", required = false) file: MultipartFile?
+        @RequestPart("file", required = false) file: MultipartFile?,
+        @Parameter(description = "시작 Row idx - 1 (헤더제외)")
+        @RequestParam("startIdx", required = false) startIdx: Int?,
+        @Parameter(description = "끝 Row idx - 1 (헤더제외)")
+        @RequestParam("endIdx", required = false) endIdx: Int?
     ): CommonResponse<String> {
-        migrationService.createNosnosSalesProducts(fileName, file)
+        migrationService.createNosnosSalesProducts(fileName, file, startIdx, endIdx)
         return CommonResponse(HttpStatus.OK.reasonPhrase)
     }
 

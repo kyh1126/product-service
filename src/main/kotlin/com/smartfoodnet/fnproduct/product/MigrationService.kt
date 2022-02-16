@@ -5,6 +5,7 @@ import com.smartfoodnet.apiclient.WmsApiClient
 import com.smartfoodnet.apiclient.request.CommonCreateBulkModel
 import com.smartfoodnet.apiclient.request.PreSalesProductModel
 import com.smartfoodnet.apiclient.request.PreShippingProductSimpleModel
+import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.fnproduct.product.mapper.BasicProductExcelModelMapper
 import com.smartfoodnet.fnproduct.product.model.BasicProductExcelModel
 import com.smartfoodnet.fnproduct.product.model.request.SubsidiaryMaterialSearchCondition
@@ -26,6 +27,7 @@ class MigrationService(
     private val wmsApiClient: WmsApiClient
 ) {
     private val defaultSubsidiaryMaterialName = "없음"
+    private val nosnosMaxRequestSize = 100
 
     @Transactional
     fun excelToBasicProducts(fileName: String?, file: MultipartFile?) {
@@ -44,60 +46,94 @@ class MigrationService(
     }
 
     @Transactional
-    fun updateProductCode(fileName: String?, file: MultipartFile?) {
-        val basicProductExcelModels = getBasicProductExcelModel(fileName, file)
-        val memberId = basicProductExcelModels.first().memberId
-        val basicProducts = basicProductExcelModels.map {
+    fun updateProductCode(fileName: String?, file: MultipartFile?, startIdx: Int?, endIdx: Int?) {
+        val basicProductExcelModels = getBasicProductExcelModel(fileName, file, startIdx, endIdx)
+        val rowIdxList = basicProductExcelModels.associate { it.shippingProductId to it.rowIdx }
+
+        val basicProductsByPartnerId = basicProductExcelModels.map {
             basicProductService.updateProductCode(it.shippingProductId)
-        }
+        }.groupBy { it.partnerId }
 
         // nosnos 쪽 출고상품 productCode 업데이트
-        wmsApiClient.updateShippingProducts(
-            CommonCreateBulkModel(
-                memberId = memberId,
-                requestDataList = basicProducts.map {
-                    PreShippingProductSimpleModel.fromEntity(it)
-                }
-            )
-        )
+        basicProductsByPartnerId.entries.forEach { (partnerId, basicProducts) ->
+            log.info("partnerId: $partnerId start!")
+
+            var start = 0
+            while (start < basicProducts.size) {
+                val end = start + nosnosMaxRequestSize
+                val subList = basicProducts.subList(start, end)
+                log.info("start: $start, end: $end, rowIdx: ${subList.map { rowIdxList[it.shippingProductId] }}")
+
+                wmsApiClient.updateShippingProducts(
+                    CommonCreateBulkModel(
+                        partnerId = partnerId,
+                        requestDataList = subList.map {
+                            PreShippingProductSimpleModel.fromEntity(it)
+                        }
+                    )
+                )
+                start = end
+            }
+        }
     }
 
     @Transactional
-    fun createNosnosSalesProducts(fileName: String?, file: MultipartFile?) {
+    fun createNosnosSalesProducts(
+        fileName: String?,
+        file: MultipartFile?,
+        startIdx: Int?,
+        endIdx: Int?
+    ) {
         val basicProductExcelModels = getBasicProductExcelModel(fileName, file)
-        val memberId = basicProductExcelModels.first().memberId
+        val rowIdxList = basicProductExcelModels.associate { it.shippingProductId to it.rowIdx }
+
         val shippingProductIds = basicProductExcelModels.map { it.shippingProductId }
-
-        val basicProducts =
+        val basicProductsByPartnerId =
             basicProductService.getBasicProductsByShippingProductId(shippingProductIds)
+                .groupBy { it.partnerId }
 
-        val basicProductsBySalesProductCode = basicProducts.associateBy { it.salesProductCode }
+        // nosnos 쪽 판매상품 일괄 등록, 판매상품 id 업데이트
+        basicProductsByPartnerId.entries.forEach { (partnerId, basicProducts) ->
+            log.info("partnerId: $partnerId start!")
 
-        // nosnos 쪽 판매상품 일괄 등록
-        val postSalesProductModels = wmsApiClient.createSalesProducts(
-            CommonCreateBulkModel(
-                memberId = memberId,
-                requestDataList = basicProducts.map {
-                    PreSalesProductModel.fromEntity(it)
+            var start = 0
+            while (start < basicProducts.size) {
+                val end = start + nosnosMaxRequestSize
+                val subList = basicProducts.subList(start, end)
+                log.info("start: $start, end: $end, rowIdx: ${subList.map { rowIdxList[it.shippingProductId] }}")
+
+                val basicProductBySalesProductCode =
+                    basicProducts.associateBy { it.salesProductCode }
+
+                // nosnos 쪽 판매상품 일괄 등록
+                val postSalesProductModels = wmsApiClient.createSalesProducts(
+                    CommonCreateBulkModel(
+                        partnerId = partnerId,
+                        requestDataList = basicProducts.map { PreSalesProductModel.fromEntity(it) }
+                    )
+                ).payload?.processedDataList
+
+                // 판매상품 id 업데이트
+                postSalesProductModels?.forEach {
+                    val basicProduct = basicProductBySalesProductCode[it.salesProductCode]
+                    basicProduct?.updateSalesProductId(it.salesProductId)
                 }
-            )
-        ).payload?.processedDataList
-
-        // 판매상품 id 업데이트
-        postSalesProductModels?.forEach {
-            val basicProduct = basicProductsBySalesProductCode[it.salesProductCode]
-            basicProduct?.updateSalesProductId(it.salesProductId)
+                start = end
+            }
         }
     }
 
     private fun getBasicProductExcelModel(
         fileName: String?,
-        file: MultipartFile?
+        file: MultipartFile?,
+        startIdx: Int? = 1,
+        endIdx: Int? = null
     ): List<BasicProductExcelModel> {
         if (file == null) throw IllegalArgumentException("엑셀 파일을 선택해주세요")
 
         val wb = ExcelReadUtils.extractSimple(fileName, file.inputStream)
-        return excelMapper.toBasicProductExcelModel(wb)
+        val defaultEndIdx = wb.worksheets[0].rows.size - 1
+        return excelMapper.toBasicProductExcelModel(wb, startIdx ?: 1, endIdx ?: defaultEndIdx)
     }
 
     private fun getDefaultSubsidiaryMaterialId(): Long {
@@ -110,4 +146,6 @@ class MigrationService(
 
         return categoryByLevelModel.value!!
     }
+
+    companion object : Log
 }

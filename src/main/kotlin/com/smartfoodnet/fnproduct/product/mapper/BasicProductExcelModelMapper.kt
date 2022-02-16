@@ -10,9 +10,13 @@ import sfn.excel.module.workbook.read.models.SimpleWorkbookModels
 @Component
 class BasicProductExcelModelMapper {
 
-    fun toBasicProductExcelModel(workbook: SimpleWorkbookModels.Workbook): List<BasicProductExcelModel> {
+    fun toBasicProductExcelModel(
+        workbook: SimpleWorkbookModels.Workbook,
+        startIdx: Int,
+        endIdx: Int
+    ): List<BasicProductExcelModel> {
         val worksheet = workbook.worksheets[0]
-        return toBasicProductExcelModel(worksheet)
+        return toBasicProductExcelModel(worksheet, startIdx, endIdx)
     }
 
     // worksheets[0]
@@ -22,7 +26,11 @@ class BasicProductExcelModelMapper {
     //      ["member_id", "shipping_product_id", "출고 상품명(product_name)", "바코드(upc)",      "관리키워드2(manage_code2)", "낱개 입수(single_eta)", "팔레트 입수(palet_count)", "유통기한 사용(use_expire_date)", "제조일자 사용(use_make_date)", "유통기한(expire_date_by_make_date)", "활성화(status)"],
     //      ["",          "",                    "양반 백합미역국 ",           "8801047169413",  "상온",                     "20",                  "",                      "1",                           "0",                        "",                                 "1"],
     // ]
-    private fun toBasicProductExcelModel(worksheet: SimpleWorkbookModels.Worksheet): List<BasicProductExcelModel> {
+    private fun toBasicProductExcelModel(
+        worksheet: SimpleWorkbookModels.Worksheet,
+        startIdx: Int,
+        endIdx: Int
+    ): List<BasicProductExcelModel> {
         var memberIdIdx = Int.MAX_VALUE
         var shippingProductIdIdx = Int.MAX_VALUE
         var productCodeIdx = Int.MAX_VALUE
@@ -55,10 +63,11 @@ class BasicProductExcelModelMapper {
         }
 
         val result = mutableListOf<BasicProductExcelModel>()
-        for (i in 1 until worksheet.rows.size) {
+        for (i in startIdx..endIdx) {
             val row = worksheet.rows[i]
             try {
                 result += BasicProductExcelModel(
+                    rowIdx = i,
                     memberId = validateNumberFormat(
                         "화주(고객사) ID", convertToLong(row[memberIdIdx])
                     ),

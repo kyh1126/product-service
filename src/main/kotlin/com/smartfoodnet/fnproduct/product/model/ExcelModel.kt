@@ -26,6 +26,7 @@ data class ExpirationDateInfoExcelModel(
 }
 
 data class BasicProductExcelModel(
+    val rowIdx: Int,
     val memberId: Long,
     val shippingProductId: Long,
     val productName: String,
