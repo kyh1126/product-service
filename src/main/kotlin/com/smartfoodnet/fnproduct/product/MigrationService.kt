@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import sfn.excel.module.workbook.read.ExcelReadUtils
+import kotlin.math.min
 
 @Service
 @Transactional(readOnly = true)
@@ -60,7 +61,7 @@ class MigrationService(
 
             var start = 0
             while (start < basicProducts.size) {
-                val end = start + nosnosMaxRequestSize
+                val end = min(start, basicProducts.size)
                 val subList = basicProducts.subList(start, end)
                 log.info("start: $start, end: $end, rowIdx: ${subList.map { rowIdxList[it.shippingProductId] }}")
 
@@ -98,7 +99,7 @@ class MigrationService(
 
             var start = 0
             while (start < basicProducts.size) {
-                val end = start + nosnosMaxRequestSize
+                val end = min(start, basicProducts.size)
                 val subList = basicProducts.subList(start, end)
                 log.info("start: $start, end: $end, rowIdx: ${subList.map { rowIdxList[it.shippingProductId] }}")
 
