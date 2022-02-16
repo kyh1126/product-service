@@ -61,7 +61,7 @@ class MigrationService(
 
             var start = 0
             while (start < basicProducts.size) {
-                val end = min(start, basicProducts.size)
+                val end = min(start + nosnosMaxRequestSize, basicProducts.size)
                 val subList = basicProducts.subList(start, end)
                 log.info("start: $start, end: $end, rowIdx: ${subList.map { rowIdxList[it.shippingProductId] }}")
 
@@ -99,7 +99,7 @@ class MigrationService(
 
             var start = 0
             while (start < basicProducts.size) {
-                val end = min(start, basicProducts.size)
+                val end = min(start + nosnosMaxRequestSize, basicProducts.size)
                 val subList = basicProducts.subList(start, end)
                 log.info("start: $start, end: $end, rowIdx: ${subList.map { rowIdxList[it.shippingProductId] }}")
 
@@ -145,7 +145,7 @@ class MigrationService(
 
             var start = 0
             while (start < basicProducts.size) {
-                val end = min(start, basicProducts.size)
+                val end = min(start + nosnosMaxRequestSize, basicProducts.size)
                 val subList = basicProducts.subList(start, end)
                 log.info("start: $start, end: $end, rowIdx: ${subList.map { rowIdxList[it.shippingProductId] }}")
 
