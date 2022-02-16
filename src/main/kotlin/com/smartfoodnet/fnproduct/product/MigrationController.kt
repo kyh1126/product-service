@@ -16,7 +16,7 @@ class MigrationController(private val migrationService: MigrationService) {
 
     @Operation(summary = "[Step 1] 출고상품 엑셀로 기본상품 생성 작업")
     @PostMapping(value = ["excel/basic-products"], consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
-    fun excelToBasicProduct(
+    fun excelToBasicProducts(
         @Parameter(description = "파일이름")
         @RequestParam("fileName", required = false) fileName: String?,
         @Parameter(name = "file", description = "파일")
@@ -27,8 +27,8 @@ class MigrationController(private val migrationService: MigrationService) {
     }
 
     @Operation(summary = "[Step 2] 출고상품 엑셀로 출고상품 product-code 업데이트 작업")
-    @PostMapping(value = ["excel/product-code"], consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
-    fun updateProductCode(
+    @PostMapping(value = ["excel/product-codes"], consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    fun updateProductCodes(
         @Parameter(description = "파일이름")
         @RequestParam("fileName", required = false) fileName: String?,
         @Parameter(name = "file", description = "파일")
@@ -38,13 +38,13 @@ class MigrationController(private val migrationService: MigrationService) {
         @Parameter(description = "끝 Row idx - 1 (헤더제외)")
         @RequestParam("endIdx", required = false) endIdx: Int?
     ): CommonResponse<String> {
-        migrationService.updateProductCode(fileName, file, startIdx, endIdx)
+        migrationService.updateProductCodes(fileName, file, startIdx, endIdx)
         return CommonResponse(HttpStatus.OK.reasonPhrase)
     }
 
     @Operation(summary = "[Step 3] 출고상품 엑셀로 판매상품 생성 작업")
     @PostMapping(value = ["excel/sales-products"], consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
-    fun createSalesProduct(
+    fun createNosnosSalesProducts(
         @Parameter(description = "파일이름")
         @RequestParam("fileName", required = false) fileName: String?,
         @Parameter(name = "file", description = "파일")

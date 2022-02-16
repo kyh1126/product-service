@@ -47,7 +47,7 @@ class MigrationService(
     }
 
     @Transactional
-    fun updateProductCode(fileName: String?, file: MultipartFile?, startIdx: Int?, endIdx: Int?) {
+    fun updateProductCodes(fileName: String?, file: MultipartFile?, startIdx: Int?, endIdx: Int?) {
         val basicProductExcelModels = getBasicProductExcelModel(fileName, file, startIdx, endIdx)
         val rowIdxList = basicProductExcelModels.associate { it.shippingProductId to it.rowIdx }
 
