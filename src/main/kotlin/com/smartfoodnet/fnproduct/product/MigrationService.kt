@@ -124,6 +124,37 @@ class MigrationService(
         }
     }
 
+    @Transactional
+    fun createProductMappings(
+        fileName: String?,
+        file: MultipartFile?,
+        startIdx: Int?,
+        endIdx: Int?
+    ) {
+        val basicProductExcelModels = getBasicProductExcelModel(fileName, file)
+        val rowIdxList = basicProductExcelModels.associate { it.shippingProductId to it.rowIdx }
+
+        val shippingProductIds = basicProductExcelModels.map { it.shippingProductId }
+        val basicProductsByPartnerId =
+            basicProductService.getBasicProductsByShippingProductId(shippingProductIds)
+                .groupBy { it.partnerId }
+
+        // nosnos 쪽 기존 출고상품-판매상품 연결
+        basicProductsByPartnerId.entries.forEach { (partnerId, basicProducts) ->
+            log.info("partnerId: $partnerId start!")
+
+            var start = 0
+            while (start < basicProducts.size) {
+                val end = min(start, basicProducts.size)
+                val subList = basicProducts.subList(start, end)
+                log.info("start: $start, end: $end, rowIdx: ${subList.map { rowIdxList[it.shippingProductId] }}")
+
+                // TODO: nosnos 쪽 상품연결 정보 등록(벌크)
+                start = end
+            }
+        }
+    }
+
     private fun getBasicProductExcelModel(
         fileName: String?,
         file: MultipartFile?,

@@ -58,4 +58,19 @@ class MigrationController(private val migrationService: MigrationService) {
         return CommonResponse(HttpStatus.OK.reasonPhrase)
     }
 
+    @Operation(summary = "[Step 4] 출고상품 엑셀로 기존 출고상품-판매상품 연결 작업")
+    @PostMapping(value = ["excel/mappings"], consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    fun createProductMappings(
+        @Parameter(description = "파일이름")
+        @RequestParam("fileName", required = false) fileName: String?,
+        @Parameter(name = "file", description = "파일")
+        @RequestPart("file", required = false) file: MultipartFile?,
+        @Parameter(description = "시작 Row idx - 1 (헤더제외)")
+        @RequestParam("startIdx", required = false) startIdx: Int?,
+        @Parameter(description = "끝 Row idx - 1 (헤더제외)")
+        @RequestParam("endIdx", required = false) endIdx: Int?
+    ): CommonResponse<String> {
+        migrationService.createProductMappings(fileName, file, startIdx, endIdx)
+        return CommonResponse(HttpStatus.OK.reasonPhrase)
+    }
 }
