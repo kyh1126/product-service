@@ -1,11 +1,8 @@
 package com.smartfoodnet.fnproduct.store.model.request
 
-import com.smartfoodnet.fnproduct.store.entity.StoreProduct
 import io.swagger.annotations.ApiModelProperty
 
 data class StoreProductCreateModel(
-    @ApiModelProperty(value = "쇼핑몰 상품 ID")
-    var id: Long? = null,
     @ApiModelProperty(value = "쇼핑몰 코드")
     var storeCode: String,
     @ApiModelProperty(value = "쇼핑몰명")
@@ -16,23 +13,15 @@ data class StoreProductCreateModel(
     var name: String,
     @ApiModelProperty(value = "쇼핑몰 상품 코드")
     var storeProductCode: String? = null,
+    @ApiModelProperty(value = "쇼핑몰 상품 옵션")
+    val options: List<OptionModel>
+)
+
+data class OptionModel(
     @ApiModelProperty(value = "옵션명")
-    var optionName: String? = null,
+    val code: String? = null,
     @ApiModelProperty(value = "옵션코드")
-    var optionCode: String? = null,
+    val name: String? = null,
     @ApiModelProperty(value = "쇼핑몰 상품 기본/모음상품 매핑")
-    var basicProductMappings: Set<StoreProductBasicProductMappingCreateModel>? = null
-) {
-    fun toEntity(): StoreProduct {
-        return StoreProduct(
-            id = id,
-            storeCode = storeCode,
-            storeName = storeName,
-            partnerId = partnerId,
-            name = name,
-            storeProductCode = storeProductCode,
-            optionName = optionName,
-            optionCode = optionCode,
-        )
-    }
-}
+    val storeProductBasicProductMappings: List<StoreProductBasicProductMappingCreateModel>? = null
+)

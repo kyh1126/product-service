@@ -4,9 +4,9 @@ import com.smartfoodnet.common.error.exception.ValidateError
 import com.smartfoodnet.fnproduct.product.BasicProductRepository
 import com.smartfoodnet.fnproduct.store.entity.StoreProduct
 import com.smartfoodnet.fnproduct.store.entity.StoreProductMapping
-import com.smartfoodnet.fnproduct.store.model.StoreProductModel
 import com.smartfoodnet.fnproduct.store.model.request.StoreProductCreateModel
 import com.smartfoodnet.fnproduct.store.model.request.StoreProductMappingCreateModel
+import com.smartfoodnet.fnproduct.store.model.response.StoreProductModel
 import com.smartfoodnet.fnproduct.store.support.StoreProductMappingRepository
 import com.smartfoodnet.fnproduct.store.support.StoreProductRepository
 import org.springframework.data.repository.findByIdOrNull
@@ -35,20 +35,37 @@ class StoreProductService(
     }
 
     @Transactional
-    fun createStoreProduct(storeProductCreateModel: StoreProductCreateModel): StoreProductModel {
-        val storeProduct = storeProductCreateModel.toEntity()
-        storeProductCreateModel.basicProductMappings?.forEach {
-            val basicProduct = basicProductRepository.findByIdOrNull(it.basicProductId)
-            storeProduct.storeProductMappings.add(
-                StoreProductMapping(
-                    storeProduct = storeProduct,
-                    basicProduct = basicProduct,
-                    quantity = it.quantity
+    fun createStoreProducts(storeProductCreateModel: StoreProductCreateModel): List<StoreProductModel> {
+        val storeProducts = with(storeProductCreateModel) {
+            options.map { option ->
+                val storeProduct = StoreProduct(
+                    storeCode = storeCode,
+                    storeName = storeName,
+                    partnerId = partnerId,
+                    name = name,
+                    storeProductCode = storeProductCode,
+                    optionName = option.name,
+                    optionCode = option.code
                 )
-            )
+
+                option.storeProductBasicProductMappings?.forEach { mapping ->
+                    val basicProduct = basicProductRepository.findByIdOrNull(mapping.basicProductId)
+                    if (basicProduct != null) {
+                        storeProduct.storeProductMappings.add(
+                            StoreProductMapping(
+                                storeProduct = storeProduct,
+                                basicProduct = basicProduct,
+                                quantity = mapping.quantity
+                            )
+                        )
+                    }
+                }
+
+                storeProduct
+            }
         }
 
-        return StoreProductModel.from(storeProductRepository.save(storeProduct))
+        return storeProductRepository.saveAll(storeProducts).map(StoreProductModel::from)
     }
 
     @Transactional
@@ -59,21 +76,21 @@ class StoreProductService(
         storeProductMappingModel.mappings.forEach { mappingModel ->
             val basicProduct = basicProductRepository.findByIdOrNull(mappingModel.basicProductId)
 
-            if(mappingModel.id != null) {
-                val storeProductMapping = storeProduct.storeProductMappings.firstOrNull { storeProductMapping ->  mappingModel.id == storeProductMapping.id }
+            if (mappingModel.id != null) {
+                val storeProductMapping =
+                    storeProduct.storeProductMappings.firstOrNull { storeProductMapping -> mappingModel.id == storeProductMapping.id }
                 storeProductMapping?.basicProduct = basicProduct
                 storeProductMapping?.quantity = mappingModel.quantity
             } else {
-                val storeProductMapping = StoreProductMapping(basicProduct = basicProduct, storeProduct = storeProduct, quantity = mappingModel.quantity)
+                val storeProductMapping = StoreProductMapping(
+                    basicProduct = basicProduct,
+                    storeProduct = storeProduct,
+                    quantity = mappingModel.quantity
+                )
                 storeProduct.storeProductMappings.add(storeProductMapping)
             }
         }
 
         return StoreProductModel.from(storeProductRepository.save(storeProduct))
-    }
-
-    @Transactional
-    fun buildStoreProductMappings() {
-
     }
 }

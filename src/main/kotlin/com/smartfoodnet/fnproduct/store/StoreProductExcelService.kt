@@ -1,21 +1,9 @@
 package com.smartfoodnet.fnproduct.store
 
-import com.google.common.collect.Lists
-import com.smartfoodnet.common.Constants.DATA_STARTING_ROW_INDEX
-import com.smartfoodnet.common.Constants.HEADER_ROW_INDEX
-import com.smartfoodnet.common.Constants.WORKSHEET_INDEX
 import com.smartfoodnet.fnproduct.product.BasicProductRepository
-import com.smartfoodnet.fnproduct.store.model.StoreProductModel
-import com.smartfoodnet.fnproduct.store.model.request.StoreProductCreateModel
-import com.smartfoodnet.fnproduct.store.support.StoreProductHeader
-import com.smartfoodnet.fnproduct.store.support.StoreProductHeader.*
-import com.smartfoodnet.fnproduct.store.support.StoreProductHeaderIndexMap
 import com.smartfoodnet.fnproduct.store.support.StoreProductRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.web.multipart.MultipartFile
-import sfn.excel.module.workbook.read.ExcelReadUtils
-import sfn.excel.module.workbook.read.models.SimpleWorkbookModels
 
 @Service
 @Transactional(readOnly = true)
@@ -23,6 +11,7 @@ class StoreProductExcelService(
     var storeProductRepository: StoreProductRepository,
     var basicProductRepository: BasicProductRepository
 ) {
+/*
     @Transactional
     //TODO: basicProduct 추가로직 생성
 
@@ -32,7 +21,7 @@ class StoreProductExcelService(
 
         val storeProductModels = buildStoreProductModels(worksheet, partnerId)
         val storeProducts = storeProductModels.map {
-            val storeProduct = it.toEntity()
+//            val storeProduct = it.toEntity()
 //            it.basicProductCode ?: run {
 //                val basicProduct = basicProductRepository.findByCode(it.basicProductCode!!)
 //                storeProduct.basicProduct = basicProduct
@@ -41,7 +30,7 @@ class StoreProductExcelService(
             storeProduct
         }
 
-        return storeProductRepository.saveAll(storeProducts).map { StoreProductModel.from(it) }
+        return storeProductRepository.saveAll(storeProducts).map(StoreProductModel::from)
     }
 
     private fun buildStoreProductModels(
@@ -50,7 +39,7 @@ class StoreProductExcelService(
     ): List<StoreProductCreateModel> {
         val indexMap = StoreProductHeaderIndexMap.from(worksheet.rows[HEADER_ROW_INDEX])
         val rows = worksheet.rows.subList(DATA_STARTING_ROW_INDEX, worksheet.rows.size)
-        val storeProductModels = Lists.newArrayList<StoreProductCreateModel>()
+        val storeProductModels = mutableListOf<StoreProductCreateModel>()
 
         rows.forEach { row ->
             buildModelFromRow(row, indexMap, partnerId)?.let {
@@ -80,4 +69,6 @@ class StoreProductExcelService(
             partnerId = partnerId
         )
     }
+
+*/
 }

@@ -70,7 +70,9 @@ class OrderSearchCondition(
     }
 
     private fun likeBasicProductName(basicProductName: String?) =
-        basicProductName?.let { orderDetail.storeProduct.basicProduct.name.likeIgnoreCase("%$basicProductName%") }
+        basicProductName?.let {
+            orderDetail.storeProduct.storeProductMappings.any().basicProduct.name.likeIgnoreCase("%$basicProductName%")
+        }
 
     private fun likeStoreProductName(storeProductName: String?) =
         storeProductName?.let { orderDetail.storeProduct.name.likeIgnoreCase("%$storeProductName%") }
@@ -79,7 +81,5 @@ class OrderSearchCondition(
         storeProductCode?.let { orderDetail.storeProduct.storeProductCode.eq(storeProductCode) }
 
     private fun eqBasicProductId(basicProductId: Long?) =
-        basicProductId?.let { orderDetail.storeProduct.basicProduct.id.eq(basicProductId) }
-
-
+        basicProductId?.let { orderDetail.storeProduct.storeProductMappings.any().basicProduct.id.eq(basicProductId) }
 }

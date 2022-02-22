@@ -1,7 +1,6 @@
-package com.smartfoodnet.fnproduct.store.model
+package com.smartfoodnet.fnproduct.store.model.response
 
 import com.smartfoodnet.fnproduct.store.entity.StoreProduct
-import com.smartfoodnet.fnproduct.store.model.response.StoreProductMappingModel
 
 data class StoreProductModel(
     var id: Long? = null,
@@ -26,7 +25,7 @@ data class StoreProductModel(
                     storeProductCode = storeProductCode,
                     optionName = optionName,
                     optionCode = optionCode,
-                    storeProductMappings = storeProductMappings?.map { StoreProductMappingModel.from(it) }?.toSet()
+                    storeProductMappings = storeProductMappings.map { StoreProductMappingModel.from(it) }.toSet()
                 )
             }
         }

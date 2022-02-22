@@ -5,7 +5,16 @@ import com.smartfoodnet.common.entity.BaseEntity
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import org.hibernate.annotations.Where
 import java.time.LocalDateTime
-import javax.persistence.*
+import javax.persistence.Column
+import javax.persistence.Entity
+import javax.persistence.FetchType
+import javax.persistence.ForeignKey
+import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType
+import javax.persistence.Id
+import javax.persistence.JoinColumn
+import javax.persistence.ManyToOne
+import javax.persistence.Table
 
 @Entity
 @Table(name = "store_product_mapping")
@@ -17,12 +26,12 @@ class StoreProductMapping(
     var id: Long? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "store_product_id", columnDefinition = "BIGINT UNSIGNED")
+    @JoinColumn(name = "store_product_id", columnDefinition = "BIGINT UNSIGNED", foreignKey = ForeignKey(name = "fk_store_product_mapping__store_product"))
     @JsonIgnore
     var storeProduct: StoreProduct? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "basic_product_id", columnDefinition = "BIGINT UNSIGNED")
+    @JoinColumn(name = "basic_product_id", columnDefinition = "BIGINT UNSIGNED", foreignKey = ForeignKey(name = "fk_store_product_mapping__basic_product"))
     var basicProduct: BasicProduct? = null,
 
     @Column(name = "quantity")
