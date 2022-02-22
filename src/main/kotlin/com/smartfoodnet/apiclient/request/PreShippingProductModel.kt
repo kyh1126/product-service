@@ -52,7 +52,6 @@ data class PreShippingProductModel(
                     memberId = partnerId!!,
                     productCode = code,
                     productName = name!!,
-                    manageCode2 = handlingTemperature?.desc,
                     upc = barcode,
                     singleEta = piecesPerBox,
                     paletCount = piecesPerPalette,

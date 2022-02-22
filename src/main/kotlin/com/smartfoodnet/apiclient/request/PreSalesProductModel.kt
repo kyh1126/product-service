@@ -26,7 +26,6 @@ data class PreSalesProductModel(
                 PreSalesProductModel(
                     memberId = partnerId!!,
                     salesProductCode = salesProductCode!!,
-                    manageCode2 = handlingTemperature?.desc,
                     productName = name!!,
                     status = convertYnToInt(activeYn),
                     useDisplayPeriod = 0, // 유효기간 사용 여부
