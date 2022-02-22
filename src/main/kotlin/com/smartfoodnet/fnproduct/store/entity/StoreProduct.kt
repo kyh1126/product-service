@@ -1,9 +1,15 @@
 package com.smartfoodnet.fnproduct.store.entity
 
 import com.smartfoodnet.common.entity.BaseEntity
-import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import org.hibernate.annotations.Where
-import javax.persistence.*
+import javax.persistence.CascadeType
+import javax.persistence.Column
+import javax.persistence.Entity
+import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType
+import javax.persistence.Id
+import javax.persistence.OneToMany
+import javax.persistence.Table
 
 @Entity
 @Table(name = "store_product")
@@ -35,7 +41,7 @@ class StoreProduct(
     @Column(name = "option_code")
     var optionCode: String? = null,
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "basic_product_id")
-    var basicProduct: BasicProduct? = null,
+    @OneToMany(mappedBy = "storeProduct", cascade = [CascadeType.PERSIST])
+    var storeProductMappings: MutableSet<StoreProductMapping> = mutableSetOf()
+
 ) : BaseEntity()

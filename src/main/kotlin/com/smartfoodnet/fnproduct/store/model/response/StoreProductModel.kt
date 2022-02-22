@@ -1,4 +1,4 @@
-package com.smartfoodnet.fnproduct.store.model
+package com.smartfoodnet.fnproduct.store.model.response
 
 import com.smartfoodnet.fnproduct.store.entity.StoreProduct
 
@@ -11,23 +11,8 @@ data class StoreProductModel(
     var storeProductCode: String? = null,
     var optionName: String? = null,
     var optionCode: String? = null,
-    var basicProductId: Long? = null,
-    var basicProductCode: String? = null,
-    var basicProductName: String? = null,
+    var storeProductMappings: Set<StoreProductMappingModel>? = null
 ) {
-    fun toEntity(): StoreProduct {
-        return StoreProduct(
-            id = id,
-            storeCode = storeCode,
-            storeName = storeName,
-            partnerId = partnerId,
-            name = name,
-            storeProductCode = storeProductCode,
-            optionName = optionName,
-            optionCode = optionCode,
-        )
-    }
-
     companion object {
         fun from(storeProduct: StoreProduct): StoreProductModel {
             return storeProduct.run {
@@ -40,7 +25,7 @@ data class StoreProductModel(
                     storeProductCode = storeProductCode,
                     optionName = optionName,
                     optionCode = optionCode,
-                    basicProductId = basicProduct?.id,
+                    storeProductMappings = storeProductMappings.map { StoreProductMappingModel.from(it) }.toSet()
                 )
             }
         }

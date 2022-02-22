@@ -7,6 +7,7 @@ import com.smartfoodnet.fnproduct.order.entity.OrderDetail
 import com.smartfoodnet.fnproduct.order.entity.QOrderDetail.orderDetail
 import com.smartfoodnet.fnproduct.order.model.OrderStatus
 import com.smartfoodnet.fnproduct.product.entity.QBasicProduct.basicProduct
+import com.smartfoodnet.fnproduct.store.entity.QStoreProductMapping.storeProductMapping
 
 class OrderDetailRepositoryImpl : Querydsl4RepositorySupport(OrderDetail::class.java), OrderDetailCustom {
     override fun findAllByPartnerIdAndStatusGroupByProductId(
@@ -24,7 +25,8 @@ class OrderDetailRepositoryImpl : Querydsl4RepositorySupport(OrderDetail::class.
             orderDetail.count.sum().`as`("totalOrderCount"),
             orderDetail.price.sum().`as`("totalShortagePrice")
         )).from(orderDetail)
-            .innerJoin(orderDetail.storeProduct.basicProduct ,basicProduct)
+            .innerJoin(orderDetail.storeProduct.storeProductMappings, storeProductMapping)
+            .innerJoin(storeProductMapping.basicProduct, basicProduct)
             .on(orderDetail.status.eq(status).and(orderDetail.partnerId.eq(partnerId)))
             .groupBy(basicProduct.shippingProductId, basicProduct.id)
             .fetch()
@@ -34,7 +36,8 @@ class OrderDetailRepositoryImpl : Querydsl4RepositorySupport(OrderDetail::class.
         return select(
             orderDetail.count.sum()
         ).from(orderDetail)
-            .innerJoin(orderDetail.storeProduct.basicProduct, basicProduct)
+            .innerJoin(orderDetail.storeProduct.storeProductMappings, storeProductMapping)
+            .innerJoin(storeProductMapping.basicProduct, basicProduct)
             .where(orderDetail.status.eq(status).and(basicProduct.id.eq(productId)))
             .groupBy(basicProduct.id)
             .fetchOne()

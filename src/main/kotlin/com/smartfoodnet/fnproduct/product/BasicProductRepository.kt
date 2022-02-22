@@ -21,4 +21,5 @@ interface BasicProductRepository : JpaRepository<BasicProduct, Long>, BasicProdu
 
     fun findByShippingProductId(shippingProductId: Long): BasicProduct?
     fun findAllByShippingProductIdIn(shippingProductIds: Collection<Long>): List<BasicProduct>
+    fun findAllByIdIn(ids: List<Long>): List<BasicProduct>
 }

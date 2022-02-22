@@ -23,7 +23,7 @@ class OrderService(
 
     @Transactional
     fun createOrderDetail(orderDetailModels: List<OrderDetailCreateModel>): List<OrderDetailModel> {
-        val orderDetails = orderDetailModels.stream().map { convert(it) }.toList()
+        val orderDetails = orderDetailModels.map { convert(it) }
 
         return orderDetails.map{OrderDetailModel.from (it)}
     }
