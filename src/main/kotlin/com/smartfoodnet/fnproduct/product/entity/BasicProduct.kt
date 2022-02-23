@@ -127,12 +127,9 @@ class BasicProduct(
         subsidiaryMaterialMappingRequests.forEach { addSubsidiaryMaterialMappings(it) }
     }
 
-    fun update(name: String, packageProductMappingRequests: Set<PackageProductMapping>) {
+    fun update(name: String, activeYn: String) {
         this.name = name
-
-        // 양방향
-        packageProductMappings.clear()
-        packageProductMappingRequests.forEach { addPackageProductMappings(it) }
+        this.activeYn = activeYn
     }
 
     fun inactivate() {
