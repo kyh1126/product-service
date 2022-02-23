@@ -21,7 +21,7 @@ class PackageProductDetailCreateModelValidator(
         target: PackageProductDetailCreateModel,
         errors: Errors
     ) {
-        checkRequiredFields(target, errors)
+        checkRequiredFields(saveState, target, errors)
 
         checkDuplicateName(saveState, target.packageProductModel, errors)
 
@@ -64,9 +64,12 @@ class PackageProductDetailCreateModelValidator(
     }
 
     private fun checkRequiredFields(
+        saveState: SaveState,
         target: PackageProductDetailCreateModel,
         errors: Errors,
     ) {
+        if (saveState == SaveState.UPDATE) return
+
         val packageProductMappingModels = target.packageProductMappingModels
 
         validateEmpty(

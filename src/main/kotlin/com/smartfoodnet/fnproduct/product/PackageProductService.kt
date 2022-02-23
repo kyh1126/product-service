@@ -38,7 +38,8 @@ class PackageProductService(
     }
 
     fun getPackageProduct(productId: Long): PackageProductDetailModel {
-        val packageProduct = basicProductService.getBasicProducts(listOf(productId)).first()
+        val packageProduct = getPackageProductByProductId(productId)
+
         // 모음상품-기본상품 매핑을 위한 기본상품(BasicProduct) 조회
         val basicProductById =
             basicProductService.getBasicProducts(packageProduct.packageProductMappings.map { it.selectedBasicProduct.id!! })
@@ -61,12 +62,16 @@ class PackageProductService(
                 HandlingTemperatureType.MIX
             )
         }
+
+        val packageProductMappingModels = createModel.packageProductMappingModels
         // 모음상품-기본상품 매핑을 위한 기본상품(BasicProduct) 조회
-        val basicProductById = getBasicProductById(createModel)
+        val basicProductById =
+            basicProductService.getBasicProducts(packageProductMappingModels.map { it.basicProductId })
+                .associateBy { it.id }
 
         // 모음상품-기본상품 매핑 저장
-        val packageProductMappings = createOrUpdatePackageProductMappings(
-            packageProductMappingModels = createModel.packageProductMappingModels,
+        val packageProductMappings = createPackageProductMappings(
+            packageProductMappingModels = packageProductMappingModels,
             basicProductById = basicProductById
         )
 
@@ -89,53 +94,30 @@ class PackageProductService(
             updateModel
         )
 
-        // 모음상품-기본상품 매핑을 위한 기본상품(BasicProduct) 조회
-        val basicProductById = getBasicProductById(updateModel)
+        val packageProduct = getPackageProductByProductId(productId)
+        with(updateModel.packageProductModel) {
+            packageProduct.update(name!!, activeYn)
+        }
 
-        val packageProduct = basicProductService.getBasicProducts(listOf(productId)).first()
-
-        // 모음상품-기본상품 매핑 저장
-        val entityById = packageProduct.packageProductMappings.associateBy { it.id }
-        val packageProductMappings = createOrUpdatePackageProductMappings(
-            updateModel.packageProductMappingModels,
-            entityById,
-            basicProductById
-        )
-
-        val basicProductPackageCreateModel = updateModel.packageProductModel
-        packageProduct.update(
-            basicProductPackageCreateModel.name!!,
-            packageProductMappings
-        )
-
+        val basicProductById =
+            packageProduct.packageProductMappings.map { it.selectedBasicProduct }
+                .associateBy { it.id }
         return toPackageProductDetailModel(packageProduct, basicProductById)
     }
 
-    private fun getBasicProductById(createModel: PackageProductDetailCreateModel) =
-        basicProductService.getBasicProducts(createModel.packageProductMappingModels.map { it.basicProductId })
-            .associateBy { it.id }
+    private fun getPackageProductByProductId(productId: Long) =
+        basicProductService.getBasicProducts(listOf(productId))
+            .first { it.type == BasicProductType.PACKAGE }
 
-    private fun createOrUpdatePackageProductMappings(
+    private fun createPackageProductMappings(
         packageProductMappingModels: List<PackageProductMappingCreateModel>,
-        entityById: Map<Long?, PackageProductMapping> = emptyMap(),
         basicProductById: Map<Long?, BasicProduct>,
     ): Set<PackageProductMapping> {
-        val packageProductMappings = packageProductMappingModels.map {
+        return packageProductMappingModels.map {
             val selectedBasicProduct = basicProductById[it.basicProductId]
                 ?: throw BaseRuntimeException(errorCode = ErrorCode.NO_ELEMENT)
-            if (it.id == null) it.toEntity(selectedBasicProduct)
-            else {
-                val entity = entityById[it.id]
-                entity!!.update(it, selectedBasicProduct)
-                entity
-            }
+            it.toEntity(selectedBasicProduct)
         }.run { LinkedHashSet(this) }
-
-        // 연관관계 끊긴 entity 삭제처리
-        entityById.values.toSet().minus(packageProductMappings)
-            .forEach(PackageProductMapping::delete)
-
-        return packageProductMappings
     }
 
     private fun toPackageProductDetailModel(
