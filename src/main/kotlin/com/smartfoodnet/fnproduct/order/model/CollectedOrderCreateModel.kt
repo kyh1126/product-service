@@ -2,19 +2,24 @@ package com.smartfoodnet.fnproduct.order.model
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.smartfoodnet.common.Constants
+import com.smartfoodnet.fnproduct.order.entity.CollectedProductInfo
+import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
 import com.smartfoodnet.fnproduct.order.entity.OrderDetail
 import io.swagger.annotations.ApiModelProperty
 import java.time.LocalDateTime
 
-data class OrderDetailCreateModel(
+data class CollectedOrderCreateModel(
     @ApiModelProperty(value = "화주사 ID")
-    val partnerId: Long? = null,
+    val partnerId: Long,
 
     @ApiModelProperty(value = "중복처리를 위한 쇼핑몰 종속적 유니크 키")
     val orderUniqueKey: String? = null,
 
     @ApiModelProperty(value = "쇼핑몰 이름")
     val storeName: String? = null,
+
+    @ApiModelProperty(value = "쇼핑몰 코유 코드")
+    val storeCode: String? = null,
 
     @ApiModelProperty(value = "쇼핑몰 ID")
     val storeId: Long? = null,
@@ -71,7 +76,10 @@ data class OrderDetailCreateModel(
     val receiver: ReceiverModel? = null,
 
     @ApiModelProperty(value = "업로드방식")
-    val uploadType: String? = null
+    val uploadType: String? = null,
+
+    @ApiModelProperty(value = "묶음번호")
+    val bundleNumber: String
 ) {
     fun toEntity(): OrderDetail {
         return run{
@@ -96,5 +104,31 @@ data class OrderDetailCreateModel(
                 uploadType = uploadType
             )
         }
+    }
+
+    fun toCollectEntity(): CollectedOrder{
+        return CollectedOrder(
+            partnerId = partnerId,
+            orderUniqueKey = orderUniqueKey,
+            bundleNumber = bundleNumber,
+            storeName = storeName,
+            storeCode = storeCode,
+            storeId = storeId,
+            collectedProductInfo = CollectedProductInfo(storeProductCode, storeProductName, storeProductOptionName),
+            userStoreId = userStoreId,
+            orderedAt = orderedAt,
+            collectedAt = collectedAt,
+            statusUpdatedAt = statusUpdatedAt,
+            orderNumber = orderNumber,
+            status = status,
+            claimStatus = claimStatus,
+            deliveryType = deliveryType,
+            expectedDeliveryDate = expectedDeliveryDate,
+            price = price,
+            shippingPrice = shippingPrice,
+            quantity = count,
+            receiver = receiver?.toEntity(),
+            uploadType = uploadType
+        )
     }
 }

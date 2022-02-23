@@ -1,60 +1,106 @@
 package com.smartfoodnet.fnproduct.order
 
+import com.smartfoodnet.apiclient.WmsApiClient
+import com.smartfoodnet.apiclient.response.NosnosStockModel
 import com.smartfoodnet.common.model.request.PredicateSearchCondition
 import com.smartfoodnet.common.model.response.PageResponse
-import com.smartfoodnet.fnproduct.order.entity.OrderDetail
-import com.smartfoodnet.fnproduct.order.model.OrderDetailCreateModel
-import com.smartfoodnet.fnproduct.order.model.OrderDetailModel
+import com.smartfoodnet.common.utils.Log
+import com.smartfoodnet.fnproduct.order.model.CollectedOrderCreateModel
 import com.smartfoodnet.fnproduct.order.model.OrderStatus
 import com.smartfoodnet.fninventory.shortage.model.ShortageOrderProjectionModel
-import com.smartfoodnet.fnproduct.order.support.OrderDetailRepository
+import com.smartfoodnet.fnproduct.order.dto.CollectedOrderModel
+import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
+import com.smartfoodnet.fnproduct.order.support.CollectedOrderRepository
+import com.smartfoodnet.fnproduct.order.support.CollectingOrderSearchCondition
 import com.smartfoodnet.fnproduct.store.StoreProductService
+import com.smartfoodnet.fnproduct.store.model.StoreProductPredicate
+import feign.FeignException
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import kotlin.streams.toList
+import java.lang.RuntimeException
 
 @Service
 @Transactional(readOnly = true)
 class OrderService(
-        private val orderDetailRepository: OrderDetailRepository,
-        private val storeProductService: StoreProductService
-) {
+    val collectedOrderRepository: CollectedOrderRepository,
+    val storeProductService: StoreProductService,
+    val wmsApiClient: WmsApiClient
+) : Log {
 
     @Transactional
-    fun createOrderDetail(orderDetailModels: List<OrderDetailCreateModel>): List<OrderDetailModel> {
-        val orderDetails = orderDetailModels.map { convert(it) }
-
-        return orderDetails.map{OrderDetailModel.from (it)}
+    fun createCollectedOrder(collectedOrderCreateModel: List<CollectedOrderCreateModel>) {
+        collectedOrderCreateModel.map { convert(it) }
     }
 
-    fun getOrderDetails(
-        condition: PredicateSearchCondition,
+    fun getCollectedOrder(
+        condition: CollectingOrderSearchCondition,
         page: Pageable
-    ): PageResponse<OrderDetailModel> {
-        return orderDetailRepository.findAll(condition.toPredicate(), page)
-            .map(OrderDetailModel::from)
-            .run { PageResponse.of(this) }
+    ): PageResponse<CollectedOrderModel> {
+        val response = collectedOrderRepository.findCollectedOrders(condition, page)
+        val shippingProductIds = response.content.mapNotNull { it.basicProductShippingProductId }
+        val availableStocks = try {
+            wmsApiClient
+                .getStocks(condition.partnerId!!, shippingProductIds).payload!!.dataList
+                .associateBy { it.shippingProductId!! }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            log.info("partnerId:${condition.partnerId}의 재고 정보[${shippingProductIds.joinToString(",")}]를 가져올 수 없습니다")
+            mapOf()
+        }
+
+        if (availableStocks != null) {
+            response.content.forEach {
+                if (it.basicProductShippingProductId != null) {
+                    it.availableQuantity =
+                        availableStocks[it.basicProductShippingProductId]?.normalStock ?: 0
+                }
+            }
+        }
+
+        return PageResponse.of(response)
     }
 
-    fun getOrderDetails(partnerId: Long, status: OrderStatus): List<OrderDetail>?{
-        return orderDetailRepository.findAllByPartnerIdAndStatus(partnerId, status)
+
+    fun getCollectedOrders(partnerId: Long, status: OrderStatus): List<CollectedOrder>? {
+        return collectedOrderRepository.findAllByPartnerIdAndStatus(partnerId, status)
     }
 
-    fun getShortageProjectionModel(partnerId: Long, status: OrderStatus): List<ShortageOrderProjectionModel>?{
-        return orderDetailRepository.findAllByPartnerIdAndStatusGroupByProductId(partnerId,status)
+    fun getShortageProjectionModel(
+        partnerId: Long,
+        status: OrderStatus
+    ): List<ShortageOrderProjectionModel>? {
+        return collectedOrderRepository.findAllByPartnerIdAndStatusGroupByProductId(
+            partnerId,
+            status
+        )
     }
 
     fun getOrderCountByProductIdAndStatus(productId: Long, status: OrderStatus): Int? {
-        return orderDetailRepository.getCountByProductIdAndStatusGroupByProductId(productId, status)
+        return collectedOrderRepository.getCountByProductIdAndStatusGroupByProductId(
+            productId,
+            status
+        )
     }
 
-    private fun convert(orderDetailModel: OrderDetailCreateModel): OrderDetail {
-        val orderDetail: OrderDetail = orderDetailModel.toEntity()
+    private fun convert(collectedOrderCreateModel: CollectedOrderCreateModel): CollectedOrder {
+        val collectedOrder = collectedOrderCreateModel.toCollectEntity()
 
-        val storeProduct = storeProductService.getStoreProductForOrderDetail(orderDetailModel.partnerId, orderDetailModel.storeProductCode)
-        orderDetail.storeProduct = storeProduct
+        val storeProduct = storeProductService
+            .getStoreProductForOrderDetail(
+                with(collectedOrderCreateModel) {
+                    StoreProductPredicate(
+                        partnerId = partnerId,
+                        storeProductName = storeProductName,
+                        storeProductOptionName = storeProductOptionName
+                    )
+                }
+            )
 
-        return orderDetailRepository.save(orderDetail)
+        collectedOrder.storeProduct = storeProduct
+
+        collectedOrderRepository.save(collectedOrder)
+        return collectedOrder
     }
+
 }

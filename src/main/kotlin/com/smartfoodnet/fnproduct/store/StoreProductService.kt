@@ -3,11 +3,11 @@ package com.smartfoodnet.fnproduct.store
 import com.smartfoodnet.common.error.exception.ValidateError
 import com.smartfoodnet.fnproduct.product.BasicProductRepository
 import com.smartfoodnet.fnproduct.store.entity.StoreProduct
+import com.smartfoodnet.fnproduct.store.model.StoreProductPredicate
 import com.smartfoodnet.fnproduct.store.entity.StoreProductMapping
 import com.smartfoodnet.fnproduct.store.model.request.StoreProductCreateModel
 import com.smartfoodnet.fnproduct.store.model.request.StoreProductMappingCreateModel
 import com.smartfoodnet.fnproduct.store.model.response.StoreProductModel
-import com.smartfoodnet.fnproduct.store.support.StoreProductMappingRepository
 import com.smartfoodnet.fnproduct.store.support.StoreProductRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -16,14 +16,17 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 @Transactional(readOnly = true)
 class StoreProductService(
-    var storeProductRepository: StoreProductRepository,
-    var basicProductRepository: BasicProductRepository,
-    var storeProductMappingRepository: StoreProductMappingRepository
+    val storeProductRepository: StoreProductRepository,
+    val basicProductRepository: BasicProductRepository
 ) {
 
     fun getStoreProducts(partnerId: Long): List<StoreProductModel> {
         val storeProducts = storeProductRepository.findAllByPartnerId(partnerId)
         return storeProducts.map { StoreProductModel.from(it) }
+    }
+
+    fun getStoreProductForOrderDetail(condition: StoreProductPredicate): StoreProduct? {
+        return storeProductRepository.findStoreProduct(condition)
     }
 
     fun getStoreProductForOrderDetail(partnerId: Long?, storeProductCode: String?): StoreProduct? {

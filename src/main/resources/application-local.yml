@@ -4,7 +4,7 @@ server:
     context-path: /fresh-networks/fn-product
 logging:
   level:
-    org.hibernate.type.descriptor.sql: trace
+#    org.hibernate.type.descriptor.sql: trace
     io.swagger.models.parameters.AbstractSerializableParameter: ERROR
 spring:
   data:
