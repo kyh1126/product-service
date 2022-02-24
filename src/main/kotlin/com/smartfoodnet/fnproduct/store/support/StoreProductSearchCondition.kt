@@ -1,11 +1,11 @@
-package com.smartfoodnet.fnproduct.store.model
+package com.smartfoodnet.fnproduct.store.support
 
 import com.querydsl.core.BooleanBuilder
 import com.querydsl.core.types.Predicate
 import com.smartfoodnet.common.model.request.PredicateSearchCondition
 import com.smartfoodnet.fnproduct.store.entity.QStoreProduct.storeProduct
 
-class StoreProductPredicate(
+class StoreProductSearchCondition(
     val partnerId : Long,
     private val storeProductName : String? = null,
     private val storeProductCode : String? = null,

@@ -1,14 +1,17 @@
 package com.smartfoodnet.fnproduct.store
 
+import com.smartfoodnet.common.error.exception.NoSuchElementError
 import com.smartfoodnet.common.error.exception.ValidateError
 import com.smartfoodnet.fnproduct.product.BasicProductRepository
 import com.smartfoodnet.fnproduct.store.entity.StoreProduct
-import com.smartfoodnet.fnproduct.store.model.StoreProductPredicate
 import com.smartfoodnet.fnproduct.store.entity.StoreProductMapping
 import com.smartfoodnet.fnproduct.store.model.request.StoreProductCreateModel
 import com.smartfoodnet.fnproduct.store.model.request.StoreProductMappingCreateModel
+import com.smartfoodnet.fnproduct.store.model.request.StoreProductUpdateModel
 import com.smartfoodnet.fnproduct.store.model.response.StoreProductModel
+import com.smartfoodnet.fnproduct.store.support.StoreProductMappingRepository
 import com.smartfoodnet.fnproduct.store.support.StoreProductRepository
+import com.smartfoodnet.fnproduct.store.support.StoreProductSearchCondition
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -17,7 +20,8 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional(readOnly = true)
 class StoreProductService(
     val storeProductRepository: StoreProductRepository,
-    val basicProductRepository: BasicProductRepository
+    val basicProductRepository: BasicProductRepository,
+    val storeProductMappingRepository: StoreProductMappingRepository
 ) {
 
     fun getStoreProducts(partnerId: Long): List<StoreProductModel> {
@@ -25,23 +29,16 @@ class StoreProductService(
         return storeProducts.map { StoreProductModel.from(it) }
     }
 
-    fun getStoreProductForOrderDetail(condition: StoreProductPredicate): StoreProduct? {
+    fun getStoreProductForOrderDetail(condition: StoreProductSearchCondition): StoreProduct? {
         return storeProductRepository.findStoreProduct(condition)
-    }
-
-    fun getStoreProductForOrderDetail(partnerId: Long?, storeProductCode: String?): StoreProduct? {
-        if (partnerId == null || storeProductCode == null) {
-            return null
-        }
-
-        return storeProductRepository.findByPartnerIdAndStoreProductCode(partnerId, storeProductCode)
     }
 
     @Transactional
     fun createStoreProducts(storeProductCreateModel: StoreProductCreateModel): List<StoreProductModel> {
         val storeProducts = with(storeProductCreateModel) {
-            options.map { option ->
+            options?.map { option ->
                 val storeProduct = StoreProduct(
+                    storeId = storeId,
                     storeCode = storeCode,
                     storeName = storeName,
                     partnerId = partnerId,
@@ -66,9 +63,51 @@ class StoreProductService(
 
                 storeProduct
             }
-        }
+        } ?: listOf(storeProductCreateModel.toEntity())
+
+
 
         return storeProductRepository.saveAll(storeProducts).map(StoreProductModel::from)
+    }
+
+    @Transactional
+    fun updateStoreProduct(storeProductModel: StoreProductUpdateModel): StoreProductModel {
+        val storeProduct = storeProductRepository.findByIdOrNull(storeProductModel.id)
+            ?: throw NoSuchElementError(errorMessage = "존재하지 않는 상품입니다. [storeProductId = ${storeProductModel.id}]")
+
+        storeProduct.update(storeProductModel)
+
+        storeProduct.storeProductMappings =
+            buildNewStoreProductMappings(storeProductModel, storeProduct)?.toMutableSet() ?: mutableSetOf()
+
+        return StoreProductModel.from(storeProduct)
+    }
+
+    fun buildNewStoreProductMappings(
+        storeProductModel: StoreProductUpdateModel,
+        storeProduct: StoreProduct
+    ): List<StoreProductMapping>? {
+        val newBasicProductIds = storeProductModel.storeProductBasicProductMappings?.map { it.basicProductId }
+
+        val unMappedBasicProducts = storeProduct.storeProductMappings.filterNot { mapping ->
+            newBasicProductIds?.contains(mapping.basicProduct.id) ?: false
+        }
+
+        unMappedBasicProducts.forEach { it.delete() }
+
+        val storeProductMappings = storeProductModel.storeProductBasicProductMappings?.map { mapping ->
+            val storeProductMapping = mapping.id?.let { id -> storeProductMappingRepository.findByIdOrNull(id) }
+                ?: StoreProductMapping(
+                    storeProduct = storeProduct,
+                    basicProduct = basicProductRepository.findByIdOrNull(mapping.basicProductId)
+                        ?: throw NoSuchElementError(errorMessage = "기본상품이 존재하지 않습니다 [id = ${mapping.basicProductId}]")
+                )
+            storeProductMapping.quantity = mapping.quantity
+
+            storeProductMapping
+        }
+
+        return storeProductMappings
     }
 
     @Transactional
@@ -77,7 +116,10 @@ class StoreProductService(
             .orElseThrow { ValidateError(errorMessage = "store product does not exist.") }
 
         storeProductMappingModel.mappings.forEach { mappingModel ->
-            val basicProduct = basicProductRepository.findByIdOrNull(mappingModel.basicProductId)
+            val basicProduct =
+                basicProductRepository.findByIdOrNull(mappingModel.basicProductId) ?: throw NoSuchElementError(
+                    errorMessage = "기본상품이 존재하지 않습니다 [id = ${mappingModel.basicProductId}]"
+                )
 
             if (mappingModel.id != null) {
                 val storeProductMapping =

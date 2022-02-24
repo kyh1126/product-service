@@ -1,7 +1,9 @@
 package com.smartfoodnet.fnproduct.store.entity
 
 import com.smartfoodnet.common.entity.BaseEntity
+import com.smartfoodnet.fnproduct.store.model.request.StoreProductUpdateModel
 import org.hibernate.annotations.Where
+import org.hibernate.validator.constraints.UniqueElements
 import javax.persistence.CascadeType
 import javax.persistence.Column
 import javax.persistence.Entity
@@ -10,9 +12,16 @@ import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.OneToMany
 import javax.persistence.Table
+import javax.persistence.UniqueConstraint
 
 @Entity
-@Table(name = "store_product")
+@Table(
+    name = "store_product",
+    uniqueConstraints = [UniqueConstraint(
+        name = "store_product_unique_key",
+        columnNames = ["store_id", "name", "partner_id", "store_product_code", "option_name", "option_code"]
+    )]
+)
 @Where(clause = "deleted_at is null")
 class StoreProduct(
     @Id
@@ -20,6 +29,10 @@ class StoreProduct(
     @Column(name = "id")
     var id: Long? = null,
 
+    @Column(name = "store_id")
+    var storeId: String,
+
+    @UniqueElements
     @Column(name = "store_code")
     var storeCode: String,
 
@@ -44,4 +57,10 @@ class StoreProduct(
     @OneToMany(mappedBy = "storeProduct", cascade = [CascadeType.PERSIST])
     var storeProductMappings: MutableSet<StoreProductMapping> = mutableSetOf()
 
-) : BaseEntity()
+) : BaseEntity() {
+    fun update(storeProductUpdateModel: StoreProductUpdateModel) {
+        name = storeProductUpdateModel.name
+        optionName = storeProductUpdateModel.optionName
+    }
+
+}
