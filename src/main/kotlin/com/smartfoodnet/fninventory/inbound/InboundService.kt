@@ -33,7 +33,7 @@ class InboundService(
         nosnosClientService.sendInboundAndSetRegisterNo(inbound)
 
         val response = inboundRepository.save(inbound)
-        return CreateInboundResponse(response.id!!, response.partnerId)
+        return CreateInboundResponse(response.id!!, response.partnerId, response.createdAt)
     }
 
     private fun getBasicProduct(basicProductCode : String) : BasicProduct {
