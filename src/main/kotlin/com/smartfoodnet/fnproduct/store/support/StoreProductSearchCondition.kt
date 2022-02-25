@@ -1,22 +1,46 @@
 package com.smartfoodnet.fnproduct.store.support
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.querydsl.core.BooleanBuilder
 import com.querydsl.core.types.Predicate
 import com.smartfoodnet.common.model.request.PredicateSearchCondition
+import com.smartfoodnet.fnproduct.product.entity.QBasicProduct.basicProduct
+import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import com.smartfoodnet.fnproduct.store.entity.QStoreProduct.storeProduct
+import io.swagger.annotations.ApiModelProperty
 
 class StoreProductSearchCondition(
-    val partnerId : Long,
-    private val storeProductName : String? = null,
-    private val storeProductCode : String? = null,
-    private val storeProductOptionName : String? = null
-) : PredicateSearchCondition(){
+    @JsonIgnore
+    @ApiModelProperty(hidden = true)
+    var partnerId: Long? = null,
+    @ApiModelProperty(value = "쇼핑몰 ID")
+    val storeId: Long? = null,
+    @ApiModelProperty(value = "쇼핑몰 상품명")
+    val storeProductName: String? = null,
+    @ApiModelProperty(value = "쇼핑몰 상품코드")
+    val storeProductCode: String? = null,
+    @ApiModelProperty(value = "쇼핑몰 상품 옵션코드")
+    val storeProductOptionCode: String? = null,
+    @ApiModelProperty(value = "쇼핑몰 상품 옵션명")
+    val storeProductOptionName: String? = null,
+    @ApiModelProperty(value = "매칭상품명")
+    val basicProductName: String? = null,
+    @ApiModelProperty(value = "매칭상코드")
+    val basicProductCode: String? = null,
+    @ApiModelProperty(value = "매칭상품 타입 (기본/묶음)")
+    val basicProductType: BasicProductType? = null
+) : PredicateSearchCondition() {
     override fun assemblePredicate(predicate: BooleanBuilder): Predicate {
         return predicate.orAllOf(
             storeProduct.partnerId.eq(partnerId),
-            storeProductName?.let { storeProduct.name.eq(it) },
+            storeId?.let { storeProduct.storeId.eq(it) },
+            storeProductName?.let { storeProduct.name.contains(it) },
             storeProductCode?.let { storeProduct.storeProductCode.eq(it) },
-            storeProductOptionName?.let { storeProduct.optionName.eq(it) }
+            storeProductOptionCode?.let { storeProduct.optionCode.eq(it) },
+            storeProductOptionName?.let { storeProduct.optionName.contains(it) },
+            basicProductName?.let { basicProduct.name.contains(it) },
+            basicProductCode?.let { basicProduct.code.eq(it) },
+            basicProductType?.let { basicProduct.type.eq(it) }
         )
     }
 }

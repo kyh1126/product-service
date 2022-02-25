@@ -3,16 +3,7 @@ package com.smartfoodnet.fnproduct.store.entity
 import com.smartfoodnet.common.entity.BaseEntity
 import com.smartfoodnet.fnproduct.store.model.request.StoreProductUpdateModel
 import org.hibernate.annotations.Where
-import org.hibernate.validator.constraints.UniqueElements
-import javax.persistence.CascadeType
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
-import javax.persistence.Id
-import javax.persistence.OneToMany
-import javax.persistence.Table
-import javax.persistence.UniqueConstraint
+import javax.persistence.*
 
 @Entity
 @Table(
@@ -30,9 +21,8 @@ class StoreProduct(
     var id: Long? = null,
 
     @Column(name = "store_id")
-    var storeId: String,
+    var storeId: Long,
 
-    @UniqueElements
     @Column(name = "store_code")
     var storeCode: String,
 

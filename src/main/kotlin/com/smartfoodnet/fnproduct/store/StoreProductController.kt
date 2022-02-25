@@ -1,18 +1,17 @@
 package com.smartfoodnet.fnproduct.store
 
+import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.fnproduct.store.model.request.StoreProductCreateModel
 import com.smartfoodnet.fnproduct.store.model.request.StoreProductMappingCreateModel
 import com.smartfoodnet.fnproduct.store.model.request.StoreProductUpdateModel
 import com.smartfoodnet.fnproduct.store.model.response.StoreProductModel
+import com.smartfoodnet.fnproduct.store.support.StoreProductSearchCondition
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PatchMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
+import org.springframework.data.web.PageableDefault
+import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
 
 @RestController
@@ -22,12 +21,24 @@ class StoreProductController(
     private val storeProductExcelService: StoreProductExcelService
 ) {
     @Operation(summary = "특정 화주(고객사) ID 의 쇼핑몰상품 리스트 조회")
-    @GetMapping("/partner/{partnerId}")
-    fun getStoreProducts(
+    @GetMapping("partner/{partnerId}")
+    fun findStoreProducts(
         @Parameter(description = "화주(고객사) ID", required = true)
         @PathVariable partnerId: Long,
-    ): List<StoreProductModel> {
-        return storeProductService.getStoreProducts(partnerId)
+        @Parameter(description = "검색조건")
+        @ModelAttribute condition: StoreProductSearchCondition,
+        @PageableDefault(size = 50, sort = ["id"], direction = Sort.Direction.DESC) page: Pageable,
+    ): PageResponse<StoreProductModel> {
+        return PageResponse.of(storeProductService.findStoreProducts(condition.apply { this.partnerId = partnerId }, page))
+    }
+
+    @Operation(summary = "쇼핑몰상품 상세 조회")
+    @GetMapping("{storeProductId}")
+    fun getStoreProduct(
+        @Parameter(description = "쇼핑몰 상품 ID", required = true)
+        @PathVariable storeProductId: Long,
+    ): StoreProductModel? {
+        return storeProductService.getStoreProduct(storeProductId)
     }
 
     @Operation(summary = "쇼핑몰상품 생성")
@@ -36,12 +47,12 @@ class StoreProductController(
         return storeProductService.createStoreProducts(storeProductCreateModel)
     }
 
-
     @Operation(summary = "쇼핑몰상품 수정")
     @PatchMapping("")
     fun updateStoreProduct(@Valid @RequestBody storeProductUpdateModel: StoreProductUpdateModel): StoreProductModel {
         return storeProductService.updateStoreProduct(storeProductUpdateModel)
     }
+
     @Operation(summary = "쇼핑몰상품 기본상품 매핑")
     @PostMapping("/map-basic-product")
     fun mapBasicProduct(@Valid @RequestBody storeProductMappingCreateModels: StoreProductMappingCreateModel): StoreProductModel {

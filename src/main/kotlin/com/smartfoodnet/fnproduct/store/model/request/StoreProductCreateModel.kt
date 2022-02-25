@@ -9,7 +9,7 @@ data class StoreProductCreateModel(
     @ApiModelProperty(value = "쇼핑몰명")
     val storeName: String,
     @ApiModelProperty(value = "쇼핑몰 ID")
-    val storeId: String,
+    val storeId: Long,
     @ApiModelProperty(value = "고객사 ID")
     val partnerId: Long,
     @ApiModelProperty(value = "쇼핑몰 상품명")

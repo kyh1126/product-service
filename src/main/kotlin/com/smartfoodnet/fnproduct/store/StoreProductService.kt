@@ -2,6 +2,7 @@ package com.smartfoodnet.fnproduct.store
 
 import com.smartfoodnet.common.error.exception.NoSuchElementError
 import com.smartfoodnet.common.error.exception.ValidateError
+import com.smartfoodnet.common.model.request.PredicateSearchCondition
 import com.smartfoodnet.fnproduct.product.BasicProductRepository
 import com.smartfoodnet.fnproduct.store.entity.StoreProduct
 import com.smartfoodnet.fnproduct.store.entity.StoreProductMapping
@@ -12,6 +13,8 @@ import com.smartfoodnet.fnproduct.store.model.response.StoreProductModel
 import com.smartfoodnet.fnproduct.store.support.StoreProductMappingRepository
 import com.smartfoodnet.fnproduct.store.support.StoreProductRepository
 import com.smartfoodnet.fnproduct.store.support.StoreProductSearchCondition
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -23,10 +26,12 @@ class StoreProductService(
     val basicProductRepository: BasicProductRepository,
     val storeProductMappingRepository: StoreProductMappingRepository
 ) {
+    fun findStoreProducts(condition: PredicateSearchCondition, page: Pageable): Page<StoreProductModel> {
+        return storeProductRepository.findStoreProducts(condition, page).map { StoreProductModel.from(it) }
+    }
 
-    fun getStoreProducts(partnerId: Long): List<StoreProductModel> {
-        val storeProducts = storeProductRepository.findAllByPartnerId(partnerId)
-        return storeProducts.map { StoreProductModel.from(it) }
+    fun getStoreProduct(storeProductId: Long): StoreProductModel? {
+        return storeProductRepository.findByIdOrNull(storeProductId)?.let { StoreProductModel.from(it) }
     }
 
     fun getStoreProductForOrderDetail(condition: StoreProductSearchCondition): StoreProduct? {
@@ -50,15 +55,15 @@ class StoreProductService(
 
                 option.storeProductBasicProductMappings?.forEach { mapping ->
                     val basicProduct = basicProductRepository.findByIdOrNull(mapping.basicProductId)
-                    if (basicProduct != null) {
-                        storeProduct.storeProductMappings.add(
-                            StoreProductMapping(
-                                storeProduct = storeProduct,
-                                basicProduct = basicProduct,
-                                quantity = mapping.quantity
-                            )
+                        ?: throw NoSuchElementError("기본상품이 존재하지 않습니다 [id = ${mapping.basicProductId}]")
+
+                    storeProduct.storeProductMappings.add(
+                        StoreProductMapping(
+                            storeProduct = storeProduct,
+                            basicProduct = basicProduct,
+                            quantity = mapping.quantity
                         )
-                    }
+                    )
                 }
 
                 storeProduct
