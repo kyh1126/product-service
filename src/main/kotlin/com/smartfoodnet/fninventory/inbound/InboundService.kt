@@ -3,6 +3,7 @@ package com.smartfoodnet.fninventory.inbound
 import com.smartfoodnet.common.error.exception.BaseRuntimeException
 import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.common.utils.Log
+import com.smartfoodnet.fninventory.inbound.model.dto.CreateInboundResponse
 import com.smartfoodnet.fninventory.inbound.model.dto.GetInbound
 import com.smartfoodnet.fninventory.inbound.model.request.InboundCreateModel
 import com.smartfoodnet.fninventory.inbound.model.request.InboundSearchCondition
@@ -22,7 +23,7 @@ class InboundService(
 ) : Log {
 
     @Transactional
-    fun createInbound(createModel: InboundCreateModel){
+    fun createInbound(createModel: InboundCreateModel) : CreateInboundResponse {
         val inbound = createModel.toEntity()
         createModel.expectedList.forEach {
             val basicProduct = getBasicProduct(it.basicProductId)
@@ -31,7 +32,8 @@ class InboundService(
 
         nosnosClientService.sendInboundAndSetRegisterNo(inbound)
 
-        inboundRepository.save(inbound)
+        val response = inboundRepository.save(inbound)
+        return CreateInboundResponse(response.id!!, response.partnerId)
     }
 
     private fun getBasicProduct(basicProductCode : String) : BasicProduct {

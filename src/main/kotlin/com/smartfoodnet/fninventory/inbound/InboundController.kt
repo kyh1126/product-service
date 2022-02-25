@@ -3,6 +3,7 @@ package com.smartfoodnet.fninventory.inbound
 import com.smartfoodnet.apiclient.response.CommonDataListModel
 import com.smartfoodnet.apiclient.response.GetInboundWorkModel
 import com.smartfoodnet.common.model.response.PageResponse
+import com.smartfoodnet.fninventory.inbound.model.dto.CreateInboundResponse
 import com.smartfoodnet.fninventory.inbound.model.dto.GetInbound
 import com.smartfoodnet.fninventory.inbound.model.request.InboundCreateModel
 import com.smartfoodnet.fninventory.inbound.model.request.InboundSearchCondition
@@ -29,8 +30,8 @@ class InboundController(
 
     @PostMapping
     @Operation(summary = "입고 등록")
-    fun createInbound(@RequestBody @Valid inboundCreateModel: InboundCreateModel) {
-        inboundService.createInbound(inboundCreateModel)
+    fun createInbound(@RequestBody @Valid inboundCreateModel: InboundCreateModel): CreateInboundResponse {
+        return inboundService.createInbound(inboundCreateModel)
     }
 
     @PutMapping("{inboundId}/cancel")
