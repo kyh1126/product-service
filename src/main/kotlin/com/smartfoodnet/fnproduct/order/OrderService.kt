@@ -1,8 +1,6 @@
 package com.smartfoodnet.fnproduct.order
 
 import com.smartfoodnet.apiclient.WmsApiClient
-import com.smartfoodnet.apiclient.response.NosnosStockModel
-import com.smartfoodnet.common.model.request.PredicateSearchCondition
 import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.fnproduct.order.model.CollectedOrderCreateModel
@@ -13,12 +11,10 @@ import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
 import com.smartfoodnet.fnproduct.order.support.CollectedOrderRepository
 import com.smartfoodnet.fnproduct.order.support.CollectingOrderSearchCondition
 import com.smartfoodnet.fnproduct.store.StoreProductService
-import com.smartfoodnet.fnproduct.store.model.StoreProductPredicate
-import feign.FeignException
+import com.smartfoodnet.fnproduct.store.support.StoreProductSearchCondition
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.lang.RuntimeException
 
 @Service
 @Transactional(readOnly = true)
@@ -89,7 +85,7 @@ class OrderService(
         val storeProduct = storeProductService
             .getStoreProductForOrderDetail(
                 with(collectedOrderCreateModel) {
-                    StoreProductPredicate(
+                    StoreProductSearchCondition(
                         partnerId = partnerId,
                         storeProductName = storeProductName,
                         storeProductOptionName = storeProductOptionName

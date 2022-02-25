@@ -1,8 +1,11 @@
 package com.smartfoodnet.fnproduct.store.support
 
+import com.smartfoodnet.common.model.request.PredicateSearchCondition
 import com.smartfoodnet.fnproduct.store.entity.StoreProduct
-import com.smartfoodnet.fnproduct.store.model.StoreProductPredicate
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 
 interface StoreProductRepositoryCustom {
-    fun findStoreProduct(condition: StoreProductPredicate) : StoreProduct?
+    fun findStoreProduct(condition: PredicateSearchCondition) : StoreProduct?
+    fun findStoreProducts(condition: PredicateSearchCondition, page: Pageable) : Page<StoreProduct>
 }

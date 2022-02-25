@@ -15,5 +15,5 @@ enum class ErrorCode(val value: Int, val code: String, val errorMessage: String)
     NO_ELEMENT(4, "E004", "아이템이 존재하지 않습니다."),
     NOT_CHANGE(5, "E005", "변경사항이 없습니다."),
     INTERNAL_SERVER_ERROR(6, "E006", "알 수 없는 에러가 발생했습니다. 관리자에게 문의해 주세요."),
-    SEARCH_CONDITION_ILLEGAL_ARGUMENT(7, "E007", "잘못된 검색 조건입니다.")
+    SEARCH_CONDITION_ILLEGAL_ARGUMENT(7, "E007", "잘못된 검색 조건입니다."),
 }

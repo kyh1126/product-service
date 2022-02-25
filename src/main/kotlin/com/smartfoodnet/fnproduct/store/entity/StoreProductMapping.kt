@@ -28,11 +28,11 @@ class StoreProductMapping(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "store_product_id", columnDefinition = "BIGINT UNSIGNED", foreignKey = ForeignKey(name = "fk_store_product_mapping__store_product"))
     @JsonIgnore
-    var storeProduct: StoreProduct? = null,
+    var storeProduct: StoreProduct,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "basic_product_id", columnDefinition = "BIGINT UNSIGNED", foreignKey = ForeignKey(name = "fk_store_product_mapping__basic_product"))
-    var basicProduct: BasicProduct? = null,
+    var basicProduct: BasicProduct,
 
     @Column(name = "quantity")
     var quantity: Int = 1,
