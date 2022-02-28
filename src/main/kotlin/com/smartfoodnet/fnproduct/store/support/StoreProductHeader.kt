@@ -1,6 +1,7 @@
 package com.smartfoodnet.fnproduct.store.support
 
 enum class StoreProductHeader(val headerTitle: String) {
+    STORE_ID("쇼핑몰 ID"),
     STORE_NAME("쇼핑몰이름"),
     STORE_CODE("쇼핑몰코드"),
     STORE_PRODUCT_CODE("쇼핑몰상품코드"),
