@@ -70,14 +70,14 @@ class InboundService(
         = inboundRepository.findInboundActualDetail(partnerId, expectedId)
 
     @Transactional
-    fun cancelInbound(partnerId:Long, inboundId : Long){
+    fun cancelInbound(inboundId : Long){
         val inbound = inboundRepository.findById(inboundId).get()
 
         inbound.status.isCancelPossiible()
 
         val receivingPlanId = inbound.registrationId?: throw BaseRuntimeException(errorMessage = "입고예정등록번호를 찾을 수 없습니다")
 
-        nosnosClientService.cancelInbound(partnerId, receivingPlanId)
+        nosnosClientService.cancelInbound(inbound.partnerId, receivingPlanId)
 
         inbound.status = InboundStatusType.CANCEL
     }
