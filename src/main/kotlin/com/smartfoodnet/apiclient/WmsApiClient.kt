@@ -3,105 +3,122 @@ package com.smartfoodnet.apiclient
 import com.smartfoodnet.apiclient.request.*
 import com.smartfoodnet.apiclient.response.*
 import com.smartfoodnet.common.model.response.CommonResponse
+import io.swagger.annotations.ApiOperation
 import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.cloud.openfeign.SpringQueryMap
 import org.springframework.web.bind.annotation.*
 
 @FeignClient(
-    name = "wmsApiClient",
-    url = "\${sfn.service.fn-warehouse-management-service}"
+        name = "wmsApiClient",
+        url = "\${sfn.service.fn-warehouse-management-service}"
 )
 interface WmsApiClient {
+    // ---------------------------------------------------------------------------------------------
+    // -- 재고관리
+    // ---------------------------------------------------------------------------------------------
     @GetMapping("stock")
     fun getStocks(
-        @RequestParam(name = "memberId") partnerId: Long,
-        @RequestParam shippingProductIds: List<Long?>?
+            @RequestParam(name = "memberId") partnerId: Long,
+            @RequestParam shippingProductIds: List<Long?>?
     ): CommonResponse<CommonDataListModel<NosnosStockModel>>
 
     @GetMapping("/stock/expire")
     fun getStocksByExpirationDate(
-        @RequestParam(name = "memberId") partnerId: Long,
-        @RequestParam shippingProductIds: List<Long?>?
+            @RequestParam(name = "memberId") partnerId: Long,
+            @RequestParam shippingProductIds: List<Long?>?
     ): CommonResponse<CommonDataListModel<NosnosExpirationDateStockModel>>
 
     @GetMapping("/stock/history/{processDate}")
     fun getStocksMoveEvents(
-        @SpringQueryMap stockDefaultModel: StockDefaultModel,
-        @PathVariable processDate: String
+            @SpringQueryMap stockDefaultModel: StockDefaultModel,
+            @PathVariable processDate: String
     ): CommonResponse<CommonDataListModel<NosnosStockMoveEventModel>>
 
     @GetMapping("/stock/daily")
     fun getDailyCloseStock(
-        @SpringQueryMap dailyCloseStockRequestModel: DailyCloseStockRequestModel,
+            @SpringQueryMap dailyCloseStockRequestModel: DailyCloseStockRequestModel,
     ): CommonResponse<CommonDataListModel<NosnosDailyCloseStockModel>>
 
     @GetMapping("/stock/summary")
     fun getDailyStockSummary(
-        @SpringQueryMap dailySummaryStockRequestModel: DailySummaryStockRequestModel,
+            @SpringQueryMap dailySummaryStockRequestModel: DailySummaryStockRequestModel,
     ): CommonResponse<CommonDataListModel<NosnosDailyStockSummaryModel>>
+
+    // ---------------------------------------------------------------------------------------------
+    // -- 출고상품(=기본상품)관리
+    // ---------------------------------------------------------------------------------------------
+    @GetMapping("bulk")
+    @ApiOperation(value = "기본상품 조회(벌크)")
+    fun getShippingProducts(@ModelAttribute basicProductReadModel: BasicProductReadModel): CommonResponse<CommonDataListModel<GetShippingProductModel>>
 
     @PostMapping("shipping/products")
     fun createShippingProduct(preModel: PreShippingProductModel): CommonResponse<PostShippingProductModel>
 
     @PutMapping("shipping/products/{shippingProductId}")
     fun updateShippingProduct(
-        @PathVariable shippingProductId: Long,
-        preModel: PreShippingProductModel
+            @PathVariable shippingProductId: Long,
+            preModel: PreShippingProductModel
     )
 
     @PutMapping("shipping/products/bulk")
     fun updateShippingProducts(
-        preModel: CommonCreateBulkModel<PreShippingProductSimpleModel>
+            preModel: CommonCreateBulkModel<PreShippingProductSimpleModel>
     )
 
+    // ---------------------------------------------------------------------------------------------
+    // -- 판매상품 관리
+    // ---------------------------------------------------------------------------------------------
     @PostMapping("sales/products/bulk")
     fun createSalesProducts(
-        @RequestBody preModel: CommonCreateBulkModel<PreSalesProductModel>
+            @RequestBody preModel: CommonCreateBulkModel<PreSalesProductModel>
     ): CommonResponse<CommonProcessBulkModel<PostSalesProductModel>>
 
     @PutMapping("sales/products/{salesProductId}")
     fun updateSalesProduct(@PathVariable salesProductId: Long, preModel: PreSalesProductModel)
 
+    // ---------------------------------------------------------------------------------------------
+    // -- 입/출고관리
+    // ---------------------------------------------------------------------------------------------
     @GetMapping("inventory/inbounds/work")
     fun getInboundWork(
-        @SpringQueryMap inboundWorkReadModel: InboundWorkReadModel
+            @SpringQueryMap inboundWorkReadModel: InboundWorkReadModel
     ): CommonResponse<CommonDataListModel<GetInboundWorkModel>>
 
     @PostMapping("inventory/inbounds")
     fun createInbound(
-        @RequestBody nosNosInboundCreateModel: NosnosInboundCreateModel
+            @RequestBody nosNosInboundCreateModel: NosnosInboundCreateModel
     ): CommonResponse<NosnosPostInboundModel>
 
     @GetMapping("inventory/inbounds/{receivingPlanId}")
     fun getInbound(
-        @PathVariable receivingPlanId: Long
+            @PathVariable receivingPlanId: Long
     ): CommonResponse<GetInboundModel>
 
     @PutMapping("inventory/inbounds/{receivingPlanId}/cancel")
     fun cancelInbound(
-        @RequestParam partnerId: Long,
-        @PathVariable receivingPlanId: Long
+            @RequestParam partnerId: Long,
+            @PathVariable receivingPlanId: Long
     ): CommonResponse<Void>
 }
 
 data class StockDefaultModel(
-    val memberId: Long,
-    val shippingProductIds: List<Int>? = null,
-    val page: Int = 1
+        val memberId: Long,
+        val shippingProductIds: List<Int>? = null,
+        val page: Int = 1
 )
 
 data class DailyCloseStockRequestModel(
-    val memberId: Long,
-    val closingDate: String,
-    val shippingProductIds: List<Long>? = null,
-    val page: Int? = 1
+        val memberId: Long,
+        val closingDate: String,
+        val shippingProductIds: List<Long>? = null,
+        val page: Int? = 1
 )
 
 data class DailySummaryStockRequestModel(
-    val memberId: Long,
-    val stockDate: String,
-    val shippingProductIds: List<Long>? = null,
-    val page: Int? = 1
+        val memberId: Long,
+        val stockDate: String,
+        val shippingProductIds: List<Long>? = null,
+        val page: Int? = 1
 )
 
 
