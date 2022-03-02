@@ -3,6 +3,7 @@ server:
   servlet:
     context-path: /fresh-networks/fn-product
 logging:
+  config: classpath:logback.xml
   level:
 #    org.hibernate.type.descriptor.sql: trace
     io.swagger.models.parameters.AbstractSerializableParameter: ERROR
@@ -58,6 +59,7 @@ sfn:
     size:
       value: "페이지 크기 (default: ${spring.data.web.pageable.default-page-size})"
   service:
+    code: FN-PRODUCT
     fn-message: ${FN_MESSAGE_SERVICE:https://s-api-dev.smartfoodnet.com/fresh-networks/fn-message}
     fn-warehouse-management-service: ${FN_WAREHOUSE_SERVICE:http://localhost:4001/fresh-networks/fn-warehouse-service}
     fn-partner: ${FN_PARTNER_SERVICE:http://localhost:4007/fresh-networks/fn-partner}
