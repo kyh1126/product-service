@@ -54,10 +54,6 @@ class CollectedOrder(
     @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
     var storeProduct: StoreProduct? = null,
 
-    @ManyToOne
-    @JoinColumn(name = "confirm_order_id", columnDefinition = "BIGINT UNSIGNED")
-    var confirmOrder: ConfirmOrder? = null,
-
     @Embedded
     val collectedProductInfo: CollectedProductInfo,
 

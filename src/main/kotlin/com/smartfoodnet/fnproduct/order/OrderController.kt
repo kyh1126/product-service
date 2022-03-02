@@ -37,7 +37,7 @@ class OrderController(
         orderConfirmService.createConfirmOrder(partnerId, collectedIds)
     }
 
-    @Operation(summary = "특정 화주(고객사) ID 의 주문 리스트 조회")
+    @Operation(summary = "특정 화주(고객사) ID 의 주문수집 조회")
     @GetMapping("partners/{partnerId}")
     fun getCollectedOrders(
         @Parameter(description = "화주(고객사) ID", required = true)
@@ -47,5 +47,12 @@ class OrderController(
         @PageableDefault(size = 50, sort = ["id"], direction = Sort.Direction.DESC) page: Pageable,
     ): PageResponse<CollectedOrderModel> {
         return orderService.getCollectedOrder(condition.apply { this.partnerId = partnerId }, page)
+    }
+
+    @GetMapping("partners/{partnerId}/confirm")
+    fun getConfirmOrders(
+        @PathVariable partnerId: Long
+    ){
+        orderConfirmService.getConfirmOrder()
     }
 }

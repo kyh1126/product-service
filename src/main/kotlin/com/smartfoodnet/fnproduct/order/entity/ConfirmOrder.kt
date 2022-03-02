@@ -13,10 +13,7 @@ class ConfirmOrder(
     var orderId: Long? = null,
     var orderCode: String? = null,
     @OneToMany(mappedBy = "confirmOrder", cascade = [CascadeType.PERSIST])
-    val confirmProductList: MutableList<ConfirmProduct> = mutableListOf(),
-    @OneToMany(mappedBy="confirmOrder")
-    val collectedOrderList: MutableList<CollectedOrder> = mutableListOf()
-
+    val confirmProductList: MutableSet<ConfirmProduct> = mutableSetOf()
 ): BaseEntity(){
     fun addConfirmProduct(confirmProduct : ConfirmProduct){
         if (this.confirmProductList.contains(confirmProduct)) this.confirmProductList.remove(confirmProduct)

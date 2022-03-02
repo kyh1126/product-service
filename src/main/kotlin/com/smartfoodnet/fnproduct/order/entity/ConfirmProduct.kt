@@ -17,12 +17,16 @@ class ConfirmProduct(
     @JoinColumn(columnDefinition = "BIGINT UNSIGNED")
     val basicProduct: BasicProduct? = null,
 
-    @OneToMany(mappedBy = "basicProduct", cascade = [CascadeType.PERSIST])
+    @OneToMany(mappedBy = "confirmProduct", cascade = [CascadeType.PERSIST])
     val confirmPackageProductList: MutableCollection<ConfirmPackageProduct> = mutableListOf(),
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "confirm_order_id", columnDefinition = "BIGINT UNSIGNED")
     var confirmOrder : ConfirmOrder? = null,
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "collected_order_id")
+    val collectedOrder : CollectedOrder,
 
     val quantity: Int
 )

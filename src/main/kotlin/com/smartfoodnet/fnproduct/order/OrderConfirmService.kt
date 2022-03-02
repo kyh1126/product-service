@@ -18,9 +18,9 @@ import org.springframework.transaction.annotation.Transactional
 class OrderConfirmService(
     val collectedOrderRepository: CollectedOrderRepository,
     val confirmOrderRepository: ConfirmOrderRepository
-){
+) {
     @Transactional
-    fun createConfirmOrder(partnerId: Long, collectedIds: List<Long>){
+    fun createConfirmOrder(partnerId: Long, collectedIds: List<Long>) {
         val collectedList = collectedOrderRepository.findAllById(collectedIds)
 
         if (!collectedList.all { it.partnerId == partnerId })
@@ -31,42 +31,49 @@ class OrderConfirmService(
 
         collectedList.groupBy {
             it.bundleNumber
-        }.forEach{
+        }.forEach {
             convertData(partnerId, it.key, it.value)
         }
     }
 
-    private fun convertData(partnerId: Long, bundleNumber : String, collectedList : List<CollectedOrder>){
-        // TODO : 묶음번호에 해당하는 마스터 데이터 생성
+    private fun convertData(
+        partnerId: Long,
+        bundleNumber: String,
+        collectedList: List<CollectedOrder>
+    ) {
         val confirmOrder = ConfirmOrder(
             partnerId = partnerId,
             bundleNumber = bundleNumber
         )
 
-        // TODO : 기본/모음상품 매핑
         collectedList.forEach {
             val storeMapping = it.storeProduct?.storeProductMappings
             storeMapping?.forEach { storeProductMapping ->
                 val basicProduct = storeProductMapping.basicProduct
-                val orderQuantity = (it.quantity?:1) * storeProductMapping.quantity
-                createConfirmProductAndPackageProduct(confirmOrder, basicProduct, orderQuantity)
+                val orderQuantity = (it.quantity ?: 1) * storeProductMapping.quantity
+                createConfirmProductAndPackageProduct(it, confirmOrder, basicProduct, orderQuantity)
             }
-            it.confirmOrder = confirmOrder
             it.status = it.status.next()
         }
 
         confirmOrderRepository.save(confirmOrder)
     }
 
-    private fun createConfirmProductAndPackageProduct(confirmOrder: ConfirmOrder, basicProduct : BasicProduct, orderQuantity: Int){
+    private fun createConfirmProductAndPackageProduct(
+        collectedOrder: CollectedOrder,
+        confirmOrder: ConfirmOrder,
+        basicProduct: BasicProduct,
+        orderQuantity: Int
+    ) {
         val confirmProduct = ConfirmProduct(
             type = basicProduct.type,
             basicProduct = basicProduct,
             confirmOrder = confirmOrder,
-            quantity = orderQuantity
-        )
+            quantity = orderQuantity,
+            collectedOrder = collectedOrder
+            )
 
-        if (basicProduct.type == BasicProductType.PACKAGE){
+        if (basicProduct.type == BasicProductType.PACKAGE) {
             basicProduct.packageProductMappings.forEach {
                 val selectedBasicProduct = it.selectedBasicProduct
                 confirmProduct.confirmPackageProductList.add(
@@ -80,5 +87,9 @@ class OrderConfirmService(
         }
 
         confirmOrder.addConfirmProduct(confirmProduct)
+    }
+
+    fun getConfirmOrder() {
+        val list = confirmOrderRepository.findAllByCondition()
     }
 }
