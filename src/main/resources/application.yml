@@ -59,6 +59,7 @@ sfn:
     size:
       value: "페이지 크기 (default: ${spring.data.web.pageable.default-page-size})"
   service:
+    code: FN-PRODUCT
     fn-message: ${FN_MESSAGE_SERVICE:http://fn-message.sfn-dev:4011/fresh-networks/fn-message}
     fn-warehouse-management-service: ${FN_WAREHOUSE_SERVICE:http://fn-warehouse-service.sfn-dev:4001/fresh-networks/fn-warehouse-service}
     fn-partner: ${FN_PARTNER_SERVICE:http://fn-partner-service.sfn-dev:4007/fresh-networks/fn-partner}
