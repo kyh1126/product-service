@@ -3,6 +3,7 @@ server:
   servlet:
     context-path: /fresh-networks/fn-product
 logging:
+  config: classpath:logback.xml
   level:
     org.hibernate.type.descriptor.sql: trace
     io.swagger.models.parameters.AbstractSerializableParameter: ERROR

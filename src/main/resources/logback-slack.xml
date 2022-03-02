@@ -24,10 +24,9 @@
             <level>ERROR</level>
         </filter>
     </appender>
-    
+
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="ASYNC_SLACK"/>
     </root>
-
 </configuration>
