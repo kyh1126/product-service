@@ -19,12 +19,22 @@ import javax.validation.Valid
 @RestController
 @RequestMapping("order")
 class OrderController(
-    private val orderService: OrderService
+    val orderService: OrderService,
+    val orderConfirmService: OrderConfirmService
 ) {
     @Operation(summary = "주문 생성")
     @PostMapping
     fun createCollectedOrder(@Valid @RequestBody collectedOrderCreateModels: List<CollectedOrderCreateModel>) {
         orderService.createCollectedOrder(collectedOrderCreateModels)
+    }
+
+    @Operation(summary = "출고지시 생성")
+    @PostMapping("/partners/{partnerId}/confirm")
+    fun createConfirmOrder(
+        @PathVariable partnerId : Long,
+        @RequestBody collectedIds: List<Long>
+    ){
+        orderConfirmService.createConfirmOrder(partnerId, collectedIds)
     }
 
     @Operation(summary = "특정 화주(고객사) ID 의 주문 리스트 조회")

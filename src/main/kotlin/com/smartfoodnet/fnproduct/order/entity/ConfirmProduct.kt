@@ -1,6 +1,7 @@
 package com.smartfoodnet.fnproduct.order.entity
 
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
+import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import javax.persistence.*
 
 @Entity
@@ -9,17 +10,19 @@ class ConfirmProduct(
     @Column(name = "confirm_product_id", columnDefinition = "BIGINT UNSIGNED")
     val id: Long? = null,
 
-    @JoinColumn(columnDefinition = "BIGINT UNSIGNED")
-    @ManyToOne(fetch = FetchType.LAZY)
-    val collectedOrder: CollectedOrder? = null,
+    @Enumerated(EnumType.STRING)
+    var type: BasicProductType,
 
-    @JoinColumn(columnDefinition = "BIGINT UNSIGNED")
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(columnDefinition = "BIGINT UNSIGNED")
     val basicProduct: BasicProduct? = null,
 
-    val packageName: String? = null,
+    @OneToMany(mappedBy = "basicProduct", cascade = [CascadeType.PERSIST])
+    val confirmPackageProductList: MutableCollection<ConfirmPackageProduct> = mutableListOf(),
 
-    val packageCode: String? = null,
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "confirm_order_id", columnDefinition = "BIGINT UNSIGNED")
+    var confirmOrder : ConfirmOrder? = null,
 
-    val quantity: Int? = null
+    val quantity: Int
 )

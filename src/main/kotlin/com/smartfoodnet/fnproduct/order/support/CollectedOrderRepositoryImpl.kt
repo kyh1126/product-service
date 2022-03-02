@@ -69,6 +69,8 @@ class CollectedOrderRepositoryImpl : CollectedOrderRepositoryCustom, Querydsl4Re
                     collectedOrder.orderNumber,
                     collectedOrder.bundleNumber,
                     basicProduct.id,
+                    basicProduct.salesProductId,
+                    basicProduct.salesProductCode,
                     basicProduct.shippingProductId,
                     basicProduct.productCode,
                     basicProduct.name,

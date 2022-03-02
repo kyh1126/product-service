@@ -39,7 +39,7 @@ data class CollectedOrderCreateModel(
     val orderNumber: String? = null,
 
     @ApiModelProperty(value = "주문 상태")
-    val status: OrderStatus? = null,
+    val status: OrderStatus,
 
     @ApiModelProperty(value = "클레임 상태")
     val claimStatus: String? = null,

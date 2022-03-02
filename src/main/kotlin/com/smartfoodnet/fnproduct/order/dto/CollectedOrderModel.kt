@@ -15,6 +15,8 @@ data class CollectedOrderModel @QueryProjection constructor(
     val orderNumber: String,
     val bundleNumber: String,
     val basicProductId: Long?,
+    val basicProductSalesProductId: Long?,
+    val basicProductSalesProductCode: String?,
     val basicProductShippingProductId: Long?,
     val basicProductShippingProductCode: String?,
     val basicProductName: String?,

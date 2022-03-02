@@ -3,18 +3,34 @@ package com.smartfoodnet.fnproduct.order.model
 
 enum class OrderStatus(val code: Int, val description: String) {
     NEW(0, "신규주문"),
-    INVOICE_PRINT(1, "송장출력"),
-    INVOICE_WRITE(2, "송장입력"),
-    SHIPPING(3, "출고"),
-    TRANSIT(4, "배송중"),
-    RECEIPT(5, "수취확인"),
-    CALCULATE(6, "정산완료"),
-    ORDER_CONFIRM(7, "주문확인"),
-    PENDING(8, "보류"),
-    CANCEL(9, "취소"),
-    CANCEL_COMPLETE(10, "취소마감"),
-    RECALL(11, "반품요청"),
-    EXCHANGE(12, "교환요청"),
-    RECALL_COMPLETE(13, "반품마감"),
-    EXCHANGE_COMPLETE(14, "교환마감");
+    ORDER_CONFIRM(1, "주문확인"),
+    RELEASE_REGISTRATION(2, "출고등록완료"),
+    RELEASE_WORKING(3, "출고작업중"),
+    IN_TRANSIT(4, "배송중"),
+    COMPLETE(5, "배송완료"),
+    CANCEL(9, "취소");
+
+    fun next() = when (this) {
+        NEW -> ORDER_CONFIRM
+        ORDER_CONFIRM -> RELEASE_REGISTRATION
+        RELEASE_REGISTRATION -> RELEASE_WORKING
+        RELEASE_WORKING -> IN_TRANSIT
+        IN_TRANSIT -> COMPLETE
+        COMPLETE -> COMPLETE
+        CANCEL -> CANCEL
+    }
+
+    fun previous() = when (this){
+        NEW -> NEW
+        ORDER_CONFIRM -> NEW
+        RELEASE_REGISTRATION -> ORDER_CONFIRM
+        RELEASE_WORKING -> RELEASE_REGISTRATION
+        IN_TRANSIT -> RELEASE_WORKING
+        COMPLETE -> IN_TRANSIT
+        CANCEL -> CANCEL
+    }
+
+    fun cancel() : OrderStatus{
+        return CANCEL
+    }
 }

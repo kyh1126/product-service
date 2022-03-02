@@ -4,10 +4,12 @@ import com.smartfoodnet.common.entity.BaseEntity
 import com.smartfoodnet.fnproduct.order.model.OrderStatus
 import com.smartfoodnet.fnproduct.store.entity.StoreProduct
 import org.hibernate.annotations.BatchSize
+import org.hibernate.annotations.DynamicUpdate
 import java.time.LocalDateTime
 import javax.persistence.*
 
 @Entity
+@DynamicUpdate
 class CollectedOrder(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,12 +18,13 @@ class CollectedOrder(
 
     @Column(columnDefinition = "BIGINT UNSIGNED")
     val partnerId: Long? = null,
+
     @Column(unique = true)
     val orderUniqueKey: String? = null,
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
-    var status: OrderStatus? = OrderStatus.NEW,
+    var status: OrderStatus = OrderStatus.NEW,
 
     val bundleNumber: String,
 
@@ -50,6 +53,10 @@ class CollectedOrder(
     @JoinColumn(name = "store_product_id", columnDefinition = "BIGINT UNSIGNED")
     @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
     var storeProduct: StoreProduct? = null,
+
+    @ManyToOne
+    @JoinColumn(name = "confirm_order_id", columnDefinition = "BIGINT UNSIGNED")
+    var confirmOrder: ConfirmOrder? = null,
 
     @Embedded
     val collectedProductInfo: CollectedProductInfo,
