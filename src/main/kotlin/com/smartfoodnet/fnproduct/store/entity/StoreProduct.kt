@@ -35,7 +35,7 @@ class StoreProduct(
     var storeName: String,
 
     @Column(name = "store_icon")
-    var storeIcon: String,
+    var storeIcon: String? = null,
 
     @Column(name = "partner_id")
     var partnerId: Long,

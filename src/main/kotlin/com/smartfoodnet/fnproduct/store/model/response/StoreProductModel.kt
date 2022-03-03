@@ -6,7 +6,7 @@ data class StoreProductModel(
     var id: Long? = null,
     var storeId: Long,
     var storeName: String,
-    var storeIcon: String,
+    var storeIcon: String? = null,
     var partnerId: Long,
     var name: String,
     var storeProductCode: String? = null,
