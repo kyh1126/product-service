@@ -11,7 +11,7 @@ object Constants {
     const val EXPIRATION_DATE_MANAGEMENT_YN = "Y"
     const val IS_ACTIVE_YN = "Y"
     const val API_CALL_LIST_SIZE = 50 //nosnos api call List Size
-    const val HEADER_ROW_INDEX: Int = 1
+    const val HEADER_ROW_INDEX: Int = 0
     const val WORKSHEET_INDEX: Int = 0
-    const val DATA_STARTING_ROW_INDEX: Int = 3
+    const val DATA_STARTING_ROW_INDEX: Int = 1
 }

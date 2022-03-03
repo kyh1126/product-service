@@ -4,12 +4,12 @@ import com.smartfoodnet.fnproduct.store.entity.StoreProduct
 import io.swagger.annotations.ApiModelProperty
 
 data class StoreProductCreateModel(
-    @ApiModelProperty(value = "쇼핑몰 코드")
-    val storeCode: String,
     @ApiModelProperty(value = "쇼핑몰명")
     val storeName: String,
     @ApiModelProperty(value = "쇼핑몰 ID")
     val storeId: Long,
+    @ApiModelProperty(value = "쇼핑몰 ID")
+    val storeIcon: String,
     @ApiModelProperty(value = "고객사 ID")
     val partnerId: Long,
     @ApiModelProperty(value = "쇼핑몰 상품명")
@@ -22,8 +22,8 @@ data class StoreProductCreateModel(
     fun toEntity(): StoreProduct {
         return StoreProduct(
             storeId = storeId,
-            storeCode = storeCode,
             storeName = storeName,
+            storeIcon = storeIcon,
             partnerId = partnerId,
             name = name,
             storeProductCode = storeProductCode
