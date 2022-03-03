@@ -19,11 +19,10 @@ class StoreProductRepositoryImpl : StoreProductRepositoryCustom, Querydsl4Reposi
     override fun findStoreProducts(condition: PredicateSearchCondition, page: Pageable): Page<StoreProduct> {
         return applyPagination(page) {
             it.selectFrom(storeProduct)
-                .innerJoin(storeProduct.storeProductMappings, QStoreProductMapping.storeProductMapping)
-                .innerJoin(QStoreProductMapping.storeProductMapping.basicProduct, QBasicProduct.basicProduct)
+                .leftJoin(storeProduct.storeProductMappings, QStoreProductMapping.storeProductMapping)
+                .leftJoin(QStoreProductMapping.storeProductMapping.basicProduct, QBasicProduct.basicProduct)
                 .where( condition.toPredicate() )
                 .distinct()
         }
     }
-
 }

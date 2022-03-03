@@ -65,6 +65,7 @@ sfn:
     fn-message: ${FN_MESSAGE_SERVICE:http://fn-message.sfn-dev:4011/fresh-networks/fn-message}
     fn-warehouse-management-service: ${FN_WAREHOUSE_SERVICE:http://fn-warehouse-service.sfn-dev:4001/fresh-networks/fn-warehouse-service}
     fn-partner: ${FN_PARTNER_SERVICE:http://fn-partner-service.sfn-dev:4007/fresh-networks/fn-partner}
+    fn-order-management-service: ${FN_ORDER_MANAGEMENT_SERVICE:http://sfn-order-management-service.sfn-dev:4003/fresh-networks/fn-order-management-service}
 
 sqs:
   queues:

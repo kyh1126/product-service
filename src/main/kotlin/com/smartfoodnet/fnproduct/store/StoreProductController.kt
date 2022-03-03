@@ -11,7 +11,17 @@ import io.swagger.v3.oas.annotations.Parameter
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.web.PageableDefault
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.ModelAttribute
+import org.springframework.web.bind.annotation.PatchMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RequestPart
+import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.multipart.MultipartFile
 import javax.validation.Valid
 
 @RestController
@@ -59,11 +69,12 @@ class StoreProductController(
         return storeProductService.mapBasicProducts(storeProductMappingCreateModels)
     }
 
-//    @Operation(summary = "쇼핑몰상품 excel 파일로 생성")
-//    @PostMapping("/bulk")
-//    fun bulkCreateByExcel(
-//        @Parameter(description = "엑셀 양식")file: MultipartFile,
-//        @Parameter(description = "화주(고객사) ID", required = true) partnerId: Long): List<StoreProductModel> {
-//        return storeProductExcelService.createBulkByExcelFile(file, partnerId)
-//    }
+    @Operation(summary = "쇼핑몰상품 excel 파일로 생성")
+    @PostMapping("/bulk")
+    fun bulkCreateByExcel(
+        @Parameter(description = "엑셀 양식", required = true)
+        @RequestPart("file", required = false) file: MultipartFile,
+        @Parameter(description = "화주(고객사) ID", required = true) @RequestParam(required = true) partnerId: Long): List<StoreProductModel> {
+        return storeProductExcelService.createBulkByExcelFile(file, partnerId)
+    }
 }
