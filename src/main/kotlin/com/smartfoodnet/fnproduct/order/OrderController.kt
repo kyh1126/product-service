@@ -43,9 +43,8 @@ class OrderController(
         @PathVariable partnerId: Long,
         @Parameter(description = "검색조건")
         @ModelAttribute condition: CollectingOrderSearchCondition,
-        @PageableDefault(size = 50, sort = ["id"], direction = Sort.Direction.DESC) page: Pageable,
-    ): PageResponse<CollectedOrderModel> {
-        return orderService.getCollectedOrder(condition.apply { this.partnerId = partnerId }, page)
+    ): List<CollectedOrderModel> {
+        return orderService.getCollectedOrder(condition.apply { this.partnerId = partnerId })
     }
 
     @GetMapping("partners/{partnerId}/confirm")
@@ -54,8 +53,7 @@ class OrderController(
         @PathVariable partnerId: Long,
         @Parameter(description = "검색조건")
         @ModelAttribute condition: ConfirmOrderSearchCondition,
-        @PageableDefault(size = 50, sort = ["id"], direction = Sort.Direction.DESC) page: Pageable,
-    ): PageResponse<CollectedOrderModel> {
-        return orderConfirmService.getConfirmOrder(condition.apply { this.partnerId = partnerId }, page)
+    ): List<CollectedOrderModel> {
+        return orderConfirmService.getConfirmOrder(condition.apply { this.partnerId = partnerId })
     }
 }

@@ -11,7 +11,6 @@ import com.smartfoodnet.fnproduct.order.entity.ConfirmProduct
 import com.smartfoodnet.fnproduct.order.model.OrderStatus
 import com.smartfoodnet.fnproduct.order.support.CollectedOrderRepository
 import com.smartfoodnet.fnproduct.order.support.ConfirmOrderRepository
-import com.smartfoodnet.fnproduct.order.support.condition.ConfirmOrderSearchCondition
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import org.springframework.data.domain.Pageable
@@ -27,6 +26,11 @@ class OrderConfirmService(
     @Transactional
     fun createConfirmOrder(partnerId: Long, collectedIds: List<Long>) {
         val collectedList = collectedOrderRepository.findAllById(collectedIds)
+
+        val subtractList = collectedIds.subtract(collectedList.map { it.id }.toSet())
+        if (subtractList.isNotEmpty()) {
+            throw BaseRuntimeException(errorMessage = "주문수집 Key[${subtractList.joinToString { it.toString() }}]를 찾을 수 없습니다")
+        }
 
         if (!collectedList.all { it.partnerId == partnerId })
             throw BaseRuntimeException(errorMessage = "해당 고객사의 주문건이 아닙니다")
@@ -53,7 +57,10 @@ class OrderConfirmService(
 
         collectedList.forEach {
             val storeMapping = it.storeProduct?.storeProductMappings
-            storeMapping?.forEach { storeProductMapping ->
+            if (storeMapping.isNullOrEmpty())
+                throw BaseRuntimeException(errorMessage = "매칭되지 않은 쇼핑몰 상품이 존재합니다 상품코드[${it.collectedProductInfo.collectedStoreProductName} - ${it.collectedProductInfo.collectedStoreProductOptionName}]")
+
+            storeMapping.forEach { storeProductMapping ->
                 val basicProduct = storeProductMapping.basicProduct
                 val orderQuantity = (it.quantity ?: 1) * storeProductMapping.quantity
                 createConfirmProductAndPackageProduct(it, confirmOrder, basicProduct, orderQuantity)
@@ -76,7 +83,7 @@ class OrderConfirmService(
             confirmOrder = confirmOrder,
             quantity = orderQuantity,
             collectedOrder = collectedOrder
-            )
+        )
 
         if (basicProduct.type == BasicProductType.PACKAGE) {
             basicProduct.packageProductMappings.forEach {
@@ -94,8 +101,15 @@ class OrderConfirmService(
         confirmOrder.addConfirmProduct(confirmProduct)
     }
 
-    fun getConfirmOrder(condition: PredicateSearchCondition, page: Pageable): PageResponse<CollectedOrderModel> {
-        val response = confirmOrderRepository.findAllByCondition(condition, page)
+    fun getConfirmOrderWithPageable(
+        condition: PredicateSearchCondition,
+        page: Pageable
+    ): PageResponse<CollectedOrderModel> {
+        val response = confirmOrderRepository.findAllByConfirmOrderWithPageable(condition, page)
         return PageResponse.of(response)
+    }
+
+    fun getConfirmOrder(condition: PredicateSearchCondition): List<CollectedOrderModel> {
+        return confirmOrderRepository.findAllByConfirmOrder(condition)
     }
 }

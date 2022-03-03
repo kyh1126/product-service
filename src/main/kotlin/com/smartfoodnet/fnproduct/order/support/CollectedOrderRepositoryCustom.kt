@@ -11,5 +11,6 @@ import org.springframework.data.domain.Pageable
 interface CollectedOrderRepositoryCustom {
     fun findAllByPartnerIdAndStatusGroupByProductId(partnerId:Long, status: OrderStatus): List<ShortageOrderProjectionModel>
     fun getCountByProductIdAndStatusGroupByProductId(productId:Long, status: OrderStatus): Int?
-    fun findCollectedOrders(condition: PredicateSearchCondition, pagination: Pageable): Page<CollectedOrderModel>
+    fun findCollectedOrdersWithPageable(condition: PredicateSearchCondition, pagination: Pageable): Page<CollectedOrderModel>
+    fun findCollectedOrders(condition: PredicateSearchCondition): List<CollectedOrderModel>
 }

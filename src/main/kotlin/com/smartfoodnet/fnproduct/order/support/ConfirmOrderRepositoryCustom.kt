@@ -9,5 +9,6 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 
 interface ConfirmOrderRepositoryCustom{
-    fun findAllByCondition(condition: PredicateSearchCondition, page: Pageable) : Page<CollectedOrderModel>
+    fun findAllByConfirmOrderWithPageable(condition: PredicateSearchCondition, page: Pageable) : Page<CollectedOrderModel>
+    fun findAllByConfirmOrder(condition: PredicateSearchCondition) : List<CollectedOrderModel>
 }

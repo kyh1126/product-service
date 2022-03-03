@@ -3,6 +3,7 @@ package com.smartfoodnet.fnproduct.order.support
 import com.querydsl.core.types.ExpressionUtils
 import com.querydsl.core.types.Projections
 import com.querydsl.core.types.dsl.Expressions
+import com.querydsl.jpa.impl.JPAQuery
 import com.smartfoodnet.common.model.request.PredicateSearchCondition
 import com.smartfoodnet.config.Querydsl4RepositorySupport
 import com.smartfoodnet.fninventory.shortage.model.ShortageOrderProjectionModel
@@ -55,50 +56,58 @@ class CollectedOrderRepositoryImpl : CollectedOrderRepositoryCustom, Querydsl4Re
             .fetchOne()
     }
 
-    override fun findCollectedOrders(
+    override fun findCollectedOrders(condition: PredicateSearchCondition): List<CollectedOrderModel> {
+        return createCollectedOrder(condition).fetch()
+    }
+
+    override fun findCollectedOrdersWithPageable(
         condition: PredicateSearchCondition,
         pagination: Pageable
     ): Page<CollectedOrderModel> {
         return applyPagination(pagination) {
-            it.select(
-                QCollectedOrderModel(
-                    collectedOrder.id,
-                    collectedOrder.partnerId,
-                    collectedOrder.uploadType,
-                    collectedOrder.status,
-                    collectedOrder.orderNumber,
-                    collectedOrder.bundleNumber,
-                    basicProduct.id,
-                    basicProduct.salesProductId,
-                    basicProduct.salesProductCode,
-                    basicProduct.shippingProductId,
-                    basicProduct.productCode,
-                    basicProduct.name,
-                    storeProductMapping.quantity,
-                    collectedOrder.storeId,
-                    collectedOrder.storeName,
-                    collectedOrder.collectedProductInfo.collectedStoreProductCode,
-                    collectedOrder.collectedProductInfo.collectedStoreProductName,
-                    collectedOrder.collectedProductInfo.collectedStoreProductOptionName,
-                    collectedOrder.storeProduct.id,
-                    collectedOrder.storeProduct.name,
-                    collectedOrder.storeProduct.storeProductCode,
-                    collectedOrder.storeProduct.optionName,
-                    collectedOrder.storeProduct.optionCode,
-                    collectedOrder.quantity,
-                    collectedOrder.deliveryType,
-                    collectedOrder.shippingPrice,
-                    collectedOrder.receiver.name,
-                    collectedOrder.receiver.address,
-                    collectedOrder.receiver.phoneNumber,
-                    collectedOrder.collectedAt
-                )
-            )
-            .from(collectedOrder)
-            .leftJoin(collectedOrder.storeProduct, storeProduct)
-            .leftJoin(storeProduct.storeProductMappings, storeProductMapping)
-            .leftJoin(storeProductMapping.basicProduct, basicProduct)
-            .where(condition.toPredicate())
+            createCollectedOrder(condition)
         }
+    }
+
+    private fun createCollectedOrder(condition: PredicateSearchCondition) : JPAQuery<CollectedOrderModel>{
+        return select(
+            QCollectedOrderModel(
+                collectedOrder.id,
+                collectedOrder.partnerId,
+                collectedOrder.uploadType,
+                collectedOrder.status,
+                collectedOrder.orderNumber,
+                collectedOrder.bundleNumber,
+                basicProduct.id,
+                basicProduct.salesProductId,
+                basicProduct.salesProductCode,
+                basicProduct.shippingProductId,
+                basicProduct.productCode,
+                basicProduct.name,
+                storeProductMapping.quantity,
+                collectedOrder.storeId,
+                collectedOrder.storeName,
+                collectedOrder.collectedProductInfo.collectedStoreProductCode,
+                collectedOrder.collectedProductInfo.collectedStoreProductName,
+                collectedOrder.collectedProductInfo.collectedStoreProductOptionName,
+                collectedOrder.storeProduct.id,
+                collectedOrder.storeProduct.name,
+                collectedOrder.storeProduct.storeProductCode,
+                collectedOrder.storeProduct.optionName,
+                collectedOrder.storeProduct.optionCode,
+                collectedOrder.quantity,
+                collectedOrder.deliveryType,
+                collectedOrder.shippingPrice,
+                collectedOrder.receiver.name,
+                collectedOrder.receiver.address,
+                collectedOrder.receiver.phoneNumber,
+                collectedOrder.collectedAt
+            )
+        )
+        .from(collectedOrder)
+        .leftJoin(collectedOrder.storeProduct, storeProduct)
+        .leftJoin(storeProduct.storeProductMappings, storeProductMapping)
+        .leftJoin(storeProductMapping.basicProduct, basicProduct)
+        .where(condition.toPredicate())
     }
 }

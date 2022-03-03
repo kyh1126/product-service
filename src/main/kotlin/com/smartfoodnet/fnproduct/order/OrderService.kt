@@ -1,6 +1,7 @@
 package com.smartfoodnet.fnproduct.order
 
 import com.smartfoodnet.apiclient.WmsApiClient
+import com.smartfoodnet.apiclient.response.NosnosStockModel
 import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.fnproduct.order.model.CollectedOrderCreateModel
@@ -29,13 +30,10 @@ class OrderService(
         collectedOrderCreateModel.map { convert(it) }
     }
 
-    fun getCollectedOrder(
-        condition: CollectingOrderSearchCondition,
-        page: Pageable
-    ): PageResponse<CollectedOrderModel> {
-        val response = collectedOrderRepository.findCollectedOrders(condition, page)
-        val shippingProductIds = response.content.mapNotNull { it.basicProductShippingProductId }
-        val availableStocks = try {
+    private fun getAvailableStocks(condition: CollectingOrderSearchCondition, shippingProductIds : List<Long>) : Map<Long, NosnosStockModel>{
+        if (shippingProductIds.isEmpty()) return mapOf()
+
+        return try {
             wmsApiClient
                 .getStocks(condition.partnerId!!, shippingProductIds).payload!!.dataList
                 .associateBy { it.shippingProductId!! }
@@ -44,9 +42,37 @@ class OrderService(
             log.info("partnerId:${condition.partnerId}의 재고 정보[${shippingProductIds.joinToString(",")}]를 가져올 수 없습니다")
             mapOf()
         }
+    }
 
-        if (availableStocks != null) {
-            response.content.forEach {
+    fun getCollectedOrder(
+        condition: CollectingOrderSearchCondition
+    ): List<CollectedOrderModel>{
+        val response = collectedOrderRepository.findCollectedOrders(condition)
+        val shippingProductIds = response.mapNotNull { it.basicProductShippingProductId }
+        val availableStocks = getAvailableStocks(condition, shippingProductIds)
+
+        if (availableStocks.isNotEmpty()) {
+            response.forEach {
+                if (it.basicProductShippingProductId != null) {
+                    it.availableQuantity =
+                        availableStocks[it.basicProductShippingProductId]?.normalStock ?: 0
+                }
+            }
+        }
+
+        return response
+    }
+
+    fun getCollectedOrderWithPage(
+        condition: CollectingOrderSearchCondition,
+        page: Pageable
+    ): PageResponse<CollectedOrderModel> {
+        val response = collectedOrderRepository.findCollectedOrdersWithPageable(condition, page)
+        val shippingProductIds = response.content.mapNotNull { it.basicProductShippingProductId }
+        val availableStocks = getAvailableStocks(condition, shippingProductIds)
+
+        if (availableStocks.isNotEmpty()) {
+            response.forEach {
                 if (it.basicProductShippingProductId != null) {
                     it.availableQuantity =
                         availableStocks[it.basicProductShippingProductId]?.normalStock ?: 0
