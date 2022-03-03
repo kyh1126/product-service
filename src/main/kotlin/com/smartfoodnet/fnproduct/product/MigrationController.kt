@@ -87,9 +87,9 @@ class MigrationController(private val migrationService: MigrationService) {
             @Parameter(description = "member ID")
             @PathVariable memberId: Long,
             @Parameter(description = "시작 Page")
-            @RequestParam(required = false) startPage: Int = 1,
+            @RequestParam(required = false, defaultValue = "1") startPage: Int,
             @Parameter(description = "끝 Page")
-            @RequestParam(required = false) endPage: Int = 1
+            @RequestParam(required = false, defaultValue = "1") endPage: Int
     ): CommonResponse<String> {
         migrationService.nosnosToBasicProducts(memberId, startPage, endPage)
         return CommonResponse(HttpStatus.OK.reasonPhrase)
