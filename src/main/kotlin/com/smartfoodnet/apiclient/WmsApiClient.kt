@@ -3,7 +3,6 @@ package com.smartfoodnet.apiclient
 import com.smartfoodnet.apiclient.request.*
 import com.smartfoodnet.apiclient.response.*
 import com.smartfoodnet.common.model.response.CommonResponse
-import io.swagger.annotations.ApiOperation
 import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.cloud.openfeign.SpringQueryMap
 import org.springframework.web.bind.annotation.*
@@ -47,9 +46,8 @@ interface WmsApiClient {
     // ---------------------------------------------------------------------------------------------
     // -- 출고상품(=기본상품)관리
     // ---------------------------------------------------------------------------------------------
-    @GetMapping("bulk")
-    @ApiOperation(value = "기본상품 조회(벌크)")
-    fun getShippingProducts(@ModelAttribute basicProductReadModel: BasicProductReadModel): CommonResponse<CommonDataListModel<GetShippingProductModel>>
+    @GetMapping("shipping/products/bulk")
+    fun getShippingProducts(@SpringQueryMap basicProductReadModel: BasicProductReadModel): CommonResponse<CommonDataListModel<GetShippingProductModel>>
 
     @PostMapping("shipping/products")
     fun createShippingProduct(preModel: PreShippingProductModel): CommonResponse<PostShippingProductModel>

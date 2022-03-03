@@ -168,7 +168,7 @@ class MigrationService(
         var page = startPage
         var totalPage = endPage
 
-        while (startPage <= totalPage) {
+        while (page <= totalPage) {
             val model: CommonDataListModel<GetShippingProductModel>
             try {
                 model = wmsApiClient.getShippingProducts(BasicProductReadModel(memberId = memberId, page = page)).payload!!
