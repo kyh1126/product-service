@@ -6,7 +6,7 @@
     <appender class="ch.qos.logback.core.ConsoleAppender" name="CONSOLE">
         <encoder>
             <pattern>
-                <![CDATA[[%d{yyyy-MM-dd HH:mm:ss}] %highlight(%-5level)[%thread] %logger{35} [%magenta(%method{24}:%line)] - %msg%n]]>
+                <![CDATA[[%d{yyyy-MM-dd HH:mm:ss}] %-5level[%thread] %logger{35} [%method{24}:%line] - %msg%n]]>
             </pattern>
         </encoder>
     </appender>
