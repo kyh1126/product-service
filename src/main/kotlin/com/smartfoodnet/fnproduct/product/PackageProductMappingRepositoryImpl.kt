@@ -52,4 +52,11 @@ class PackageProductMappingRepositoryImpl :
     private fun containsCode(code: String?, target: QBasicProduct = basicProduct) =
         code?.let { target.code.contains(it) }
 
+
+    override fun findAllByBasicProductId(basicProductId: Long): List<PackageProductMapping> {
+        return selectFrom(packageProductMapping)
+            .innerJoin(packageProductMapping.selectedBasicProduct).fetchJoin()
+            .where(packageProductMapping.packageProduct.id.eq(basicProductId))
+            .fetch()
+    }
 }

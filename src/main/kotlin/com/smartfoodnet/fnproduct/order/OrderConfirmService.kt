@@ -1,9 +1,11 @@
 package com.smartfoodnet.fnproduct.order
 
+import com.smartfoodnet.apiclient.WmsApiClient
 import com.smartfoodnet.common.error.exception.BaseRuntimeException
 import com.smartfoodnet.common.model.request.PredicateSearchCondition
 import com.smartfoodnet.common.model.response.PageResponse
-import com.smartfoodnet.fnproduct.order.dto.CollectedOrderModel
+import com.smartfoodnet.common.utils.Log
+import com.smartfoodnet.fnproduct.order.dto.ConfirmOrderModel
 import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
 import com.smartfoodnet.fnproduct.order.entity.ConfirmOrder
 import com.smartfoodnet.fnproduct.order.entity.ConfirmPackageProduct
@@ -11,6 +13,8 @@ import com.smartfoodnet.fnproduct.order.entity.ConfirmProduct
 import com.smartfoodnet.fnproduct.order.model.OrderStatus
 import com.smartfoodnet.fnproduct.order.support.CollectedOrderRepository
 import com.smartfoodnet.fnproduct.order.support.ConfirmOrderRepository
+import com.smartfoodnet.fnproduct.order.support.condition.ConfirmOrderSearchCondition
+import com.smartfoodnet.fnproduct.product.PackageProductMappingRepository
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import org.springframework.data.domain.Pageable
@@ -21,8 +25,10 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional(readOnly = true)
 class OrderConfirmService(
     val collectedOrderRepository: CollectedOrderRepository,
-    val confirmOrderRepository: ConfirmOrderRepository
-) {
+    val confirmOrderRepository: ConfirmOrderRepository,
+    val packageProductMappingRepository: PackageProductMappingRepository,
+    val wmsApiClient: WmsApiClient
+) : Log {
     @Transactional
     fun createConfirmOrder(partnerId: Long, collectedIds: List<Long>) {
         val collectedList = collectedOrderRepository.findAllById(collectedIds)
@@ -41,11 +47,11 @@ class OrderConfirmService(
         collectedList.groupBy {
             it.bundleNumber
         }.forEach {
-            convertData(partnerId, it.key, it.value)
+            convertConfirmOrderEntity(partnerId, it.key, it.value)
         }
     }
 
-    private fun convertData(
+    private fun convertConfirmOrderEntity(
         partnerId: Long,
         bundleNumber: String,
         collectedList: List<CollectedOrder>
@@ -101,15 +107,81 @@ class OrderConfirmService(
         confirmOrder.addConfirmProduct(confirmProduct)
     }
 
+    private fun getAvailableStocks(
+        partnerId: Long,
+        shippingProductIds: List<Long>
+    ): Map<Long, Int> {
+        if (shippingProductIds.isEmpty()) return mapOf()
+
+        return try {
+            wmsApiClient
+                .getStocks(partnerId, shippingProductIds).payload!!.dataList
+                .associateBy({ it.shippingProductId }, { it.normalStock ?: 0 })
+        } catch (e: Exception) {
+            e.printStackTrace()
+            log.info("partnerId:${partnerId}의 재고 정보[${shippingProductIds.joinToString(",")}]를 가져올 수 없습니다")
+            mapOf()
+        }
+    }
+
+    private fun getPackageAvailableMinStocks(
+        confirmOrderModel: ConfirmOrderModel,
+        availableStocks: MutableMap<Long, Int>
+    ): Double {
+        val basicProductId = confirmOrderModel.basicProductId!!
+
+        // TODO : 모음상품의 기본상품셋을 가져온다
+        val basicProductAndQuantity =
+            packageProductMappingRepository.findAllByBasicProductId(basicProductId)
+                .associateBy({ it.selectedBasicProduct }, { it.quantity })
+
+        val shippingProductIds =
+            basicProductAndQuantity.map {
+                it.key.shippingProductId!!
+            }.filter {
+                !availableStocks.containsKey(it)
+            }
+
+        if (shippingProductIds.isNotEmpty()) {
+            availableStocks.putAll(
+                getAvailableStocks(
+                    confirmOrderModel.partnerId,
+                    shippingProductIds
+                )
+            )
+        }
+
+        val mappedQuantity = confirmOrderModel.mappedQuantityCalc
+        val minQuantity = basicProductAndQuantity.map {
+            var quantity = it.value * mappedQuantity
+            val availableStock = availableStocks[it.key.shippingProductId] ?: 0
+            availableStock.toDouble().div(quantity.toDouble())
+        }.minOf { it }
+
+        return minQuantity
+    }
+
     fun getConfirmOrderWithPageable(
         condition: PredicateSearchCondition,
         page: Pageable
-    ): PageResponse<CollectedOrderModel> {
+    ): PageResponse<ConfirmOrderModel> {
         val response = confirmOrderRepository.findAllByConfirmOrderWithPageable(condition, page)
         return PageResponse.of(response)
     }
 
-    fun getConfirmOrder(condition: PredicateSearchCondition): List<CollectedOrderModel> {
-        return confirmOrderRepository.findAllByConfirmOrder(condition)
+    fun getConfirmOrder(condition: ConfirmOrderSearchCondition): List<ConfirmOrderModel> {
+        val partnerId = condition.partnerId!!
+        val response = confirmOrderRepository.findAllByConfirmOrder(condition)
+        val shippingProductIds = response.filter { it.basicProductType == BasicProductType.BASIC }
+            .mapNotNull { it.basicProductShippingProductId }
+        val availableStocks = getAvailableStocks(partnerId, shippingProductIds).toMutableMap()
+
+        response.forEach {
+            it.availableQuantity =
+                if (it.basicProductType == BasicProductType.PACKAGE) getPackageAvailableMinStocks(it, availableStocks)
+                else availableStocks[it.basicProductShippingProductId]?.toDouble() ?: -1.0
+        }
+
+        return response
     }
 }

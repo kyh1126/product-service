@@ -2,6 +2,7 @@ package com.smartfoodnet.fnproduct.order
 
 import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.fnproduct.order.dto.CollectedOrderModel
+import com.smartfoodnet.fnproduct.order.dto.ConfirmOrderModel
 import com.smartfoodnet.fnproduct.order.model.CollectedOrderCreateModel
 import com.smartfoodnet.fnproduct.order.support.condition.CollectingOrderSearchCondition
 import com.smartfoodnet.fnproduct.order.support.condition.ConfirmOrderSearchCondition
@@ -53,7 +54,7 @@ class OrderController(
         @PathVariable partnerId: Long,
         @Parameter(description = "검색조건")
         @ModelAttribute condition: ConfirmOrderSearchCondition,
-    ): List<CollectedOrderModel> {
+    ): List<ConfirmOrderModel> {
         return orderConfirmService.getConfirmOrder(condition.apply { this.partnerId = partnerId })
     }
 }

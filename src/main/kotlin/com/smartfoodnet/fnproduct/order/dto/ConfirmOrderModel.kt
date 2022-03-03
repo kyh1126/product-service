@@ -8,8 +8,9 @@ import com.smartfoodnet.fnproduct.order.model.OrderStatus
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import java.time.LocalDateTime
 
-data class CollectedOrderModel @QueryProjection constructor(
-    val id: Long,
+data class ConfirmOrderModel @QueryProjection constructor(
+    val collectedId: Long,
+    val confirmOrderId: Long,
     val partnerId: Long,
     val uploadType: String,
     val status: OrderStatus,
@@ -44,5 +45,6 @@ data class CollectedOrderModel @QueryProjection constructor(
     val collectedAt: LocalDateTime?
 ) {
     val mappedFlag: Boolean = basicProductId != null
+    var availableQuantity: Double = -1.0
     val mappedQuantityCalc: Int = (mappedQuantity ?: 0) * (quantity ?: 0)
 }
