@@ -10,7 +10,7 @@ enum class StoreProductHeader(val headerTitle: String) {
     OPTION_NAME("쇼핑몰옵션이름"),
     BASIC_PRODUCT_CODE("매칭상품코드"),
     BASIC_PRODUCT_NAME("매칭상품코드"),
-    BASIC_PRODUCT_QUANTITY("기본상품 개수");
+    BASIC_PRODUCT_QUANTITY("매칭상품 개수");
 
     companion object {
         fun from(text: String?): StoreProductHeader? {
