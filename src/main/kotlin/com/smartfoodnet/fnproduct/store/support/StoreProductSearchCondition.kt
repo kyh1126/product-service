@@ -3,6 +3,7 @@ package com.smartfoodnet.fnproduct.store.support
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.querydsl.core.BooleanBuilder
 import com.querydsl.core.types.Predicate
+import com.querydsl.core.types.dsl.BooleanExpression
 import com.smartfoodnet.common.model.request.PredicateSearchCondition
 import com.smartfoodnet.fnproduct.product.entity.QBasicProduct.basicProduct
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
@@ -43,7 +44,17 @@ class StoreProductSearchCondition(
             basicProductName?.let { basicProduct.name.contains(it) },
             basicProductCode?.let { basicProduct.code.eq(it) },
             basicProductType?.let { basicProduct.type.eq(it) },
-            basicProductMatchFlag?.let { storeProduct.storeProductMappings.isEmpty }
+            isMatched()
         )
+    }
+
+    private fun isMatched(): BooleanExpression? {
+        return basicProductMatchFlag?.let {
+            if (!basicProductMatchFlag) {
+                storeProduct.storeProductMappings.isEmpty
+            } else {
+                storeProduct.storeProductMappings.isNotEmpty
+            }
+        }
     }
 }
