@@ -1,6 +1,9 @@
 package com.smartfoodnet.fnproduct.order
 
 import com.smartfoodnet.common.error.exception.BaseRuntimeException
+import com.smartfoodnet.common.model.request.PredicateSearchCondition
+import com.smartfoodnet.common.model.response.PageResponse
+import com.smartfoodnet.fnproduct.order.dto.CollectedOrderModel
 import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
 import com.smartfoodnet.fnproduct.order.entity.ConfirmOrder
 import com.smartfoodnet.fnproduct.order.entity.ConfirmPackageProduct
@@ -8,8 +11,10 @@ import com.smartfoodnet.fnproduct.order.entity.ConfirmProduct
 import com.smartfoodnet.fnproduct.order.model.OrderStatus
 import com.smartfoodnet.fnproduct.order.support.CollectedOrderRepository
 import com.smartfoodnet.fnproduct.order.support.ConfirmOrderRepository
+import com.smartfoodnet.fnproduct.order.support.condition.ConfirmOrderSearchCondition
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -89,7 +94,8 @@ class OrderConfirmService(
         confirmOrder.addConfirmProduct(confirmProduct)
     }
 
-    fun getConfirmOrder() {
-        val list = confirmOrderRepository.findAllByCondition()
+    fun getConfirmOrder(condition: PredicateSearchCondition, page: Pageable): PageResponse<CollectedOrderModel> {
+        val response = confirmOrderRepository.findAllByCondition(condition, page)
+        return PageResponse.of(response)
     }
 }

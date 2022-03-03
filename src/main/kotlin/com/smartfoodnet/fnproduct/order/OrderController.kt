@@ -2,10 +2,9 @@ package com.smartfoodnet.fnproduct.order
 
 import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.fnproduct.order.dto.CollectedOrderModel
-import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
 import com.smartfoodnet.fnproduct.order.model.CollectedOrderCreateModel
-import com.smartfoodnet.fnproduct.order.support.CollectingOrderSearchCondition
-import com.smartfoodnet.fnproduct.order.support.OrderSearchCondition
+import com.smartfoodnet.fnproduct.order.support.condition.CollectingOrderSearchCondition
+import com.smartfoodnet.fnproduct.order.support.condition.ConfirmOrderSearchCondition
 import io.swagger.annotations.Api
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -31,9 +30,9 @@ class OrderController(
     @Operation(summary = "출고지시 생성")
     @PostMapping("/partners/{partnerId}/confirm")
     fun createConfirmOrder(
-        @PathVariable partnerId : Long,
+        @PathVariable partnerId: Long,
         @RequestBody collectedIds: List<Long>
-    ){
+    ) {
         orderConfirmService.createConfirmOrder(partnerId, collectedIds)
     }
 
@@ -51,8 +50,12 @@ class OrderController(
 
     @GetMapping("partners/{partnerId}/confirm")
     fun getConfirmOrders(
-        @PathVariable partnerId: Long
-    ){
-        orderConfirmService.getConfirmOrder()
+        @Parameter(description = "화주(고객사) ID", required = true)
+        @PathVariable partnerId: Long,
+        @Parameter(description = "검색조건")
+        @ModelAttribute condition: ConfirmOrderSearchCondition,
+        @PageableDefault(size = 50, sort = ["id"], direction = Sort.Direction.DESC) page: Pageable,
+    ): PageResponse<CollectedOrderModel> {
+        return orderConfirmService.getConfirmOrder(condition.apply { this.partnerId = partnerId }, page)
     }
 }

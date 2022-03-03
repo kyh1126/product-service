@@ -9,7 +9,7 @@ import com.smartfoodnet.fninventory.shortage.model.ShortageOrderProjectionModel
 import com.smartfoodnet.fnproduct.order.dto.CollectedOrderModel
 import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
 import com.smartfoodnet.fnproduct.order.support.CollectedOrderRepository
-import com.smartfoodnet.fnproduct.order.support.CollectingOrderSearchCondition
+import com.smartfoodnet.fnproduct.order.support.condition.CollectingOrderSearchCondition
 import com.smartfoodnet.fnproduct.store.StoreProductService
 import com.smartfoodnet.fnproduct.store.support.StoreProductSearchCondition
 import org.springframework.data.domain.Pageable
