@@ -4,7 +4,9 @@ import com.querydsl.jpa.impl.JPAQuery
 import com.smartfoodnet.common.model.request.PredicateSearchCondition
 import com.smartfoodnet.config.Querydsl4RepositorySupport
 import com.smartfoodnet.fnproduct.order.dto.CollectedOrderModel
+import com.smartfoodnet.fnproduct.order.dto.ConfirmOrderModel
 import com.smartfoodnet.fnproduct.order.dto.QCollectedOrderModel
+import com.smartfoodnet.fnproduct.order.dto.QConfirmOrderModel
 import com.smartfoodnet.fnproduct.order.entity.ConfirmOrder
 import com.smartfoodnet.fnproduct.order.entity.QCollectedOrder.collectedOrder
 import com.smartfoodnet.fnproduct.order.entity.QConfirmOrder.confirmOrder
@@ -15,26 +17,28 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 
 class ConfirmOrderRepositoryImpl : ConfirmOrderRepositoryCustom, Querydsl4RepositorySupport(ConfirmOrder::class.java) {
-    override fun findAllByConfirmOrderWithPageable(condition: PredicateSearchCondition, page: Pageable): Page<CollectedOrderModel> {
+    override fun findAllByConfirmOrderWithPageable(condition: PredicateSearchCondition, page: Pageable): Page<ConfirmOrderModel> {
         return applyPagination(page){
             createConfirmOrderQuery(condition)
         }
     }
 
-    override fun findAllByConfirmOrder(condition: PredicateSearchCondition): List<CollectedOrderModel> {
+    override fun findAllByConfirmOrder(condition: PredicateSearchCondition): List<ConfirmOrderModel> {
         return createConfirmOrderQuery(condition).fetch()
     }
 
-    private fun createConfirmOrderQuery(condition : PredicateSearchCondition) : JPAQuery<CollectedOrderModel>{
+    private fun createConfirmOrderQuery(condition : PredicateSearchCondition) : JPAQuery<ConfirmOrderModel>{
         return select(
-            QCollectedOrderModel(
+            QConfirmOrderModel(
                 collectedOrder.id,
+                confirmOrder.id,
                 collectedOrder.partnerId,
                 collectedOrder.uploadType,
                 collectedOrder.status,
                 collectedOrder.orderNumber,
                 collectedOrder.bundleNumber,
                 basicProduct.id,
+                confirmProduct.type,
                 basicProduct.salesProductId,
                 basicProduct.salesProductCode,
                 basicProduct.shippingProductId,

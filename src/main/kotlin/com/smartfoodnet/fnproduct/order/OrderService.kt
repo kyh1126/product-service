@@ -2,7 +2,6 @@ package com.smartfoodnet.fnproduct.order
 
 import com.smartfoodnet.apiclient.WmsApiClient
 import com.smartfoodnet.apiclient.response.NosnosStockModel
-import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.fnproduct.order.model.CollectedOrderCreateModel
 import com.smartfoodnet.fnproduct.order.model.OrderStatus
@@ -13,7 +12,6 @@ import com.smartfoodnet.fnproduct.order.support.CollectedOrderRepository
 import com.smartfoodnet.fnproduct.order.support.condition.CollectingOrderSearchCondition
 import com.smartfoodnet.fnproduct.store.StoreProductService
 import com.smartfoodnet.fnproduct.store.support.StoreProductSearchCondition
-import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -27,7 +25,7 @@ class OrderService(
 
     @Transactional
     fun createCollectedOrder(collectedOrderCreateModel: List<CollectedOrderCreateModel>) {
-        collectedOrderCreateModel.map { convert(it) }
+        collectedOrderCreateModel.map { convertCollectedOrderEntity(it) }
     }
 
     private fun getAvailableStocks(condition: CollectingOrderSearchCondition, shippingProductIds : List<Long>) : Map<Long, NosnosStockModel>{
@@ -46,43 +44,9 @@ class OrderService(
 
     fun getCollectedOrder(
         condition: CollectingOrderSearchCondition
-    ): List<CollectedOrderModel>{
-        val response = collectedOrderRepository.findCollectedOrders(condition)
-        val shippingProductIds = response.mapNotNull { it.basicProductShippingProductId }
-        val availableStocks = getAvailableStocks(condition, shippingProductIds)
-
-        if (availableStocks.isNotEmpty()) {
-            response.forEach {
-                if (it.basicProductShippingProductId != null) {
-                    it.availableQuantity =
-                        availableStocks[it.basicProductShippingProductId]?.normalStock ?: 0
-                }
-            }
-        }
-
-        return response
+    ): List<CollectedOrderModel> {
+        return collectedOrderRepository.findCollectedOrders(condition)
     }
-
-    fun getCollectedOrderWithPage(
-        condition: CollectingOrderSearchCondition,
-        page: Pageable
-    ): PageResponse<CollectedOrderModel> {
-        val response = collectedOrderRepository.findCollectedOrdersWithPageable(condition, page)
-        val shippingProductIds = response.content.mapNotNull { it.basicProductShippingProductId }
-        val availableStocks = getAvailableStocks(condition, shippingProductIds)
-
-        if (availableStocks.isNotEmpty()) {
-            response.forEach {
-                if (it.basicProductShippingProductId != null) {
-                    it.availableQuantity =
-                        availableStocks[it.basicProductShippingProductId]?.normalStock ?: 0
-                }
-            }
-        }
-
-        return PageResponse.of(response)
-    }
-
 
     fun getCollectedOrders(partnerId: Long, status: OrderStatus): List<CollectedOrder>? {
         return collectedOrderRepository.findAllByPartnerIdAndStatus(partnerId, status)
@@ -105,7 +69,7 @@ class OrderService(
         )
     }
 
-    private fun convert(collectedOrderCreateModel: CollectedOrderCreateModel): CollectedOrder {
+    private fun convertCollectedOrderEntity(collectedOrderCreateModel: CollectedOrderCreateModel): CollectedOrder {
         val collectedOrder = collectedOrderCreateModel.toCollectEntity()
 
         val storeProduct = storeProductService
