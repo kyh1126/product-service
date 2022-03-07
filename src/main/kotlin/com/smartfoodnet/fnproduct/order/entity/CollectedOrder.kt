@@ -70,7 +70,9 @@ class CollectedOrder(
     @Embedded
     val sender: Sender? = null,
 
-    val uploadType: String? = "자동"
+    val uploadType: String? = "자동",
+
+    val unprocessed: Boolean = false
 
 ): BaseEntity(){
     val isConnectedStoreProduct
