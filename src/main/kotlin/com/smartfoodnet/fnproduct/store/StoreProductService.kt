@@ -13,6 +13,7 @@ import com.smartfoodnet.fnproduct.store.model.response.StoreProductModel
 import com.smartfoodnet.fnproduct.store.support.StoreProductMappingRepository
 import com.smartfoodnet.fnproduct.store.support.StoreProductRepository
 import com.smartfoodnet.fnproduct.store.support.StoreProductSearchCondition
+import org.reflections.Store
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
@@ -37,6 +38,10 @@ class StoreProductService(
     fun getStoreProductForOrderDetail(condition: StoreProductSearchCondition): StoreProduct? {
         return storeProductRepository.findStoreProduct(condition)
     }
+
+    @Transactional
+    fun createStoreProduct(storeProduct: StoreProduct) = storeProductRepository.save(storeProduct)
+
 
     @Transactional
     fun createStoreProducts(storeProductCreateModel: StoreProductCreateModel): List<StoreProductModel> {

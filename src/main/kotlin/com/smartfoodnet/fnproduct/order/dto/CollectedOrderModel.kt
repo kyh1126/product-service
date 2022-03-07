@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.querydsl.core.annotations.QueryProjection
 import com.smartfoodnet.common.Constants.TIMESTAMP_FORMAT
 import com.smartfoodnet.fnproduct.order.model.OrderStatus
+import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import java.time.LocalDateTime
 
@@ -16,7 +17,7 @@ data class CollectedOrderModel @QueryProjection constructor(
     val orderNumber: String,
     val bundleNumber: String,
     val basicProductId: Long?,
-    val basicProductType: BasicProductType,
+    val basicProductType: String?,
     val basicProductSalesProductId: Long?,
     val basicProductSalesProductCode: String?,
     val basicProductShippingProductId: Long?,

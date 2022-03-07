@@ -4,8 +4,8 @@ import javax.persistence.Embeddable
 
 @Embeddable
 class CollectedProductInfo(
-    var collectedStoreProductCode : String? = null,
-    var collectedStoreProductName : String? = null,
+    var collectedStoreProductCode : String,
+    var collectedStoreProductName : String,
     var collectedStoreProductOptionName: String? = null,
     var collectedStoreProductOptionCode: String? = null
 )

@@ -1,5 +1,6 @@
 package com.smartfoodnet.fnproduct.order.entity
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.smartfoodnet.common.entity.BaseEntity
 import com.smartfoodnet.fnproduct.order.model.OrderStatus
 import com.smartfoodnet.fnproduct.store.entity.StoreProduct
@@ -17,7 +18,7 @@ class CollectedOrder(
     val id: Long? = null,
 
     @Column(columnDefinition = "BIGINT UNSIGNED")
-    val partnerId: Long? = null,
+    val partnerId: Long,
 
     @Column(unique = true)
     val orderUniqueKey: String? = null,
@@ -28,11 +29,11 @@ class CollectedOrder(
 
     val bundleNumber: String,
 
-    val storeName: String? = null,
+    val storeName: String,
 
-    val storeCode: String? = null,
+    val storeCode: String,
 
-    val storeId: Long? = null,
+    val storeId: Long,
 
     val userStoreId: String? = null,
 
@@ -71,4 +72,8 @@ class CollectedOrder(
 
     val uploadType: String? = "자동"
 
-): BaseEntity()
+): BaseEntity(){
+    val isConnectedStoreProduct
+        @JsonIgnore @Transient
+        get() = storeProduct?.storeProductMappings?.isNotEmpty()?:false
+}

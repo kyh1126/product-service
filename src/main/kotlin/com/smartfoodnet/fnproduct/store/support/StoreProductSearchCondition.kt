@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.querydsl.core.BooleanBuilder
 import com.querydsl.core.types.Predicate
 import com.smartfoodnet.common.model.request.PredicateSearchCondition
+import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
+import com.smartfoodnet.fnproduct.order.model.CollectedOrderCreateModel
 import com.smartfoodnet.fnproduct.product.entity.QBasicProduct.basicProduct
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import com.smartfoodnet.fnproduct.store.entity.QStoreProduct.storeProduct
@@ -42,5 +44,19 @@ class StoreProductSearchCondition(
             basicProductCode?.let { basicProduct.code.eq(it) },
             basicProductType?.let { basicProduct.type.eq(it) }
         )
+    }
+
+    companion object {
+        fun toSearchConditionModel(collectedOrder : CollectedOrder) : StoreProductSearchCondition{
+            return with(collectedOrder) {
+                StoreProductSearchCondition(
+                    partnerId = partnerId,
+                    storeId = storeId,
+                    storeProductCode = collectedProductInfo.collectedStoreProductCode,
+                    storeProductName = collectedProductInfo.collectedStoreProductName,
+                    storeProductOptionName = collectedProductInfo.collectedStoreProductOptionName
+                )
+            }
+        }
     }
 }

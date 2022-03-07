@@ -17,8 +17,8 @@ import javax.persistence.*
 class StoreProduct(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    var id: Long? = null,
+    @Column(name = "id", columnDefinition = "BIGINT UNSIGNED")
+    val id: Long? = null,
 
     @Column(name = "store_id")
     var storeId: Long,

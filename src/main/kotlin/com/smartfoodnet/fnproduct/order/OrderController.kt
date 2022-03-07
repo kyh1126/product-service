@@ -3,6 +3,7 @@ package com.smartfoodnet.fnproduct.order
 import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.fnproduct.order.dto.CollectedOrderModel
 import com.smartfoodnet.fnproduct.order.dto.ConfirmOrderModel
+import com.smartfoodnet.fnproduct.order.model.BasicProductAddModel
 import com.smartfoodnet.fnproduct.order.model.CollectedOrderCreateModel
 import com.smartfoodnet.fnproduct.order.support.condition.CollectingOrderSearchCondition
 import com.smartfoodnet.fnproduct.order.support.condition.ConfirmOrderSearchCondition
@@ -26,6 +27,16 @@ class OrderController(
     @PostMapping
     fun createCollectedOrder(@Valid @RequestBody collectedOrderCreateModels: List<CollectedOrderCreateModel>) {
         orderService.createCollectedOrder(collectedOrderCreateModels)
+    }
+
+    @Operation(summary = "주문수집 미매칭 쇼핑몰상품 연결")
+    @PostMapping("{collectedOrderId}")
+    fun addStoreProductToCollectedOrder(
+        @Parameter(description = "주문수집 고유 ID", required = true)
+        @PathVariable collectedOrderId: Long,
+        @RequestBody basicProductAddModel : BasicProductAddModel
+    ){
+        orderService.addStoreProduct(collectedOrderId, basicProductAddModel)
     }
 
     @Operation(summary = "출고지시 생성")

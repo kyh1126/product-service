@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat
 import com.smartfoodnet.common.Constants
 import com.smartfoodnet.fnproduct.order.entity.CollectedProductInfo
 import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
-import com.smartfoodnet.fnproduct.order.entity.OrderDetail
 import io.swagger.annotations.ApiModelProperty
 import java.time.LocalDateTime
 
@@ -16,13 +15,13 @@ data class CollectedOrderCreateModel(
     val orderUniqueKey: String? = null,
 
     @ApiModelProperty(value = "쇼핑몰 이름")
-    val storeName: String? = null,
+    val storeName: String,
 
     @ApiModelProperty(value = "쇼핑몰 코유 코드")
-    val storeCode: String? = null,
+    val storeCode: String,
 
     @ApiModelProperty(value = "쇼핑몰 ID")
-    val storeId: Long? = null,
+    val storeId: Long,
 
     @ApiModelProperty(value = "화주사 쇼핑몰 ID")
     val userStoreId: String? = null,
@@ -45,10 +44,10 @@ data class CollectedOrderCreateModel(
     val claimStatus: String? = null,
 
     @ApiModelProperty(value = "쇼핑몰 상품명")
-    val storeProductName: String? = null,
+    val storeProductName: String,
 
     @ApiModelProperty(value = "쇼핑몰별 상품코드")
-    val storeProductCode: String? = null,
+    val storeProductCode: String,
 
     @ApiModelProperty(value = "상품 옵션명")
     val storeProductOptionName: String? = null,
@@ -81,31 +80,6 @@ data class CollectedOrderCreateModel(
     @ApiModelProperty(value = "묶음번호")
     val bundleNumber: String
 ) {
-    fun toEntity(): OrderDetail {
-        return run{
-            OrderDetail(
-                partnerId = partnerId,
-                orderUniqueKey = orderUniqueKey,
-                storeName = storeName,
-                storeId = storeId,
-                userStoreId = userStoreId,
-                orderedAt = orderedAt,
-                collectedAt = collectedAt,
-                statusUpdatedAt = statusUpdatedAt,
-                orderNumber = orderNumber,
-                status = status,
-                claimStatus = claimStatus,
-                deliveryType = deliveryType,
-                expectedDeliveryDate = expectedDeliveryDate,
-                price = price,
-                shippingPrice = shippingPrice,
-                count = count,
-                receiver = receiver?.toEntity(),
-                uploadType = uploadType
-            )
-        }
-    }
-
     fun toCollectEntity(): CollectedOrder{
         return CollectedOrder(
             partnerId = partnerId,

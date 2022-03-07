@@ -10,7 +10,7 @@ enum class BasicProductType(val desc: String, val code: String?) {
     PACKAGE("모음상품", "B");
 
     companion object {
-        fun fromName(name: String): BasicProductType {
+        fun fromName(name: String): BasicProductType? {
             return values().firstOrNull { it.name == name }
                 ?: throw IllegalArgumentException("Format $name is illegal")
         }
