@@ -4,8 +4,9 @@ import com.smartfoodnet.fnproduct.store.entity.StoreProduct
 
 data class StoreProductModel(
     var id: Long? = null,
-    var storeCode: String,
+    var storeId: Long,
     var storeName: String,
+    var storeIcon: String? = null,
     var partnerId: Long,
     var name: String,
     var storeProductCode: String? = null,
@@ -18,8 +19,9 @@ data class StoreProductModel(
             return storeProduct.run {
                 StoreProductModel(
                     id = id,
-                    storeCode = storeCode,
+                    storeId = storeId,
                     storeName = storeName,
+                    storeIcon = storeIcon,
                     partnerId = partnerId,
                     name = name,
                     storeProductCode = storeProductCode,

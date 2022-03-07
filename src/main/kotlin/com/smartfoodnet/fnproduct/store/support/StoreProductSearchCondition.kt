@@ -3,6 +3,7 @@ package com.smartfoodnet.fnproduct.store.support
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.querydsl.core.BooleanBuilder
 import com.querydsl.core.types.Predicate
+import com.querydsl.core.types.dsl.BooleanExpression
 import com.smartfoodnet.common.model.request.PredicateSearchCondition
 import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
 import com.smartfoodnet.fnproduct.order.model.CollectedOrderCreateModel
@@ -30,7 +31,9 @@ class StoreProductSearchCondition(
     @ApiModelProperty(value = "매칭상코드")
     val basicProductCode: String? = null,
     @ApiModelProperty(value = "매칭상품 타입 (기본/묶음)")
-    val basicProductType: BasicProductType? = null
+    val basicProductType: BasicProductType? = null,
+    @ApiModelProperty(value = "매칭 여부")
+    val basicProductMatchFlag: Boolean? = null,
 ) : PredicateSearchCondition() {
     override fun assemblePredicate(predicate: BooleanBuilder): Predicate {
         return predicate.orAllOf(
@@ -42,8 +45,19 @@ class StoreProductSearchCondition(
             storeProductOptionName?.let { storeProduct.optionName.contains(it) },
             basicProductName?.let { basicProduct.name.contains(it) },
             basicProductCode?.let { basicProduct.code.eq(it) },
-            basicProductType?.let { basicProduct.type.eq(it) }
+            basicProductType?.let { basicProduct.type.eq(it) },
+            isMatched()
         )
+    }
+
+    private fun isMatched(): BooleanExpression? {
+        return basicProductMatchFlag?.let {
+            if (!basicProductMatchFlag) {
+                storeProduct.storeProductMappings.isEmpty
+            } else {
+                storeProduct.storeProductMappings.isNotEmpty
+            }
+        }
     }
 
     companion object {
@@ -57,6 +71,4 @@ class StoreProductSearchCondition(
                     storeProductOptionName = collectedProductInfo.collectedStoreProductOptionName
                 )
             }
-        }
-    }
 }

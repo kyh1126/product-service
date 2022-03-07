@@ -36,24 +36,24 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 @Transactional(readOnly = true)
 class BasicProductService(
-    private val inWarehouseService: InWarehouseService,
-    private val basicProductRepository: BasicProductRepository,
-    private val basicProductDetailCreateModelValidator: BasicProductDetailCreateModelValidator,
-    private val packageProductFinder: PackageProductFinder,
-    private val basicProductCategoryFinder: BasicProductCategoryFinder,
-    private val subsidiaryMaterialCategoryFinder: SubsidiaryMaterialCategoryFinder,
-    private val basicProductCodeGenerator: BasicProductCodeGenerator,
-    private val wmsApiClient: WmsApiClient,
+        private val inWarehouseService: InWarehouseService,
+        private val basicProductRepository: BasicProductRepository,
+        private val basicProductDetailCreateModelValidator: BasicProductDetailCreateModelValidator,
+        private val packageProductFinder: PackageProductFinder,
+        private val basicProductCategoryFinder: BasicProductCategoryFinder,
+        private val subsidiaryMaterialCategoryFinder: SubsidiaryMaterialCategoryFinder,
+        private val basicProductCodeGenerator: BasicProductCodeGenerator,
+        private val wmsApiClient: WmsApiClient,
 ) {
     val nosnosCallBasicProductType = listOf(BasicProductType.BASIC, BasicProductType.CUSTOM_SUB)
 
     fun getBasicProducts(
-        condition: PredicateSearchCondition,
-        page: Pageable
+            condition: PredicateSearchCondition,
+            page: Pageable
     ): PageResponse<BasicProductModel> {
         return basicProductRepository.findAll(condition.toPredicate(), page)
-            .map(BasicProductModel::fromEntity)
-            .run { PageResponse.of(this) }
+                .map(BasicProductModel::fromEntity)
+                .run { PageResponse.of(this) }
     }
 
     fun getBasicProducts(ids: List<Long>): List<BasicProduct> {
@@ -62,22 +62,26 @@ class BasicProductService(
 
     fun getBasicProductsByShippingProductId(shippingProductIds: Collection<Long>): List<BasicProduct> {
         return basicProductRepository.findAllByShippingProductIdIn(shippingProductIds)
-            .ifEmpty { throw NoSuchElementException("기본상품(shippingProductIds:${shippingProductIds}) 값이 없습니다.") }
+                .ifEmpty { throw NoSuchElementException("기본상품(shippingProductIds:${shippingProductIds}) 값이 없습니다.") }
+    }
+
+    fun getBasicProductsByPartnerId(partnerId: Long): List<BasicProduct> {
+        return basicProductRepository.findAllByPartnerId(partnerId)
     }
 
     fun getBasicProduct(productId: Long): BasicProductDetailModel {
         val basicProduct = getBasicProducts(listOf(productId)).first()
         // 기본상품-부자재 매핑을 위한 부자재(BasicProduct) 조회
         val subsidiaryMaterialById =
-            getBasicProducts(basicProduct.subsidiaryMaterialMappings.map { it.subsidiaryMaterial.id!! })
-                .associateBy { it.id }
+                getBasicProducts(basicProduct.subsidiaryMaterialMappings.map { it.subsidiaryMaterial.id!! })
+                        .associateBy { it.id }
 
         return toBasicProductDetailModel(basicProduct, subsidiaryMaterialById)
     }
 
     fun getSubsidiaryMaterials(
-        condition: PredicateSearchCondition,
-        page: Pageable
+            condition: PredicateSearchCondition,
+            page: Pageable
     ): List<CategoryByLevelModel> {
         val subsidiaryMaterials = getBasicProducts(condition, page).payload
         val result = mutableListOf<CategoryByLevelModel>()
@@ -86,7 +90,7 @@ class BasicProductService(
         val subs = subsidiaryMaterials.filter { it.type == BasicProductType.SUB }
         if (subs.isNotEmpty()) {
             val subIdsByCategoryId =
-                subs.groupBy({ it.subsidiaryMaterialCategory!!.id!! }, { it.id })
+                    subs.groupBy({ it.subsidiaryMaterialCategory!!.id!! }, { it.id })
             val subModels = getSubsidiaryMaterialCategories().map {
                 // level2 카테고리에 기본상품 id 를 넣어준다.
                 it.children.map { it.value = subIdsByCategoryId[it.value]?.first() }
@@ -106,35 +110,35 @@ class BasicProductService(
     }
 
     fun getBasicProductCategories(
-        level1CategoryName: String?,
-        level2CategoryName: String?
+            level1CategoryName: String?,
+            level2CategoryName: String?
     ): List<CategoryByLevelModel> {
         val basicProductCategories = basicProductCategoryFinder.getBasicProductCategories(
-            level1CategoryName,
-            level2CategoryName
+                level1CategoryName,
+                level2CategoryName
         )
 
         // level2 카테고리에 기본상품 카테고리의 id 를 넣어준다.
         return basicProductCategories.groupBy(
-            { it.level1Category },
-            { CategoryDto.fromEntity(it.id, it.level2Category) }
+                { it.level1Category },
+                { CategoryDto.fromEntity(it.id, it.level2Category) }
         ).run { toCategoriesByLevelModel(this) }
     }
 
     fun getSubsidiaryMaterialCategories(
-        level1CategoryName: String? = null,
-        level2CategoryName: String? = null,
+            level1CategoryName: String? = null,
+            level2CategoryName: String? = null,
     ): List<CategoryByLevelModel> {
         val subsidiaryMaterialCategories =
-            subsidiaryMaterialCategoryFinder.getSubsidiaryMaterialCategories(
-                level1CategoryName,
-                level2CategoryName
-            )
+                subsidiaryMaterialCategoryFinder.getSubsidiaryMaterialCategories(
+                        level1CategoryName,
+                        level2CategoryName
+                )
 
         // level2 카테고리에 기본상품 카테고리의 id 를 넣어준다.
         return subsidiaryMaterialCategories.groupBy(
-            { it.level1Category },
-            { CategoryDto.fromEntity(it.id, it.level2Category) }
+                { it.level1Category },
+                { CategoryDto.fromEntity(it.id, it.level2Category) }
         ).run { toCategoriesByLevelModel(this) }
     }
 
@@ -158,13 +162,13 @@ class BasicProductService(
 
     @Transactional
     fun updateBasicProduct(
-        productId: Long,
-        updateModel: BasicProductDetailCreateModel
+            productId: Long,
+            updateModel: BasicProductDetailCreateModel
     ): BasicProductDetailModel {
         ValidatorUtils.validateAndThrow(
-            SaveState.UPDATE,
-            basicProductDetailCreateModelValidator,
-            updateModel
+                SaveState.UPDATE,
+                basicProductDetailCreateModelValidator,
+                updateModel
         )
 
         val basicProductCreateModel = updateModel.basicProductModel
@@ -183,32 +187,32 @@ class BasicProductService(
         // 기본상품-부자재 매핑 저장
         val entityById = basicProduct.subsidiaryMaterialMappings.associateBy { it.id }
         val subsidiaryMaterials = createOrUpdateSubsidiaryMaterialMappings(
-            updateModel.subsidiaryMaterialMappingModels,
-            entityById,
-            subsidiaryMaterialById
+                updateModel.subsidiaryMaterialMappingModels,
+                entityById,
+                subsidiaryMaterialById
         )
 
         // 모음상품-기본상품의 기본상품이 비활성화 될 경우, 모음상품도 비활성화
         inactivatePackageProduct(basicProductCreateModel, basicProduct)
 
         basicProduct.update(
-            basicProductCreateModel,
-            basicProductCategory,
-            subsidiaryMaterialCategory,
-            subsidiaryMaterials,
-            inWarehouse
+                basicProductCreateModel,
+                basicProductCategory,
+                subsidiaryMaterialCategory,
+                subsidiaryMaterials,
+                inWarehouse
         )
 
         // nosnos 쪽 상품 수정
         if (basicProduct.type in nosnosCallBasicProductType) {
             wmsApiClient.updateShippingProduct(
-                basicProduct.shippingProductId!!,
-                PreShippingProductModel.fromEntity(basicProduct)
+                    basicProduct.shippingProductId!!,
+                    PreShippingProductModel.fromEntity(basicProduct)
             )
 
             wmsApiClient.updateSalesProduct(
-                basicProduct.salesProductId!!,
-                PreSalesProductModel.fromEntity(basicProduct)
+                    basicProduct.salesProductId!!,
+                    PreSalesProductModel.fromEntity(basicProduct)
             )
         }
 
@@ -227,9 +231,16 @@ class BasicProductService(
         }
     }
 
+    @Transactional
+    fun updateProductCodeByPartnerId(partnerId: Long): List<BasicProduct> {
+        val basicProducts = getBasicProductsByPartnerId(partnerId)
+        basicProducts.forEach { it.updateProductCode(it.code!!) }
+        return basicProducts
+    }
+
     private fun getBasicProductByShippingProductId(shippingProductId: Long): BasicProduct {
         return basicProductRepository.findByShippingProductId(shippingProductId)
-            ?: throw NoSuchElementException("기본상품(shippingProductId:${shippingProductId}) 값이 없습니다.")
+                ?: throw NoSuchElementException("기본상품(shippingProductId:${shippingProductId}) 값이 없습니다.")
     }
 
     private fun createBasicProduct(createModel: BasicProductDetailCreateModel): BasicProduct {
@@ -239,10 +250,10 @@ class BasicProductService(
         // 상품코드 채번
         val basicProductCode = with(basicProductCreateModel) {
             basicProductCodeGenerator.getBasicProductCode(
-                partnerId!!,
-                partnerCode!!,
-                type,
-                handlingTemperature!!
+                    partnerId!!,
+                    partnerCode!!,
+                    type,
+                    handlingTemperature!!
             )
         }
         // 기본상품 카테고리 조회
@@ -256,16 +267,16 @@ class BasicProductService(
 
         // 기본상품-부자재 매핑 저장
         val subsidiaryMaterialMappings = createOrUpdateSubsidiaryMaterialMappings(
-            subsidiaryMaterialMappingModels = createModel.subsidiaryMaterialMappingModels,
-            subsidiaryMaterialById = subsidiaryMaterialById
+                subsidiaryMaterialMappingModels = createModel.subsidiaryMaterialMappingModels,
+                subsidiaryMaterialById = subsidiaryMaterialById
         )
 
         val basicProduct = createModel.toEntity(
-            code = basicProductCode,
-            basicProductCategory = basicProductCategory,
-            subsidiaryMaterialCategory = subsidiaryMaterialCategory,
-            subsidiaryMaterialMappings = subsidiaryMaterialMappings,
-            inWarehouse = inWarehouse
+                code = basicProductCode,
+                basicProductCategory = basicProductCategory,
+                subsidiaryMaterialCategory = subsidiaryMaterialCategory,
+                subsidiaryMaterialMappings = subsidiaryMaterialMappings,
+                inWarehouse = inWarehouse
         )
         return saveBasicProduct(basicProduct)
     }
@@ -275,8 +286,8 @@ class BasicProductService(
 
         if (basicProduct.type in nosnosCallBasicProductType) {
             val createShippingProduct =
-                wmsApiClient.createShippingProduct(PreShippingProductModel.fromEntity(basicProduct)).payload
-                    ?: throw BaseRuntimeException(errorMessage = "출고상품 생성 실패, 상품코드 : ${basicProduct.code}")
+                    wmsApiClient.createShippingProduct(PreShippingProductModel.fromEntity(basicProduct)).payload
+                            ?: throw BaseRuntimeException(errorMessage = "출고상품 생성 실패, 상품코드 : ${basicProduct.code}")
 
             with(createShippingProduct) {
                 basicProduct.shippingProductId = shippingProductId
@@ -301,20 +312,20 @@ class BasicProductService(
     }
 
     private fun getWarehouse(basicProductCreateModel: BasicProductCreateModel) =
-        basicProductCreateModel.warehouseId?.let { inWarehouseService.getInWarehouse(it) }
+            basicProductCreateModel.warehouseId?.let { inWarehouseService.getInWarehouse(it) }
 
     private fun getSubsidiaryMaterialById(createModel: BasicProductDetailCreateModel) =
-        getBasicProducts(createModel.subsidiaryMaterialMappingModels.map { it.subsidiaryMaterialId!! })
-            .associateBy { it.id }
+            getBasicProducts(createModel.subsidiaryMaterialMappingModels.map { it.subsidiaryMaterialId!! })
+                    .associateBy { it.id }
 
     private fun createOrUpdateSubsidiaryMaterialMappings(
-        subsidiaryMaterialMappingModels: List<SubsidiaryMaterialMappingCreateModel>,
-        entityById: Map<Long?, SubsidiaryMaterialMapping> = emptyMap(),
-        subsidiaryMaterialById: Map<Long?, BasicProduct>,
+            subsidiaryMaterialMappingModels: List<SubsidiaryMaterialMappingCreateModel>,
+            entityById: Map<Long?, SubsidiaryMaterialMapping> = emptyMap(),
+            subsidiaryMaterialById: Map<Long?, BasicProduct>,
     ): Set<SubsidiaryMaterialMapping> {
         val subsidiaryMaterialMappings = subsidiaryMaterialMappingModels.map {
             val basicProductSub = subsidiaryMaterialById[it.subsidiaryMaterialId]
-                ?: throw BaseRuntimeException(errorCode = ErrorCode.NO_ELEMENT)
+                    ?: throw BaseRuntimeException(errorCode = ErrorCode.NO_ELEMENT)
             if (it.id == null) it.toEntity(basicProductSub)
             else {
                 val entity = entityById[it.id]
@@ -325,14 +336,14 @@ class BasicProductService(
 
         // 연관관계 끊긴 entity 삭제처리
         entityById.values.toSet().minus(subsidiaryMaterialMappings)
-            .forEach(SubsidiaryMaterialMapping::delete)
+                .forEach(SubsidiaryMaterialMapping::delete)
 
         return subsidiaryMaterialMappings
     }
 
     private fun inactivatePackageProduct(
-        request: BasicProductCreateModel,
-        basicProduct: BasicProduct
+            request: BasicProductCreateModel,
+            basicProduct: BasicProduct
     ) {
         if (request.activeYn == "Y") return
 
@@ -344,14 +355,14 @@ class BasicProductService(
     }
 
     private fun toBasicProductDetailModel(
-        basicProduct: BasicProduct,
-        subsidiaryMaterialById: Map<Long?, BasicProduct>,
+            basicProduct: BasicProduct,
+            subsidiaryMaterialById: Map<Long?, BasicProduct>,
     ): BasicProductDetailModel {
         return BasicProductDetailModel.fromEntity(basicProduct, subsidiaryMaterialById)
     }
 
     private fun toCategoriesByLevelModel(categoriesByLevel1: Map<Code, List<CategoryDto?>>) =
-        categoriesByLevel1.map { CategoryByLevelModel.fromEntity(it.key, it.value) }
+            categoriesByLevel1.map { CategoryByLevelModel.fromEntity(it.key, it.value) }
 
     companion object : Log
 }

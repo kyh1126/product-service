@@ -90,6 +90,9 @@ dependencies {
 
     // sfn common
     implementation("sfn", "sfn-excel-module", "1.0.106")
+
+    // slack 로깅 설정
+    implementation("com.github.maricn:logback-slack-appender:1.4.0")
 }
 
 dependencyManagement {

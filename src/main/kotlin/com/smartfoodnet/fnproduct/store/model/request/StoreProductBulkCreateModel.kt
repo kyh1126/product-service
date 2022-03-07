@@ -3,12 +3,12 @@ package com.smartfoodnet.fnproduct.store.model.request
 import com.smartfoodnet.fnproduct.store.entity.StoreProduct
 import io.swagger.annotations.ApiModelProperty
 
-data class StoreProductCreateModel(
+data class StoreProductBulkCreateModel(
     @ApiModelProperty(value = "쇼핑몰명")
     val storeName: String,
     @ApiModelProperty(value = "쇼핑몰 ID")
     val storeId: Long,
-    @ApiModelProperty(value = "쇼핑몰 ID")
+    @ApiModelProperty(value = "쇼핑몰 아이콘")
     val storeIcon: String? = null,
     @ApiModelProperty(value = "고객사 ID")
     val partnerId: Long,
@@ -16,26 +16,27 @@ data class StoreProductCreateModel(
     val name: String,
     @ApiModelProperty(value = "쇼핑몰 상품 코드")
     val storeProductCode: String,
-    @ApiModelProperty(value = "쇼핑몰 상품 옵션")
-    val options: List<OptionModel>? = null
+    @ApiModelProperty(value = "옵션명")
+    val optionCode: String? = null,
+    @ApiModelProperty(value = "옵션코드")
+    val optionName: String? = null,
+    @ApiModelProperty(value = "기본상품코드")
+    val basicProductCode: String? = null,
+    @ApiModelProperty(value = "기본상품명")
+    val basicProductName: String? = null,
+    @ApiModelProperty(value = "기본상품 개수")
+    val basicProductQuantity: Int? = null,
 ) {
     fun toEntity(): StoreProduct {
         return StoreProduct(
-            storeId = storeId,
             storeName = storeName,
+            storeId = storeId,
             storeIcon = storeIcon,
             partnerId = partnerId,
             name = name,
-            storeProductCode = storeProductCode
+            storeProductCode = storeProductCode,
+            optionCode = optionCode,
+            optionName = optionName
         )
     }
 }
-
-data class OptionModel(
-    @ApiModelProperty(value = "옵션명")
-    val code: String? = null,
-    @ApiModelProperty(value = "옵션코드")
-    val name: String? = null,
-    @ApiModelProperty(value = "쇼핑몰 상품 기본/모음상품 매핑")
-    val storeProductBasicProductMappings: List<StoreProductBasicProductMappingCreateModel>? = null
-)

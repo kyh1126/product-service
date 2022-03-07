@@ -49,8 +49,8 @@ class StoreProductService(
             options?.map { option ->
                 val storeProduct = StoreProduct(
                     storeId = storeId,
-                    storeCode = storeCode,
                     storeName = storeName,
+                    storeIcon = storeIcon,
                     partnerId = partnerId,
                     name = name,
                     storeProductCode = storeProductCode,

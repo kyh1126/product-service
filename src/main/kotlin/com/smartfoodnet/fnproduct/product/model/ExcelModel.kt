@@ -6,45 +6,43 @@ import com.smartfoodnet.fnproduct.product.model.request.BasicProductDetailCreate
 import com.smartfoodnet.fnproduct.product.model.request.ExpirationDateInfoCreateModel
 import com.smartfoodnet.fnproduct.product.model.request.SubsidiaryMaterialMappingCreateModel
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
-import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
 import com.smartfoodnet.fnproduct.product.model.vo.SeasonalOption
 
 interface ExcelModel
 
 data class ExpirationDateInfoExcelModel(
-    val manufactureDateWriteYn: String,
-    val expirationDateWriteYn: String,
-    val manufactureToExpirationDate: Int?,
+        val manufactureDateWriteYn: String,
+        val expirationDateWriteYn: String,
+        val manufactureToExpirationDate: Int?,
 ) {
     fun toExpirationDateInfoCreateModel(): ExpirationDateInfoCreateModel {
         return ExpirationDateInfoCreateModel(
-            manufactureDateWriteYn = manufactureDateWriteYn,
-            expirationDateWriteYn = expirationDateWriteYn,
-            manufactureToExpirationDate = manufactureToExpirationDate
+                manufactureDateWriteYn = manufactureDateWriteYn,
+                expirationDateWriteYn = expirationDateWriteYn,
+                manufactureToExpirationDate = manufactureToExpirationDate
         )
     }
 }
 
 data class BasicProductExcelModel(
-    val rowIdx: Int,
-    val memberId: Long,
-    val shippingProductId: Long,
-    val productName: String,
-    val barcode: String?,
-    val handlingTemperature: HandlingTemperatureType,
-    val piecesPerBox: Int,
-    val piecesPerPalette: Int?,
-    val expirationDateInfoExcelModel: ExpirationDateInfoExcelModel,
-    val activeYn: String,
+        val rowIdx: Int,
+        val memberId: Long,
+        val shippingProductId: Long,
+        val productName: String,
+        val barcode: String?,
+        val piecesPerBox: Int,
+        val piecesPerPalette: Int?,
+        val expirationDateInfoExcelModel: ExpirationDateInfoExcelModel,
+        val activeYn: String,
 ) : ExcelModel {
     fun toBasicProductDetailCreateModel(
-        defaultBasicProductSubId: Long,
-        partnerModel: PartnerIdPairModel
+            defaultBasicProductSubId: Long,
+            partnerModel: PartnerIdPairModel
     ): BasicProductDetailCreateModel {
         val subsidiaryMaterialMappingCreateModel = SubsidiaryMaterialMappingCreateModel(
-            subsidiaryMaterialId = defaultBasicProductSubId,
-            seasonalOption = SeasonalOption.ALL,
-            quantity = 1
+                subsidiaryMaterialId = defaultBasicProductSubId,
+                seasonalOption = SeasonalOption.ALL,
+                quantity = 1
         )
 
         val basicProductModel = BasicProductCreateModel().also {
@@ -55,17 +53,16 @@ data class BasicProductExcelModel(
             it.name = productName
             it.barcodeYn = if (barcode.isNullOrEmpty()) "N" else "Y"
             it.barcode = barcode
-            it.handlingTemperature = handlingTemperature
             it.piecesPerBox = piecesPerBox
             it.piecesPerPalette = piecesPerPalette
             it.expirationDateManagementYn = isExpirationDateManagement(expirationDateInfoExcelModel)
             it.expirationDateInfoModel =
-                expirationDateInfoExcelModel.toExpirationDateInfoCreateModel()
+                    expirationDateInfoExcelModel.toExpirationDateInfoCreateModel()
             it.activeYn = activeYn
         }
 
         return BasicProductDetailCreateModel(
-            subsidiaryMaterialMappingModels = mutableListOf(subsidiaryMaterialMappingCreateModel)
+                subsidiaryMaterialMappingModels = mutableListOf(subsidiaryMaterialMappingCreateModel)
         ).also {
             it.basicProductModel = basicProductModel
         }
