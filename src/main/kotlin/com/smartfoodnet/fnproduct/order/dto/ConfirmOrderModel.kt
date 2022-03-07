@@ -45,6 +45,6 @@ data class ConfirmOrderModel @QueryProjection constructor(
     val collectedAt: LocalDateTime?
 ) {
     val mappedFlag: Boolean = basicProductId != null
-    var availableQuantity: Double = -1.0
+    var availableQuantity: Int = -1
     val mappedQuantityCalc: Int = (mappedQuantity ?: 0) * (quantity ?: 0)
 }
