@@ -59,6 +59,7 @@ class OrderController(
         return orderService.getCollectedOrder(condition.apply { this.partnerId = partnerId })
     }
 
+    @Operation(summary = "출고지시 조회")
     @GetMapping("partners/{partnerId}/confirm")
     fun getConfirmOrders(
         @Parameter(description = "화주(고객사) ID", required = true)

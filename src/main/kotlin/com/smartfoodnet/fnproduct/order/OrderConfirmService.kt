@@ -139,7 +139,7 @@ class OrderConfirmService(
     private fun getPackageAvailableMinStocks(
         confirmOrderModel: ConfirmOrderModel,
         availableStocks: MutableMap<Long, Int>
-    ): Double {
+    ): Int {
         val basicProductId = confirmOrderModel.basicProductId!!
 
         // TODO : 모음상품의 기본상품셋을 가져온다
@@ -161,7 +161,7 @@ class OrderConfirmService(
             var quantity = it.value * mappedQuantity
             val availableStock = availableStocks[it.key.shippingProductId] ?: 0
             availableStock.toDouble().div(quantity.toDouble())
-        }.minOf { it }
+        }.minOf { it.toInt() }
 
         return minQuantity
     }
@@ -184,7 +184,7 @@ class OrderConfirmService(
         response.forEach {
             it.availableQuantity =
                 if (it.basicProductType == BasicProductType.PACKAGE) getPackageAvailableMinStocks(it, availableStocks)
-                else availableStocks[it.basicProductShippingProductId]?.toDouble() ?: -1.0
+                else availableStocks[it.basicProductShippingProductId]?.toInt() ?: -1
         }
 
         return response
