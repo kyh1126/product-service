@@ -5,19 +5,19 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.querydsl.core.annotations.QueryProjection
 import com.smartfoodnet.common.Constants.TIMESTAMP_FORMAT
 import com.smartfoodnet.fnproduct.order.model.OrderStatus
-import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import java.time.LocalDateTime
 
-data class CollectedOrderModel @QueryProjection constructor(
-    val id: Long,
+data class ConfirmOrderModel @QueryProjection constructor(
+    val collectedId: Long,
+    val confirmOrderId: Long,
     val partnerId: Long,
     val uploadType: String,
     val status: OrderStatus,
     val orderNumber: String,
     val bundleNumber: String,
     val basicProductId: Long?,
-    val basicProductType: String?,
+    val basicProductType: BasicProductType,
     val basicProductSalesProductId: Long?,
     val basicProductSalesProductCode: String?,
     val basicProductShippingProductId: Long?,
@@ -45,5 +45,6 @@ data class CollectedOrderModel @QueryProjection constructor(
     val collectedAt: LocalDateTime?
 ) {
     val mappedFlag: Boolean = basicProductId != null
+    var availableQuantity: Double = -1.0
     val mappedQuantityCalc: Int = (mappedQuantity ?: 0) * (quantity ?: 0)
 }

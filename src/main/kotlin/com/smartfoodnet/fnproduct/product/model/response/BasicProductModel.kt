@@ -105,7 +105,7 @@ data class BasicProductModel(
 
                 BasicProductModel(
                     id = id,
-                    type = type,
+                    type = type!!,
                     partnerId = partnerId,
                     name = if (type == BasicProductType.SUB) level2CategoryName else name,
                     code = code,

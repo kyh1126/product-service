@@ -56,7 +56,7 @@ class InboundJobService(
                 inboundExpectedDetail?.inboundActualDetail?.add(
                     it.toEntity(
                         inboundExpectedDetail,
-                        inboundExpectedDetail.basicProduct!!
+                        inboundExpectedDetail.basicProduct
                     )
                 )
             }

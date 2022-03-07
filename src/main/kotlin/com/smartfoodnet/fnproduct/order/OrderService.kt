@@ -1,18 +1,22 @@
 package com.smartfoodnet.fnproduct.order
 
 import com.smartfoodnet.apiclient.WmsApiClient
-import com.smartfoodnet.common.model.response.PageResponse
+import com.smartfoodnet.common.error.exception.BaseRuntimeException
 import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.fnproduct.order.model.CollectedOrderCreateModel
 import com.smartfoodnet.fnproduct.order.model.OrderStatus
 import com.smartfoodnet.fninventory.shortage.model.ShortageOrderProjectionModel
 import com.smartfoodnet.fnproduct.order.dto.CollectedOrderModel
 import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
+import com.smartfoodnet.fnproduct.order.model.BasicProductAddModel
 import com.smartfoodnet.fnproduct.order.support.CollectedOrderRepository
-import com.smartfoodnet.fnproduct.order.support.CollectingOrderSearchCondition
+import com.smartfoodnet.fnproduct.order.support.condition.CollectingOrderSearchCondition
+import com.smartfoodnet.fnproduct.product.BasicProductService
+import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.store.StoreProductService
+import com.smartfoodnet.fnproduct.store.entity.StoreProduct
+import com.smartfoodnet.fnproduct.store.entity.StoreProductMapping
 import com.smartfoodnet.fnproduct.store.support.StoreProductSearchCondition
-import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -21,42 +25,34 @@ import org.springframework.transaction.annotation.Transactional
 class OrderService(
     val collectedOrderRepository: CollectedOrderRepository,
     val storeProductService: StoreProductService,
+    val basicProductService: BasicProductService,
     val wmsApiClient: WmsApiClient
 ) : Log {
 
+    private fun convertCollectedOrderEntity(collectedOrderCreateModel: CollectedOrderCreateModel): CollectedOrder {
+        val collectedOrder = collectedOrderCreateModel.toCollectEntity()
+
+        val storeProduct = storeProductService
+            .getStoreProductForOrderDetail(
+                StoreProductSearchCondition.toSearchConditionModel(collectedOrder)
+            )
+
+        collectedOrder.storeProduct = storeProduct
+
+        collectedOrderRepository.save(collectedOrder)
+        return collectedOrder
+    }
+
     @Transactional
     fun createCollectedOrder(collectedOrderCreateModel: List<CollectedOrderCreateModel>) {
-        collectedOrderCreateModel.map { convert(it) }
+        collectedOrderCreateModel.map { convertCollectedOrderEntity(it) }
     }
 
     fun getCollectedOrder(
-        condition: CollectingOrderSearchCondition,
-        page: Pageable
-    ): PageResponse<CollectedOrderModel> {
-        val response = collectedOrderRepository.findCollectedOrders(condition, page)
-        val shippingProductIds = response.content.mapNotNull { it.basicProductShippingProductId }
-        val availableStocks = try {
-            wmsApiClient
-                .getStocks(condition.partnerId!!, shippingProductIds).payload!!.dataList
-                .associateBy { it.shippingProductId!! }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            log.info("partnerId:${condition.partnerId}의 재고 정보[${shippingProductIds.joinToString(",")}]를 가져올 수 없습니다")
-            mapOf()
-        }
-
-        if (availableStocks != null) {
-            response.content.forEach {
-                if (it.basicProductShippingProductId != null) {
-                    it.availableQuantity =
-                        availableStocks[it.basicProductShippingProductId]?.normalStock ?: 0
-                }
-            }
-        }
-
-        return PageResponse.of(response)
+        condition: CollectingOrderSearchCondition
+    ): List<CollectedOrderModel> {
+        return collectedOrderRepository.findCollectedOrders(condition)
     }
-
 
     fun getCollectedOrders(partnerId: Long, status: OrderStatus): List<CollectedOrder>? {
         return collectedOrderRepository.findAllByPartnerIdAndStatus(partnerId, status)
@@ -79,24 +75,70 @@ class OrderService(
         )
     }
 
-    private fun convert(collectedOrderCreateModel: CollectedOrderCreateModel): CollectedOrder {
-        val collectedOrder = collectedOrderCreateModel.toCollectEntity()
+    @Transactional
+    fun addStoreProduct(collectedOrderId: Long, basicProductAddModel: BasicProductAddModel) {
+        // TODO : CollectedOrder에 이미 쇼핑몰 상품이 매칭되어있다면 오류
+        val collectedOrder = collectedOrderRepository.findById(collectedOrderId).get()
 
-        val storeProduct = storeProductService
-            .getStoreProductForOrderDetail(
-                with(collectedOrderCreateModel) {
-                    StoreProductSearchCondition(
-                        partnerId = partnerId,
-                        storeProductName = storeProductName,
-                        storeProductOptionName = storeProductOptionName
-                    )
+        if (collectedOrder.partnerId != basicProductAddModel.partnerId) {
+            throw BaseRuntimeException(errorMessage = "해당 고객사의 주문이 아닙니다")
+        }
+
+        if (collectedOrder.isConnectedStoreProduct) {
+            throw BaseRuntimeException(errorMessage = "이미 매칭된 쇼핑몰 상품이 있습니다")
+        }
+
+        // 1. 주문수집시 쇼핑몰상품 매칭기준에 따라 조회 후 없으면 쇼핑몰 생성
+        val storeProduct =
+            storeProductService.getStoreProductForOrderDetail(
+                StoreProductSearchCondition.toSearchConditionModel(collectedOrder)
+            ) ?: createStoreProduct(collectedOrder)
+
+        if (storeProduct.storeProductMappings.isEmpty()) {
+            // 3. 쇼핑몰 상품 정보에 기본/모음상품을 같이 매핑등록
+            val basicProducts = basicProductAddModel.basicProducts
+            val findBasicProducts =
+                basicProductService.getBasicProducts(basicProducts.map { it.basicProductId })
+                    .associateBy { it.id!! }
+
+            val mappedBasicProducts = mutableMapOf<BasicProduct, Int>()
+            basicProducts.forEach {
+                val basicProduct = findBasicProducts[it.basicProductId]
+                if (basicProduct != null) {
+                    mappedBasicProducts[basicProduct] = it.quantity
                 }
-            )
+            }
 
+            // 4. 주문수집에 해당 쇼핑몰 상품을 매칭
+            mappedBasicProducts.forEach {
+                val storeProductMapping = StoreProductMapping(
+                    storeProduct = storeProduct,
+                    basicProduct = it.key,
+                    quantity = it.value
+                )
+                storeProduct.storeProductMappings.add(storeProductMapping)
+            }
+        }
+
+        // TODO : 생성된 쇼핑몰 상품을 연결 한다
         collectedOrder.storeProduct = storeProduct
+    }
 
-        collectedOrderRepository.save(collectedOrder)
-        return collectedOrder
+    private fun createStoreProduct(collectedOrder: CollectedOrder): StoreProduct {
+        val storeProduct = with(collectedOrder) {
+            StoreProduct(
+                storeId = storeId,
+                partnerId = partnerId,
+                storeCode = storeCode,
+                storeName = storeName,
+                name = collectedProductInfo.collectedStoreProductName,
+                storeProductCode = collectedProductInfo.collectedStoreProductCode,
+                optionName = collectedProductInfo.collectedStoreProductOptionName,
+                optionCode = collectedProductInfo.collectedStoreProductOptionCode
+            )
+        }
+
+        return storeProductService.createStoreProduct(storeProduct)
     }
 
 }

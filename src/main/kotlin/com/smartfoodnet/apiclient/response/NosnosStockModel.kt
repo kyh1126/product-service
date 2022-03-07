@@ -9,7 +9,7 @@ import io.swagger.annotations.ApiModelProperty
 @ApiModel(value = "노스노스 재고 모델")
 data class NosnosStockModel(
     @ApiModelProperty(value = "출고상품 ID", example = "454")
-    val shippingProductId: Long? = null,
+    val shippingProductId: Long,
     @ApiModelProperty(value = "입고 재고", example = "77")
     val receivingStock: Int? = null,
     @ApiModelProperty(value = "출고가능 재고", example = "454")

@@ -10,4 +10,6 @@ interface PackageProductMappingCustom {
         condition: PackageProductMappingSearchCondition,
         page: Pageable
     ): Page<PackageProductMapping>
+
+    fun findAllByBasicProductId(basicProductId: Long) : List<PackageProductMapping>
 }
