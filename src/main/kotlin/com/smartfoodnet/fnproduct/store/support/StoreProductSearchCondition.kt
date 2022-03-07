@@ -61,7 +61,7 @@ class StoreProductSearchCondition(
     }
 
     companion object {
-        fun toSearchConditionModel(collectedOrder : CollectedOrder) : StoreProductSearchCondition{
+        fun toSearchConditionModel(collectedOrder: CollectedOrder): StoreProductSearchCondition {
             return with(collectedOrder) {
                 StoreProductSearchCondition(
                     partnerId = partnerId,
@@ -71,4 +71,6 @@ class StoreProductSearchCondition(
                     storeProductOptionName = collectedProductInfo.collectedStoreProductOptionName
                 )
             }
+        }
+    }
 }

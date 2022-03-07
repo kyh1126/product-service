@@ -129,7 +129,6 @@ class OrderService(
             StoreProduct(
                 storeId = storeId,
                 partnerId = partnerId,
-                storeCode = storeCode,
                 storeName = storeName,
                 name = collectedProductInfo.collectedStoreProductName,
                 storeProductCode = collectedProductInfo.collectedStoreProductCode,
