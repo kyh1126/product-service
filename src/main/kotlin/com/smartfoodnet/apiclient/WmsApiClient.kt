@@ -17,13 +17,13 @@ interface WmsApiClient {
     // ---------------------------------------------------------------------------------------------
     @GetMapping("stock")
     fun getStocks(
-            @RequestParam(name = "memberId") partnerId: Long,
+            @RequestParam partnerId: Long,
             @RequestParam shippingProductIds: List<Long?>?
     ): CommonResponse<CommonDataListModel<NosnosStockModel>>
 
     @GetMapping("/stock/expire")
     fun getStocksByExpirationDate(
-            @RequestParam(name = "memberId") partnerId: Long,
+            @RequestParam partnerId: Long,
             @RequestParam shippingProductIds: List<Long?>?
     ): CommonResponse<CommonDataListModel<NosnosExpirationDateStockModel>>
 
