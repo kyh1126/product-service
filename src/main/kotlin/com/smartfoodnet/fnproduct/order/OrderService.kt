@@ -29,7 +29,12 @@ class OrderService(
     val wmsApiClient: WmsApiClient
 ) : Log {
 
-    private fun convertCollectedOrderEntity(collectedOrderCreateModel: CollectedOrderCreateModel): CollectedOrder {
+    private fun convertCollectedOrderEntity(collectedOrderCreateModel: CollectedOrderCreateModel) {
+        if (collectedOrderRepository.existsByOrderUniqueKey(collectedOrderCreateModel.orderUniqueKey)) {
+            log.info("Duplicate OrderKey = ${collectedOrderCreateModel.orderUniqueKey}")
+            return
+        }
+
         val collectedOrder = collectedOrderCreateModel.toCollectEntity()
 
         val storeProduct = storeProductService
@@ -40,7 +45,6 @@ class OrderService(
         collectedOrder.storeProduct = storeProduct
 
         collectedOrderRepository.save(collectedOrder)
-        return collectedOrder
     }
 
     @Transactional

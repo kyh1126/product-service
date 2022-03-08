@@ -12,7 +12,7 @@ data class CollectedOrderCreateModel(
     val partnerId: Long,
 
     @ApiModelProperty(value = "중복처리를 위한 쇼핑몰 종속적 유니크 키")
-    val orderUniqueKey: String? = null,
+    val orderUniqueKey: String,
 
     @ApiModelProperty(value = "쇼핑몰 이름")
     val storeName: String,
