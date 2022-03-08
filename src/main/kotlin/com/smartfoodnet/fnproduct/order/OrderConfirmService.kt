@@ -14,6 +14,7 @@ import com.smartfoodnet.fnproduct.order.model.OrderStatus
 import com.smartfoodnet.fnproduct.order.support.CollectedOrderRepository
 import com.smartfoodnet.fnproduct.order.support.ConfirmOrderRepository
 import com.smartfoodnet.fnproduct.order.support.condition.ConfirmOrderSearchCondition
+import com.smartfoodnet.fnproduct.order.vo.MatchingType
 import com.smartfoodnet.fnproduct.product.PackageProductMappingRepository
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
@@ -86,6 +87,7 @@ class OrderConfirmService(
     ) {
         val confirmProduct = ConfirmProduct(
             type = basicProduct.type,
+            matchingType = MatchingType.AUTO,
             basicProduct = basicProduct,
             confirmOrder = confirmOrder,
             quantity = orderQuantity,
