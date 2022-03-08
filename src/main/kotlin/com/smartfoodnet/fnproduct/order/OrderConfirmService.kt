@@ -120,7 +120,7 @@ class OrderConfirmService(
             wmsApiClient
                 .getStocks(partnerId, shippingProductIds).payload!!.dataList
                 .associateBy({ it.shippingProductId }, { it.normalStock ?: 0 })
-        } catch (e: RetryableException) {
+        } catch (e: Exception) {
             e.printStackTrace()
             log.info("partnerId:${partnerId}의 재고 정보[${shippingProductIds.joinToString(",")}]를 가져올 수 없습니다")
             mapOf()

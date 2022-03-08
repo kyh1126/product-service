@@ -37,6 +37,7 @@ class ConfirmOrderRepositoryImpl : ConfirmOrderRepositoryCustom, Querydsl4Reposi
                 collectedOrder.status,
                 collectedOrder.orderNumber,
                 collectedOrder.bundleNumber,
+                confirmProduct.matchingType,
                 basicProduct.id,
                 confirmProduct.type,
                 basicProduct.salesProductId,
