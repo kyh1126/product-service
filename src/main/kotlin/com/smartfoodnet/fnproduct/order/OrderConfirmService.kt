@@ -129,12 +129,15 @@ class OrderConfirmService(
 
     private fun getMissingPackageProductStocks(partnerId: Long, shippingProductIds: List<Long>, availableStocks: MutableMap<Long, Int>){
         if (shippingProductIds.isNotEmpty()) {
-            availableStocks.putAll(
-                getAvailableStocks(
-                    partnerId,
-                    shippingProductIds
+            val chunkedList = shippingProductIds.chunked(100)
+            chunkedList.forEach {
+                availableStocks.putAll(
+                    getAvailableStocks(
+                        partnerId,
+                        it
+                    )
                 )
-            )
+            }
         }
     }
 
