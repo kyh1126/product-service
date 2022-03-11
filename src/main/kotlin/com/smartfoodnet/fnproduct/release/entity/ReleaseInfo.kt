@@ -2,6 +2,7 @@ package com.smartfoodnet.fnproduct.release.entity
 
 import com.smartfoodnet.fnproduct.order.entity.ConfirmOrder
 import com.smartfoodnet.fnproduct.release.model.vo.ReleaseStatus
+import com.smartfoodnet.fnproduct.release.model.vo.ShippingCodeStatus
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import java.time.LocalDateTime
@@ -35,14 +36,18 @@ class ReleaseInfo(
     @Column(name = "release_status")
     var releaseStatus: ReleaseStatus = ReleaseStatus.RELEASE_REQUESTED,
 
-    @Column(name = "shipping_code")
-    var shippingCode: String? = null,
-
     @Column(name = "delivery_agency_id")
     var deliveryAgencyId: Long? = null,
 
     @Column(name = "delivery_agency_name")
     var deliveryAgencyName: String? = null,
+
+    @Column(name = "shipping_code")
+    var shippingCode: String? = null,
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "shipping_code_status")
+    var shippingCodeStatus: ShippingCodeStatus? = ShippingCodeStatus.UNREGISTERED,
 
     @Column(name = "shipping_code_created_at")
     var shippingCodeCreatedAt: LocalDateTime? = null,
