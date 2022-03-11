@@ -51,7 +51,7 @@ class InboundRepositoryImpl
         }
     }
 
-    override fun findStatusExptectedInbounds(basicDate: LocalDateTime): List<Inbound> {
+    override fun findStatusExpectedInbounds(basicDate: LocalDateTime): List<Inbound> {
         return selectFrom(inbound)
             .where(
                 inbound.status.eq(InboundStatusType.EXPECTED),
@@ -80,32 +80,6 @@ class InboundRepositoryImpl
                     inboundActualDetail.expirationDate.count()
                 )
             ).fetch()
-    }
-
-    override fun findInboundActualDetail(
-        partnerId: Long,
-        expectedId: Long
-    ): List<GetInboundActualDetail> {
-        return queryFactory.from(inbound)
-            .innerJoin(inbound.expectedList, inboundExpectedDetail)
-            .leftJoin(inboundExpectedDetail.inboundActualDetail, inboundActualDetail)
-            .where(
-                inbound.partnerId.eq(partnerId),
-                inboundExpectedDetail.id.eq(expectedId)
-            )
-            .select(
-                QGetInboundActualDetail(
-                    inboundActualDetail.id,
-                    inboundExpectedDetail.id,
-                    inboundActualDetail.actualInboundDate,
-                    inboundActualDetail.actualQuantity,
-                    inboundActualDetail.boxQuantity,
-                    inboundActualDetail.palletQuantity,
-                    inboundActualDetail.manufactureDate,
-                    inboundActualDetail.expirationDate
-                )
-            ).fetch()
-
     }
 
     override fun findInboundExpectedWithBasicProduct(
