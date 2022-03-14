@@ -21,7 +21,7 @@ class ConfirmProduct(
     @JoinColumn(columnDefinition = "BIGINT UNSIGNED")
     val basicProduct: BasicProduct? = null,
 
-    @OneToMany(mappedBy = "confirmProduct", cascade = [CascadeType.PERSIST])
+    @OneToMany(mappedBy = "confirmProduct", cascade = [CascadeType.PERSIST], orphanRemoval = true)
     val confirmPackageProductList: MutableCollection<ConfirmPackageProduct> = mutableListOf(),
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -32,5 +32,8 @@ class ConfirmProduct(
     @JoinColumn(name = "collected_order_id")
     val collectedOrder : CollectedOrder,
 
-    val quantity: Int
+    val quantity: Int,
+
+    val quantityPerUnit: Int,
+
 )

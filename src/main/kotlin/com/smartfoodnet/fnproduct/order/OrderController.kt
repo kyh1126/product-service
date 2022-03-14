@@ -1,6 +1,5 @@
 package com.smartfoodnet.fnproduct.order
 
-import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.fnproduct.order.dto.CollectedOrderModel
 import com.smartfoodnet.fnproduct.order.dto.ConfirmOrderModel
 import com.smartfoodnet.fnproduct.order.model.BasicProductAddModel
@@ -10,9 +9,6 @@ import com.smartfoodnet.fnproduct.order.support.condition.ConfirmOrderSearchCond
 import io.swagger.annotations.Api
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
-import org.springframework.data.domain.Pageable
-import org.springframework.data.domain.Sort
-import org.springframework.data.web.PageableDefault
 import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
 
@@ -21,7 +17,7 @@ import javax.validation.Valid
 @RequestMapping("order")
 class OrderController(
     val orderService: OrderService,
-    val orderConfirmService: OrderConfirmService
+    val confirmOrderService: ConfirmOrderService
 ) {
     @Operation(summary = "주문 생성")
     @PostMapping
@@ -36,7 +32,7 @@ class OrderController(
         @PathVariable collectedOrderId: Long,
         @RequestBody basicProductAddModel : BasicProductAddModel
     ){
-        orderService.addStoreProduct(collectedOrderId, basicProductAddModel)
+        orderService.addStoreProduct(basicProductAddModel.apply { this.collectedOrderId = collectedOrderId })
     }
 
     @Operation(summary = "출고지시 생성")
@@ -45,7 +41,7 @@ class OrderController(
         @PathVariable partnerId: Long,
         @RequestBody collectedIds: List<Long>
     ) {
-        orderConfirmService.createConfirmOrder(partnerId, collectedIds)
+        confirmOrderService.createConfirmOrder(partnerId, collectedIds)
     }
 
     @Operation(summary = "특정 화주(고객사) ID 의 주문수집 조회")
@@ -67,6 +63,19 @@ class OrderController(
         @Parameter(description = "검색조건")
         @ModelAttribute condition: ConfirmOrderSearchCondition,
     ): List<ConfirmOrderModel> {
-        return orderConfirmService.getConfirmOrder(condition.apply { this.partnerId = partnerId })
+        return confirmOrderService.getConfirmOrder(condition.apply { this.partnerId = partnerId })
     }
+
+    @Operation(summary = "임시대체상품 추가")
+    @PostMapping("partners/{partnerId}/confirm/{confirmOrderId}")
+    fun addBasicProductWithConfirmProduct(
+        @Parameter(description = "화주(고객사) ID", required = true)
+        @PathVariable partnerId : Long,
+        @Parameter(description = "출고지시 고유번호", required = true)
+        @PathVariable confirmOrderId : Long,
+        @RequestBody basicProductAddModel: BasicProductAddModel
+    ){
+        confirmOrderService.addBasicProduct(confirmOrderId, basicProductAddModel.apply { this.partnerId = partnerId })
+    }
+
 }

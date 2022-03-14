@@ -62,7 +62,7 @@ class CollectedOrder(
 
     val shippingPrice: Double? = null,
 
-    val quantity: Int? = null,
+    val quantity: Int,
 
     @Embedded
     val receiver: Receiver? = null,
