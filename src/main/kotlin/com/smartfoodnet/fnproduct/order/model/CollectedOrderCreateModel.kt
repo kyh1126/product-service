@@ -70,7 +70,7 @@ data class CollectedOrderCreateModel(
     val shippingPrice: Double? = null,
 
     @ApiModelProperty(value = "수량")
-    val count: Int? = null,
+    val count: Int,
 
     val receiver: ReceiverModel? = null,
 

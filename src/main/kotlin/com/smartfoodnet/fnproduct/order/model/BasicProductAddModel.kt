@@ -4,7 +4,8 @@ import io.swagger.annotations.ApiModelProperty
 
 data class BasicProductAddModel(
     @ApiModelProperty(value = "화주(고객)사 ID", example = "11")
-    val partnerId : Long,
+    var partnerId : Long,
+    var collectedOrderId: Long,
     val basicProducts : List<BasicProductMappedModel>
 )
 

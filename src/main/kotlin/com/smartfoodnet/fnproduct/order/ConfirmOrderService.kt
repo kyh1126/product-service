@@ -10,32 +10,33 @@ import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
 import com.smartfoodnet.fnproduct.order.entity.ConfirmOrder
 import com.smartfoodnet.fnproduct.order.entity.ConfirmPackageProduct
 import com.smartfoodnet.fnproduct.order.entity.ConfirmProduct
+import com.smartfoodnet.fnproduct.order.model.BasicProductAddModel
 import com.smartfoodnet.fnproduct.order.model.OrderStatus
-import com.smartfoodnet.fnproduct.order.support.CollectedOrderRepository
 import com.smartfoodnet.fnproduct.order.support.ConfirmOrderRepository
 import com.smartfoodnet.fnproduct.order.support.condition.ConfirmOrderSearchCondition
 import com.smartfoodnet.fnproduct.order.vo.MatchingType
+import com.smartfoodnet.fnproduct.product.BasicProductService
 import com.smartfoodnet.fnproduct.product.PackageProductMappingRepository
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
-import feign.RetryableException
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 @Transactional(readOnly = true)
-class OrderConfirmService(
-    val collectedOrderRepository: CollectedOrderRepository,
+class ConfirmOrderService(
+    val orderService: OrderService,
     val confirmOrderRepository: ConfirmOrderRepository,
+    val basicProductService: BasicProductService,
     val packageProductMappingRepository: PackageProductMappingRepository,
     val wmsApiClient: WmsApiClient
 ) : Log {
     @Transactional
-    fun createConfirmOrder(partnerId: Long, collectedIds: List<Long>) {
-        val collectedList = collectedOrderRepository.findAllById(collectedIds)
+    fun createConfirmOrder(partnerId: Long, collectedOrderIds: List<Long>) {
+        val collectedList = orderService.getCollectedOrders(collectedOrderIds)
 
-        val subtractList = collectedIds.subtract(collectedList.map { it.id }.toSet())
+        val subtractList = collectedOrderIds.subtract(collectedList.map { it.id }.toSet())
         if (subtractList.isNotEmpty()) {
             throw BaseRuntimeException(errorMessage = "주문수집 Key[${subtractList.joinToString { it.toString() }}]를 찾을 수 없습니다")
         }
@@ -83,14 +84,16 @@ class OrderConfirmService(
         collectedOrder: CollectedOrder,
         confirmOrder: ConfirmOrder,
         basicProduct: BasicProduct,
-        orderQuantity: Int
+        orderQuantity: Int,
+        matchingType: MatchingType = MatchingType.AUTO
     ) {
         val confirmProduct = ConfirmProduct(
             type = basicProduct.type,
-            matchingType = MatchingType.AUTO,
+            matchingType = matchingType,
             basicProduct = basicProduct,
             confirmOrder = confirmOrder,
             quantity = orderQuantity,
+            quantityPerUnit = orderQuantity / collectedOrder.quantity,
             collectedOrder = collectedOrder
         )
 
@@ -193,5 +196,27 @@ class OrderConfirmService(
         }
 
         return response
+    }
+
+    @Transactional
+    fun addBasicProduct(confirmOrderId : Long, basicProductAddModel: BasicProductAddModel){
+        val collectedOrder = orderService.getCollectedOrder(basicProductAddModel.collectedOrderId)
+
+        val confirmOrder = confirmOrderRepository.findById(confirmOrderId).get()
+        confirmOrder.confirmProductList.clear()
+
+        val basicProducts =
+            basicProductService.getBasicProducts(basicProductAddModel.basicProducts.map { it.basicProductId })
+
+        val quantityPerBasicProduct = getBasicProductsAndRequestQuantityMapping(basicProductAddModel)
+
+        basicProducts.forEach {
+            createConfirmProductAndPackageProduct(collectedOrder, confirmOrder, it, quantityPerBasicProduct[it.id]!!, MatchingType.TEMP)
+        }
+
+    }
+
+    private fun getBasicProductsAndRequestQuantityMapping(basicProductAddModel: BasicProductAddModel) : Map<Long, Int>{
+        return basicProductAddModel.basicProducts.associateBy({it.basicProductId},{it.quantity})
     }
 }

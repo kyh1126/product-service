@@ -12,7 +12,7 @@ class ConfirmOrder(
     val bundleNumber : String,
     var orderId: Long? = null,
     var orderCode: String? = null,
-    @OneToMany(mappedBy = "confirmOrder", cascade = [CascadeType.PERSIST])
+    @OneToMany(mappedBy = "confirmOrder", cascade = [CascadeType.PERSIST], orphanRemoval = true)
     val confirmProductList: MutableSet<ConfirmProduct> = mutableSetOf()
 ): BaseEntity(){
     fun addConfirmProduct(confirmProduct : ConfirmProduct){
