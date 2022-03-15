@@ -44,7 +44,9 @@ data class GetInboundDetailModel(
     val deliveryFlag: Boolean = false,
     val deliveryName: String? = null,
     val trackingNo: String? = null,
-    val inboundActualList: List<InboundActualModel>
+    val inboundActualList: List<InboundActualModel>,
+    @JsonFormat(pattern = Constants.TIMESTAMP_FORMAT)
+    val createdAt: LocalDateTime
 ){
     companion object {
         fun toDto(inboundExpectedDetail: InboundExpectedDetail) : GetInboundDetailModel {
@@ -65,7 +67,8 @@ data class GetInboundDetailModel(
                 deliveryFlag = inboundExpectedDetail.deliveryFlag,
                 deliveryName = inboundExpectedDetail.deliveryName,
                 trackingNo = inboundExpectedDetail.trackingNo,
-                inboundActualList = inboundExpectedDetail.inboundActualDetail?.map{ InboundActualModel.toDto(it) }?: listOf()
+                inboundActualList = inboundExpectedDetail.inboundActualDetail?.map{ InboundActualModel.toDto(it) }?: listOf(),
+                createdAt = inbound.createdAt!!
             )
         }
     }
