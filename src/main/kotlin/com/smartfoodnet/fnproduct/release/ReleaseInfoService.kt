@@ -11,8 +11,7 @@ class ReleaseInfoService(
 ) {
     fun getReleaseInfo(id: Long): ReleaseInfoDetailModel {
         val releaseInfo = releaseInfoRepository.findById(id).get()
-        val collectedOrders = releaseInfo.confirmOrder?.confirmProductList
-            ?.map { it.collectedOrder }?.distinct() ?: emptyList()
+        val collectedOrders = releaseInfo.releaseOrderMappings.map { it.collectedOrder }
 
         return ReleaseInfoDetailModel.fromEntity(releaseInfo, collectedOrders)
     }
