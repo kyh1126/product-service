@@ -10,6 +10,8 @@ import com.smartfoodnet.fninventory.stock.model.StockByBestBeforeModel
 import com.smartfoodnet.fninventory.stock.support.DailyStockSummaryRepository
 import com.smartfoodnet.fninventory.stock.support.StockByBestBeforeRepository
 import com.smartfoodnet.fninventory.stock.support.StockByBestBeforeSearchCondition
+import com.smartfoodnet.fnproduct.order.OrderService
+import com.smartfoodnet.fnproduct.order.model.OrderStatus
 import com.smartfoodnet.fnproduct.product.BasicProductRepository
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -22,6 +24,7 @@ class StockService(
     private val basicProductRepository: BasicProductRepository,
     private val stockByBestBeforeRepository: StockByBestBeforeRepository,
     private val dailyStockSummaryRepository: DailyStockSummaryRepository,
+    private val orderService: OrderService,
     private val wmsApiClient: WmsApiClient
 ) {
     fun getBasicProductStocks(
@@ -31,7 +34,13 @@ class StockService(
     ): PageResponse<BasicProductStockModel> {
         val basicProducts = basicProductRepository.findAll(condition.toPredicate(), page)
         val basicProductStockModels =
-            basicProducts.map { BasicProductStockModel.fromBasicProduct(it) }
+            basicProducts.map {
+                val orderCount = orderService.getOrderCountByProductIdAndStatus(
+                    it.id!!,
+                    OrderStatus.NEW
+                ) ?: 0
+                BasicProductStockModel.fromBasicProduct(it,orderCount)
+            }
 
         val nosnosStocks = wmsApiClient.getStocks(
             partnerId = partnerId,
