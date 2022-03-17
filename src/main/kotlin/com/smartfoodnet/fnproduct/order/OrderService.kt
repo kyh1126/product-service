@@ -55,7 +55,7 @@ class OrderService(
     fun getCollectedOrder(
         condition: CollectingOrderSearchCondition
     ): List<CollectedOrderModel> {
-        return collectedOrderRepository.findCollectedOrders(condition)
+        return collectedOrderRepository.findAllCollectedOrders(condition)
     }
 
     fun getCollectedOrder(collectedOrderId: Long) =
