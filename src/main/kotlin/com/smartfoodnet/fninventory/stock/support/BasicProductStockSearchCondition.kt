@@ -59,13 +59,13 @@ class BasicProductStockSearchCondition(
     private fun eqPartnerId(partnerId: Long?) = partnerId?.let { basicProduct.partnerId.eq(it) }
 
     private fun likeBasicProductName(basicProductName: String?) =
-        basicProductName?.let { basicProduct.name.likeIgnoreCase("%$it%") }
+        basicProductName?.let { basicProduct.name.contains(it) }
 
     private fun eqBasicProductCode(basicProductCode: String?) =
-        basicProductCode?.let { basicProduct.code.eq(it) }
+        basicProductCode?.let { basicProduct.code.contains(it) }
 
     private fun eqBarcode(barcode: String?) =
-        barcode?.let { basicProduct.barcode.eq(it) }
+        barcode?.let { basicProduct.barcode.contains(it) }
 
     private fun eqExpirationDateManagementYn(expirationDateManagementYn: String?) =
         expirationDateManagementYn?.let { basicProduct.expirationDateManagementYn.eq(it) }
