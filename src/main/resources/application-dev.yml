@@ -22,7 +22,7 @@ spring:
       maxFileSize: 10MB
       maxRequestSize: 10MB
   jpa:
-    database-platform: org.hibernate.dialect.MySQL8Dialect
+    database-platform: com.smartfoodnet.config.querydsl.impl.Mysql8CustomDialect
     open-in-view: false
     hibernate:
       ddl-auto: none

@@ -55,11 +55,18 @@ class OrderService(
     fun getCollectedOrder(
         condition: CollectingOrderSearchCondition
     ): List<CollectedOrderModel> {
-        return collectedOrderRepository.findCollectedOrders(condition)
+        return collectedOrderRepository.findAllCollectedOrders(condition)
     }
+
+    fun getCollectedOrder(collectedOrderId: Long) =
+        collectedOrderRepository.findById(collectedOrderId).get()
 
     fun getCollectedOrders(partnerId: Long, status: OrderStatus): List<CollectedOrder>? {
         return collectedOrderRepository.findAllByPartnerIdAndStatus(partnerId, status)
+    }
+
+    fun getCollectedOrders(collectedOrderIds: List<Long>): List<CollectedOrder> {
+        return collectedOrderRepository.findAllById(collectedOrderIds)
     }
 
     fun getShortageProjectionModel(
@@ -80,9 +87,9 @@ class OrderService(
     }
 
     @Transactional
-    fun addStoreProduct(collectedOrderId: Long, basicProductAddModel: BasicProductAddModel) {
+    fun addStoreProduct(basicProductAddModel: BasicProductAddModel) {
         // TODO : CollectedOrder에 이미 쇼핑몰 상품이 매칭되어있다면 오류
-        val collectedOrder = collectedOrderRepository.findById(collectedOrderId).get()
+        val collectedOrder = collectedOrderRepository.findById(basicProductAddModel.collectedOrderId).get()
 
         if (collectedOrder.partnerId != basicProductAddModel.partnerId) {
             throw BaseRuntimeException(errorMessage = "해당 고객사의 주문이 아닙니다")

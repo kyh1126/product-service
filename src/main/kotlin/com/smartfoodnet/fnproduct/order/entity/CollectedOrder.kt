@@ -43,7 +43,7 @@ class CollectedOrder(
 
     val statusUpdatedAt: LocalDateTime? = null,
 
-    val orderNumber: String? = null,
+    val orderNumber: String,
 
     var claimStatus: String? = null,
 
@@ -55,6 +55,9 @@ class CollectedOrder(
     @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
     var storeProduct: StoreProduct? = null,
 
+    @OneToMany(mappedBy = "collectedOrder", fetch = FetchType.LAZY)
+    val confirmProductList : List<ConfirmProduct> = listOf(),
+
     @Embedded
     val collectedProductInfo: CollectedProductInfo,
 
@@ -62,10 +65,10 @@ class CollectedOrder(
 
     val shippingPrice: Double? = null,
 
-    val quantity: Int? = null,
+    val quantity: Int,
 
     @Embedded
-    val receiver: Receiver? = null,
+    val receiver: Receiver,
 
     @Embedded
     val sender: Sender? = null,
@@ -78,4 +81,8 @@ class CollectedOrder(
     val isConnectedStoreProduct
         @JsonIgnore @Transient
         get() = storeProduct?.storeProductMappings?.isNotEmpty()?:false
+
+    fun nextStep(){
+        status = status.next()
+    }
 }
