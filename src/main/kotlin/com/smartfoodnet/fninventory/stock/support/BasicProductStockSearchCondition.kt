@@ -51,20 +51,20 @@ class BasicProductStockSearchCondition(
 
     private fun toPredicate(searchType: SearchType) =
         when (searchType) {
-            NAME -> likeBasicProductName(searchKeyword)
-            CODE -> eqBasicProductCode(searchKeyword)
-            BARCODE -> eqBarcode(searchKeyword)
+            NAME -> containBasicProductName(searchKeyword)
+            CODE -> containBasicProductCode(searchKeyword)
+            BARCODE -> containBarcode(searchKeyword)
         }
 
     private fun eqPartnerId(partnerId: Long?) = partnerId?.let { basicProduct.partnerId.eq(it) }
 
-    private fun likeBasicProductName(basicProductName: String?) =
+    private fun containBasicProductName(basicProductName: String?) =
         basicProductName?.let { basicProduct.name.contains(it) }
 
-    private fun eqBasicProductCode(basicProductCode: String?) =
+    private fun containBasicProductCode(basicProductCode: String?) =
         basicProductCode?.let { basicProduct.code.contains(it) }
 
-    private fun eqBarcode(barcode: String?) =
+    private fun containBarcode(barcode: String?) =
         barcode?.let { basicProduct.barcode.contains(it) }
 
     private fun eqExpirationDateManagementYn(expirationDateManagementYn: String?) =
