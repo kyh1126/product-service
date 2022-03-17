@@ -13,5 +13,5 @@ interface InboundRepositoryCustom {
     fun findInbounds(condition: InboundSearchCondition, page: Pageable): Page<GetInboundParent>
     fun findStatusExpectedInbounds(basicDate : LocalDateTime) : List<Inbound>
     fun findSumActualDetail(expectedIds: List<Long>) : List<GetInboundSumDetail>
-    fun findInboundExpectedWithBasicProduct(receivingPlanId: Long, basicProductId : Long) : InboundExpectedDetail?
+    fun findInboundExpectedWithBasicProduct(receivingPlanId: Long, shippingProductId : Long) : InboundExpectedDetail?
 }

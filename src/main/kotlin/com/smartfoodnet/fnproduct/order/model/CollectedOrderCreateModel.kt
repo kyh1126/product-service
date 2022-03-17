@@ -35,7 +35,7 @@ data class CollectedOrderCreateModel(
     val collectedAt: LocalDateTime? = null,
 
     @ApiModelProperty(value = "주문번호")
-    val orderNumber: String? = null,
+    val orderNumber: String,
 
     @ApiModelProperty(value = "주문 상태")
     val status: OrderStatus,
@@ -72,7 +72,7 @@ data class CollectedOrderCreateModel(
     @ApiModelProperty(value = "수량")
     val count: Int,
 
-    val receiver: ReceiverModel? = null,
+    val receiver: ReceiverModel,
 
     @ApiModelProperty(value = "업로드방식")
     val uploadType: String? = null,
@@ -101,7 +101,7 @@ data class CollectedOrderCreateModel(
             price = price,
             shippingPrice = shippingPrice,
             quantity = count,
-            receiver = receiver?.toEntity(),
+            receiver = receiver.toEntity(),
             uploadType = uploadType
         )
     }

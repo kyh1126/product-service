@@ -9,6 +9,7 @@ import com.smartfoodnet.fnproduct.order.dto.CollectedOrderModel
 import com.smartfoodnet.fnproduct.order.dto.QCollectedOrderModel
 import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
 import com.smartfoodnet.fnproduct.order.entity.QCollectedOrder.collectedOrder
+import com.smartfoodnet.fnproduct.order.entity.QConfirmProduct.confirmProduct
 import com.smartfoodnet.fnproduct.order.model.OrderStatus
 import com.smartfoodnet.fnproduct.product.entity.QBasicProduct.basicProduct
 import com.smartfoodnet.fnproduct.store.entity.QStoreProduct.storeProduct
@@ -52,20 +53,7 @@ class CollectedOrderRepositoryImpl : CollectedOrderRepositoryCustom, Querydsl4Re
             .fetchOne()
     }
 
-    override fun findCollectedOrders(condition: PredicateSearchCondition): List<CollectedOrderModel> {
-        return createCollectedOrder(condition).fetch()
-    }
-
-    override fun findCollectedOrdersWithPageable(
-        condition: PredicateSearchCondition,
-        pagination: Pageable
-    ): Page<CollectedOrderModel> {
-        return applyPagination(pagination) {
-            createCollectedOrder(condition)
-        }
-    }
-
-    private fun createCollectedOrder(condition: PredicateSearchCondition) : JPAQuery<CollectedOrderModel>{
+    override fun findAllCollectedOrders(condition: PredicateSearchCondition): List<CollectedOrderModel> {
         return select(
             QCollectedOrderModel(
                 collectedOrder.id,
@@ -101,10 +89,11 @@ class CollectedOrderRepositoryImpl : CollectedOrderRepositoryCustom, Querydsl4Re
                 collectedOrder.collectedAt
             )
         )
-        .from(collectedOrder)
-        .leftJoin(collectedOrder.storeProduct, storeProduct)
-        .leftJoin(storeProduct.storeProductMappings, storeProductMapping)
-        .leftJoin(storeProductMapping.basicProduct, basicProduct)
-        .where(condition.toPredicate())
+            .from(collectedOrder)
+            .leftJoin(collectedOrder.storeProduct, storeProduct)
+            .leftJoin(storeProduct.storeProductMappings, storeProductMapping)
+            .leftJoin(storeProductMapping.basicProduct, basicProduct)
+            .where(condition.toPredicate())
+            .fetch()
     }
 }

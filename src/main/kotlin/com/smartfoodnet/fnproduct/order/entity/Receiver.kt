@@ -6,9 +6,11 @@ import javax.persistence.Embeddable
 @Embeddable
 class Receiver (
     @Column(name = "receiver_name")
-    var name: String? = null,
+    val name: String,
+    @Column(name = "zip_code")
+    val zipCode: String? = null,
     @Column(name = "receiver_address")
-    var address: String? = null,
+    val address: String,
     @Column(name = "receiver_phone_number")
-    var phoneNumber: String? = null,
+    val phoneNumber: String,
 )

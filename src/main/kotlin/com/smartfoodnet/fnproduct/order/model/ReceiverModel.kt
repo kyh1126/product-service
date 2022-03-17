@@ -2,27 +2,30 @@ package com.smartfoodnet.fnproduct.order.model
 
 import com.smartfoodnet.fnproduct.order.entity.Receiver
 import io.swagger.annotations.ApiModelProperty
+import javax.persistence.Access
+import javax.persistence.AccessType
 import javax.persistence.Embeddable
 
-@Embeddable
 class ReceiverModel(
     @ApiModelProperty(value = "받는 분 이름")
-    var name: String? = null,
+    val name: String,
+    @ApiModelProperty(value = "받는 분 우편번호")
+    val zipCode: String? = null,
     @ApiModelProperty(value = "받는 분 주소")
-    var address: String? = null,
+    val address: String,
     @ApiModelProperty(value = "받는 분 전화번호")
-    var phoneNumber: String? = null,
+    val phoneNumber: String,
 ) {
     fun toEntity(): Receiver {
         return run {
-            Receiver(name = name, address = address, phoneNumber = phoneNumber)
+            Receiver(name = name, zipCode = zipCode, address = address, phoneNumber = phoneNumber)
         }
     }
 
     companion object {
         fun from(receiver: Receiver): ReceiverModel {
             return receiver.run {
-                ReceiverModel(name = name, address = address, phoneNumber = phoneNumber)
+                ReceiverModel(name = name, zipCode = zipCode, address = address, phoneNumber = phoneNumber)
             }
         }
     }
