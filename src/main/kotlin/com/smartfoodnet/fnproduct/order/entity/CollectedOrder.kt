@@ -2,9 +2,8 @@ package com.smartfoodnet.fnproduct.order.entity
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.smartfoodnet.common.entity.BaseEntity
-import com.smartfoodnet.fnproduct.order.model.OrderStatus
+import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import com.smartfoodnet.fnproduct.store.entity.StoreProduct
-import org.hibernate.annotations.BatchSize
 import org.hibernate.annotations.DynamicUpdate
 import java.time.LocalDateTime
 import javax.persistence.*

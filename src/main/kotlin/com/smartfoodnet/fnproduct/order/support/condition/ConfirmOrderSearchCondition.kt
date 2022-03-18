@@ -6,10 +6,9 @@ import com.querydsl.core.BooleanBuilder
 import com.querydsl.core.types.Predicate
 import com.smartfoodnet.common.Constants
 import com.smartfoodnet.common.model.request.PredicateSearchCondition
-import com.smartfoodnet.fnproduct.order.entity.QCollectedOrder
 import com.smartfoodnet.fnproduct.order.entity.QCollectedOrder.collectedOrder
 import com.smartfoodnet.fnproduct.order.entity.QConfirmOrder.confirmOrder
-import com.smartfoodnet.fnproduct.order.model.OrderStatus
+import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import io.swagger.annotations.ApiModelProperty
 import java.time.LocalDate
 

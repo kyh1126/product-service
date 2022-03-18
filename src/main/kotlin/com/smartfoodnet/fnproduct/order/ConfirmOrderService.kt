@@ -7,7 +7,8 @@ import com.smartfoodnet.common.error.exception.BaseRuntimeException
 import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.fnproduct.order.dto.ConfirmProductModel
 import com.smartfoodnet.fnproduct.order.entity.*
-import com.smartfoodnet.fnproduct.order.model.OrderStatus
+import com.smartfoodnet.fnproduct.order.model.RequestOrderCreateModel
+import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import com.smartfoodnet.fnproduct.order.support.ConfirmOrderRepository
 import com.smartfoodnet.fnproduct.order.support.ConfirmProductRepository
 import com.smartfoodnet.fnproduct.order.support.condition.ConfirmProductSearchCondition
@@ -70,8 +71,8 @@ class ConfirmOrderService(
     }
 
     @Transactional
-    fun requestOrders(partnerId: Long, collectedOrderIds: List<Long>) {
-        val collectedOrderList = orderService.getCollectedOrders(collectedOrderIds)
+    fun requestOrders(partnerId: Long, requestOrderCreateModel: RequestOrderCreateModel) {
+        val collectedOrderList = orderService.getCollectedOrders(requestOrderCreateModel.collectedOrderIds)
 
         if (collectedOrderList.all { it.status != OrderStatus.ORDER_CONFIRM }) {
             throw BaseRuntimeException(errorMessage = "출고지시 상태가 아닌 주문건이 있습니다")
@@ -80,7 +81,7 @@ class ConfirmOrderService(
         val sendOrderList = collectedOrderList
             .groupBy { it.bundleNumber }
             .map {
-                createSendOrder(partnerId, it)
+                createSendOrder(partnerId, requestOrderCreateModel, it)
             }
 
         sendOrderList.forEach {
@@ -93,6 +94,7 @@ class ConfirmOrderService(
 
     private fun createSendOrder(
         partnerId: Long,
+        requestOrderCreateModel: RequestOrderCreateModel,
         orderGroup: Map.Entry<String, List<CollectedOrder>>
     ): ConfirmOrder {
         val firstCollectedOrder = orderGroup.value.first()
@@ -102,8 +104,13 @@ class ConfirmOrderService(
             shippingMethodType = 1,
             requestShippingDate = LocalDateTime.now(),
             receiver = firstCollectedOrder.receiver,
-            // TODO : 2022-03-16 memo 2~3 항목 확인해서 추가해야합니다. memo5는 사용하지 않습니다
-            memo = Memo(firstCollectedOrder.storeName, null, null, firstCollectedOrder.shippingPrice.toString(), null)
+            memo = Memo(
+                firstCollectedOrder.storeName,
+                requestOrderCreateModel.promotion,
+                requestOrderCreateModel.reShipmentReason,
+                firstCollectedOrder.shippingPrice.toString(),
+                null
+            )
         )
 
         orderGroup.value.forEach {
