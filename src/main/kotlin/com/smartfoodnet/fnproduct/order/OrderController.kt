@@ -88,4 +88,14 @@ class OrderController(
         confirmOrderService.replaceConfirmProducts(confirmProductAddModel.apply { this.partnerId = partnerId })
     }
 
+    @Operation(summary = "기존 기본상품으로 복구")
+    @PutMapping("partners/{partnerId}/confirm/products/restore")
+    fun restoreConfirmProduct(
+        @Parameter(description = "화주(고객사) ID", required = true)
+        @PathVariable partnerId : Long,
+        @RequestBody collectedIds: List<Long>
+    ){
+        confirmOrderService.restoreConfirmProduct(partnerId, collectedIds)
+    }
+
 }

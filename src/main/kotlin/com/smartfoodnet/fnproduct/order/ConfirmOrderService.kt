@@ -33,8 +33,10 @@ class ConfirmOrderService(
     val packageProductMappingRepository: PackageProductMappingRepository,
     val wmsApiClient: WmsApiClient
 ) : Log {
-    @Transactional
-    fun createConfirmProduct(partnerId: Long, collectedOrderIds: List<Long>) {
+    private fun validateConfirmProduct(
+        partnerId: Long,
+        collectedOrderIds: List<Long>,
+    ) : List<CollectedOrder>{
         val collectedList = orderService.getCollectedOrders(collectedOrderIds)
         val subtractList = collectedOrderIds.subtract(collectedList.map { it.id }.toSet())
 
@@ -45,6 +47,13 @@ class ConfirmOrderService(
         if (!collectedList.all { it.partnerId == partnerId })
             throw BaseRuntimeException(errorMessage = "해당 고객사의 주문건이 아닙니다")
 
+        return collectedList
+    }
+
+    @Transactional
+    fun createConfirmProduct(partnerId: Long, collectedOrderIds: List<Long>) {
+        val collectedList = validateConfirmProduct(partnerId, collectedOrderIds)
+
         if (!collectedList.all { it.status == OrderStatus.NEW })
             throw BaseRuntimeException(errorMessage = "이미 출고지시가 처리된 데이터 입니다")
 
@@ -54,25 +63,45 @@ class ConfirmOrderService(
     }
 
     private fun convertConfirmProduct(collectedOrder: CollectedOrder) {
+        collectedOrderAddConfirmProduct(collectedOrder)
+        collectedOrder.nextStep()
+    }
+
+    @Transactional
+    fun restoreConfirmProduct(partnerId: Long, collectedOrderIds: List<Long>){
+        val collectedList = validateConfirmProduct(partnerId, collectedOrderIds)
+
+        if (!collectedList.all { it.status == OrderStatus.ORDER_CONFIRM })
+            throw BaseRuntimeException(errorMessage = "출고지시 상태의 주문건이 아닙니다")
+
+        collectedList.forEach {
+            restoreConfirmProduct(it)
+        }
+    }
+
+    private fun restoreConfirmProduct(collectedOrder: CollectedOrder){
+        collectedOrder.clearConfirmProduct()
+        collectedOrderAddConfirmProduct(collectedOrder)
+    }
+
+    private fun collectedOrderAddConfirmProduct(collectedOrder : CollectedOrder){
         val storeMapping = collectedOrder.storeProduct?.storeProductMappings
         if (storeMapping.isNullOrEmpty())
             throw BaseRuntimeException(errorMessage = "매칭되지 않은 쇼핑몰 상품이 존재합니다 상품코드[${collectedOrder.collectedProductInfo.collectedStoreProductName} - ${collectedOrder.collectedProductInfo.collectedStoreProductOptionName}]")
 
         storeMapping.forEach {
-            val basicProduct = it.basicProduct
-            val confirmProduct = ConfirmProduct(
-                collectedOrder = collectedOrder,
-                type = basicProduct.type,
-                matchingType = MatchingType.AUTO,
-                basicProduct = basicProduct,
-                quantity = collectedOrder.quantity * it.quantity,
-                quantityPerUnit = it.quantity
+            collectedOrder.addConfirmProduct(
+                ConfirmProduct(
+                    type = it.basicProduct.type,
+                    matchingType = MatchingType.AUTO,
+                    basicProduct = it.basicProduct,
+                    quantity = collectedOrder.quantity * it.quantity,
+                    quantityPerUnit = it.quantity
+                )
             )
-            confirmProductRepository.save(confirmProduct)
         }
-
-        collectedOrder.nextStep()
     }
+
 
     @Transactional
     fun requestOrders(partnerId: Long, requestOrderCreateModel: RequestOrderCreateModel) {

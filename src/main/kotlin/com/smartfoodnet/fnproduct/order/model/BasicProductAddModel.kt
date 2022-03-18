@@ -17,7 +17,7 @@ data class BasicProductMappedModel(
 )
 
 class ConfirmProductAddModel(
-    @ApiModelProperty(value = "화주(고객)사 ID", example = "11")
+    @ApiModelProperty(value = "화주(고객)사 ID", example = "11", hidden = true)
     var partnerId: Long,
     val confirmProductList: List<ConfirmProductMappedModel>
 )
