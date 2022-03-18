@@ -7,12 +7,16 @@ import com.smartfoodnet.common.error.exception.BaseRuntimeException
 import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.fnproduct.order.dto.ConfirmProductModel
 import com.smartfoodnet.fnproduct.order.entity.*
+import com.smartfoodnet.fnproduct.order.model.BasicProductAddModel
+import com.smartfoodnet.fnproduct.order.model.ConfirmProductAddModel
+import com.smartfoodnet.fnproduct.order.model.ConfirmProductMappedModel
 import com.smartfoodnet.fnproduct.order.model.RequestOrderCreateModel
 import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import com.smartfoodnet.fnproduct.order.support.ConfirmOrderRepository
 import com.smartfoodnet.fnproduct.order.support.ConfirmProductRepository
 import com.smartfoodnet.fnproduct.order.support.condition.ConfirmProductSearchCondition
 import com.smartfoodnet.fnproduct.order.vo.MatchingType
+import com.smartfoodnet.fnproduct.product.BasicProductService
 import com.smartfoodnet.fnproduct.product.PackageProductMappingRepository
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import org.springframework.stereotype.Service
@@ -23,11 +27,11 @@ import java.time.LocalDateTime
 @Transactional(readOnly = true)
 class ConfirmOrderService(
     val orderService: OrderService,
+    val basicProductService : BasicProductService,
     val confirmOrderRepository: ConfirmOrderRepository,
     val confirmProductRepository: ConfirmProductRepository,
     val packageProductMappingRepository: PackageProductMappingRepository,
-    val wmsApiClient: WmsApiClient,
-    val objectMapper: ObjectMapper
+    val wmsApiClient: WmsApiClient
 ) : Log {
     @Transactional
     fun createConfirmProduct(partnerId: Long, collectedOrderIds: List<Long>) {
@@ -108,7 +112,7 @@ class ConfirmOrderService(
                 firstCollectedOrder.storeName,
                 requestOrderCreateModel.promotion,
                 requestOrderCreateModel.reShipmentReason,
-                firstCollectedOrder.shippingPrice.toString(),
+                firstCollectedOrder.shippingPrice?.toInt().toString(),
                 null
             )
         )
@@ -211,5 +215,41 @@ class ConfirmOrderService(
         }
 
         return response
+    }
+
+    @Transactional
+    fun replaceConfirmProducts(confirmProductAddModel : ConfirmProductAddModel){
+        confirmProductAddModel.confirmProductList.forEach {
+            replaceConfirmProduct(it)
+        }
+    }
+
+    private fun replaceConfirmProduct(mappedModel : ConfirmProductMappedModel){
+        val collectedOrder = orderService.getCollectedOrder(mappedModel.collectedOrderId)
+        collectedOrder.clearConfirmProduct()
+
+        val basicProducts =
+            basicProductService.getBasicProducts(mappedModel.basicProducts.map { it.basicProductId })
+
+        val quantityPerBasicProduct = getBasicProductsAndRequestQuantityMapping(mappedModel)
+
+        basicProducts.forEach {
+            collectedOrder.addConfirmProduct(
+                it.run {
+                    ConfirmProduct(
+                        type = type,
+                        basicProduct = this,
+                        matchingType = MatchingType.TEMP,
+                        quantity = quantityPerBasicProduct[this.id]!!,
+                        quantityPerUnit = 0
+                    )
+                }
+            )
+        }
+
+    }
+
+    private fun getBasicProductsAndRequestQuantityMapping(mappedModel : ConfirmProductMappedModel) : Map<Long, Int>{
+        return mappedModel.basicProducts.associateBy({it.basicProductId},{it.quantity})
     }
 }

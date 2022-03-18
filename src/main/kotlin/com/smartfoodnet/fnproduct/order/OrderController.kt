@@ -4,6 +4,7 @@ import com.smartfoodnet.fnproduct.order.dto.CollectedOrderModel
 import com.smartfoodnet.fnproduct.order.dto.ConfirmProductModel
 import com.smartfoodnet.fnproduct.order.model.BasicProductAddModel
 import com.smartfoodnet.fnproduct.order.model.CollectedOrderCreateModel
+import com.smartfoodnet.fnproduct.order.model.ConfirmProductAddModel
 import com.smartfoodnet.fnproduct.order.model.RequestOrderCreateModel
 import com.smartfoodnet.fnproduct.order.support.condition.CollectingOrderSearchCondition
 import com.smartfoodnet.fnproduct.order.support.condition.ConfirmProductSearchCondition
@@ -77,16 +78,14 @@ class OrderController(
         confirmOrderService.requestOrders(partnerId, requestOrderCreateModel)
     }
 
-//    @Operation(summary = "임시대체상품 추가")
-//    @PostMapping("partners/{partnerId}/confirm/{confirmOrderId}")
-//    fun addBasicProductWithConfirmProduct(
-//        @Parameter(description = "화주(고객사) ID", required = true)
-//        @PathVariable partnerId : Long,
-//        @Parameter(description = "출고지시 고유번호", required = true)
-//        @PathVariable confirmOrderId : Long,
-//        @RequestBody basicProductAddModel: BasicProductAddModel
-//    ){
-//        confirmOrderService.addBasicProduct(confirmOrderId, basicProductAddModel.apply { this.partnerId = partnerId })
-//    }
+    @Operation(summary = "임시대체상품 추가")
+    @PutMapping("partners/{partnerId}/confirm/products")
+    fun addBasicProductWithConfirmProduct(
+        @Parameter(description = "화주(고객사) ID", required = true)
+        @PathVariable partnerId : Long,
+        @RequestBody confirmProductAddModel: ConfirmProductAddModel
+    ){
+        confirmOrderService.replaceConfirmProducts(confirmProductAddModel.apply { this.partnerId = partnerId })
+    }
 
 }
