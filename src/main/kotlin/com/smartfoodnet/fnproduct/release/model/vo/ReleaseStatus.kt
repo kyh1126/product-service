@@ -7,5 +7,13 @@ enum class ReleaseStatus(val releaseStatus: Int?, val description: String, val o
     RELEASE_ORDERED(3, "출고지시", OrderStatus.RELEASE_WORKING),
     RELEASE_IN_PROGRESS(5, "출고작업중", OrderStatus.IN_TRANSIT),
     RELEASE_COMPLETED(7, "출고완료", OrderStatus.COMPLETE),
-    RELEASE_CANCELED(9, "출고취소", OrderStatus.CANCEL),
+    RELEASE_CANCELED(9, "출고취소", OrderStatus.CANCEL);
+
+    fun isSyncableStatus(): Boolean {
+        return this in SYNCABLE_STATUSES
+    }
+
+    companion object {
+        val SYNCABLE_STATUSES = setOf(RELEASE_REQUESTED, RELEASE_ORDERED, RELEASE_IN_PROGRESS)
+    }
 }
