@@ -14,18 +14,18 @@ import org.springframework.web.bind.annotation.*
 
 @Api(description = "릴리즈 관련 API")
 @RestController
-@RequestMapping("/release")
+@RequestMapping("/release-info")
 class ReleaseController(
     private val releaseInfoService: ReleaseInfoService
 ) {
     @Operation(summary = "릴리즈 정보 리스트 조회")
     @GetMapping
-    fun getReleaseInfos(
+    fun getReleaseInfoList(
         @Parameter(description = "검색조건")
         @ModelAttribute condition: ReleaseInfoSearchCondition,
         @PageableDefault(size = 50, sort = ["id"], direction = Sort.Direction.DESC) page: Pageable,
     ): PageResponse<ReleaseInfoModel> {
-        return releaseInfoService.getReleaseInfos(condition, page)
+        return releaseInfoService.getReleaseInfoList(condition, page)
     }
 
     @Operation(summary = "릴리즈 정보 상세 조회")

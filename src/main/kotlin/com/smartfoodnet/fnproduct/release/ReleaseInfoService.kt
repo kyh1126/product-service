@@ -13,7 +13,10 @@ import org.springframework.transaction.annotation.Transactional
 class ReleaseInfoService(
     private val releaseInfoRepository: ReleaseInfoRepository
 ) {
-    fun getReleaseInfos(condition: ReleaseInfoSearchCondition, page: Pageable): PageResponse<ReleaseInfoModel> {
+    fun getReleaseInfoList(
+        condition: ReleaseInfoSearchCondition,
+        page: Pageable
+    ): PageResponse<ReleaseInfoModel> {
         return releaseInfoRepository.findAllByCondition(condition, page)
             .map(ReleaseInfoModel::fromEntity)
             .run { PageResponse.of(this) }
