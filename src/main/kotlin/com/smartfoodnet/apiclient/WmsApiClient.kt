@@ -101,10 +101,15 @@ interface WmsApiClient {
     // ---------------------------------------------------------------------------------------------
     // -- 발주
     // ---------------------------------------------------------------------------------------------
-    @PostMapping("inventory/outbounds")
+    @PostMapping("inventory/outbound")
     fun createOutbound(
         @RequestBody outboundCreateModel: OutboundCreateModel
     ): CommonResponse<PostOutboundModel>
+
+    @PostMapping("inventory/outbounds")
+    fun createOutbounds(
+        @RequestBody outboundCreateBulkModel: OutboundCreateBulkModel
+    ): CommonResponse<CommonProcessBulkModel<PostOutboundModel>>
 }
 
 data class StockDefaultModel(
