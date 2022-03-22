@@ -4,7 +4,7 @@ import com.smartfoodnet.apiclient.WmsApiClient
 import com.smartfoodnet.common.error.exception.BaseRuntimeException
 import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.fnproduct.order.model.CollectedOrderCreateModel
-import com.smartfoodnet.fnproduct.order.model.OrderStatus
+import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import com.smartfoodnet.fninventory.shortage.model.ShortageOrderProjectionModel
 import com.smartfoodnet.fnproduct.order.dto.CollectedOrderModel
 import com.smartfoodnet.fnproduct.order.entity.CollectedOrder

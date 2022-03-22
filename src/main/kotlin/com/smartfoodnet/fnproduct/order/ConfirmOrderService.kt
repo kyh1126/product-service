@@ -7,11 +7,16 @@ import com.smartfoodnet.common.error.exception.BaseRuntimeException
 import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.fnproduct.order.dto.ConfirmProductModel
 import com.smartfoodnet.fnproduct.order.entity.*
-import com.smartfoodnet.fnproduct.order.model.OrderStatus
+import com.smartfoodnet.fnproduct.order.model.BasicProductAddModel
+import com.smartfoodnet.fnproduct.order.model.ConfirmProductAddModel
+import com.smartfoodnet.fnproduct.order.model.ConfirmProductMappedModel
+import com.smartfoodnet.fnproduct.order.model.RequestOrderCreateModel
+import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import com.smartfoodnet.fnproduct.order.support.ConfirmOrderRepository
 import com.smartfoodnet.fnproduct.order.support.ConfirmProductRepository
 import com.smartfoodnet.fnproduct.order.support.condition.ConfirmProductSearchCondition
 import com.smartfoodnet.fnproduct.order.vo.MatchingType
+import com.smartfoodnet.fnproduct.product.BasicProductService
 import com.smartfoodnet.fnproduct.product.PackageProductMappingRepository
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import org.springframework.stereotype.Service
@@ -22,14 +27,16 @@ import java.time.LocalDateTime
 @Transactional(readOnly = true)
 class ConfirmOrderService(
     val orderService: OrderService,
+    val basicProductService: BasicProductService,
     val confirmOrderRepository: ConfirmOrderRepository,
     val confirmProductRepository: ConfirmProductRepository,
     val packageProductMappingRepository: PackageProductMappingRepository,
-    val wmsApiClient: WmsApiClient,
-    val objectMapper: ObjectMapper
+    val wmsApiClient: WmsApiClient
 ) : Log {
-    @Transactional
-    fun createConfirmProduct(partnerId: Long, collectedOrderIds: List<Long>) {
+    private fun validateConfirmProduct(
+        partnerId: Long,
+        collectedOrderIds: List<Long>,
+    ): List<CollectedOrder> {
         val collectedList = orderService.getCollectedOrders(collectedOrderIds)
         val subtractList = collectedOrderIds.subtract(collectedList.map { it.id }.toSet())
 
@@ -40,6 +47,13 @@ class ConfirmOrderService(
         if (!collectedList.all { it.partnerId == partnerId })
             throw BaseRuntimeException(errorMessage = "해당 고객사의 주문건이 아닙니다")
 
+        return collectedList
+    }
+
+    @Transactional
+    fun createConfirmProduct(partnerId: Long, collectedOrderIds: List<Long>) {
+        val collectedList = validateConfirmProduct(partnerId, collectedOrderIds)
+
         if (!collectedList.all { it.status == OrderStatus.NEW })
             throw BaseRuntimeException(errorMessage = "이미 출고지시가 처리된 데이터 입니다")
 
@@ -49,29 +63,50 @@ class ConfirmOrderService(
     }
 
     private fun convertConfirmProduct(collectedOrder: CollectedOrder) {
+        collectedOrderAddConfirmProduct(collectedOrder)
+        collectedOrder.nextStep()
+    }
+
+    @Transactional
+    fun restoreConfirmProduct(partnerId: Long, collectedOrderIds: List<Long>) {
+        val collectedList = validateConfirmProduct(partnerId, collectedOrderIds)
+
+        if (!collectedList.all { it.status == OrderStatus.ORDER_CONFIRM })
+            throw BaseRuntimeException(errorMessage = "출고지시 상태의 주문건이 아닙니다")
+
+        collectedList.forEach {
+            restoreConfirmProduct(it)
+        }
+    }
+
+    private fun restoreConfirmProduct(collectedOrder: CollectedOrder) {
+        collectedOrder.clearConfirmProduct()
+        collectedOrderAddConfirmProduct(collectedOrder)
+    }
+
+    private fun collectedOrderAddConfirmProduct(collectedOrder: CollectedOrder) {
         val storeMapping = collectedOrder.storeProduct?.storeProductMappings
         if (storeMapping.isNullOrEmpty())
             throw BaseRuntimeException(errorMessage = "매칭되지 않은 쇼핑몰 상품이 존재합니다 상품코드[${collectedOrder.collectedProductInfo.collectedStoreProductName} - ${collectedOrder.collectedProductInfo.collectedStoreProductOptionName}]")
 
         storeMapping.forEach {
-            val basicProduct = it.basicProduct
-            val confirmProduct = ConfirmProduct(
-                collectedOrder = collectedOrder,
-                type = basicProduct.type,
-                matchingType = MatchingType.AUTO,
-                basicProduct = basicProduct,
-                quantity = collectedOrder.quantity * it.quantity,
-                quantityPerUnit = it.quantity
+            collectedOrder.addConfirmProduct(
+                ConfirmProduct(
+                    type = it.basicProduct.type,
+                    matchingType = MatchingType.AUTO,
+                    basicProduct = it.basicProduct,
+                    quantity = collectedOrder.quantity * it.quantity,
+                    quantityPerUnit = it.quantity
+                )
             )
-            confirmProductRepository.save(confirmProduct)
         }
-
-        collectedOrder.nextStep()
     }
 
+
     @Transactional
-    fun requestOrders(partnerId: Long, collectedOrderIds: List<Long>) {
-        val collectedOrderList = orderService.getCollectedOrders(collectedOrderIds)
+    fun requestOrders(partnerId: Long, requestOrderCreateModel: RequestOrderCreateModel) {
+        val collectedOrderList =
+            orderService.getCollectedOrders(requestOrderCreateModel.collectedOrderIds)
 
         if (collectedOrderList.all { it.status != OrderStatus.ORDER_CONFIRM }) {
             throw BaseRuntimeException(errorMessage = "출고지시 상태가 아닌 주문건이 있습니다")
@@ -80,19 +115,22 @@ class ConfirmOrderService(
         val sendOrderList = collectedOrderList
             .groupBy { it.bundleNumber }
             .map {
-                createSendOrder(partnerId, it)
+                createSendOrder(partnerId, requestOrderCreateModel, it)
             }
 
-        sendOrderList.forEach {
-            val outboundModel = RequestOrderMapper.toOutboundCreateModel(it)
-//            log.info("log -> {}",objectMapper.writeValueAsString(outboundModel))
-            val response = wmsApiClient.createOutbound(outboundModel).payload!!
-            it.setOrderInfo(response.orderId, response.orderCode)
+        val requestBulkModel = RequestOrderMapper.toOutboundCreateBulkModel(sendOrderList)
+        val response =
+            wmsApiClient.createOutbounds(requestBulkModel).payload?.processedDataList ?: listOf()
+
+        for ((index, confirmOrder) in sendOrderList.withIndex()) {
+            val orderInfo = response[index]
+            confirmOrder.setOrderInfo(orderInfo.orderId, orderInfo.orderCode)
         }
     }
 
     private fun createSendOrder(
         partnerId: Long,
+        requestOrderCreateModel: RequestOrderCreateModel,
         orderGroup: Map.Entry<String, List<CollectedOrder>>
     ): ConfirmOrder {
         val firstCollectedOrder = orderGroup.value.first()
@@ -102,8 +140,13 @@ class ConfirmOrderService(
             shippingMethodType = 1,
             requestShippingDate = LocalDateTime.now(),
             receiver = firstCollectedOrder.receiver,
-            // TODO : 2022-03-16 memo 2~3 항목 확인해서 추가해야합니다. memo5는 사용하지 않습니다
-            memo = Memo(firstCollectedOrder.storeName, null, null, firstCollectedOrder.shippingPrice.toString(), null)
+            memo = Memo(
+                firstCollectedOrder.storeName,
+                requestOrderCreateModel.promotion,
+                requestOrderCreateModel.reShipmentReason,
+                firstCollectedOrder.shippingPrice?.toInt().toString(),
+                null
+            )
         )
 
         orderGroup.value.forEach {
@@ -204,5 +247,41 @@ class ConfirmOrderService(
         }
 
         return response
+    }
+
+    @Transactional
+    fun replaceConfirmProducts(confirmProductAddModel: ConfirmProductAddModel) {
+        confirmProductAddModel.confirmProductList.forEach {
+            replaceConfirmProduct(it)
+        }
+    }
+
+    private fun replaceConfirmProduct(mappedModel: ConfirmProductMappedModel) {
+        val collectedOrder = orderService.getCollectedOrder(mappedModel.collectedOrderId)
+        collectedOrder.clearConfirmProduct()
+
+        val basicProducts =
+            basicProductService.getBasicProducts(mappedModel.basicProducts.map { it.basicProductId })
+
+        val quantityPerBasicProduct = getBasicProductsAndRequestQuantityMapping(mappedModel)
+
+        basicProducts.forEach {
+            collectedOrder.addConfirmProduct(
+                it.run {
+                    ConfirmProduct(
+                        type = type,
+                        basicProduct = this,
+                        matchingType = MatchingType.TEMP,
+                        quantity = quantityPerBasicProduct[this.id]!!,
+                        quantityPerUnit = 0
+                    )
+                }
+            )
+        }
+
+    }
+
+    private fun getBasicProductsAndRequestQuantityMapping(mappedModel: ConfirmProductMappedModel): Map<Long, Int> {
+        return mappedModel.basicProducts.associateBy({ it.basicProductId }, { it.quantity })
     }
 }

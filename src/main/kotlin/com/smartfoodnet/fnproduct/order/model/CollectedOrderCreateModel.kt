@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat
 import com.smartfoodnet.common.Constants
 import com.smartfoodnet.fnproduct.order.entity.CollectedProductInfo
 import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
+import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import io.swagger.annotations.ApiModelProperty
 import java.time.LocalDateTime
 

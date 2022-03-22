@@ -1,7 +1,6 @@
 package com.smartfoodnet.fnproduct.order.support
 
 import com.querydsl.core.types.Projections
-import com.querydsl.jpa.impl.JPAQuery
 import com.smartfoodnet.common.model.request.PredicateSearchCondition
 import com.smartfoodnet.config.Querydsl4RepositorySupport
 import com.smartfoodnet.fninventory.shortage.model.ShortageOrderProjectionModel
@@ -9,13 +8,10 @@ import com.smartfoodnet.fnproduct.order.dto.CollectedOrderModel
 import com.smartfoodnet.fnproduct.order.dto.QCollectedOrderModel
 import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
 import com.smartfoodnet.fnproduct.order.entity.QCollectedOrder.collectedOrder
-import com.smartfoodnet.fnproduct.order.entity.QConfirmProduct.confirmProduct
-import com.smartfoodnet.fnproduct.order.model.OrderStatus
+import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import com.smartfoodnet.fnproduct.product.entity.QBasicProduct.basicProduct
 import com.smartfoodnet.fnproduct.store.entity.QStoreProduct.storeProduct
 import com.smartfoodnet.fnproduct.store.entity.QStoreProductMapping.storeProductMapping
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.Pageable
 
 class CollectedOrderRepositoryImpl : CollectedOrderRepositoryCustom, Querydsl4RepositorySupport(
     CollectedOrder::class.java) {

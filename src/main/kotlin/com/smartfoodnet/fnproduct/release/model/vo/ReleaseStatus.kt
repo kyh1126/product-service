@@ -1,6 +1,6 @@
 package com.smartfoodnet.fnproduct.release.model.vo
 
-import com.smartfoodnet.fnproduct.order.model.OrderStatus
+import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 
 enum class ReleaseStatus(val releaseStatus: Int?, val description: String, val orderStatus: OrderStatus? = null) {
     RELEASE_REQUESTED(1, "출고요청", OrderStatus.RELEASE_REGISTRATION),

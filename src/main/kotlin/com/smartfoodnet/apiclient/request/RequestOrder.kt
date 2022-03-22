@@ -77,6 +77,42 @@ object RequestOrderMapper {
             )
         }
     }
+
+    fun toOutboundCreateBulkModel(confirmOrders: List<ConfirmOrder>): OutboundCreateBulkModel{
+        return OutboundCreateBulkModel(
+            confirmOrders.first().partnerId,
+            createOutboundBulkItem(confirmOrders)
+        )
+    }
+
+    private fun createOutboundBulkItem(confirmOrders: List<ConfirmOrder>) : List<OutboundCreateBulkItemModel>{
+        return confirmOrders.map {
+            it.run {
+                OutboundCreateBulkItemModel(
+                    companyOrderCode = requestOrderList.first().collectedOrder.orderNumber,
+                    shippingMethodId = shippingMethodType,
+                    requestShippingDt = requestShippingDate.format(DateTimeFormatter.ofPattern(NOSNOS_DATE_FORMAT)),
+                    buyerName = receiver.name,
+                    receiverName = receiver.name,
+                    tel1 = receiver.phoneNumber,
+                    zipcode = receiver.zipCode,
+                    shippingAddress1 = receiver.address,
+                    shippingMessage = shippingMessage,
+                    memo1 = memo?.memo1,
+                    memo2 = memo?.memo2,
+                    memo3 = memo?.memo3,
+                    memo4 = memo?.memo4,
+                    memo5 = memo?.memo5,
+                    orderItemList = toOrderItemList(
+                        requestOrderList
+                            .map { it.collectedOrder.confirmProductList }
+                            .flatten()
+                        ,bundleNumber
+                    )
+                )
+            }
+        }
+    }
 }
 
 class OutboundCreateModel(
@@ -149,4 +185,68 @@ class OrderItem(
     val itemCd2: String? = null,
     @JsonProperty("item_cd3")
     val itemCd3: String? = null
+)
+
+class OutboundCreateBulkModel(
+    @JsonProperty("partner_id")
+    val partnerId: Long? = null,
+
+    @JsonProperty("request_data_list")
+    val requestDataList : List<OutboundCreateBulkItemModel>
+)
+
+class OutboundCreateBulkItemModel(
+    @JsonProperty("company_order_code")
+    val companyOrderCode: String,
+
+    @JsonProperty("shipping_method_id")
+    val shippingMethodId: Int? = null,
+
+    @JsonProperty("request_shipping_dt")
+    val requestShippingDt: String,
+
+    @JsonProperty("buyer_name")
+    val buyerName: String? = null,
+
+    @JsonProperty("receiver_name")
+    val receiverName: String,
+
+    @JsonProperty("tel1")
+    val tel1: String,
+
+    @JsonProperty("tel2")
+    val tel2: String? = null,
+
+    @JsonProperty("zipcode")
+    val zipcode: String? = null,
+
+    @JsonProperty("shipping_address1")
+    val shippingAddress1: String,
+
+    @JsonProperty("shipping_address2")
+    val shippingAddress2: String? = null,
+
+    @JsonProperty("shipping_message")
+    val shippingMessage: String? = null,
+
+    @JsonProperty("channel_id")
+    val channelId: Int? = null,
+
+    @JsonProperty("memo1")
+    val memo1: String? = null,
+
+    @JsonProperty("memo2")
+    val memo2: String? = null,
+
+    @JsonProperty("memo3")
+    val memo3: String? = null,
+
+    @JsonProperty("memo4")
+    val memo4: String? = null,
+
+    @JsonProperty("memo5")
+    val memo5: String? = null,
+
+    @JsonProperty("order_item_list")
+    val orderItemList: List<OrderItem>
 )

@@ -4,6 +4,8 @@ import com.smartfoodnet.fnproduct.order.dto.CollectedOrderModel
 import com.smartfoodnet.fnproduct.order.dto.ConfirmProductModel
 import com.smartfoodnet.fnproduct.order.model.BasicProductAddModel
 import com.smartfoodnet.fnproduct.order.model.CollectedOrderCreateModel
+import com.smartfoodnet.fnproduct.order.model.ConfirmProductAddModel
+import com.smartfoodnet.fnproduct.order.model.RequestOrderCreateModel
 import com.smartfoodnet.fnproduct.order.support.condition.CollectingOrderSearchCondition
 import com.smartfoodnet.fnproduct.order.support.condition.ConfirmProductSearchCondition
 import io.swagger.annotations.Api
@@ -70,21 +72,30 @@ class OrderController(
     @PostMapping("partners/{partnerId}/reqeust")
     fun createConfirmOrder(
         @Parameter(description = "화주(고객사) ID", required = true)
-        @PathVariable partnerId: Long
+        @PathVariable partnerId: Long,
+        @RequestBody requestOrderCreateModel : RequestOrderCreateModel
     ){
-        confirmOrderService.requestOrders(partnerId, listOf(4,5,6))
+        confirmOrderService.requestOrders(partnerId, requestOrderCreateModel)
     }
 
-//    @Operation(summary = "임시대체상품 추가")
-//    @PostMapping("partners/{partnerId}/confirm/{confirmOrderId}")
-//    fun addBasicProductWithConfirmProduct(
-//        @Parameter(description = "화주(고객사) ID", required = true)
-//        @PathVariable partnerId : Long,
-//        @Parameter(description = "출고지시 고유번호", required = true)
-//        @PathVariable confirmOrderId : Long,
-//        @RequestBody basicProductAddModel: BasicProductAddModel
-//    ){
-//        confirmOrderService.addBasicProduct(confirmOrderId, basicProductAddModel.apply { this.partnerId = partnerId })
-//    }
+    @Operation(summary = "임시대체상품 추가")
+    @PutMapping("partners/{partnerId}/confirm/products")
+    fun addBasicProductWithConfirmProduct(
+        @Parameter(description = "화주(고객사) ID", required = true)
+        @PathVariable partnerId : Long,
+        @RequestBody confirmProductAddModel: ConfirmProductAddModel
+    ){
+        confirmOrderService.replaceConfirmProducts(confirmProductAddModel.apply { this.partnerId = partnerId })
+    }
+
+    @Operation(summary = "기존 기본상품으로 복구")
+    @PutMapping("partners/{partnerId}/confirm/products/restore")
+    fun restoreConfirmProduct(
+        @Parameter(description = "화주(고객사) ID", required = true)
+        @PathVariable partnerId : Long,
+        @RequestBody collectedIds: List<Long>
+    ){
+        confirmOrderService.restoreConfirmProduct(partnerId, collectedIds)
+    }
 
 }

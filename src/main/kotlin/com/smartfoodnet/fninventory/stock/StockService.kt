@@ -11,7 +11,7 @@ import com.smartfoodnet.fninventory.stock.support.DailyStockSummaryRepository
 import com.smartfoodnet.fninventory.stock.support.StockByBestBeforeRepository
 import com.smartfoodnet.fninventory.stock.support.StockByBestBeforeSearchCondition
 import com.smartfoodnet.fnproduct.order.OrderService
-import com.smartfoodnet.fnproduct.order.model.OrderStatus
+import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import com.smartfoodnet.fnproduct.product.BasicProductRepository
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
