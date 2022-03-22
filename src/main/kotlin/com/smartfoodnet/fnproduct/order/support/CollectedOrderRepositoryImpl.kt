@@ -14,7 +14,9 @@ import com.smartfoodnet.fnproduct.store.entity.QStoreProduct.storeProduct
 import com.smartfoodnet.fnproduct.store.entity.QStoreProductMapping.storeProductMapping
 
 class CollectedOrderRepositoryImpl : CollectedOrderRepositoryCustom, Querydsl4RepositorySupport(
-    CollectedOrder::class.java) {
+    CollectedOrder::class.java
+) {
+
     override fun findAllByPartnerIdAndStatusGroupByProductId(
         partnerId: Long,
         status: OrderStatus
@@ -22,15 +24,15 @@ class CollectedOrderRepositoryImpl : CollectedOrderRepositoryCustom, Querydsl4Re
 
         return select(
             Projections.fields(
-            ShortageOrderProjectionModel::class.java,
-            basicProduct.id.`as`("basicProductId"),
-            basicProduct.name.`as`("basicProductName"),
-            basicProduct.code.`as`("basicProductCode"),
-            basicProduct.id.count().`as`("shortageOrderCount"),
-            basicProduct.shippingProductId,
-            collectedOrder.quantity.sum().`as`("totalOrderCount"),
-            collectedOrder.price.sum().`as`("totalShortagePrice")
-        )).from(collectedOrder)
+                ShortageOrderProjectionModel::class.java,
+                basicProduct.id.`as`("basicProductId"),
+                basicProduct.name.`as`("basicProductName"),
+                basicProduct.code.`as`("basicProductCode"),
+                basicProduct.id.count().`as`("shortageOrderCount"),
+                basicProduct.shippingProductId,
+                collectedOrder.quantity.sum().`as`("totalOrderCount"),
+                collectedOrder.price.sum().`as`("totalShortagePrice")
+            )).from(collectedOrder)
             .innerJoin(collectedOrder.storeProduct.storeProductMappings, storeProductMapping)
             .innerJoin(storeProductMapping.basicProduct, basicProduct)
             .on(collectedOrder.status.eq(status).and(collectedOrder.partnerId.eq(partnerId)))

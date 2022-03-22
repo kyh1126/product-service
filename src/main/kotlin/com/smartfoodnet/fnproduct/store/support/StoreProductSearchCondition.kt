@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.querydsl.core.BooleanBuilder
 import com.querydsl.core.types.Predicate
 import com.querydsl.core.types.dsl.BooleanExpression
+import com.smartfoodnet.common.error.exception.BaseRuntimeException
 import com.smartfoodnet.common.model.request.PredicateSearchCondition
 import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
 import com.smartfoodnet.fnproduct.product.entity.QBasicProduct.basicProduct
@@ -62,9 +63,12 @@ class StoreProductSearchCondition(
     companion object {
         fun toSearchConditionModel(collectedOrder: CollectedOrder): StoreProductSearchCondition {
             return with(collectedOrder) {
+                val nonNullStoreId = storeId
+                    ?: throw BaseRuntimeException(errorMessage = "storeId가 없습니다")
+
                 StoreProductSearchCondition(
                     partnerId = partnerId,
-                    storeIds = listOf(storeId),
+                    storeIds = listOf(nonNullStoreId),
                     storeProductCode = collectedProductInfo.collectedStoreProductCode,
                     storeProductName = collectedProductInfo.collectedStoreProductName,
                     storeProductOptionName = collectedProductInfo.collectedStoreProductOptionName

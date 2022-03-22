@@ -72,12 +72,12 @@ data class ReleaseInfoDetailModel(
                     bundleNumbers = collectedOrders.joinToString { it.bundleNumber },
                     orderNumbers = collectedOrders.joinToString { it.orderNumber as String },
                     orderStatuses = collectedOrders.map { it.status },
-                    uploadType = collectedOrders.joinToString { it.uploadType as String },
+                    uploadType = collectedOrders.joinToString { it.uploadType.name },
                     claimStatus = collectedOrders.joinToString { it.claimStatus as String },
                     storeName = collectedOrders.joinToString { it.storeName },
-                    receiverName = receivers.joinToString { it?.name ?: "" },
-                    receiverAddress = receivers.joinToString { it?.address ?: "" },
-                    phoneNumber = receivers.joinToString { it?.phoneNumber ?: "" },
+                    receiverName = receivers.joinToString { it.name },
+                    receiverAddress = receivers.joinToString { it.address },
+                    phoneNumber = receivers.joinToString { it.phoneNumber },
                 )
             }
         }

@@ -6,6 +6,7 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor
 
 interface BasicProductRepository : JpaRepository<BasicProduct, Long>, BasicProductCustom,
         QuerydslPredicateExecutor<BasicProduct> {
+    fun findAllByIdIn(ids: Collection<Long>): List<BasicProduct>
     fun findByCode(code: String): BasicProduct?
     fun findByPartnerIdAndName(partnerId: Long, name: String): BasicProduct?
     fun findByPartnerIdAndExpirationDateManagementYnAndActiveYn(

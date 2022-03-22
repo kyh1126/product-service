@@ -3,7 +3,6 @@ package com.smartfoodnet.fninventory.inbound
 import com.smartfoodnet.common.error.exception.BaseRuntimeException
 import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.common.utils.Log
-import com.smartfoodnet.fninventory.inbound.entity.InboundExpectedDetail
 import com.smartfoodnet.fninventory.inbound.model.dto.CreateInboundResponse
 import com.smartfoodnet.fninventory.inbound.model.dto.GetInbound
 import com.smartfoodnet.fninventory.inbound.model.dto.GetInboundDetailModel

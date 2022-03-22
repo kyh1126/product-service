@@ -1,8 +1,8 @@
 package com.smartfoodnet.common
 
-import java.time.LocalDateTime
-
 object Constants {
+    const val HEADER_KEY_SFN_META_USER = "sfn-meta-user"
+
     const val TIMESTAMP3_FORMAT = "yyyy-MM-dd HH:mm:ss:SSS"
     const val TIMESTAMP_MINUTE_FORMAT = "yyyy-MM-dd HH:mm"
     const val DATE_FORMAT = "yyyy-MM-dd"
