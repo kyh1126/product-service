@@ -28,7 +28,7 @@ class ReleaseInfo(
 
     @Enumerated(EnumType.STRING)
     @Column(name = "release_status")
-    var releaseStatus: ReleaseStatus? = null,
+    var releaseStatus: ReleaseStatus = ReleaseStatus.RELEASE_REQUESTED,
 
     @Column(name = "delivery_agency_id")
     var deliveryAgencyId: Long? = null,
