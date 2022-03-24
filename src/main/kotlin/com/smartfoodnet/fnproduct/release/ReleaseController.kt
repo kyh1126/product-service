@@ -1,5 +1,6 @@
 package com.smartfoodnet.fnproduct.release
 
+import com.smartfoodnet.common.model.response.CommonResponse
 import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.fnproduct.release.model.request.ReleaseInfoSearchCondition
 import com.smartfoodnet.fnproduct.release.model.response.ReleaseInfoDetailModel
@@ -10,6 +11,7 @@ import io.swagger.v3.oas.annotations.Parameter
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.web.PageableDefault
+import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 
 @Api(description = "릴리즈 관련 API")
@@ -35,5 +37,12 @@ class ReleaseController(
         @PathVariable id: Long,
     ): ReleaseInfoDetailModel {
         return releaseInfoService.getReleaseInfo(id)
+    }
+
+    @Operation(summary = "릴리즈 정보 동기화")
+    @PostMapping("/sync")
+    fun syncReleaseInfo(): CommonResponse<String> {
+        releaseInfoService.syncReleaseInfo()
+        return CommonResponse(HttpStatus.OK.reasonPhrase)
     }
 }
