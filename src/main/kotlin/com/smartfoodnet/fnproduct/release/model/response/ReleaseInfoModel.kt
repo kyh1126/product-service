@@ -83,7 +83,6 @@ data class ReleaseInfoModel(
                     releaseStatus = releaseStatus,
                     shippingCode = shippingCode,
                     deliveryAgencyId = deliveryAgencyId,
-                    deliveryAgencyName = deliveryAgencyName,
                     shippingCodeCreatedAt = shippingCodeCreatedAt,
                     productNames = collectedOrders.joinToString {
                         Strings.concat(it.storeProduct?.name, it.storeProduct?.optionName)
