@@ -1,37 +1,26 @@
 package com.smartfoodnet.fnproduct.order.support
 
-import com.querydsl.jpa.impl.JPAQuery
 import com.smartfoodnet.common.model.request.PredicateSearchCondition
 import com.smartfoodnet.config.Querydsl4RepositorySupport
 import com.smartfoodnet.fnproduct.order.dto.CollectedOrderModel
-import com.smartfoodnet.fnproduct.order.dto.ConfirmOrderModel
+import com.smartfoodnet.fnproduct.order.dto.ConfirmProductModel
 import com.smartfoodnet.fnproduct.order.dto.QCollectedOrderModel
-import com.smartfoodnet.fnproduct.order.dto.QConfirmOrderModel
-import com.smartfoodnet.fnproduct.order.entity.ConfirmOrder
-import com.smartfoodnet.fnproduct.order.entity.QCollectedOrder.collectedOrder
-import com.smartfoodnet.fnproduct.order.entity.QConfirmOrder.confirmOrder
-import com.smartfoodnet.fnproduct.order.entity.QConfirmProduct.confirmProduct
-import com.smartfoodnet.fnproduct.product.entity.QBasicProduct.basicProduct
-import com.smartfoodnet.fnproduct.store.entity.QStoreProduct.storeProduct
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.Pageable
+import com.smartfoodnet.fnproduct.order.dto.QConfirmProductModel
+import com.smartfoodnet.fnproduct.order.entity.ConfirmProduct
+import com.smartfoodnet.fnproduct.order.entity.QCollectedOrder
+import com.smartfoodnet.fnproduct.order.entity.QCollectedOrder.*
+import com.smartfoodnet.fnproduct.order.entity.QConfirmProduct
+import com.smartfoodnet.fnproduct.order.entity.QConfirmProduct.*
+import com.smartfoodnet.fnproduct.product.entity.QBasicProduct
+import com.smartfoodnet.fnproduct.product.entity.QBasicProduct.*
 
-class ConfirmOrderRepositoryImpl : ConfirmOrderRepositoryCustom, Querydsl4RepositorySupport(ConfirmOrder::class.java) {
-    override fun findAllByConfirmOrderWithPageable(condition: PredicateSearchCondition, page: Pageable): Page<ConfirmOrderModel> {
-        return applyPagination(page){
-            createConfirmOrderQuery(condition)
-        }
-    }
-
-    override fun findAllByConfirmOrder(condition: PredicateSearchCondition): List<ConfirmOrderModel> {
-        return createConfirmOrderQuery(condition).fetch()
-    }
-
-    private fun createConfirmOrderQuery(condition : PredicateSearchCondition) : JPAQuery<ConfirmOrderModel>{
+class ConfirmProductRepositoryImpl : ConfirmProductRepositoryCustom, Querydsl4RepositorySupport(
+    ConfirmProduct::class.java){
+    override fun findAllCollectedOrderWithConfirmProduct(condition: PredicateSearchCondition): List<ConfirmProductModel> {
         return select(
-            QConfirmOrderModel(
+            QConfirmProductModel(
                 collectedOrder.id,
-                confirmOrder.id,
+                confirmProduct.id,
                 collectedOrder.partnerId,
                 collectedOrder.uploadType,
                 collectedOrder.status,
@@ -39,13 +28,13 @@ class ConfirmOrderRepositoryImpl : ConfirmOrderRepositoryCustom, Querydsl4Reposi
                 collectedOrder.bundleNumber,
                 confirmProduct.matchingType,
                 basicProduct.id,
-                confirmProduct.type,
+                basicProduct.type,
                 basicProduct.salesProductId,
                 basicProduct.salesProductCode,
                 basicProduct.shippingProductId,
                 basicProduct.productCode,
                 basicProduct.name,
-                confirmProduct.quantity,
+                confirmProduct.quantityPerUnit,
                 collectedOrder.storeId,
                 collectedOrder.storeName,
                 collectedOrder.collectedProductInfo.collectedStoreProductCode,
@@ -65,11 +54,13 @@ class ConfirmOrderRepositoryImpl : ConfirmOrderRepositoryCustom, Querydsl4Reposi
                 collectedOrder.collectedAt
             )
         )
-            .from(confirmOrder)
-//            .leftJoin(confirmOrder.confirmProductList, confirmProduct)
+            .from(collectedOrder)
+            .leftJoin(
+                collectedOrder.confirmProductList,
+                confirmProduct
+            )
             .leftJoin(confirmProduct.basicProduct, basicProduct)
-            .leftJoin(confirmProduct.collectedOrder, collectedOrder)
-            .leftJoin(collectedOrder.storeProduct, storeProduct)
-        .where(condition.toPredicate())
+            .where(condition.toPredicate())
+            .fetch()
     }
 }

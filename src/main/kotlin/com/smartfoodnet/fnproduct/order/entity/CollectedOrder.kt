@@ -2,9 +2,8 @@ package com.smartfoodnet.fnproduct.order.entity
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.smartfoodnet.common.entity.BaseEntity
-import com.smartfoodnet.fnproduct.order.model.OrderStatus
+import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import com.smartfoodnet.fnproduct.store.entity.StoreProduct
-import org.hibernate.annotations.BatchSize
 import org.hibernate.annotations.DynamicUpdate
 import java.time.LocalDateTime
 import javax.persistence.*
@@ -43,7 +42,7 @@ class CollectedOrder(
 
     val statusUpdatedAt: LocalDateTime? = null,
 
-    val orderNumber: String? = null,
+    val orderNumber: String,
 
     var claimStatus: String? = null,
 
@@ -55,6 +54,9 @@ class CollectedOrder(
     @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
     var storeProduct: StoreProduct? = null,
 
+    @OneToMany(mappedBy = "collectedOrder", fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST], orphanRemoval = true)
+    val confirmProductList : MutableList<ConfirmProduct> = mutableListOf(),
+
     @Embedded
     val collectedProductInfo: CollectedProductInfo,
 
@@ -62,10 +64,10 @@ class CollectedOrder(
 
     val shippingPrice: Double? = null,
 
-    val quantity: Int? = null,
+    val quantity: Int,
 
     @Embedded
-    val receiver: Receiver? = null,
+    val receiver: Receiver,
 
     @Embedded
     val sender: Sender? = null,
@@ -78,4 +80,17 @@ class CollectedOrder(
     val isConnectedStoreProduct
         @JsonIgnore @Transient
         get() = storeProduct?.storeProductMappings?.isNotEmpty()?:false
+
+    fun nextStep(){
+        status = status.next()
+    }
+
+    fun addConfirmProduct(confirmProduct : ConfirmProduct){
+        confirmProduct.collectedOrder = this
+        confirmProductList.add(confirmProduct)
+    }
+
+    fun clearConfirmProduct(){
+        confirmProductList.clear()
+    }
 }

@@ -6,7 +6,6 @@ import com.querydsl.core.types.Predicate
 import com.querydsl.core.types.dsl.BooleanExpression
 import com.smartfoodnet.common.model.request.PredicateSearchCondition
 import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
-import com.smartfoodnet.fnproduct.order.model.CollectedOrderCreateModel
 import com.smartfoodnet.fnproduct.product.entity.QBasicProduct.basicProduct
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import com.smartfoodnet.fnproduct.store.entity.QStoreProduct.storeProduct
@@ -17,7 +16,7 @@ class StoreProductSearchCondition(
     @ApiModelProperty(hidden = true)
     var partnerId: Long? = null,
     @ApiModelProperty(value = "쇼핑몰 ID")
-    val storeId: Long? = null,
+    val storeIds: List<Long>? = null,
     @ApiModelProperty(value = "쇼핑몰 상품명")
     val storeProductName: String? = null,
     @ApiModelProperty(value = "쇼핑몰 상품코드")
@@ -38,7 +37,7 @@ class StoreProductSearchCondition(
     override fun assemblePredicate(predicate: BooleanBuilder): Predicate {
         return predicate.orAllOf(
             storeProduct.partnerId.eq(partnerId),
-            storeId?.let { storeProduct.storeId.eq(it) },
+            storeIds?.let { storeProduct.storeId.`in`(it) },
             storeProductName?.let { storeProduct.name.contains(it) },
             storeProductCode?.let { storeProduct.storeProductCode.eq(it) },
             storeProductOptionCode?.let { storeProduct.optionCode.eq(it) },
@@ -65,7 +64,7 @@ class StoreProductSearchCondition(
             return with(collectedOrder) {
                 StoreProductSearchCondition(
                     partnerId = partnerId,
-                    storeId = storeId,
+                    storeIds = listOf(storeId),
                     storeProductCode = collectedProductInfo.collectedStoreProductCode,
                     storeProductName = collectedProductInfo.collectedStoreProductName,
                     storeProductOptionName = collectedProductInfo.collectedStoreProductOptionName

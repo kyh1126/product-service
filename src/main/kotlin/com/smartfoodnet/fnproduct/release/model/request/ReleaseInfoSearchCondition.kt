@@ -1,6 +1,6 @@
 package com.smartfoodnet.fnproduct.release.model.request
 
-import com.smartfoodnet.fnproduct.order.model.OrderStatus
+import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import io.swagger.annotations.ApiModelProperty
 
 class ReleaseInfoSearchCondition(

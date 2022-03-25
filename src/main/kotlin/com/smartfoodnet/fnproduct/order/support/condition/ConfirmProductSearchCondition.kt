@@ -7,12 +7,11 @@ import com.querydsl.core.types.Predicate
 import com.smartfoodnet.common.Constants
 import com.smartfoodnet.common.model.request.PredicateSearchCondition
 import com.smartfoodnet.fnproduct.order.entity.QCollectedOrder.collectedOrder
-import com.smartfoodnet.fnproduct.order.entity.QConfirmOrder.confirmOrder
 import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import io.swagger.annotations.ApiModelProperty
 import java.time.LocalDate
 
-class ConfirmOrderSearchCondition(
+class ConfirmProductSearchCondition(
     @JsonIgnore
     @ApiModelProperty(hidden = true)
     var partnerId: Long? = null,
@@ -44,7 +43,7 @@ class ConfirmOrderSearchCondition(
 ) : PredicateSearchCondition() {
     override fun assemblePredicate(predicate: BooleanBuilder): Predicate {
         return predicate.orAllOf(
-            confirmOrder.partnerId.eq(partnerId),
+            collectedOrder.partnerId.eq(partnerId),
             collectedOrder.status.eq(OrderStatus.ORDER_CONFIRM),
             collectedAt?.let {
                 collectedOrder.collectedAt.between(
@@ -52,7 +51,7 @@ class ConfirmOrderSearchCondition(
                     it.plusDays(1).atStartOfDay()
                 )
             },
-            bundleNumber?.let { confirmOrder.bundleNumber.eq(it) },
+            bundleNumber?.let { collectedOrder.bundleNumber.eq(it) },
             orderNumber?.let { collectedOrder.orderNumber.eq(it) },
             storeId?.let { collectedOrder.storeId.eq(it) },
             storeProductName?.let { collectedOrder.collectedProductInfo.collectedStoreProductName.contains(it) },

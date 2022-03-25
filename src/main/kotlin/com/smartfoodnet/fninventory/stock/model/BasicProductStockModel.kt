@@ -31,9 +31,12 @@ data class BasicProductStockModel(
 
     @ApiModelProperty(value = "점유 PLT 수")
     var occupiedPLTCount: Int? = null,
+
+    @ApiModelProperty(value = "총 주문 수량(미출고)")
+    var totalNewOrdersCount: Int? = null,
 ) {
     companion object {
-        fun fromBasicProduct(basicProduct: BasicProduct): BasicProductStockModel {
+        fun fromBasicProduct(basicProduct: BasicProduct, orderCount:Int): BasicProductStockModel {
             return basicProduct.run {
                 BasicProductStockModel(
                     basicProductId = id,
@@ -41,7 +44,8 @@ data class BasicProductStockModel(
                     basicProductCode = code,
                     shippingProductId = shippingProductId,
                     barcode = barcode,
-                    expirationDateManagementYn = expirationDateManagementYn
+                    expirationDateManagementYn = expirationDateManagementYn,
+                    totalNewOrdersCount = orderCount,
                 )
             }
         }

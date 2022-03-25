@@ -1,5 +1,7 @@
 package com.smartfoodnet.common
 
+import java.time.LocalDateTime
+
 object Constants {
     const val TIMESTAMP3_FORMAT = "yyyy-MM-dd HH:mm:ss:SSS"
     const val TIMESTAMP_MINUTE_FORMAT = "yyyy-MM-dd HH:mm"

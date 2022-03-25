@@ -2,7 +2,7 @@ package com.smartfoodnet.fnproduct.release
 
 import com.smartfoodnet.config.Querydsl4RepositorySupport
 import com.smartfoodnet.fnproduct.order.entity.QCollectedOrder.collectedOrder
-import com.smartfoodnet.fnproduct.order.model.OrderStatus
+import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import com.smartfoodnet.fnproduct.release.entity.QReleaseInfo.releaseInfo
 import com.smartfoodnet.fnproduct.release.entity.QReleaseOrderMapping.releaseOrderMapping
 import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo

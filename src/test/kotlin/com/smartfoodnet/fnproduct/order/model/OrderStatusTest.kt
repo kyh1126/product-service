@@ -1,5 +1,6 @@
 package com.smartfoodnet.fnproduct.order.model
 
+import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test

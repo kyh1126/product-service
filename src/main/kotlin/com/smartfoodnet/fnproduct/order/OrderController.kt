@@ -1,18 +1,16 @@
 package com.smartfoodnet.fnproduct.order
 
-import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.fnproduct.order.dto.CollectedOrderModel
-import com.smartfoodnet.fnproduct.order.dto.ConfirmOrderModel
+import com.smartfoodnet.fnproduct.order.dto.ConfirmProductModel
 import com.smartfoodnet.fnproduct.order.model.BasicProductAddModel
 import com.smartfoodnet.fnproduct.order.model.CollectedOrderCreateModel
+import com.smartfoodnet.fnproduct.order.model.ConfirmProductAddModel
+import com.smartfoodnet.fnproduct.order.model.RequestOrderCreateModel
 import com.smartfoodnet.fnproduct.order.support.condition.CollectingOrderSearchCondition
-import com.smartfoodnet.fnproduct.order.support.condition.ConfirmOrderSearchCondition
+import com.smartfoodnet.fnproduct.order.support.condition.ConfirmProductSearchCondition
 import io.swagger.annotations.Api
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
-import org.springframework.data.domain.Pageable
-import org.springframework.data.domain.Sort
-import org.springframework.data.web.PageableDefault
 import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
 
@@ -21,7 +19,7 @@ import javax.validation.Valid
 @RequestMapping("order")
 class OrderController(
     val orderService: OrderService,
-    val orderConfirmService: OrderConfirmService
+    val confirmOrderService: ConfirmOrderService
 ) {
     @Operation(summary = "주문 생성")
     @PostMapping
@@ -36,16 +34,16 @@ class OrderController(
         @PathVariable collectedOrderId: Long,
         @RequestBody basicProductAddModel : BasicProductAddModel
     ){
-        orderService.addStoreProduct(collectedOrderId, basicProductAddModel)
+        orderService.addStoreProduct(basicProductAddModel.apply { this.collectedOrderId = collectedOrderId })
     }
 
     @Operation(summary = "출고지시 생성")
     @PostMapping("/partners/{partnerId}/confirm")
-    fun createConfirmOrder(
+    fun createConfirmProduct(
         @PathVariable partnerId: Long,
         @RequestBody collectedIds: List<Long>
     ) {
-        orderConfirmService.createConfirmOrder(partnerId, collectedIds)
+        confirmOrderService.createConfirmProduct(partnerId, collectedIds)
     }
 
     @Operation(summary = "특정 화주(고객사) ID 의 주문수집 조회")
@@ -65,8 +63,39 @@ class OrderController(
         @Parameter(description = "화주(고객사) ID", required = true)
         @PathVariable partnerId: Long,
         @Parameter(description = "검색조건")
-        @ModelAttribute condition: ConfirmOrderSearchCondition,
-    ): List<ConfirmOrderModel> {
-        return orderConfirmService.getConfirmOrder(condition.apply { this.partnerId = partnerId })
+        @ModelAttribute condition: ConfirmProductSearchCondition,
+    ): List<ConfirmProductModel> {
+        return confirmOrderService.getConfirmProduct(condition.apply { this.partnerId = partnerId })
     }
+
+    @Operation(summary = "발주처리")
+    @PostMapping("partners/{partnerId}/reqeust")
+    fun createConfirmOrder(
+        @Parameter(description = "화주(고객사) ID", required = true)
+        @PathVariable partnerId: Long,
+        @RequestBody requestOrderCreateModel : RequestOrderCreateModel
+    ){
+        confirmOrderService.requestOrders(partnerId, requestOrderCreateModel)
+    }
+
+    @Operation(summary = "임시대체상품 추가")
+    @PutMapping("partners/{partnerId}/confirm/products")
+    fun addBasicProductWithConfirmProduct(
+        @Parameter(description = "화주(고객사) ID", required = true)
+        @PathVariable partnerId : Long,
+        @RequestBody confirmProductAddModel: ConfirmProductAddModel
+    ){
+        confirmOrderService.replaceConfirmProducts(confirmProductAddModel.apply { this.partnerId = partnerId })
+    }
+
+    @Operation(summary = "기존 기본상품으로 복구")
+    @PutMapping("partners/{partnerId}/confirm/products/restore")
+    fun restoreConfirmProduct(
+        @Parameter(description = "화주(고객사) ID", required = true)
+        @PathVariable partnerId : Long,
+        @RequestBody collectedIds: List<Long>
+    ){
+        confirmOrderService.restoreConfirmProduct(partnerId, collectedIds)
+    }
+
 }

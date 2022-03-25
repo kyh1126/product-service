@@ -11,26 +11,21 @@ class ConfirmProduct(
     @Column(name = "confirm_product_id", columnDefinition = "BIGINT UNSIGNED")
     val id: Long? = null,
 
-    @Enumerated(EnumType.STRING)
-    var type: BasicProductType,
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "collected_order_id")
+    var collectedOrder: CollectedOrder? = null,
 
     @Enumerated(EnumType.STRING)
-    val matchingType: MatchingType,
+    var type: BasicProductType = BasicProductType.BASIC,
+
+    @Enumerated(EnumType.STRING)
+    val matchingType: MatchingType = MatchingType.AUTO,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(columnDefinition = "BIGINT UNSIGNED")
-    val basicProduct: BasicProduct? = null,
+    val basicProduct: BasicProduct,
 
-    @OneToMany(mappedBy = "confirmProduct", cascade = [CascadeType.PERSIST])
-    val confirmPackageProductList: MutableCollection<ConfirmPackageProduct> = mutableListOf(),
+    val quantity: Int,
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "confirm_order_id", columnDefinition = "BIGINT UNSIGNED")
-    var confirmOrder : ConfirmOrder? = null,
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "collected_order_id")
-    val collectedOrder : CollectedOrder,
-
-    val quantity: Int
+    val quantityPerUnit: Int
 )

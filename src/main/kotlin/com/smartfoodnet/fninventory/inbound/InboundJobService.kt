@@ -1,18 +1,12 @@
 package com.smartfoodnet.fninventory.inbound
 
-import com.smartfoodnet.apiclient.WmsApiClient
-import com.smartfoodnet.apiclient.request.InboundWorkReadModel
-import com.smartfoodnet.apiclient.response.CommonDataListModel
-import com.smartfoodnet.apiclient.response.GetInboundModel
 import com.smartfoodnet.apiclient.response.GetInboundWorkModel
-import com.smartfoodnet.common.Constants
 import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.fninventory.inbound.model.vo.InboundStatusType
 import com.smartfoodnet.fnproduct.product.BasicProductRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @Service
@@ -78,7 +72,7 @@ class InboundJobService(
     @Transactional
     fun inboundProcessCheck(basicDt: String) {
         val paramDate = LocalDate.parse(basicDt, DateTimeFormatter.ofPattern("yyyyMMdd")).atStartOfDay()
-        val expectedList = inboundRepository.findStatusExptectedInbounds(paramDate)
+        val expectedList = inboundRepository.findStatusExpectedInbounds(paramDate)
 
         expectedList.forEach {
             val responseInboundModel = nosnosClientService.getInbound(it.registrationId!!)

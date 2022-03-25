@@ -4,7 +4,7 @@ import com.smartfoodnet.apiclient.response.NosnosStockModel
 import com.smartfoodnet.common.Constants.API_CALL_LIST_SIZE
 import com.smartfoodnet.fninventory.shortage.model.ProductShortageModel
 import com.smartfoodnet.fnproduct.order.OrderService
-import com.smartfoodnet.fnproduct.order.model.OrderStatus
+import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.concurrent.CompletableFuture

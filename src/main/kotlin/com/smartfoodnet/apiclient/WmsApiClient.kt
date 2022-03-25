@@ -116,7 +116,20 @@ interface WmsApiClient {
     fun cancelInbound(
         @RequestParam partnerId: Long,
         @PathVariable receivingPlanId: Long
-    ): CommonResponse<Void>
+    ): CommonResponse<Unit>
+
+    // ---------------------------------------------------------------------------------------------
+    // -- 발주
+    // ---------------------------------------------------------------------------------------------
+    @PostMapping("inventory/outbound")
+    fun createOutbound(
+        @RequestBody outboundCreateModel: OutboundCreateModel
+    ): CommonResponse<PostOutboundModel>
+
+    @PostMapping("inventory/outbounds")
+    fun createOutbounds(
+        @RequestBody outboundCreateBulkModel: OutboundCreateBulkModel
+    ): CommonResponse<CommonProcessBulkModel<PostOutboundModel>>
 }
 
 data class StockDefaultModel(
