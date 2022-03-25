@@ -15,5 +15,10 @@ enum class ReleaseStatus(val releaseStatus: Int?, val description: String, val o
 
     companion object {
         val SYNCABLE_STATUSES = setOf(RELEASE_REQUESTED, RELEASE_ORDERED, RELEASE_IN_PROGRESS)
+
+        fun fromReleaseStatus(releaseStatus: Int): ReleaseStatus {
+            return values().firstOrNull { it.releaseStatus == releaseStatus }
+                ?: throw IllegalArgumentException("Format $releaseStatus is illegal")
+        }
     }
 }

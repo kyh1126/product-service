@@ -33,15 +33,12 @@ class ReleaseInfo(
     @Column(name = "delivery_agency_id")
     var deliveryAgencyId: Long? = null,
 
-    @Column(name = "delivery_agency_name")
-    var deliveryAgencyName: String? = null,
-
     @Column(name = "shipping_code")
     var shippingCode: String? = null,
 
     @Enumerated(EnumType.STRING)
     @Column(name = "shipping_code_status")
-    var shippingCodeStatus: ShippingCodeStatus? = ShippingCodeStatus.UNREGISTERED,
+    var shippingCodeStatus: ShippingCodeStatus? = null,
 
     @Column(name = "shipping_code_created_at")
     var shippingCodeCreatedAt: LocalDateTime? = null,
