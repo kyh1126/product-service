@@ -47,7 +47,7 @@ interface WmsApiClient {
     // -- 출고상품(=기본상품)관리
     // ---------------------------------------------------------------------------------------------
     @GetMapping("shipping/products/bulk")
-    fun getShippingProducts(@SpringQueryMap basicProductReadModel: BasicProductReadModel): CommonResponse<CommonDataListModel<GetShippingProductModel>>
+    fun getShippingProducts(@SpringQueryMap basicProductReadModel: BasicProductReadModel): CommonResponse<CommonDataListModel<NosnosShippingProductModel>>
 
     @PostMapping("shipping/products")
     fun createShippingProduct(preModel: PreShippingProductModel): CommonResponse<PostShippingProductModel>
@@ -74,14 +74,14 @@ interface WmsApiClient {
         @RequestParam(required = false) releaseDate: String? = null,
         @RequestParam(required = false) requestShippingDt: String? = null,
         @RequestParam page: Int = 1
-    ): CommonResponse<CommonDataListModel<GetReleaseModel>?>
+    ): CommonResponse<CommonDataListModel<NosnosReleaseModel>>
 
     @GetMapping("release/items")
     fun getReleaseItems(
         @RequestParam releaseIds: List<Long>,
         @RequestParam(required = false) shippingOrderInfoId: Int? = null,
         @RequestParam page: Int = 1
-    ): CommonResponse<CommonDataListModel<GetReleaseItemModel>?>
+    ): CommonResponse<CommonDataListModel<NosnosReleaseItemModel>>
 
     // ---------------------------------------------------------------------------------------------
     // -- 판매상품 관리
@@ -89,7 +89,7 @@ interface WmsApiClient {
     @PostMapping("sales/products/bulk")
     fun createSalesProducts(
         @RequestBody preModel: CommonCreateBulkModel<PreSalesProductModel>
-    ): CommonResponse<CommonProcessBulkModel<PostSalesProductModel>>
+    ): CommonResponse<CommonProcessBulkModel<NosnosSalesProductModel>>
 
     @PutMapping("sales/products/{salesProductId}")
     fun updateSalesProduct(@PathVariable salesProductId: Long, preModel: PreSalesProductModel)
@@ -130,6 +130,12 @@ interface WmsApiClient {
     fun createOutbounds(
         @RequestBody outboundCreateBulkModel: OutboundCreateBulkModel
     ): CommonResponse<CommonProcessBulkModel<PostOutboundModel>>
+
+    // ---------------------------------------------------------------------------------------------
+    // -- 로케이션,택배
+    // ---------------------------------------------------------------------------------------------
+    @GetMapping("delivery-agency/info/bulk")
+    fun getDeliveryAgencyInfoList(): CommonResponse<CommonDataListModel<NosnosReleaseItemModel>>
 }
 
 data class StockDefaultModel(

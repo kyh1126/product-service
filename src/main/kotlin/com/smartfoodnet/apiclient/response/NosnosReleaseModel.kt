@@ -2,9 +2,13 @@ package com.smartfoodnet.apiclient.response
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonNaming
+import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
+import com.smartfoodnet.fnproduct.release.model.vo.ReleaseStatus
+import com.smartfoodnet.fnproduct.release.model.vo.ShippingCodeStatus
+import java.time.LocalDateTime
 
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy::class)
-data class GetReleaseModel(
+data class NosnosReleaseModel(
     val releaseId: Int? = null,
     val memberId: Int? = null,
     val releaseCode: String? = null,
@@ -33,4 +37,18 @@ data class GetReleaseModel(
     val shippingAddress2: String? = null,
     val shippingMessage: String? = null,
     val channelId: Int? = null,
-)
+) {
+    fun toEntity(): ReleaseInfo {
+        return ReleaseInfo(
+            orderId = orderId!!.toLong(),
+            orderCode = orderCode!!,
+            releaseId = releaseId!!.toLong(),
+            releaseCode = releaseCode!!,
+            releaseStatus = ReleaseStatus.fromReleaseStatus(releaseStatus!!),
+            deliveryAgencyId = deliveryAgencyId?.toLong(),
+            shippingCode = shippingCode,
+            shippingCodeStatus = shippingCode?.let { ShippingCodeStatus.UNREGISTERED },
+            shippingCodeCreatedAt = shippingCode?.let { LocalDateTime.now() },
+        )
+    }
+}
