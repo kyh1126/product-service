@@ -135,7 +135,7 @@ interface WmsApiClient {
     // -- 로케이션,택배
     // ---------------------------------------------------------------------------------------------
     @GetMapping("delivery-agency/info/bulk")
-    fun getDeliveryAgencyInfoList(): CommonResponse<CommonDataListModel<NosnosReleaseItemModel>>
+    fun getDeliveryAgencyInfoList(): CommonResponse<CommonDataListModel<NosnosDeliveryAgencyInfoModel>>
 }
 
 data class StockDefaultModel(
