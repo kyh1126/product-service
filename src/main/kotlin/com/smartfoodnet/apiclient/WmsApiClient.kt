@@ -1,11 +1,41 @@
 package com.smartfoodnet.apiclient
 
-import com.smartfoodnet.apiclient.request.*
-import com.smartfoodnet.apiclient.response.*
+import com.smartfoodnet.apiclient.request.BasicProductReadModel
+import com.smartfoodnet.apiclient.request.CommonCreateBulkModel
+import com.smartfoodnet.apiclient.request.InboundWorkReadModel
+import com.smartfoodnet.apiclient.request.NosnosInboundCreateModel
+import com.smartfoodnet.apiclient.request.OutboundCreateBulkModel
+import com.smartfoodnet.apiclient.request.OutboundCreateModel
+import com.smartfoodnet.apiclient.request.PreSalesProductModel
+import com.smartfoodnet.apiclient.request.PreShippingProductModel
+import com.smartfoodnet.apiclient.request.PreShippingProductSimpleModel
+import com.smartfoodnet.apiclient.response.CommonDataListModel
+import com.smartfoodnet.apiclient.response.CommonProcessBulkModel
+import com.smartfoodnet.apiclient.response.GetInboundModel
+import com.smartfoodnet.apiclient.response.GetInboundWorkModel
+import com.smartfoodnet.apiclient.response.GetReleaseItemModel
+import com.smartfoodnet.apiclient.response.GetReleaseModel
+import com.smartfoodnet.apiclient.response.GetShippingProductModel
+import com.smartfoodnet.apiclient.response.NosnosDailyCloseStockModel
+import com.smartfoodnet.apiclient.response.NosnosDailyStockSummaryModel
+import com.smartfoodnet.apiclient.response.NosnosExpirationDateStockModel
+import com.smartfoodnet.apiclient.response.NosnosPostInboundModel
+import com.smartfoodnet.apiclient.response.NosnosStockModel
+import com.smartfoodnet.apiclient.response.NosnosStockMoveEventModel
+import com.smartfoodnet.apiclient.response.PostOutboundModel
+import com.smartfoodnet.apiclient.response.PostReturnModel
+import com.smartfoodnet.apiclient.response.PostSalesProductModel
+import com.smartfoodnet.apiclient.response.PostShippingProductModel
+import com.smartfoodnet.apiclient.response.ReturnCreateModel
 import com.smartfoodnet.common.model.response.CommonResponse
 import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.cloud.openfeign.SpringQueryMap
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestParam
 
 @FeignClient(
     name = "wmsApiClient",
@@ -130,6 +160,11 @@ interface WmsApiClient {
     fun createOutbounds(
         @RequestBody outboundCreateBulkModel: OutboundCreateBulkModel
     ): CommonResponse<CommonProcessBulkModel<PostOutboundModel>>
+
+    @PostMapping("return")
+    fun createReleaseReturn(
+        @RequestBody returnCreateModel: ReturnCreateModel
+    ): PostReturnModel?
 }
 
 data class StockDefaultModel(
