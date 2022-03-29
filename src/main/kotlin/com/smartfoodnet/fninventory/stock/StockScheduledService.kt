@@ -261,8 +261,12 @@ class StockScheduledService(
         if (duration < 0)
             return 0f
 
-        return duration.div(manufacturedBefore.toFloat()) * 100
+        var calBestBefore = duration.div(manufacturedBefore.toFloat()) * 100
+        if (calBestBefore > 100) calBestBefore = 100f
+
+        return calBestBefore
     }
+
 
     companion object : Log
 }
