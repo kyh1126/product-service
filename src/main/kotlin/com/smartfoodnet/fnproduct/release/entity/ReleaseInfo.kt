@@ -1,5 +1,6 @@
 package com.smartfoodnet.fnproduct.release.entity
 
+import com.smartfoodnet.apiclient.response.NosnosReleaseModel
 import com.smartfoodnet.common.entity.SimpleBaseEntity
 import com.smartfoodnet.fnproduct.release.model.vo.ReleaseStatus
 import com.smartfoodnet.fnproduct.release.model.vo.ShippingCodeStatus
@@ -47,5 +48,37 @@ class ReleaseInfo(
     var deliveryCompletedAt: LocalDateTime? = null,
 
     @OneToMany(mappedBy = "releaseInfo", cascade = [CascadeType.PERSIST])
-    var releaseOrderMappings: MutableSet<ReleaseOrderMapping> = LinkedHashSet()
-) : SimpleBaseEntity()
+    var releaseOrderMappings: MutableSet<ReleaseOrderMapping> = LinkedHashSet(),
+
+    @OneToMany(mappedBy = "releaseInfo", cascade = [CascadeType.PERSIST])
+    var releaseProducts: MutableSet<ReleaseProduct> = LinkedHashSet()
+) : SimpleBaseEntity() {
+    fun addReleaseOrderMappings(releaseOrderMapping: ReleaseOrderMapping) {
+        releaseOrderMappings.add(releaseOrderMapping)
+        releaseOrderMapping.releaseInfo = this
+    }
+
+    fun addReleaseProducts(releaseProduct: ReleaseProduct) {
+        releaseProducts.add(releaseProduct)
+        releaseProduct.releaseInfo = this
+    }
+
+    fun update(request: NosnosReleaseModel, releaseProductRequests: Set<ReleaseProduct>) {
+        releaseStatus = ReleaseStatus.fromReleaseStatus(request.releaseStatus!!)
+        deliveryAgencyId = request.deliveryAgencyId?.toLong()
+        shippingCode = request.shippingCode
+        if (shippingCode != null) {
+            shippingCodeStatus = shippingCodeStatus ?: ShippingCodeStatus.UNREGISTERED
+            shippingCodeCreatedAt = shippingCodeCreatedAt ?: LocalDateTime.now()
+        }
+
+        // 양방향
+        releaseProducts.clear()
+        releaseProductRequests.forEach { addReleaseProducts(it) }
+    }
+
+    fun updateReleaseId(request: NosnosReleaseModel) {
+        releaseId = request.releaseId?.toLong()
+        releaseCode = request.releaseCode
+    }
+}

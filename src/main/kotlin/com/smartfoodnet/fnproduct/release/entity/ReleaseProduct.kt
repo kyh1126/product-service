@@ -1,6 +1,7 @@
 package com.smartfoodnet.fnproduct.release.entity
 
-import com.smartfoodnet.common.entity.SimpleBaseEntity
+import com.smartfoodnet.common.entity.BaseEntity
+import java.time.LocalDateTime
 import javax.persistence.*
 
 @Entity
@@ -13,11 +14,19 @@ class ReleaseProduct(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "release_info_id", columnDefinition = "BIGINT UNSIGNED")
-    var releaseInfo: ReleaseInfo,
+    var releaseInfo: ReleaseInfo? = null,
 
     @Column(name = "basic_product_id", columnDefinition = "BIGINT UNSIGNED")
     var basicProductId: Long,
 
     @Column(name = "quantity")
-    var quantity: Int
-) : SimpleBaseEntity()
+    var quantity: Int,
+) : BaseEntity() {
+    fun update(quantity: Int) {
+        this.quantity = quantity
+    }
+
+    fun delete() {
+        deletedAt = LocalDateTime.now()
+    }
+}

@@ -1,7 +1,8 @@
 package com.smartfoodnet.fnproduct.release.entity
 
-import com.smartfoodnet.common.entity.SimpleBaseEntity
+import com.smartfoodnet.common.entity.BaseEntity
 import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
+import java.time.LocalDateTime
 import javax.persistence.*
 
 @Entity
@@ -14,9 +15,13 @@ class ReleaseOrderMapping(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "release_info_id", columnDefinition = "BIGINT UNSIGNED")
-    var releaseInfo: ReleaseInfo,
+    var releaseInfo: ReleaseInfo? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "collected_order_id", columnDefinition = "BIGINT UNSIGNED")
     var collectedOrder: CollectedOrder
-) : SimpleBaseEntity()
+) : BaseEntity() {
+    fun delete() {
+        deletedAt = LocalDateTime.now()
+    }
+}

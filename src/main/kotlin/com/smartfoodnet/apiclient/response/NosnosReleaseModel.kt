@@ -3,6 +3,8 @@ package com.smartfoodnet.apiclient.response
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
+import com.smartfoodnet.fnproduct.release.entity.ReleaseOrderMapping
+import com.smartfoodnet.fnproduct.release.entity.ReleaseProduct
 import com.smartfoodnet.fnproduct.release.model.vo.ReleaseStatus
 import com.smartfoodnet.fnproduct.release.model.vo.ShippingCodeStatus
 import java.time.LocalDateTime
@@ -38,8 +40,11 @@ data class NosnosReleaseModel(
     val shippingMessage: String? = null,
     val channelId: Int? = null,
 ) {
-    fun toEntity(): ReleaseInfo {
-        return ReleaseInfo(
+    fun toEntity(
+        releaseOrderMappings: List<ReleaseOrderMapping>,
+        releaseProducts: Set<ReleaseProduct>
+    ): ReleaseInfo {
+        val releaseInfo = ReleaseInfo(
             orderId = orderId!!.toLong(),
             orderCode = orderCode!!,
             releaseId = releaseId!!.toLong(),
@@ -50,5 +55,10 @@ data class NosnosReleaseModel(
             shippingCodeStatus = shippingCode?.let { ShippingCodeStatus.UNREGISTERED },
             shippingCodeCreatedAt = shippingCode?.let { LocalDateTime.now() },
         )
+
+        return releaseInfo.apply {
+            releaseOrderMappings.forEach { addReleaseOrderMappings(it) }
+            releaseProducts.forEach { addReleaseProducts(it) }
+        }
     }
 }
