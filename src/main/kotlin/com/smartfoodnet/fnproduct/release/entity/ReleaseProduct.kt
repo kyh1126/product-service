@@ -1,11 +1,13 @@
 package com.smartfoodnet.fnproduct.release.entity
 
 import com.smartfoodnet.common.entity.BaseEntity
+import org.hibernate.annotations.Where
 import java.time.LocalDateTime
 import javax.persistence.*
 
 @Entity
 @Table(name = "release_product")
+@Where(clause = "deleted_at is NULL")
 class ReleaseProduct(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -2,11 +2,13 @@ package com.smartfoodnet.fnproduct.release.entity
 
 import com.smartfoodnet.common.entity.BaseEntity
 import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
+import org.hibernate.annotations.Where
 import java.time.LocalDateTime
 import javax.persistence.*
 
 @Entity
 @Table(name = "release_order_mapping")
+@Where(clause = "deleted_at is NULL")
 class ReleaseOrderMapping(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
