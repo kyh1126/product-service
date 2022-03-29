@@ -1,4 +1,4 @@
-package com.smartfoodnet.fnproduct.order.model
+package com.smartfoodnet.fnproduct.order.vo
 
 
 enum class OrderStatus(val code: Int, val description: String) {
@@ -30,7 +30,7 @@ enum class OrderStatus(val code: Int, val description: String) {
         CANCEL -> CANCEL
     }
 
-    fun cancel() : OrderStatus{
+    fun cancel() : OrderStatus {
         return CANCEL
     }
 }

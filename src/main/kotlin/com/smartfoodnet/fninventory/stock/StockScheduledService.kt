@@ -15,7 +15,7 @@ import com.smartfoodnet.fninventory.stock.entity.StockByBestBefore
 import com.smartfoodnet.fninventory.stock.support.DailyStockSummaryRepository
 import com.smartfoodnet.fninventory.stock.support.StockByBestBeforeRepository
 import com.smartfoodnet.fnproduct.order.OrderService
-import com.smartfoodnet.fnproduct.order.model.OrderStatus
+import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import com.smartfoodnet.fnproduct.product.BasicProductRepository
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import feign.FeignException

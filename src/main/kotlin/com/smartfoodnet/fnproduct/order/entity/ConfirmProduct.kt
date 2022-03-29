@@ -13,7 +13,7 @@ class ConfirmProduct(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "collected_order_id")
-    val collectedOrder: CollectedOrder,
+    var collectedOrder: CollectedOrder? = null,
 
     @Enumerated(EnumType.STRING)
     var type: BasicProductType = BasicProductType.BASIC,

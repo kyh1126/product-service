@@ -1,7 +1,7 @@
 package com.smartfoodnet.fnproduct.release.model.response
 
 import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
-import com.smartfoodnet.fnproduct.order.model.OrderStatus
+import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
 import com.smartfoodnet.fnproduct.release.model.vo.ShippingCodeStatus
 import io.swagger.annotations.ApiModelProperty
