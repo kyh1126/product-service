@@ -6,6 +6,7 @@ import com.smartfoodnet.common.model.request.PredicateSearchCondition
 import com.smartfoodnet.fninventory.stock.entity.QStockByBestBefore.stockByBestBefore
 import com.smartfoodnet.fninventory.stock.support.StockByBestBeforeSearchCondition.SearchType.*
 import io.swagger.annotations.ApiModelProperty
+import java.time.LocalDate
 
 class StockByBestBeforeSearchCondition(
     @ApiModelProperty(hidden = true)
@@ -48,6 +49,7 @@ class StockByBestBeforeSearchCondition(
 
     override fun assemblePredicate(predicate: BooleanBuilder): Predicate {
         return predicate.orAllOf(
+            eqCollectDateToday(),
             eqPartnerId(partnerId),
 //            likeBasicProductName(basicProductName),
 //            eqBasicProductCode(basicProductCode),
@@ -63,6 +65,9 @@ class StockByBestBeforeSearchCondition(
             CODE -> containBasicProductCode(searchKeyword)
             BARCODE -> containBarcode(searchKeyword)
         }
+
+    private fun eqCollectDateToday()=
+        stockByBestBefore.collectedDate.eq(LocalDate.now())
 
     private fun eqPartnerId(partnerId: Long?) = partnerId?.let { stockByBestBefore.partnerId.eq(it) }
 
@@ -80,13 +85,10 @@ class StockByBestBeforeSearchCondition(
 
     private fun betweenBestBeforeFromTo(rangeBestBeforeFrom: Int?, rangeBestBeforeTo: Int?) =
         if (rangeBestBeforeTo != 0) {
-            println("=====1 : "+rangeBestBeforeTo)
             safeLet(rangeBestBeforeFrom, rangeBestBeforeTo) { from, to ->
                 stockByBestBefore.bestBefore.between(from, to)
             }
         } else {
-            println("=====2 : "+rangeBestBeforeTo)
-            println("=====3 : "+rangeBestBeforeTo?.let { println(it) })
             rangeBestBeforeTo?.let { stockByBestBefore.bestBefore.eq(it.toFloat()) }
         }
 
