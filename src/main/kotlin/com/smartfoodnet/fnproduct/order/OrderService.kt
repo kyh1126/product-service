@@ -6,6 +6,7 @@ import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.fnproduct.order.model.CollectedOrderCreateModel
 import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import com.smartfoodnet.fninventory.shortage.model.ShortageOrderProjectionModel
+import com.smartfoodnet.fninventory.shortage.support.ProductShortageSearchCondition
 import com.smartfoodnet.fnproduct.order.dto.CollectedOrderModel
 import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
 import com.smartfoodnet.fnproduct.order.model.BasicProductAddModel
@@ -70,11 +71,13 @@ class OrderService(
 
     fun getShortageProjectionModel(
         partnerId: Long,
-        status: OrderStatus
+        status: OrderStatus,
+        condition: ProductShortageSearchCondition
     ): List<ShortageOrderProjectionModel>? {
         return collectedOrderRepository.findAllByPartnerIdAndStatusGroupByProductId(
             partnerId,
-            status
+            status,
+            condition
         )
     }
 
