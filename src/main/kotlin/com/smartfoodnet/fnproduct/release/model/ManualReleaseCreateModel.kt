@@ -51,8 +51,6 @@ data class ManualReleaseCreateModel(
                 orderNumber = orderUniqueKey
             ),
             storeName = "",
-            memo2 = promotion,
-            memo3 = reShipmentReason,
             storeCode = ReservedStoreCode.NON_ORDER.storeCode,
             storeId = ReservedStoreCode.NON_ORDER.storeId,
             collectedProductInfo = CollectedProductInfo.empty(),
