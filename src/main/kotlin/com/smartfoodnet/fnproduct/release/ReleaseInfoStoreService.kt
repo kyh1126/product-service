@@ -4,7 +4,6 @@ import com.smartfoodnet.apiclient.response.NosnosReleaseItemModel
 import com.smartfoodnet.apiclient.response.NosnosReleaseModel
 import com.smartfoodnet.common.error.exception.BaseRuntimeException
 import com.smartfoodnet.common.error.exception.ErrorCode
-import com.smartfoodnet.fnproduct.product.BasicProductService
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
 import com.smartfoodnet.fnproduct.release.entity.ReleaseOrderMapping
@@ -18,40 +17,12 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 @Transactional
 class ReleaseInfoStoreService(
-    private val basicProductService: BasicProductService,
     private val releaseInfoRepository: ReleaseInfoRepository,
 ) {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    fun updateReleaseInfo(
-        releaseInfoListByOrderId: Map<Long, List<ReleaseInfo>>,
-        releasesByOrderIdFromNosnos: Map<Long, List<NosnosReleaseModel>>,
-        itemsByReleaseIdFromNosnos: Map<Long, List<NosnosReleaseItemModel>>
-    ) {
-        val basicProductByShippingProductId = getBasicProductBy(itemsByReleaseIdFromNosnos)
-
-        releasesByOrderIdFromNosnos.entries.forEach { (orderId, releaseModels) ->
-            val targetReleaseInfoList = releaseInfoListByOrderId[orderId]!!
-            createOrUpdateReleaseInfo(
-                releaseModels,
-                itemsByReleaseIdFromNosnos,
-                basicProductByShippingProductId,
-                targetReleaseInfoList
-            )
-        }
-    }
-
-    private fun getBasicProductBy(
-        itemsByReleaseId: Map<Long, List<NosnosReleaseItemModel>>
-    ): Map<Long, BasicProduct> {
-        val shippingProductIdsFromModel = itemsByReleaseId.values.flatten()
-            .mapNotNull { it.shippingProductId?.toLong() }.toSet()
-        return basicProductService.getBasicProductsByShippingProductIds(shippingProductIdsFromModel)
-            .associateBy { it.shippingProductId!! }
-    }
-
-    private fun createOrUpdateReleaseInfo(
+    fun createOrUpdateReleaseInfo(
         releaseModels: List<NosnosReleaseModel>,
-        itemsByReleaseIdFromNosnos: Map<Long, List<NosnosReleaseItemModel>>,
+        itemModelsByReleaseId: Map<Long, List<NosnosReleaseItemModel>>,
         basicProductByShippingProductId: Map<Long, BasicProduct>,
         targetReleaseInfoList: List<ReleaseInfo>
     ) {
@@ -59,7 +30,7 @@ class ReleaseInfoStoreService(
 
         releaseModels.map { model ->
             val releaseId = model.releaseId!!.toLong()
-            val releaseItemModels = itemsByReleaseIdFromNosnos[releaseId] ?: emptyList()
+            val releaseItemModels = itemModelsByReleaseId[releaseId] ?: emptyList()
             val releaseModelDto = ReleaseModelDto(model, releaseItemModels)
 
             // Case1: releaseInfo 테이블 내 releaseId 가 있는 경우

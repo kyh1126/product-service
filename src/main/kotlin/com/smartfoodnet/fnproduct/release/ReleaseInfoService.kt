@@ -7,6 +7,8 @@ import com.smartfoodnet.apiclient.response.NosnosReleaseModel
 import com.smartfoodnet.common.error.exception.BaseRuntimeException
 import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.common.utils.Log
+import com.smartfoodnet.fnproduct.product.BasicProductService
+import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.release.model.request.ReleaseInfoSearchCondition
 import com.smartfoodnet.fnproduct.release.model.response.ReleaseInfoDetailModel
 import com.smartfoodnet.fnproduct.release.model.response.ReleaseInfoModel
@@ -21,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional(readOnly = true)
 class ReleaseInfoService(
     private val releaseInfoStoreService: ReleaseInfoStoreService,
+    private val basicProductService: BasicProductService,
     private val releaseInfoRepository: ReleaseInfoRepository,
     private val wmsApiClient: WmsApiClient,
 ) {
@@ -58,18 +61,24 @@ class ReleaseInfoService(
                 continue
             }
 
-            val releaseInfoListByOrderIdFromTarget = targetList.content
-                .groupBy { it.orderId }
-            val releasesByOrderIdFromNosnos = getReleases(orderIds = orderIds)
-                .groupBy { it.orderId!!.toLong() }
-            val itemsByReleaseIdFromNosnos = getReleaseItems(releasesByOrderIdFromNosnos)
-                .groupBy { it.releaseId!!.toLong() }
+            try {
+                val releaseModelsByOrderId = getReleases(orderIds = orderIds)
+                    .groupBy { it.orderId!!.toLong() }
+                val itemModelsByReleaseId = getReleaseItems(releaseModelsByOrderId)
+                    .groupBy { it.releaseId!!.toLong() }
+                val basicProductByShippingProductId = getBasicProductBy(itemModelsByReleaseId)
 
-            releaseInfoStoreService.updateReleaseInfo(
-                releaseInfoListByOrderIdFromTarget,
-                releasesByOrderIdFromNosnos,
-                itemsByReleaseIdFromNosnos
-            )
+                releaseModelsByOrderId.entries.forEach { (orderId, releaseModels) ->
+                    updateReleaseInfo(
+                        orderId,
+                        releaseModels,
+                        itemModelsByReleaseId,
+                        basicProductByShippingProductId
+                    )
+                }
+            } catch (e: BaseRuntimeException) {
+                log.error("[syncReleaseInfo] orderIds: ${orderIds} 동기화 실패")
+            }
 
             if (targetList.isLast) break
 
@@ -88,7 +97,7 @@ class ReleaseInfoService(
             try {
                 model = wmsApiClient.getReleases(orderIds = orderIds.toList(), page = page).payload
             } catch (e: Exception) {
-                log.error("orderIds: ${orderIds}, page: ${page}, error: ${e.message}")
+                log.error("[getReleases] orderIds: ${orderIds}, page: ${page}, error: ${e.message}")
                 throw BaseRuntimeException(errorMessage = "출고 정보 조회 실패, orderIds: ${orderIds}, page: ${page}")
             }
 
@@ -113,7 +122,7 @@ class ReleaseInfoService(
             try {
                 model = wmsApiClient.getReleaseItems(releaseIds = releaseIds, page = page).payload
             } catch (e: Exception) {
-                log.error("releaseIds: ${releaseIds}, page: ${page}, error: ${e.message}")
+                log.error("[getReleaseItems] releaseIds: ${releaseIds}, page: ${page}, error: ${e.message}")
                 throw BaseRuntimeException(errorMessage = "출고 대상 상품 조회 실패, releaseIds: ${releaseIds}, page: ${page}")
             }
 
@@ -125,6 +134,34 @@ class ReleaseInfoService(
             page++
         }
         return releaseItems
+    }
+
+    private fun getBasicProductBy(
+        itemsByReleaseId: Map<Long, List<NosnosReleaseItemModel>>
+    ): Map<Long, BasicProduct> {
+        val shippingProductIdsFromModel = itemsByReleaseId.values.flatten()
+            .mapNotNull { it.shippingProductId?.toLong() }.toSet()
+        return basicProductService.getBasicProductsByShippingProductIds(shippingProductIdsFromModel)
+            .associateBy { it.shippingProductId!! }
+    }
+
+    private fun updateReleaseInfo(
+        orderId: Long,
+        releaseModels: List<NosnosReleaseModel>,
+        itemModelsByReleaseId: Map<Long, List<NosnosReleaseItemModel>>,
+        basicProductByShippingProductId: Map<Long, BasicProduct>
+    ) {
+        val releaseInfoListByOrderId = releaseInfoRepository.findByOrderId(orderId)
+        try {
+            releaseInfoStoreService.createOrUpdateReleaseInfo(
+                releaseModels,
+                itemModelsByReleaseId,
+                basicProductByShippingProductId,
+                releaseInfoListByOrderId
+            )
+        } catch (e: BaseRuntimeException) {
+            log.error("orderId: ${orderId} releaseInfo 동기화 실패")
+        }
     }
 
     companion object : Log
