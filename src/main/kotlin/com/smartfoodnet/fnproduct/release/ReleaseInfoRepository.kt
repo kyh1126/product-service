@@ -10,4 +10,5 @@ interface ReleaseInfoRepository : JpaRepository<ReleaseInfo, Long>, ReleaseInfoC
     fun findAllByReleaseStatusIn(syncableStatuses: Collection<ReleaseStatus>, page: Pageable): Page<ReleaseInfo>
     fun findByReleaseId(releaseId: Long): ReleaseInfo?
     fun findFirstByOrderId(orderId: Long): ReleaseInfo?
+    fun findByOrderId(orderId: Long): List<ReleaseInfo>
 }
