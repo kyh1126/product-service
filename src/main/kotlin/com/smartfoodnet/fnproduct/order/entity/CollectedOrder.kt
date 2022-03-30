@@ -33,10 +33,6 @@ class CollectedOrder(
 
     val storeName: String,
 
-    val memo2: String? = null,
-
-    val memo3: String? = null,
-
     val storeCode: String?,
 
     val storeId: Long?,
