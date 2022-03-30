@@ -2,17 +2,22 @@ package com.smartfoodnet.fnproduct.claim
 
 import com.smartfoodnet.apiclient.WmsApiClient
 import com.smartfoodnet.apiclient.response.ReturnCreateModel
+import com.smartfoodnet.fnproduct.claim.model.ClaimCreateModel
 import com.smartfoodnet.fnproduct.claim.model.vo.ClaimReason
 import com.smartfoodnet.fnproduct.release.ReleaseInfoRepository
 import com.smartfoodnet.fnproduct.release.ReleaseInfoService
 import org.springframework.stereotype.Service
 
 @Service
-class ClaimServiceImsi(
+class ClaimService(
     private val wmsApiClient: WmsApiClient,
     private val releaseInfoService: ReleaseInfoService,
     private val releaseInfoRepository: ReleaseInfoRepository
-) {
+)  {
+    fun createClaim(claimCreateModel: ClaimCreateModel) {
+
+    }
+
     fun getReturnInfo() {
         val releaseInfo = releaseInfoRepository.findById(1).get()
         val returnCreateModel = ReturnCreateModel(
