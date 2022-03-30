@@ -117,6 +117,7 @@ class OrderController(
         @Valid
         @RequestBody manualReleaseRequest: ManualReleaseCreateModel
     ): ManualReleaseResponseModel {
+        println("createManualRelease")
         return manualReleaseService.issueManualRelease(
             sfnMetaUser,
             partnerId,

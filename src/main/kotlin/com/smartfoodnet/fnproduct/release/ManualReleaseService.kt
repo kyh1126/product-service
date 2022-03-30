@@ -46,6 +46,7 @@ class ManualReleaseService(
         partnerId: Long,
         manualReleaseRequest: ManualReleaseCreateModel
     ): ManualReleaseResponseModel {
+        println("issueManualRelease 1")
         // validation
         ValidatorUtils.validateAndThrow(
             SaveState.CREATE,
@@ -53,20 +54,24 @@ class ManualReleaseService(
             manualReleaseRequest
         )
 
+        println("issueManualRelease 2")
         // partnerService.checkUserPartnerMembership(sfnMetaUser, partnerId)
 
+        println("issueManualRelease 3")
         // 1. collected order생성하기
         val collectedOrder = createCollectedOrder(
             partnerId = partnerId,
             manualReleaseRequest = manualReleaseRequest
         )
 
+        println("issueManualRelease 4")
         // 2. confirm product생성하기
         val confirmProducts =
             createConfirmProducts(collectedOrder, manualReleaseRequest.products)
         confirmProducts.forEach { collectedOrder.addConfirmProduct(it) }
         collectedOrder.nextStep()
 
+        println("issueManualRelease 5")
         // 3. confirm order
         val confirmOrders = confirmOrderService.requestOrders(
             partnerId = partnerId,
@@ -78,6 +83,7 @@ class ManualReleaseService(
             )
         )
 
+        println("issueManualRelease 6")
         return ManualReleaseResponseModel.from(collectedOrder, confirmOrders)
     }
 
