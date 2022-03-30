@@ -33,16 +33,16 @@ class ReleaseInfoStoreService(
             val releaseItemModels = itemModelsByReleaseId[releaseId] ?: emptyList()
             val releaseModelDto = ReleaseModelDto(model, releaseItemModels)
 
-            // Case1: releaseInfo 테이블 내 releaseId 가 있는 경우
-            if (isExistingReleaseId(releaseId, releaseInfoByReleaseId)) {
-                updateExistingReleaseId(
-                    releaseId = releaseId,
-                    releaseModelDto = releaseModelDto,
-                    basicProductByShippingProductId = basicProductByShippingProductId
-                )
-            } else {
+            when {
+                // Case1: releaseInfo 테이블 내 releaseId 가 있는 경우
+                isExistingReleaseId(releaseId, releaseInfoByReleaseId) ->
+                    updateExistingReleaseId(
+                        releaseId = releaseId,
+                        releaseModelDto = releaseModelDto,
+                        basicProductByShippingProductId = basicProductByShippingProductId
+                    )
                 // Case2: releaseId 가 null 인 releaseInfo 업데이트
-                if (isNeedToBeUpdatedReleaseId(targetReleaseInfoList, releaseModels)) {
+                isNeedToBeUpdatedReleaseId(targetReleaseInfoList, releaseModels) -> {
                     val targetReleaseInfoId = releaseInfoByReleaseId[null]!!.id!!
                     updateReleaseId(
                         targetReleaseInfoId,
@@ -51,9 +51,7 @@ class ReleaseInfoStoreService(
                     )
                 }
                 // Case3: releaseInfo 엔티티 생성
-                else {
-                    createReleaseInfo(releaseModelDto, basicProductByShippingProductId)
-                }
+                else -> createReleaseInfo(releaseModelDto, basicProductByShippingProductId)
             }
         }
     }
