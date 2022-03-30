@@ -53,7 +53,7 @@ class ManualReleaseService(
             manualReleaseRequest
         )
 
-        partnerService.checkUserPartnerMembership(sfnMetaUser, partnerId)
+        // partnerService.checkUserPartnerMembership(sfnMetaUser, partnerId)
 
         // 1. collected order생성하기
         val collectedOrder = createCollectedOrder(
