@@ -3,6 +3,7 @@ package com.smartfoodnet.fninventory.shortage
 import com.smartfoodnet.apiclient.response.NosnosStockModel
 import com.smartfoodnet.common.Constants.API_CALL_LIST_SIZE
 import com.smartfoodnet.fninventory.shortage.model.ProductShortageModel
+import com.smartfoodnet.fninventory.shortage.support.ProductShortageSearchCondition
 import com.smartfoodnet.fnproduct.order.OrderService
 import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import org.springframework.stereotype.Service
@@ -15,9 +16,9 @@ class ShortageService(
     private val orderService: OrderService,
     private val shortageAsyncService: ShortageAsyncService
 ) {
-    fun getProductShortages(partnerId: Long): List<ProductShortageModel> {
+    fun getProductShortages(partnerId: Long, condition: ProductShortageSearchCondition): List<ProductShortageModel> {
         val shortageProjections =
-            orderService.getShortageProjectionModel(partnerId = partnerId, status = OrderStatus.NEW)
+            orderService.getShortageProjectionModel(partnerId = partnerId, status = OrderStatus.NEW, condition)
                 ?: return listOf()
         val shippingProductIds = shortageProjections.map { it.shippingProductId }
 
