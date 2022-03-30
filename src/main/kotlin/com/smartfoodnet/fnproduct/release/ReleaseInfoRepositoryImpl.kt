@@ -2,10 +2,11 @@ package com.smartfoodnet.fnproduct.release
 
 import com.smartfoodnet.config.Querydsl4RepositorySupport
 import com.smartfoodnet.fnproduct.order.entity.QCollectedOrder.collectedOrder
-import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
+import com.smartfoodnet.fnproduct.order.entity.QConfirmOrder.confirmOrder
+import com.smartfoodnet.fnproduct.order.entity.QConfirmRequestOrder.confirmRequestOrder
 import com.smartfoodnet.fnproduct.order.vo.OrderStatus
+import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
 import com.smartfoodnet.fnproduct.release.entity.QReleaseInfo.releaseInfo
-import com.smartfoodnet.fnproduct.release.entity.QReleaseOrderMapping.releaseOrderMapping
 import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
 import com.smartfoodnet.fnproduct.release.model.request.ReleaseInfoSearchCondition
 import org.springframework.data.domain.Page
@@ -15,8 +16,9 @@ class ReleaseInfoRepositoryImpl : Querydsl4RepositorySupport(ReleaseInfo::class.
     override fun findAllByCondition(condition: ReleaseInfoSearchCondition, page: Pageable): Page<ReleaseInfo> {
         return applyPagination(page) {
             it.selectFrom(releaseInfo)
-                .innerJoin(releaseInfo.releaseOrderMappings, releaseOrderMapping)
-                .innerJoin(releaseOrderMapping.collectedOrder, collectedOrder)
+                .innerJoin(releaseInfo.confirmOrder, confirmOrder)
+                .innerJoin(confirmOrder.requestOrderList, confirmRequestOrder)
+                .innerJoin(confirmRequestOrder.collectedOrder, collectedOrder)
                 .where(
                     containsOrderNumber(condition.orderNumber),
                     containsStoreName(condition.storeName),

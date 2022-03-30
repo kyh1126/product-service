@@ -2,7 +2,7 @@ package com.smartfoodnet.fnproduct.release.model.vo
 
 import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 
-enum class ReleaseStatus(val releaseStatus: Int?, val description: String, val orderStatus: OrderStatus? = null) {
+enum class ReleaseStatus(val releaseStatus: Int?, val description: String, val orderStatus: OrderStatus) {
     BEFORE_RELEASE_REQUEST(null, "출고요청전", OrderStatus.ORDER_CONFIRM),
     RELEASE_REQUESTED(1, "출고요청", OrderStatus.RELEASE_REGISTRATION),
     RELEASE_ORDERED(3, "출고지시", OrderStatus.RELEASE_WORKING),

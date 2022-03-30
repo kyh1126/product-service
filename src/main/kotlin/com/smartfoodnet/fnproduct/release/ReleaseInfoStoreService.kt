@@ -6,7 +6,6 @@ import com.smartfoodnet.common.error.exception.BaseRuntimeException
 import com.smartfoodnet.common.error.exception.ErrorCode
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
-import com.smartfoodnet.fnproduct.release.entity.ReleaseOrderMapping
 import com.smartfoodnet.fnproduct.release.entity.ReleaseProduct
 import com.smartfoodnet.fnproduct.release.model.dto.ReleaseModelDto
 import org.springframework.data.repository.findByIdOrNull
@@ -111,22 +110,13 @@ class ReleaseInfoStoreService(
     ) {
         val (releaseModel, releaseItemModels) = releaseModelDto
 
-        val orderId = releaseModel.orderId!!.toLong()
-        val collectedOrders = releaseInfoRepository.findFirstByOrderId(orderId)
-            ?.releaseOrderMappings?.map { it.collectedOrder }?.toList() ?: return
-
-        // 릴리즈-주문수집 매핑 저장
-        val releaseOrderMappings = collectedOrders.map {
-            ReleaseOrderMapping(collectedOrder = it)
-        }
-
         // 릴리즈상품 저장
         val releaseProducts = createOrUpdateReleaseProducts(
             releaseItemModels = releaseItemModels,
             basicProductByShippingProductId = basicProductByShippingProductId
         )
 
-        val releaseInfo = releaseModel.toEntity(releaseOrderMappings, releaseProducts)
+        val releaseInfo = releaseModel.toEntity(releaseProducts)
         releaseInfoRepository.save(releaseInfo)
     }
 

@@ -2,6 +2,7 @@ package com.smartfoodnet.fnproduct.release.entity
 
 import com.smartfoodnet.apiclient.response.NosnosReleaseModel
 import com.smartfoodnet.common.entity.SimpleBaseEntity
+import com.smartfoodnet.fnproduct.order.entity.ConfirmOrder
 import com.smartfoodnet.fnproduct.release.model.vo.ReleaseStatus
 import com.smartfoodnet.fnproduct.release.model.vo.ShippingCodeStatus
 import java.time.LocalDateTime
@@ -15,7 +16,7 @@ class ReleaseInfo(
     @Column(name = "id", columnDefinition = "BIGINT UNSIGNED")
     var id: Long? = null,
 
-    @Column(name = "order_id")
+    @Column(name = "order_id", columnDefinition = "BIGINT")
     var orderId: Long,
 
     @Column(name = "order_code")
@@ -48,16 +49,16 @@ class ReleaseInfo(
     var deliveryCompletedAt: LocalDateTime? = null,
 
     @OneToMany(mappedBy = "releaseInfo", cascade = [CascadeType.PERSIST])
-    var releaseOrderMappings: MutableSet<ReleaseOrderMapping> = LinkedHashSet(),
+    var releaseProducts: MutableSet<ReleaseProduct> = LinkedHashSet(),
 
-    @OneToMany(mappedBy = "releaseInfo", cascade = [CascadeType.PERSIST])
-    var releaseProducts: MutableSet<ReleaseProduct> = LinkedHashSet()
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+        name = "order_id", referencedColumnName = "orderId",
+        insertable = false, updatable = false, // read-only
+        foreignKey = ForeignKey(value = ConstraintMode.NO_CONSTRAINT)
+    )
+    var confirmOrder: ConfirmOrder? = null
 ) : SimpleBaseEntity() {
-    fun addReleaseOrderMappings(releaseOrderMapping: ReleaseOrderMapping) {
-        releaseOrderMappings.add(releaseOrderMapping)
-        releaseOrderMapping.releaseInfo = this
-    }
-
     fun addReleaseProducts(releaseProduct: ReleaseProduct) {
         releaseProducts.add(releaseProduct)
         releaseProduct.releaseInfo = this

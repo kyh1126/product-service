@@ -33,14 +33,17 @@ class ReleaseInfoService(
         condition: ReleaseInfoSearchCondition,
         page: Pageable
     ): PageResponse<ReleaseInfoModel> {
-        return releaseInfoRepository.findAllByCondition(condition, page)
-            .map(ReleaseInfoModel::fromEntity)
-            .run { PageResponse.of(this) }
+        return releaseInfoRepository.findAllByCondition(condition, page).map { it ->
+            val collectedOrders = it.confirmOrder?.requestOrderList
+                ?.map { it.collectedOrder } ?: emptyList()
+            ReleaseInfoModel.fromEntity(it, collectedOrders)
+        }.run { PageResponse.of(this) }
     }
 
     fun getReleaseInfo(id: Long): ReleaseInfoDetailModel {
         val releaseInfo = releaseInfoRepository.findById(id).get()
-        val collectedOrders = releaseInfo.releaseOrderMappings.map { it.collectedOrder }
+        val collectedOrders = releaseInfo.confirmOrder?.requestOrderList
+            ?.map { it.collectedOrder } ?: emptyList()
 
         return ReleaseInfoDetailModel.fromEntity(releaseInfo, collectedOrders)
     }
