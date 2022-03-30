@@ -1,21 +1,20 @@
 package com.smartfoodnet.fnproduct.order
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.smartfoodnet.apiclient.WmsApiClient
 import com.smartfoodnet.apiclient.request.RequestOrderMapper
 import com.smartfoodnet.common.error.exception.BaseRuntimeException
 import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.fnproduct.order.dto.ConfirmProductModel
 import com.smartfoodnet.fnproduct.order.entity.*
-import com.smartfoodnet.fnproduct.order.model.BasicProductAddModel
+import com.smartfoodnet.fnproduct.order.enums.DeliveryType
 import com.smartfoodnet.fnproduct.order.model.ConfirmProductAddModel
 import com.smartfoodnet.fnproduct.order.model.ConfirmProductMappedModel
 import com.smartfoodnet.fnproduct.order.model.RequestOrderCreateModel
-import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import com.smartfoodnet.fnproduct.order.support.ConfirmOrderRepository
 import com.smartfoodnet.fnproduct.order.support.ConfirmProductRepository
 import com.smartfoodnet.fnproduct.order.support.condition.ConfirmProductSearchCondition
 import com.smartfoodnet.fnproduct.order.vo.MatchingType
+import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import com.smartfoodnet.fnproduct.product.BasicProductService
 import com.smartfoodnet.fnproduct.product.PackageProductMappingRepository
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
@@ -102,9 +101,8 @@ class ConfirmOrderService(
         }
     }
 
-
     @Transactional
-    fun requestOrders(partnerId: Long, requestOrderCreateModel: RequestOrderCreateModel) {
+    fun requestOrders(partnerId: Long, requestOrderCreateModel: RequestOrderCreateModel): List<ConfirmOrder> {
         val collectedOrderList =
             orderService.getCollectedOrders(requestOrderCreateModel.collectedOrderIds)
 
@@ -120,12 +118,15 @@ class ConfirmOrderService(
 
         val requestBulkModel = RequestOrderMapper.toOutboundCreateBulkModel(sendOrderList)
         val response =
-            wmsApiClient.createOutbounds(requestBulkModel).payload?.processedDataList ?: listOf()
+            wmsApiClient.createOutbounds(requestBulkModel).payload?.processedDataList
+                ?: listOf()
 
         for ((index, confirmOrder) in sendOrderList.withIndex()) {
             val orderInfo = response[index]
             confirmOrder.setOrderInfo(orderInfo.orderId, orderInfo.orderCode)
         }
+
+        return sendOrderList
     }
 
     private fun createSendOrder(
@@ -134,10 +135,14 @@ class ConfirmOrderService(
         orderGroup: Map.Entry<String, List<CollectedOrder>>
     ): ConfirmOrder {
         val firstCollectedOrder = orderGroup.value.first()
+        val shippingMethodType =
+            requestOrderCreateModel.deliveryType?.shippingMethodType
+                ?: DeliveryType.PARCEL.shippingMethodType
+
         val confirmOrder = ConfirmOrder(
             partnerId = partnerId,
             bundleNumber = orderGroup.key,
-            shippingMethodType = 1,
+            shippingMethodType = shippingMethodType.value,
             requestShippingDate = LocalDateTime.now(),
             receiver = firstCollectedOrder.receiver,
             memo = Memo(
