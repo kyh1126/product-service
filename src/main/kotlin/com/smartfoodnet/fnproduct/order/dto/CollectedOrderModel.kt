@@ -4,13 +4,15 @@ import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.querydsl.core.annotations.QueryProjection
 import com.smartfoodnet.common.Constants.TIMESTAMP_FORMAT
+import com.smartfoodnet.fnproduct.order.enums.DeliveryType
+import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
 import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import java.time.LocalDateTime
 
 data class CollectedOrderModel @QueryProjection constructor(
     val id: Long,
     val partnerId: Long,
-    val uploadType: String,
+    val uploadType: OrderUploadType,
     val status: OrderStatus,
     val orderNumber: String,
     val bundleNumber: String,
@@ -34,7 +36,7 @@ data class CollectedOrderModel @QueryProjection constructor(
     val storeProductOptionName: String?,
     val storeProductOptionCode: String?,
     val quantity: Int?,
-    val deliveryType: String?,
+    val deliveryType: DeliveryType,
     val shippingPrice: Double?,
     val name: String? = null,
     val address: String? = null,

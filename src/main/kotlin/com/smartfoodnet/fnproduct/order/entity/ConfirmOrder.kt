@@ -12,25 +12,25 @@ class ConfirmOrder(
     @Column(name = "confirm_order_id", columnDefinition = "BIGINT UNSIGNED")
     val id: Long? = null,
     val partnerId: Long,
-    val bundleNumber : String,
-    val shippingMethodType : Int? = null,
-    val requestShippingDate : LocalDateTime,
-    val shippingMessage : String? = null,
+    val bundleNumber: String,
+    val shippingMethodType: Int? = null,
+    val requestShippingDate: LocalDateTime,
+    val shippingMessage: String? = null,
     @Embedded
-    val receiver : Receiver,
+    val receiver: Receiver,
     @Embedded
-    val memo : Memo? = null,
+    val memo: Memo? = null,
     @OneToMany(mappedBy = "confirmOrder", cascade = [CascadeType.PERSIST], orphanRemoval = true)
-    val requestOrderList : MutableList<ConfirmRequestOrder> = mutableListOf()
-): BaseEntity(){
+    val requestOrderList: MutableList<ConfirmRequestOrder> = mutableListOf()
+) : BaseEntity() {
     var orderId: Long? = null
     var orderCode: String? = null
 
-    fun addRequestOrder(confirmRequestOrder: ConfirmRequestOrder){
+    fun addRequestOrder(confirmRequestOrder: ConfirmRequestOrder) {
         requestOrderList.add(confirmRequestOrder)
     }
 
-    fun setOrderInfo(id:Long, code: String){
+    fun setOrderInfo(id: Long, code: String) {
         orderId = id
         orderCode = code
     }

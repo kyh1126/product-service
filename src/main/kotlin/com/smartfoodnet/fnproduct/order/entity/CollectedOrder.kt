@@ -2,6 +2,9 @@ package com.smartfoodnet.fnproduct.order.entity
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.smartfoodnet.common.entity.BaseEntity
+import com.smartfoodnet.fnproduct.order.enums.DeliveryType
+import com.smartfoodnet.fnproduct.order.enums.DeliveryTypeConverter
+import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
 import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import com.smartfoodnet.fnproduct.store.entity.StoreProduct
 import org.hibernate.annotations.DynamicUpdate
@@ -30,9 +33,13 @@ class CollectedOrder(
 
     val storeName: String,
 
-    val storeCode: String,
+    val memo2: String? = null,
 
-    val storeId: Long,
+    val memo3: String? = null,
+
+    val storeCode: String?,
+
+    val storeId: Long?,
 
     val userStoreId: String? = null,
 
@@ -46,7 +53,9 @@ class CollectedOrder(
 
     var claimStatus: String? = null,
 
-    val deliveryType: String? = "택배",
+    @Column(name = "delivery_type")
+    @Convert(converter = DeliveryTypeConverter::class)
+    val deliveryType: DeliveryType = DeliveryType.PARCEL,
 
     var expectedDeliveryDate: LocalDateTime? = null,
 
@@ -55,7 +64,7 @@ class CollectedOrder(
     var storeProduct: StoreProduct? = null,
 
     @OneToMany(mappedBy = "collectedOrder", fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST], orphanRemoval = true)
-    val confirmProductList : MutableList<ConfirmProduct> = mutableListOf(),
+    val confirmProductList: MutableList<ConfirmProduct> = mutableListOf(),
 
     @Embedded
     val collectedProductInfo: CollectedProductInfo,
@@ -72,25 +81,26 @@ class CollectedOrder(
     @Embedded
     val sender: Sender? = null,
 
-    val uploadType: String? = "자동",
+    @Column(name = "upload_type")
+    @Enumerated(EnumType.STRING)
+    val uploadType: OrderUploadType = OrderUploadType.API,
 
     val unprocessed: Boolean = false
-
-): BaseEntity(){
+) : BaseEntity() {
     val isConnectedStoreProduct
         @JsonIgnore @Transient
-        get() = storeProduct?.storeProductMappings?.isNotEmpty()?:false
+        get() = storeProduct?.storeProductMappings?.isNotEmpty() ?: false
 
-    fun nextStep(){
+    fun nextStep() {
         status = status.next()
     }
 
-    fun addConfirmProduct(confirmProduct : ConfirmProduct){
+    fun addConfirmProduct(confirmProduct: ConfirmProduct) {
         confirmProduct.collectedOrder = this
         confirmProductList.add(confirmProduct)
     }
 
-    fun clearConfirmProduct(){
+    fun clearConfirmProduct() {
         confirmProductList.clear()
     }
 }

@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/release-info")
 class ReleaseController(
-    private val releaseInfoService: ReleaseInfoService
+    private val releaseInfoService: ReleaseInfoService,
 ) {
     @Operation(summary = "릴리즈 정보 리스트 조회")
     @GetMapping

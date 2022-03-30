@@ -2,6 +2,7 @@ package com.smartfoodnet.fnproduct.release
 
 import com.smartfoodnet.config.Querydsl4RepositorySupport
 import com.smartfoodnet.fnproduct.order.entity.QCollectedOrder.collectedOrder
+import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
 import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import com.smartfoodnet.fnproduct.release.entity.QReleaseInfo.releaseInfo
 import com.smartfoodnet.fnproduct.release.entity.QReleaseOrderMapping.releaseOrderMapping
@@ -42,7 +43,7 @@ class ReleaseInfoRepositoryImpl : Querydsl4RepositorySupport(ReleaseInfo::class.
     private fun eqReceiverName(receiverName: String?) =
         receiverName?.let { collectedOrder.receiver.name.eq(it) }
 
-    private fun eqUploadType(uploadType: String?) =
+    private fun eqUploadType(uploadType: OrderUploadType?) =
         uploadType?.let { collectedOrder.uploadType.eq(it) }
 
     private fun eqClaimStatus(claimStatus: String?) =

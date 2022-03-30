@@ -1,17 +1,23 @@
 package com.smartfoodnet.fnproduct.order
 
+import com.smartfoodnet.common.Constants
+import com.smartfoodnet.common.model.header.SfnMetaUser
 import com.smartfoodnet.fnproduct.order.dto.CollectedOrderModel
 import com.smartfoodnet.fnproduct.order.dto.ConfirmProductModel
 import com.smartfoodnet.fnproduct.order.model.BasicProductAddModel
 import com.smartfoodnet.fnproduct.order.model.CollectedOrderCreateModel
 import com.smartfoodnet.fnproduct.order.model.ConfirmProductAddModel
 import com.smartfoodnet.fnproduct.order.model.RequestOrderCreateModel
+import com.smartfoodnet.fnproduct.order.model.response.ManualReleaseResponseModel
 import com.smartfoodnet.fnproduct.order.support.condition.CollectingOrderSearchCondition
 import com.smartfoodnet.fnproduct.order.support.condition.ConfirmProductSearchCondition
+import com.smartfoodnet.fnproduct.release.ManualReleaseService
+import com.smartfoodnet.fnproduct.release.model.ManualReleaseCreateModel
 import io.swagger.annotations.Api
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import org.springframework.web.bind.annotation.*
+import springfox.documentation.annotations.ApiIgnore
 import javax.validation.Valid
 
 @Api(description = "주문 관련 API")
@@ -19,7 +25,8 @@ import javax.validation.Valid
 @RequestMapping("order")
 class OrderController(
     val orderService: OrderService,
-    val confirmOrderService: ConfirmOrderService
+    val confirmOrderService: ConfirmOrderService,
+    val manualReleaseService: ManualReleaseService
 ) {
     @Operation(summary = "주문 생성")
     @PostMapping
@@ -32,8 +39,8 @@ class OrderController(
     fun addStoreProductToCollectedOrder(
         @Parameter(description = "주문수집 고유 ID", required = true)
         @PathVariable collectedOrderId: Long,
-        @RequestBody basicProductAddModel : BasicProductAddModel
-    ){
+        @RequestBody basicProductAddModel: BasicProductAddModel
+    ) {
         orderService.addStoreProduct(basicProductAddModel.apply { this.collectedOrderId = collectedOrderId })
     }
 
@@ -73,8 +80,8 @@ class OrderController(
     fun createConfirmOrder(
         @Parameter(description = "화주(고객사) ID", required = true)
         @PathVariable partnerId: Long,
-        @RequestBody requestOrderCreateModel : RequestOrderCreateModel
-    ){
+        @RequestBody requestOrderCreateModel: RequestOrderCreateModel
+    ) {
         confirmOrderService.requestOrders(partnerId, requestOrderCreateModel)
     }
 
@@ -82,9 +89,9 @@ class OrderController(
     @PutMapping("partners/{partnerId}/confirm/products")
     fun addBasicProductWithConfirmProduct(
         @Parameter(description = "화주(고객사) ID", required = true)
-        @PathVariable partnerId : Long,
+        @PathVariable partnerId: Long,
         @RequestBody confirmProductAddModel: ConfirmProductAddModel
-    ){
+    ) {
         confirmOrderService.replaceConfirmProducts(confirmProductAddModel.apply { this.partnerId = partnerId })
     }
 
@@ -92,10 +99,28 @@ class OrderController(
     @PutMapping("partners/{partnerId}/confirm/products/restore")
     fun restoreConfirmProduct(
         @Parameter(description = "화주(고객사) ID", required = true)
-        @PathVariable partnerId : Long,
+        @PathVariable partnerId: Long,
         @RequestBody collectedIds: List<Long>
-    ){
+    ) {
         confirmOrderService.restoreConfirmProduct(partnerId, collectedIds)
     }
 
+    @Operation(summary = "주문외출고")
+    @PostMapping("/partners/{partnerId}/release/manual")
+    fun createManualRelease(
+        @ApiIgnore
+        @RequestHeader(Constants.HEADER_KEY_SFN_META_USER)
+        sfnMetaUser: SfnMetaUser?,
+        @Parameter(description = "화주(고객사) ID", required = true)
+        @PathVariable partnerId: Long,
+        @Parameter(description = "주문외출고 정보", required = true)
+        @Valid
+        @RequestBody manualReleaseRequest: ManualReleaseCreateModel
+    ): ManualReleaseResponseModel {
+        return manualReleaseService.issueManualRelease(
+            sfnMetaUser,
+            partnerId,
+            manualReleaseRequest
+        )
+    }
 }

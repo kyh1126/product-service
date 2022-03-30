@@ -27,8 +27,7 @@ class OrderService(
     val storeProductService: StoreProductService,
     val basicProductService: BasicProductService,
     val wmsApiClient: WmsApiClient
-) : Log {
-
+) {
     private fun convertCollectedOrderEntity(collectedOrderCreateModel: CollectedOrderCreateModel) {
         if (collectedOrderRepository.existsByOrderUniqueKey(collectedOrderCreateModel.orderUniqueKey)) {
             log.info("Duplicate OrderKey = ${collectedOrderCreateModel.orderUniqueKey}")
@@ -138,10 +137,11 @@ class OrderService(
     private fun createStoreProduct(collectedOrder: CollectedOrder): StoreProduct {
         val storeProduct = with(collectedOrder) {
             StoreProduct(
-                storeId = storeId,
+                storeId = storeId ?: throw IllegalArgumentException("storeId가 없습니다"),
                 partnerId = partnerId,
                 storeName = storeName,
-                name = collectedProductInfo.collectedStoreProductName,
+                name = collectedProductInfo.collectedStoreProductName
+                    ?: throw IllegalArgumentException("상품명이 없습니다"),
                 storeProductCode = collectedProductInfo.collectedStoreProductCode,
                 optionName = collectedProductInfo.collectedStoreProductOptionName,
                 optionCode = collectedProductInfo.collectedStoreProductOptionCode
@@ -151,4 +151,5 @@ class OrderService(
         return storeProductService.createStoreProduct(storeProduct)
     }
 
+    companion object : Log
 }

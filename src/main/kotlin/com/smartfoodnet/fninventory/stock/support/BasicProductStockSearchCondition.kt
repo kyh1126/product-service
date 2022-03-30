@@ -23,18 +23,6 @@ class BasicProductStockSearchCondition(
     @ApiModelProperty(value = "유통기한관리여부")
     var expirationDateManagementYn: String? = null,
 ) : PredicateSearchCondition() {
-    override fun assemblePredicate(predicate: BooleanBuilder): Predicate {
-        return predicate.orAllOf(
-            eqPartnerId(partnerId),
-            /*
-            likeBasicProductName(basicProductName),
-            eqBasicProductCode(basicProductCode),
-            eqBarcode(barcode),
-             */
-            searchType?.let { toPredicate(it) },
-            eqExpirationDateManagementYn(expirationDateManagementYn)
-        )
-    }
 
     @ApiModelProperty(
         value = "상품별검색 (NAME:기본상품명/CODE:기본상품코드/BARCODE:상품바코드)",
@@ -47,6 +35,19 @@ class BasicProductStockSearchCondition(
 
     enum class SearchType {
         NAME, CODE, BARCODE
+    }
+
+    override fun assemblePredicate(predicate: BooleanBuilder): Predicate {
+        return predicate.orAllOf(
+            eqPartnerId(partnerId),
+            /*
+            likeBasicProductName(basicProductName),
+            eqBasicProductCode(basicProductCode),
+            eqBarcode(barcode),
+             */
+            searchType?.let { toPredicate(it) },
+            eqExpirationDateManagementYn(expirationDateManagementYn)
+        )
     }
 
     private fun toPredicate(searchType: SearchType) =
