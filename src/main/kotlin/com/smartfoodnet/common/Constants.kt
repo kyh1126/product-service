@@ -16,4 +16,5 @@ object Constants {
     const val HEADER_ROW_INDEX: Int = 0
     const val WORKSHEET_INDEX: Int = 0
     const val DATA_STARTING_ROW_INDEX: Int = 1
+    const val NOSNOS_INITIAL_PAGE = 1
 }

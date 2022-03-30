@@ -4,6 +4,7 @@ import com.smartfoodnet.apiclient.WmsApiClient
 import com.smartfoodnet.apiclient.response.CommonDataListModel
 import com.smartfoodnet.apiclient.response.NosnosReleaseItemModel
 import com.smartfoodnet.apiclient.response.NosnosReleaseModel
+import com.smartfoodnet.common.Constants.NOSNOS_INITIAL_PAGE
 import com.smartfoodnet.common.error.exception.BaseRuntimeException
 import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.common.utils.Log
@@ -27,8 +28,6 @@ class ReleaseInfoService(
     private val releaseInfoRepository: ReleaseInfoRepository,
     private val wmsApiClient: WmsApiClient,
 ) {
-    private val nosnosInitialPage = 1
-
     fun getReleaseInfoList(
         condition: ReleaseInfoSearchCondition,
         page: Pageable
@@ -92,8 +91,8 @@ class ReleaseInfoService(
 
     private fun getReleases(orderIds: Set<Long>): List<NosnosReleaseModel> {
         val releases = mutableListOf<NosnosReleaseModel>()
-        var page = nosnosInitialPage
-        var totalPage = nosnosInitialPage
+        var page = NOSNOS_INITIAL_PAGE
+        var totalPage = NOSNOS_INITIAL_PAGE
 
         while (page <= totalPage) {
             val model: CommonDataListModel<NosnosReleaseModel>?
@@ -104,7 +103,7 @@ class ReleaseInfoService(
                 throw BaseRuntimeException(errorMessage = "출고 정보 조회 실패, orderIds: ${orderIds}, page: ${page}")
             }
 
-            if (totalPage == nosnosInitialPage) {
+            if (totalPage == NOSNOS_INITIAL_PAGE) {
                 totalPage = model?.totalPage?.toInt() ?: totalPage
             }
             releases.addAll(model?.dataList ?: emptyList())
@@ -117,8 +116,8 @@ class ReleaseInfoService(
     private fun getReleaseItems(releasesByOrderId: Map<Long, List<NosnosReleaseModel>>): List<NosnosReleaseItemModel> {
         val releaseIds = releasesByOrderId.values.flatten().mapNotNull { it.releaseId?.toLong() }
         val releaseItems = mutableListOf<NosnosReleaseItemModel>()
-        var page = nosnosInitialPage
-        var totalPage = nosnosInitialPage
+        var page = NOSNOS_INITIAL_PAGE
+        var totalPage = NOSNOS_INITIAL_PAGE
 
         while (page <= totalPage) {
             val model: CommonDataListModel<NosnosReleaseItemModel>?
@@ -129,7 +128,7 @@ class ReleaseInfoService(
                 throw BaseRuntimeException(errorMessage = "출고 대상 상품 조회 실패, releaseIds: ${releaseIds}, page: ${page}")
             }
 
-            if (totalPage == nosnosInitialPage) {
+            if (totalPage == NOSNOS_INITIAL_PAGE) {
                 totalPage = model?.totalPage?.toInt() ?: totalPage
             }
             releaseItems.addAll(model?.dataList ?: emptyList())
