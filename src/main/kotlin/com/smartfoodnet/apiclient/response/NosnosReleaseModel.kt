@@ -2,6 +2,7 @@ package com.smartfoodnet.apiclient.response
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonNaming
+import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
 import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
 import com.smartfoodnet.fnproduct.release.entity.ReleaseProduct
 import com.smartfoodnet.fnproduct.release.model.vo.ReleaseStatus
@@ -39,7 +40,7 @@ data class NosnosReleaseModel(
     val shippingMessage: String? = null,
     val channelId: Int? = null,
 ) {
-    fun toEntity(releaseProducts: Set<ReleaseProduct>): ReleaseInfo {
+    fun toEntity(releaseProducts: Set<ReleaseProduct>, uploadType: OrderUploadType): ReleaseInfo {
         val releaseInfo = ReleaseInfo(
             orderId = orderId!!.toLong(),
             orderCode = orderCode!!,
@@ -48,9 +49,14 @@ data class NosnosReleaseModel(
             releaseStatus = ReleaseStatus.fromReleaseStatus(releaseStatus!!),
             deliveryAgencyId = deliveryAgencyId?.toLong(),
             shippingCode = shippingCode,
-            shippingCodeStatus = shippingCode?.let { ShippingCodeStatus.UNREGISTERED },
-            shippingCodeCreatedAt = shippingCode?.let { LocalDateTime.now() },
         )
-        return releaseInfo.apply { releaseProducts.forEach { addReleaseProducts(it) } }
+
+        return releaseInfo.apply {
+            if (shippingCode != null) {
+                shippingCodeStatus = ShippingCodeStatus.getInitialStatus(uploadType)
+                shippingCodeCreatedAt = LocalDateTime.now()
+            }
+            releaseProducts.forEach { addReleaseProducts(it) }
+        }
     }
 }

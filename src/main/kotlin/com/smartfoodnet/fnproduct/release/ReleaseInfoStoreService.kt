@@ -4,6 +4,7 @@ import com.smartfoodnet.apiclient.response.NosnosReleaseItemModel
 import com.smartfoodnet.apiclient.response.NosnosReleaseModel
 import com.smartfoodnet.common.error.exception.BaseRuntimeException
 import com.smartfoodnet.common.error.exception.ErrorCode
+import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
 import com.smartfoodnet.fnproduct.release.entity.ReleaseProduct
@@ -50,7 +51,10 @@ class ReleaseInfoStoreService(
                     )
                 }
                 // Case3: releaseInfo 엔티티 생성
-                else -> createReleaseInfo(releaseModelDto, basicProductByShippingProductId)
+                else -> {
+                    val uploadType = getUploadType(targetReleaseInfoList.firstOrNull()!!)
+                    createReleaseInfo(releaseModelDto, basicProductByShippingProductId, uploadType)
+                }
             }
         }
     }
@@ -64,6 +68,10 @@ class ReleaseInfoStoreService(
         releaseId: Long,
         releaseInfoByReleaseId: Map<Long?, ReleaseInfo>
     ) = releaseId in releaseInfoByReleaseId.keys
+
+    private fun getUploadType(targetReleaseInfo: ReleaseInfo) =
+        targetReleaseInfo.confirmOrder?.requestOrderList?.firstOrNull()?.collectedOrder?.uploadType
+            ?: OrderUploadType.API
 
     private fun updateReleaseId(
         releaseInfoId: Long,
@@ -93,20 +101,21 @@ class ReleaseInfoStoreService(
             ?: (releaseInfoRepository.findByReleaseId(releaseId) ?: return)
 
         // 릴리즈상품 저장
-        val entityByBasicProductId =
-            targetReleaseInfo.releaseProducts.associateBy { it.basicProductId }
+        val entityByReleaseItemId =
+            targetReleaseInfo.releaseProducts.associateBy { it.releaseItemId }
         val releaseProducts = createOrUpdateReleaseProducts(
             releaseItemModels,
-            entityByBasicProductId,
+            entityByReleaseItemId,
             basicProductByShippingProductId
         )
 
-        targetReleaseInfo.update(releaseModel, releaseProducts)
+        targetReleaseInfo.update(releaseModel, releaseProducts, getUploadType(targetReleaseInfo))
     }
 
     private fun createReleaseInfo(
         releaseModelDto: ReleaseModelDto,
-        basicProductByShippingProductId: Map<Long, BasicProduct>
+        basicProductByShippingProductId: Map<Long, BasicProduct>,
+        uploadType: OrderUploadType
     ) {
         val (releaseModel, releaseItemModels) = releaseModelDto
 
@@ -116,28 +125,29 @@ class ReleaseInfoStoreService(
             basicProductByShippingProductId = basicProductByShippingProductId
         )
 
-        val releaseInfo = releaseModel.toEntity(releaseProducts)
+        val releaseInfo = releaseModel.toEntity(releaseProducts, uploadType)
         releaseInfoRepository.save(releaseInfo)
     }
 
     private fun createOrUpdateReleaseProducts(
         releaseItemModels: List<NosnosReleaseItemModel>,
-        entityByBasicProductId: Map<Long, ReleaseProduct> = emptyMap(),
+        entityByReleaseItemId: Map<Long, ReleaseProduct> = emptyMap(),
         basicProductByShippingProductId: Map<Long, BasicProduct>,
     ): Set<ReleaseProduct> {
         val releaseProducts = releaseItemModels.map {
             val basicProduct = basicProductByShippingProductId[it.shippingProductId!!.toLong()]
                 ?: throw BaseRuntimeException(errorCode = ErrorCode.NO_ELEMENT)
-            if (basicProduct.id !in entityByBasicProductId.keys) it.toEntity(basicProduct)
+            val releaseItemId = it.releaseItemId!!.toLong()
+            if (releaseItemId !in entityByReleaseItemId.keys) it.toEntity(basicProduct)
             else {
-                val entity = entityByBasicProductId[basicProduct.id]
+                val entity = entityByReleaseItemId[releaseItemId]
                 entity!!.update(it.quantity ?: 0)
                 entity
             }
         }.run { LinkedHashSet(this) }
 
         // 연관관계 끊긴 entity 삭제처리
-        entityByBasicProductId.values.toSet().minus(releaseProducts)
+        entityByReleaseItemId.values.toSet().minus(releaseProducts)
             .forEach(ReleaseProduct::delete)
 
         return releaseProducts

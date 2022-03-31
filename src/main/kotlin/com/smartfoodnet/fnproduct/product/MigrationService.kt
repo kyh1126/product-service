@@ -8,6 +8,7 @@ import com.smartfoodnet.apiclient.request.PreSalesProductModel
 import com.smartfoodnet.apiclient.request.PreShippingProductSimpleModel
 import com.smartfoodnet.apiclient.response.CommonDataListModel
 import com.smartfoodnet.apiclient.response.NosnosShippingProductModel
+import com.smartfoodnet.common.Constants.NOSNOS_INITIAL_PAGE
 import com.smartfoodnet.common.error.exception.BaseRuntimeException
 import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
@@ -177,7 +178,7 @@ class MigrationService(
                 throw BaseRuntimeException(errorMessage = "출고상품 생성 실패, memberId: ${memberId}, page: ${page}")
             }
 
-            if (totalPage == 1) {
+            if (totalPage == NOSNOS_INITIAL_PAGE) {
                 totalPage = model.totalPage.toInt()
             }
             val dataList = model.dataList

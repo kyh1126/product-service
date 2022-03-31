@@ -4,13 +4,15 @@ import com.smartfoodnet.apiclient.WmsApiClient
 import com.smartfoodnet.apiclient.response.CommonDataListModel
 import com.smartfoodnet.apiclient.response.NosnosReleaseItemModel
 import com.smartfoodnet.apiclient.response.NosnosReleaseModel
+import com.smartfoodnet.common.Constants.NOSNOS_INITIAL_PAGE
 import com.smartfoodnet.common.error.exception.BaseRuntimeException
 import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.fnproduct.product.BasicProductService
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
+import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
 import com.smartfoodnet.fnproduct.release.model.request.ReleaseInfoSearchCondition
-import com.smartfoodnet.fnproduct.release.model.response.ReleaseInfoDetailModel
+import com.smartfoodnet.fnproduct.release.model.response.OrderProductModel
 import com.smartfoodnet.fnproduct.release.model.response.ReleaseInfoModel
 import com.smartfoodnet.fnproduct.release.model.vo.ReleaseStatus
 import org.springframework.data.domain.PageRequest
@@ -27,25 +29,18 @@ class ReleaseInfoService(
     private val releaseInfoRepository: ReleaseInfoRepository,
     private val wmsApiClient: WmsApiClient,
 ) {
-    private val nosnosInitialPage = 1
-
     fun getReleaseInfoList(
         condition: ReleaseInfoSearchCondition,
         page: Pageable
     ): PageResponse<ReleaseInfoModel> {
-        return releaseInfoRepository.findAllByCondition(condition, page).map { it ->
-            val collectedOrders = it.confirmOrder?.requestOrderList
-                ?.map { it.collectedOrder } ?: emptyList()
-            ReleaseInfoModel.fromEntity(it, collectedOrders)
+        val releaseInfoPage = releaseInfoRepository.findAllByCondition(condition, page)
+        val deliveryAgencyModelsByDeliveryAgencyId =
+            wmsApiClient.getDeliveryAgencyInfoList().payload?.dataList
+                ?.associateBy { it.deliveryAgencyId!!.toLong() } ?: emptyMap()
+
+        return releaseInfoPage.map {
+            ReleaseInfoModel.fromEntity(it, deliveryAgencyModelsByDeliveryAgencyId)
         }.run { PageResponse.of(this) }
-    }
-
-    fun getReleaseInfo(id: Long): ReleaseInfoDetailModel {
-        val releaseInfo = releaseInfoRepository.findById(id).get()
-        val collectedOrders = releaseInfo.confirmOrder?.requestOrderList
-            ?.map { it.collectedOrder } ?: emptyList()
-
-        return ReleaseInfoDetailModel.fromEntity(releaseInfo, collectedOrders)
     }
 
     fun syncReleaseInfo() {
@@ -90,10 +85,32 @@ class ReleaseInfoService(
         }
     }
 
+    fun getOrderProductsByOrderCode(orderCode: String): List<OrderProductModel> {
+        val releaseInfoList = releaseInfoRepository.findByOrderCode(orderCode)
+        return releaseInfoList.flatMap(::getOrderProducts)
+    }
+
+    fun getOrderProductsByReleaseCode(releaseCode: String): List<OrderProductModel> {
+        val releaseInfo = releaseInfoRepository.findByReleaseCode(releaseCode) ?: return emptyList()
+        return getOrderProducts(releaseInfo)
+    }
+
+    fun getOrderProducts(releaseInfo: ReleaseInfo): List<OrderProductModel> {
+        return releaseInfo.releaseProducts.map { OrderProductModel.fromEntity(it, releaseInfo) }
+            .ifEmpty {
+                val confirmProducts = releaseInfo.confirmOrder?.requestOrderList
+                    ?.flatMap { it.collectedOrder.confirmProductList } ?: emptyList()
+
+                confirmProducts.map { it ->
+                    OrderProductModel.fromEntity(it, releaseInfo)
+                }
+            }
+    }
+
     private fun getReleases(orderIds: Set<Long>): List<NosnosReleaseModel> {
         val releases = mutableListOf<NosnosReleaseModel>()
-        var page = nosnosInitialPage
-        var totalPage = nosnosInitialPage
+        var page = NOSNOS_INITIAL_PAGE
+        var totalPage = NOSNOS_INITIAL_PAGE
 
         while (page <= totalPage) {
             val model: CommonDataListModel<NosnosReleaseModel>?
@@ -104,7 +121,7 @@ class ReleaseInfoService(
                 throw BaseRuntimeException(errorMessage = "출고 정보 조회 실패, orderIds: ${orderIds}, page: ${page}")
             }
 
-            if (totalPage == nosnosInitialPage) {
+            if (totalPage == NOSNOS_INITIAL_PAGE) {
                 totalPage = model?.totalPage?.toInt() ?: totalPage
             }
             releases.addAll(model?.dataList ?: emptyList())
@@ -117,8 +134,8 @@ class ReleaseInfoService(
     private fun getReleaseItems(releasesByOrderId: Map<Long, List<NosnosReleaseModel>>): List<NosnosReleaseItemModel> {
         val releaseIds = releasesByOrderId.values.flatten().mapNotNull { it.releaseId?.toLong() }
         val releaseItems = mutableListOf<NosnosReleaseItemModel>()
-        var page = nosnosInitialPage
-        var totalPage = nosnosInitialPage
+        var page = NOSNOS_INITIAL_PAGE
+        var totalPage = NOSNOS_INITIAL_PAGE
 
         while (page <= totalPage) {
             val model: CommonDataListModel<NosnosReleaseItemModel>?
@@ -129,7 +146,7 @@ class ReleaseInfoService(
                 throw BaseRuntimeException(errorMessage = "출고 대상 상품 조회 실패, releaseIds: ${releaseIds}, page: ${page}")
             }
 
-            if (totalPage == nosnosInitialPage) {
+            if (totalPage == NOSNOS_INITIAL_PAGE) {
                 totalPage = model?.totalPage?.toInt() ?: totalPage
             }
             releaseItems.addAll(model?.dataList ?: emptyList())

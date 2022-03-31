@@ -4,8 +4,8 @@ import com.smartfoodnet.common.error.exception.CreateModelValidateError
 import org.springframework.validation.BeanPropertyBindingResult
 
 object ValidatorUtils {
-    fun <T> validateAndThrow(createModelValidator: CreateModelValidator<T>, target: T) {
-        val bindingResult = BeanPropertyBindingResult(target, target!!::class.java.simpleName)
+    fun <T : Any> validateAndThrow(createModelValidator: CreateModelValidator<T>, target: T) {
+        val bindingResult = BeanPropertyBindingResult(target, target::class.java.simpleName)
         createModelValidator.validate(target, bindingResult)
 
         if (bindingResult.hasErrors()) {
@@ -13,12 +13,12 @@ object ValidatorUtils {
         }
     }
 
-    fun <T> validateAndThrow(
+    fun <T : Any> validateAndThrow(
         saveState: SaveState,
         createModelValidator: CreateModelValidator<T>,
         target: T
     ) {
-        val bindingResult = BeanPropertyBindingResult(target, target!!::class.java.simpleName)
+        val bindingResult = BeanPropertyBindingResult(target, target::class.java.simpleName)
         createModelValidator.validate(saveState, target, bindingResult)
 
         if (bindingResult.hasErrors()) {

@@ -13,11 +13,11 @@ class CreateModelValidateError(val errors: Errors?) : RuntimeException(errors?.o
             }
 
             return "CreateModelValidateErrorMessage: " +
-                    errors.allErrors.map(DefaultMessageSourceResolvable::getDefaultMessage)
-                        .joinToString(
-                            validationErrorMessageSeparator,
-                            validationErrorMessageSeparator,
-                            validationErrorMessageSeparator
-                        )
+                errors.allErrors.map(DefaultMessageSourceResolvable::getDefaultMessage)
+                    .joinToString(
+                        validationErrorMessageSeparator,
+                        validationErrorMessageSeparator,
+                        validationErrorMessageSeparator
+                    )
         }
 }
