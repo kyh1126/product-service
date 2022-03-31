@@ -11,7 +11,6 @@ import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.fnproduct.product.BasicProductService
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.release.model.request.ReleaseInfoSearchCondition
-import com.smartfoodnet.fnproduct.release.model.response.ReleaseInfoDetailModel
 import com.smartfoodnet.fnproduct.release.model.response.ReleaseInfoModel
 import com.smartfoodnet.fnproduct.release.model.vo.ReleaseStatus
 import org.springframework.data.domain.PageRequest
@@ -42,14 +41,6 @@ class ReleaseInfoService(
                 ?.map { it.collectedOrder } ?: emptyList()
             ReleaseInfoModel.fromEntity(it, collectedOrders, deliveryAgencyModelsByDeliveryAgencyId)
         }.run { PageResponse.of(this) }
-    }
-
-    fun getReleaseInfo(id: Long): ReleaseInfoDetailModel {
-        val releaseInfo = releaseInfoRepository.findById(id).get()
-        val collectedOrders = releaseInfo.confirmOrder?.requestOrderList
-            ?.map { it.collectedOrder } ?: emptyList()
-
-        return ReleaseInfoDetailModel.fromEntity(releaseInfo, collectedOrders)
     }
 
     fun syncReleaseInfo() {

@@ -3,7 +3,6 @@ package com.smartfoodnet.fnproduct.release
 import com.smartfoodnet.common.model.response.CommonResponse
 import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.fnproduct.release.model.request.ReleaseInfoSearchCondition
-import com.smartfoodnet.fnproduct.release.model.response.ReleaseInfoDetailModel
 import com.smartfoodnet.fnproduct.release.model.response.ReleaseInfoModel
 import io.swagger.annotations.Api
 import io.swagger.v3.oas.annotations.Operation
@@ -30,17 +29,8 @@ class ReleaseController(
         return releaseInfoService.getReleaseInfoList(condition, page)
     }
 
-    @Operation(summary = "릴리즈 정보 상세 조회")
-    @GetMapping("{id}")
-    fun getReleaseInfo(
-        @Parameter(description = "릴리즈 정보 ID", required = true)
-        @PathVariable id: Long,
-    ): ReleaseInfoDetailModel {
-        return releaseInfoService.getReleaseInfo(id)
-    }
-
     @Operation(summary = "릴리즈 정보 동기화")
-    @PostMapping("/sync")
+    @PostMapping("sync")
     fun syncReleaseInfo(): CommonResponse<String> {
         releaseInfoService.syncReleaseInfo()
         return CommonResponse(HttpStatus.OK.reasonPhrase)
