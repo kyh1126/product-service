@@ -6,6 +6,7 @@ import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.fnproduct.order.model.CollectedOrderCreateModel
 import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import com.smartfoodnet.fninventory.shortage.model.ShortageOrderProjectionModel
+import com.smartfoodnet.fninventory.shortage.support.ProductShortageSearchCondition
 import com.smartfoodnet.fnproduct.order.dto.CollectedOrderModel
 import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
 import com.smartfoodnet.fnproduct.order.model.BasicProductAddModel
@@ -27,8 +28,7 @@ class OrderService(
     val storeProductService: StoreProductService,
     val basicProductService: BasicProductService,
     val wmsApiClient: WmsApiClient
-) : Log {
-
+) {
     private fun convertCollectedOrderEntity(collectedOrderCreateModel: CollectedOrderCreateModel) {
         if (collectedOrderRepository.existsByOrderUniqueKey(collectedOrderCreateModel.orderUniqueKey)) {
             log.info("Duplicate OrderKey = ${collectedOrderCreateModel.orderUniqueKey}")
@@ -71,11 +71,13 @@ class OrderService(
 
     fun getShortageProjectionModel(
         partnerId: Long,
-        status: OrderStatus
+        status: OrderStatus,
+        condition: ProductShortageSearchCondition
     ): List<ShortageOrderProjectionModel>? {
         return collectedOrderRepository.findAllByPartnerIdAndStatusGroupByProductId(
             partnerId,
-            status
+            status,
+            condition
         )
     }
 
@@ -138,10 +140,11 @@ class OrderService(
     private fun createStoreProduct(collectedOrder: CollectedOrder): StoreProduct {
         val storeProduct = with(collectedOrder) {
             StoreProduct(
-                storeId = storeId,
+                storeId = storeId ?: throw IllegalArgumentException("storeId가 없습니다"),
                 partnerId = partnerId,
                 storeName = storeName,
-                name = collectedProductInfo.collectedStoreProductName,
+                name = collectedProductInfo.collectedStoreProductName
+                    ?: throw IllegalArgumentException("상품명이 없습니다"),
                 storeProductCode = collectedProductInfo.collectedStoreProductCode,
                 optionName = collectedProductInfo.collectedStoreProductOptionName,
                 optionCode = collectedProductInfo.collectedStoreProductOptionCode
@@ -151,4 +154,5 @@ class OrderService(
         return storeProductService.createStoreProduct(storeProduct)
     }
 
+    companion object : Log
 }

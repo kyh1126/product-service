@@ -1,5 +1,6 @@
 package com.smartfoodnet.fnproduct.release.model.request
 
+import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
 import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import io.swagger.annotations.ApiModelProperty
 
@@ -20,7 +21,7 @@ class ReleaseInfoSearchCondition(
     var receiverName: String? = null,
 
     @ApiModelProperty(value = "업로드방식")
-    var uploadType: String? = null,
+    var uploadType: OrderUploadType? = null,
 
     @ApiModelProperty(value = "클레임상태")
     var claimStatus: String? = null,

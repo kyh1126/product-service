@@ -4,6 +4,7 @@ import com.querydsl.core.types.Projections
 import com.smartfoodnet.common.model.request.PredicateSearchCondition
 import com.smartfoodnet.config.Querydsl4RepositorySupport
 import com.smartfoodnet.fninventory.shortage.model.ShortageOrderProjectionModel
+import com.smartfoodnet.fninventory.shortage.support.ProductShortageSearchCondition
 import com.smartfoodnet.fnproduct.order.dto.CollectedOrderModel
 import com.smartfoodnet.fnproduct.order.dto.QCollectedOrderModel
 import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
@@ -14,29 +15,34 @@ import com.smartfoodnet.fnproduct.store.entity.QStoreProduct.storeProduct
 import com.smartfoodnet.fnproduct.store.entity.QStoreProductMapping.storeProductMapping
 
 class CollectedOrderRepositoryImpl : CollectedOrderRepositoryCustom, Querydsl4RepositorySupport(
-    CollectedOrder::class.java) {
+    CollectedOrder::class.java
+) {
+
     override fun findAllByPartnerIdAndStatusGroupByProductId(
         partnerId: Long,
-        status: OrderStatus
+        status: OrderStatus,
+        condition: ProductShortageSearchCondition
     ): List<ShortageOrderProjectionModel> {
 
         return select(
             Projections.fields(
-            ShortageOrderProjectionModel::class.java,
-            basicProduct.id.`as`("basicProductId"),
-            basicProduct.name.`as`("basicProductName"),
-            basicProduct.code.`as`("basicProductCode"),
-            basicProduct.id.count().`as`("shortageOrderCount"),
-            basicProduct.shippingProductId,
-            collectedOrder.quantity.sum().`as`("totalOrderCount"),
-            collectedOrder.price.sum().`as`("totalShortagePrice")
-        )).from(collectedOrder)
+                ShortageOrderProjectionModel::class.java,
+                basicProduct.id.`as`("basicProductId"),
+                basicProduct.name.`as`("basicProductName"),
+                basicProduct.code.`as`("basicProductCode"),
+                basicProduct.id.count().`as`("shortageOrderCount"),
+                basicProduct.shippingProductId,
+                (collectedOrder.quantity.sum()).multiply(storeProductMapping.quantity) .`as`("totalOrderCount"),
+                collectedOrder.price.sum().`as`("totalShortagePrice")
+            )).from(collectedOrder)
             .innerJoin(collectedOrder.storeProduct.storeProductMappings, storeProductMapping)
             .innerJoin(storeProductMapping.basicProduct, basicProduct)
             .on(collectedOrder.status.eq(status).and(collectedOrder.partnerId.eq(partnerId)))
+            .where(condition.toPredicate())
             .groupBy(basicProduct.shippingProductId, basicProduct.id)
             .fetch()
     }
+
 
     override fun getCountByProductIdAndStatusGroupByProductId(productId: Long, status: OrderStatus): Int? {
         return select(

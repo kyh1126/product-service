@@ -1,5 +1,7 @@
 package com.smartfoodnet.fnproduct.release.model.response
 
+import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
+import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
 import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
 import com.smartfoodnet.fnproduct.release.model.vo.ReleaseStatus
 import io.swagger.annotations.ApiModelProperty
@@ -13,7 +15,7 @@ data class ReleaseInfoModel(
     @ApiModelProperty(value = "NOSNOS 발주 id")
     var orderId: Long? = null,
 
-    @ApiModelProperty(value = "출고코드")
+    @ApiModelProperty(value = "출고번호")
     var orderCode: String? = null,
 
     @ApiModelProperty(value = "NOSNOS 출고 id")
@@ -53,7 +55,7 @@ data class ReleaseInfoModel(
     var receiverAddress: String? = null,
 
     @ApiModelProperty(value = "업로드방식")
-    var uploadType: String? = null,
+    var uploadType: OrderUploadType? = null,
 
     @ApiModelProperty(value = "쇼핑몰 이름")
     var storeName: String? = null,
@@ -71,8 +73,7 @@ data class ReleaseInfoModel(
     var claimStatuses: String? = null,
 ) {
     companion object {
-        fun fromEntity(releaseInfo: ReleaseInfo): ReleaseInfoModel {
-            val collectedOrders = releaseInfo.releaseOrderMappings.map { it.collectedOrder }
+        fun fromEntity(releaseInfo: ReleaseInfo, collectedOrders: List<CollectedOrder>): ReleaseInfoModel {
             return releaseInfo.run {
                 ReleaseInfoModel(
                     id = id,
@@ -84,14 +85,24 @@ data class ReleaseInfoModel(
                     shippingCode = shippingCode,
                     deliveryAgencyId = deliveryAgencyId,
                     shippingCodeCreatedAt = shippingCodeCreatedAt,
-                    productNames = collectedOrders.joinToString {
+                    productNames = collectedOrders.joinToString { // TODO: 출고상품으로 교체
                         Strings.concat(it.storeProduct?.name, it.storeProduct?.optionName)
                             ?: Strings.concat(
                                 it.collectedProductInfo.collectedStoreProductName,
                                 it.collectedProductInfo.collectedStoreProductOptionName
                             )
                     },
-                    productCodes = collectedOrders.joinToString { it.collectedProductInfo.collectedStoreProductCode },
+                    productCodes = collectedOrders.map { collectedOrder ->
+                        if (collectedOrder.uploadType == OrderUploadType.MANUAL) {
+                            // 주문외출고
+                            collectedOrder.confirmProductList.map { confirmProduct ->
+                                confirmProduct.basicProduct.productCode
+                            }
+                        } else {
+                            // 일반 쇼핑몰 주문
+                            mutableListOf(collectedOrder.collectedProductInfo.collectedStoreProductCode)
+                        }
+                    }.flatten().joinToString(),
                     quantities = collectedOrders.joinToString { (it.quantity ?: 0).toString() },
                     receiverName = collectedOrders.firstOrNull()?.receiver?.name,
                     receiverAddress = collectedOrders.firstOrNull()?.receiver?.address,

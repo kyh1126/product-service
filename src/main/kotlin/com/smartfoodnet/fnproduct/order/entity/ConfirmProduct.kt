@@ -19,7 +19,7 @@ class ConfirmProduct(
     var type: BasicProductType = BasicProductType.BASIC,
 
     @Enumerated(EnumType.STRING)
-    val matchingType: MatchingType = MatchingType.AUTO,
+    val matchingType: MatchingType? = MatchingType.AUTO,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(columnDefinition = "BIGINT UNSIGNED")

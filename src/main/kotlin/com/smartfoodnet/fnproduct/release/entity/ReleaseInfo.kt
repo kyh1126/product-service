@@ -1,6 +1,8 @@
 package com.smartfoodnet.fnproduct.release.entity
 
+import com.smartfoodnet.apiclient.response.NosnosReleaseModel
 import com.smartfoodnet.common.entity.SimpleBaseEntity
+import com.smartfoodnet.fnproduct.order.entity.ConfirmOrder
 import com.smartfoodnet.fnproduct.release.model.vo.ReleaseStatus
 import com.smartfoodnet.fnproduct.release.model.vo.ShippingCodeStatus
 import java.time.LocalDateTime
@@ -14,7 +16,7 @@ class ReleaseInfo(
     @Column(name = "id", columnDefinition = "BIGINT UNSIGNED")
     var id: Long? = null,
 
-    @Column(name = "order_id")
+    @Column(name = "order_id", columnDefinition = "BIGINT")
     var orderId: Long,
 
     @Column(name = "order_code")
@@ -28,7 +30,7 @@ class ReleaseInfo(
 
     @Enumerated(EnumType.STRING)
     @Column(name = "release_status")
-    var releaseStatus: ReleaseStatus = ReleaseStatus.RELEASE_REQUESTED,
+    var releaseStatus: ReleaseStatus = ReleaseStatus.BEFORE_RELEASE_REQUEST,
 
     @Column(name = "delivery_agency_id")
     var deliveryAgencyId: Long? = null,
@@ -47,5 +49,37 @@ class ReleaseInfo(
     var deliveryCompletedAt: LocalDateTime? = null,
 
     @OneToMany(mappedBy = "releaseInfo", cascade = [CascadeType.PERSIST])
-    var releaseOrderMappings: MutableSet<ReleaseOrderMapping> = LinkedHashSet()
-) : SimpleBaseEntity()
+    var releaseProducts: MutableSet<ReleaseProduct> = LinkedHashSet(),
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+        name = "order_id", referencedColumnName = "orderId",
+        insertable = false, updatable = false, // read-only
+        foreignKey = ForeignKey(value = ConstraintMode.NO_CONSTRAINT)
+    )
+    var confirmOrder: ConfirmOrder? = null
+) : SimpleBaseEntity() {
+    fun addReleaseProducts(releaseProduct: ReleaseProduct) {
+        releaseProducts.add(releaseProduct)
+        releaseProduct.releaseInfo = this
+    }
+
+    fun update(request: NosnosReleaseModel, releaseProductRequests: Set<ReleaseProduct>) {
+        releaseStatus = ReleaseStatus.fromReleaseStatus(request.releaseStatus!!)
+        deliveryAgencyId = request.deliveryAgencyId?.toLong()
+        shippingCode = request.shippingCode
+        if (shippingCode != null) {
+            shippingCodeStatus = shippingCodeStatus ?: ShippingCodeStatus.UNREGISTERED
+            shippingCodeCreatedAt = shippingCodeCreatedAt ?: LocalDateTime.now()
+        }
+
+        // 양방향
+        releaseProducts.clear()
+        releaseProductRequests.forEach { addReleaseProducts(it) }
+    }
+
+    fun updateReleaseId(request: NosnosReleaseModel) {
+        releaseId = request.releaseId?.toLong()
+        releaseCode = request.releaseCode
+    }
+}

@@ -13,18 +13,19 @@ import com.smartfoodnet.apiclient.response.CommonDataListModel
 import com.smartfoodnet.apiclient.response.CommonProcessBulkModel
 import com.smartfoodnet.apiclient.response.GetInboundModel
 import com.smartfoodnet.apiclient.response.GetInboundWorkModel
-import com.smartfoodnet.apiclient.response.GetReleaseItemModel
-import com.smartfoodnet.apiclient.response.GetReleaseModel
-import com.smartfoodnet.apiclient.response.GetShippingProductModel
 import com.smartfoodnet.apiclient.response.NosnosDailyCloseStockModel
 import com.smartfoodnet.apiclient.response.NosnosDailyStockSummaryModel
+import com.smartfoodnet.apiclient.response.NosnosDeliveryAgencyInfoModel
 import com.smartfoodnet.apiclient.response.NosnosExpirationDateStockModel
 import com.smartfoodnet.apiclient.response.NosnosPostInboundModel
+import com.smartfoodnet.apiclient.response.NosnosReleaseItemModel
+import com.smartfoodnet.apiclient.response.NosnosReleaseModel
+import com.smartfoodnet.apiclient.response.NosnosSalesProductModel
+import com.smartfoodnet.apiclient.response.NosnosShippingProductModel
 import com.smartfoodnet.apiclient.response.NosnosStockModel
 import com.smartfoodnet.apiclient.response.NosnosStockMoveEventModel
 import com.smartfoodnet.apiclient.response.PostOutboundModel
 import com.smartfoodnet.apiclient.response.PostReturnModel
-import com.smartfoodnet.apiclient.response.PostSalesProductModel
 import com.smartfoodnet.apiclient.response.PostShippingProductModel
 import com.smartfoodnet.apiclient.response.ReturnCreateModel
 import com.smartfoodnet.common.model.response.CommonResponse
@@ -77,7 +78,7 @@ interface WmsApiClient {
     // -- 출고상품(=기본상품)관리
     // ---------------------------------------------------------------------------------------------
     @GetMapping("shipping/products/bulk")
-    fun getShippingProducts(@SpringQueryMap basicProductReadModel: BasicProductReadModel): CommonResponse<CommonDataListModel<GetShippingProductModel>>
+    fun getShippingProducts(@SpringQueryMap basicProductReadModel: BasicProductReadModel): CommonResponse<CommonDataListModel<NosnosShippingProductModel>>
 
     @PostMapping("shipping/products")
     fun createShippingProduct(preModel: PreShippingProductModel): CommonResponse<PostShippingProductModel>
@@ -104,14 +105,14 @@ interface WmsApiClient {
         @RequestParam(required = false) releaseDate: String? = null,
         @RequestParam(required = false) requestShippingDt: String? = null,
         @RequestParam page: Int = 1
-    ): CommonResponse<CommonDataListModel<GetReleaseModel>?>
+    ): CommonResponse<CommonDataListModel<NosnosReleaseModel>>
 
     @GetMapping("release/items")
     fun getReleaseItems(
         @RequestParam releaseIds: List<Long>,
         @RequestParam(required = false) shippingOrderInfoId: Int? = null,
         @RequestParam page: Int = 1
-    ): CommonResponse<CommonDataListModel<GetReleaseItemModel>?>
+    ): CommonResponse<CommonDataListModel<NosnosReleaseItemModel>>
 
     // ---------------------------------------------------------------------------------------------
     // -- 판매상품 관리
@@ -119,7 +120,7 @@ interface WmsApiClient {
     @PostMapping("sales/products/bulk")
     fun createSalesProducts(
         @RequestBody preModel: CommonCreateBulkModel<PreSalesProductModel>
-    ): CommonResponse<CommonProcessBulkModel<PostSalesProductModel>>
+    ): CommonResponse<CommonProcessBulkModel<NosnosSalesProductModel>>
 
     @PutMapping("sales/products/{salesProductId}")
     fun updateSalesProduct(@PathVariable salesProductId: Long, preModel: PreSalesProductModel)
@@ -161,10 +162,20 @@ interface WmsApiClient {
         @RequestBody outboundCreateBulkModel: OutboundCreateBulkModel
     ): CommonResponse<CommonProcessBulkModel<PostOutboundModel>>
 
+    // ---------------------------------------------------------------------------------------------
+    // -- 반품
+    // ---------------------------------------------------------------------------------------------
     @PostMapping("return")
     fun createReleaseReturn(
         @RequestBody returnCreateModel: ReturnCreateModel
     ): PostReturnModel?
+
+    // ---------------------------------------------------------------------------------------------
+    // -- 로케이션,택배
+    // ---------------------------------------------------------------------------------------------
+    @GetMapping("delivery-agency/info/bulk")
+    fun getDeliveryAgencyInfoList(): CommonResponse<CommonDataListModel<NosnosDeliveryAgencyInfoModel>>
+
 }
 
 data class StockDefaultModel(

@@ -2,11 +2,13 @@ package com.smartfoodnet.fnproduct.release
 
 import com.smartfoodnet.apiclient.WmsApiClient
 import com.smartfoodnet.apiclient.response.CommonDataListModel
-import com.smartfoodnet.apiclient.response.GetReleaseItemModel
-import com.smartfoodnet.apiclient.response.GetReleaseModel
+import com.smartfoodnet.apiclient.response.NosnosReleaseItemModel
+import com.smartfoodnet.apiclient.response.NosnosReleaseModel
 import com.smartfoodnet.common.error.exception.BaseRuntimeException
 import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.common.utils.Log
+import com.smartfoodnet.fnproduct.product.BasicProductService
+import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.release.model.request.ReleaseInfoSearchCondition
 import com.smartfoodnet.fnproduct.release.model.response.ReleaseInfoDetailModel
 import com.smartfoodnet.fnproduct.release.model.response.ReleaseInfoModel
@@ -21,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional(readOnly = true)
 class ReleaseInfoService(
     private val releaseInfoStoreService: ReleaseInfoStoreService,
+    private val basicProductService: BasicProductService,
     private val releaseInfoRepository: ReleaseInfoRepository,
     private val wmsApiClient: WmsApiClient,
 ) {
@@ -30,37 +33,55 @@ class ReleaseInfoService(
         condition: ReleaseInfoSearchCondition,
         page: Pageable
     ): PageResponse<ReleaseInfoModel> {
-        return releaseInfoRepository.findAllByCondition(condition, page)
-            .map(ReleaseInfoModel::fromEntity)
-            .run { PageResponse.of(this) }
+        return releaseInfoRepository.findAllByCondition(condition, page).map { it ->
+            val collectedOrders = it.confirmOrder?.requestOrderList
+                ?.map { it.collectedOrder } ?: emptyList()
+            ReleaseInfoModel.fromEntity(it, collectedOrders)
+        }.run { PageResponse.of(this) }
     }
 
     fun getReleaseInfo(id: Long): ReleaseInfoDetailModel {
         val releaseInfo = releaseInfoRepository.findById(id).get()
-        val collectedOrders = releaseInfo.releaseOrderMappings.map { it.collectedOrder }
+        val collectedOrders = releaseInfo.confirmOrder?.requestOrderList
+            ?.map { it.collectedOrder } ?: emptyList()
 
         return ReleaseInfoDetailModel.fromEntity(releaseInfo, collectedOrders)
     }
 
     fun syncReleaseInfo() {
         var page = PageRequest.of(0, 100, Sort.Direction.DESC, "id")
-        val doneOrderIds: MutableSet<Long> = mutableSetOf()
+        val doneOrderIds = mutableSetOf<Long>()
 
         while (true) {
-            val targetList = releaseInfoRepository.findAllByReleaseStatusIn(ReleaseStatus.SYNCABLE_STATUSES, page)
+            val targetList =
+                releaseInfoRepository.findAllByReleaseStatusIn(ReleaseStatus.SYNCABLE_STATUSES, page)
             if (!targetList.hasContent()) break
 
-            val orderIds = targetList.filter { it.orderId !in doneOrderIds }.map { it.orderId }.toList()
+            val orderIds = targetList.filter { it.orderId !in doneOrderIds }
+                .map { it.orderId }.toSet()
             if (orderIds.isEmpty()) {
                 page = page.next()
                 continue
             }
 
-            val releasesByOrderId = getReleases(orderIds = orderIds).groupBy { it.orderId?.toLong()!! }
-            val releaseIds = releasesByOrderId.values.flatten().mapNotNull { it.releaseId?.toLong() }
-            val releaseItems = getReleaseItems(releaseIds)
+            try {
+                val releaseModelsByOrderId = getReleases(orderIds = orderIds)
+                    .groupBy { it.orderId!!.toLong() }
+                val itemModelsByReleaseId = getReleaseItems(releaseModelsByOrderId)
+                    .groupBy { it.releaseId!!.toLong() }
+                val basicProductByShippingProductId = getBasicProductBy(itemModelsByReleaseId)
 
-            releaseInfoStoreService.updateReleaseInfo(targetList, releasesByOrderId, releaseItems)
+                releaseModelsByOrderId.entries.forEach { (orderId, releaseModels) ->
+                    updateReleaseInfo(
+                        orderId,
+                        releaseModels,
+                        itemModelsByReleaseId,
+                        basicProductByShippingProductId
+                    )
+                }
+            } catch (e: BaseRuntimeException) {
+                log.error("[syncReleaseInfo] orderIds: ${orderIds} 동기화 실패")
+            }
 
             if (targetList.isLast) break
 
@@ -69,17 +90,17 @@ class ReleaseInfoService(
         }
     }
 
-    private fun getReleases(orderIds: List<Long>): List<GetReleaseModel> {
-        val releases: MutableList<GetReleaseModel> = mutableListOf()
+    private fun getReleases(orderIds: Set<Long>): List<NosnosReleaseModel> {
+        val releases = mutableListOf<NosnosReleaseModel>()
         var page = nosnosInitialPage
         var totalPage = nosnosInitialPage
 
         while (page <= totalPage) {
-            val model: CommonDataListModel<GetReleaseModel>?
+            val model: CommonDataListModel<NosnosReleaseModel>?
             try {
-                model = wmsApiClient.getReleases(orderIds = orderIds, page = page).payload
+                model = wmsApiClient.getReleases(orderIds = orderIds.toList(), page = page).payload
             } catch (e: Exception) {
-                log.error("orderIds: ${orderIds}, page: ${page}, error: ${e.message}")
+                log.error("[getReleases] orderIds: ${orderIds}, page: ${page}, error: ${e.message}")
                 throw BaseRuntimeException(errorMessage = "출고 정보 조회 실패, orderIds: ${orderIds}, page: ${page}")
             }
 
@@ -93,17 +114,18 @@ class ReleaseInfoService(
         return releases
     }
 
-    private fun getReleaseItems(releaseIds: List<Long>): List<GetReleaseItemModel> {
-        val releaseItems: MutableList<GetReleaseItemModel> = mutableListOf()
+    private fun getReleaseItems(releasesByOrderId: Map<Long, List<NosnosReleaseModel>>): List<NosnosReleaseItemModel> {
+        val releaseIds = releasesByOrderId.values.flatten().mapNotNull { it.releaseId?.toLong() }
+        val releaseItems = mutableListOf<NosnosReleaseItemModel>()
         var page = nosnosInitialPage
         var totalPage = nosnosInitialPage
 
         while (page <= totalPage) {
-            val model: CommonDataListModel<GetReleaseItemModel>?
+            val model: CommonDataListModel<NosnosReleaseItemModel>?
             try {
                 model = wmsApiClient.getReleaseItems(releaseIds = releaseIds, page = page).payload
             } catch (e: Exception) {
-                log.error("releaseIds: ${releaseIds}, page: ${page}, error: ${e.message}")
+                log.error("[getReleaseItems] releaseIds: ${releaseIds}, page: ${page}, error: ${e.message}")
                 throw BaseRuntimeException(errorMessage = "출고 대상 상품 조회 실패, releaseIds: ${releaseIds}, page: ${page}")
             }
 
@@ -115,6 +137,34 @@ class ReleaseInfoService(
             page++
         }
         return releaseItems
+    }
+
+    private fun getBasicProductBy(
+        itemsByReleaseId: Map<Long, List<NosnosReleaseItemModel>>
+    ): Map<Long, BasicProduct> {
+        val shippingProductIdsFromModel = itemsByReleaseId.values.flatten()
+            .mapNotNull { it.shippingProductId?.toLong() }.toSet()
+        return basicProductService.getBasicProductsByShippingProductIds(shippingProductIdsFromModel)
+            .associateBy { it.shippingProductId!! }
+    }
+
+    private fun updateReleaseInfo(
+        orderId: Long,
+        releaseModels: List<NosnosReleaseModel>,
+        itemModelsByReleaseId: Map<Long, List<NosnosReleaseItemModel>>,
+        basicProductByShippingProductId: Map<Long, BasicProduct>
+    ) {
+        val releaseInfoListByOrderId = releaseInfoRepository.findByOrderId(orderId)
+        try {
+            releaseInfoStoreService.createOrUpdateReleaseInfo(
+                releaseModels,
+                itemModelsByReleaseId,
+                basicProductByShippingProductId,
+                releaseInfoListByOrderId
+            )
+        } catch (e: BaseRuntimeException) {
+            log.error("orderId: ${orderId} releaseInfo 동기화 실패")
+        }
     }
 
     companion object : Log

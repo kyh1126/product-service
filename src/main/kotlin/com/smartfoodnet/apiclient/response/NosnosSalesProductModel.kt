@@ -2,7 +2,7 @@ package com.smartfoodnet.apiclient.response
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
-data class PostSalesProductModel(
+data class NosnosSalesProductModel(
     @JsonProperty("sales_product_id")
     val salesProductId: Long,
     @JsonProperty("sales_product_code")

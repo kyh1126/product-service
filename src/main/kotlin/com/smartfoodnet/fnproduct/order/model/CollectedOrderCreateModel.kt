@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonFormat
 import com.smartfoodnet.common.Constants
 import com.smartfoodnet.fnproduct.order.entity.CollectedProductInfo
 import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
+import com.smartfoodnet.fnproduct.order.enums.DeliveryType
+import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
 import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import io.swagger.annotations.ApiModelProperty
 import java.time.LocalDateTime
@@ -58,7 +60,7 @@ data class CollectedOrderCreateModel(
     val statusUpdatedAt: LocalDateTime? = null,
 
     @ApiModelProperty(value = "배송방식")
-    val deliveryType: String? = null,
+    val deliveryType: DeliveryType = DeliveryType.PARCEL,
 
     @ApiModelProperty(value = "배송완료요청일")
     @JsonFormat(pattern = Constants.TIMESTAMP_FORMAT)
@@ -76,12 +78,12 @@ data class CollectedOrderCreateModel(
     val receiver: ReceiverModel,
 
     @ApiModelProperty(value = "업로드방식")
-    val uploadType: String? = null,
+    val uploadType: OrderUploadType,
 
     @ApiModelProperty(value = "묶음번호")
     val bundleNumber: String
 ) {
-    fun toCollectEntity(): CollectedOrder{
+    fun toCollectEntity(): CollectedOrder {
         return CollectedOrder(
             partnerId = partnerId,
             orderUniqueKey = orderUniqueKey,
