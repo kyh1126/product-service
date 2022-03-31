@@ -3,13 +3,16 @@ package com.smartfoodnet.fnproduct.claim
 import com.smartfoodnet.apiclient.WmsApiClient
 import com.smartfoodnet.apiclient.response.ReturnCreateItem
 import com.smartfoodnet.apiclient.response.ReturnCreateModel
+import com.smartfoodnet.fnproduct.claim.entity.ReturnProduct
 import com.smartfoodnet.fnproduct.claim.model.ClaimCreateModel
 import com.smartfoodnet.fnproduct.claim.model.vo.ClaimReason
 import com.smartfoodnet.fnproduct.release.ReleaseInfoRepository
 import com.smartfoodnet.fnproduct.release.ReleaseInfoService
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
+@Transactional(readOnly = true)
 class ClaimService(
     private val wmsApiClient: WmsApiClient,
     private val releaseInfoService: ReleaseInfoService,
@@ -18,13 +21,26 @@ class ClaimService(
     fun createClaim(claimCreateModel: ClaimCreateModel) {
         val claim = claimCreateModel.toEntity()
 
+        val returnProducts = buildReturnProducts(claimCreateModel)
+        claim.returnProducts = returnProducts.toMutableList()
+
+
+    }
+
+    private fun buildReturnProducts(claimCreateModel: ClaimCreateModel): List<ReturnProduct> {
+        return claimCreateModel.returnProducts.map {
+            ReturnProduct(
+                basicProductId = it.basicProductId,
+                shippingProductId = it.shippingProductId,
+                quantity = it.quantity
+            )
+        }
     }
 
     fun getReturnInfo() {
         val releaseInfo = releaseInfoRepository.findById(1).get()
 
         val releaseItems = getReleaseItems()
-
 
         val returnCreateModel = ReturnCreateModel(
             partnerId = 11,

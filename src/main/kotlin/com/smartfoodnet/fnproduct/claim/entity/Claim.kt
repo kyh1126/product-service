@@ -3,6 +3,7 @@ package com.smartfoodnet.fnproduct.claim.entity
 import com.smartfoodnet.fnproduct.claim.model.vo.ClaimReason
 import com.smartfoodnet.fnproduct.claim.model.vo.ClaimStatus
 import java.time.LocalDateTime
+import javax.persistence.CascadeType
 import javax.persistence.Column
 import javax.persistence.Embeddable
 import javax.persistence.Embedded
@@ -10,6 +11,7 @@ import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
+import javax.persistence.OneToMany
 import javax.persistence.Table
 
 @Entity
@@ -69,25 +71,15 @@ class Claim(
     var returnShippingCompletedAt: LocalDateTime? = null,
 
     @Column(name = "return_requested_at")
-    var returnRequestedAt: LocalDateTime? = null
+    var returnRequestedAt: LocalDateTime? = null,
+
+    @OneToMany(mappedBy = "claim", cascade = [CascadeType.PERSIST])
+    var returnProducts: MutableList<ReturnProduct> = mutableListOf()
 )
 
 @Embeddable
 data class ReturnRequestDetail(
-    @Column(name = "returning_product_name")
-    var returningProductName: String? = null,
 
-    @Column(name = "returning_product_code")
-    var returningProductCode: String? = null,
-
-    @Column(name = "return_request_quantity")
-    var returnRequestQuantity: Int? = null,
-
-    @Column(name = "inbound_quantity")
-    var inboundQuantity: Int? = null,
-
-    @Column(name = "discarded_quantity")
-    var discardedQuantity: Int? = null,
 )
 
 @Embeddable
