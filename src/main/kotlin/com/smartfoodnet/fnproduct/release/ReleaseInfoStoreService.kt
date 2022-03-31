@@ -4,6 +4,7 @@ import com.smartfoodnet.apiclient.response.NosnosReleaseItemModel
 import com.smartfoodnet.apiclient.response.NosnosReleaseModel
 import com.smartfoodnet.common.error.exception.BaseRuntimeException
 import com.smartfoodnet.common.error.exception.ErrorCode
+import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
 import com.smartfoodnet.fnproduct.release.entity.ReleaseProduct
@@ -50,7 +51,10 @@ class ReleaseInfoStoreService(
                     )
                 }
                 // Case3: releaseInfo 엔티티 생성
-                else -> createReleaseInfo(releaseModelDto, basicProductByShippingProductId)
+                else -> {
+                    val uploadType = getUploadType(targetReleaseInfoList.firstOrNull()!!)
+                    createReleaseInfo(releaseModelDto, basicProductByShippingProductId, uploadType)
+                }
             }
         }
     }
@@ -64,6 +68,10 @@ class ReleaseInfoStoreService(
         releaseId: Long,
         releaseInfoByReleaseId: Map<Long?, ReleaseInfo>
     ) = releaseId in releaseInfoByReleaseId.keys
+
+    private fun getUploadType(targetReleaseInfo: ReleaseInfo) =
+        targetReleaseInfo.confirmOrder?.requestOrderList?.firstOrNull()?.collectedOrder?.uploadType
+            ?: OrderUploadType.API
 
     private fun updateReleaseId(
         releaseInfoId: Long,
@@ -101,12 +109,13 @@ class ReleaseInfoStoreService(
             basicProductByShippingProductId
         )
 
-        targetReleaseInfo.update(releaseModel, releaseProducts)
+        targetReleaseInfo.update(releaseModel, releaseProducts, getUploadType(targetReleaseInfo))
     }
 
     private fun createReleaseInfo(
         releaseModelDto: ReleaseModelDto,
-        basicProductByShippingProductId: Map<Long, BasicProduct>
+        basicProductByShippingProductId: Map<Long, BasicProduct>,
+        uploadType: OrderUploadType
     ) {
         val (releaseModel, releaseItemModels) = releaseModelDto
 
@@ -116,7 +125,7 @@ class ReleaseInfoStoreService(
             basicProductByShippingProductId = basicProductByShippingProductId
         )
 
-        val releaseInfo = releaseModel.toEntity(releaseProducts)
+        val releaseInfo = releaseModel.toEntity(releaseProducts, uploadType)
         releaseInfoRepository.save(releaseInfo)
     }
 

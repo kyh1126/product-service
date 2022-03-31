@@ -1,6 +1,7 @@
 package com.smartfoodnet.fnproduct.release.model.vo
 
 import com.smartfoodnet.fnproduct.order.vo.OrderStatus
+import java.util.*
 
 enum class ReleaseStatus(val releaseStatus: Int?, val description: String, val orderStatus: OrderStatus) {
     BEFORE_RELEASE_REQUEST(null, "출고요청전", OrderStatus.ORDER_CONFIRM),
@@ -10,13 +11,9 @@ enum class ReleaseStatus(val releaseStatus: Int?, val description: String, val o
     RELEASE_COMPLETED(7, "출고완료", OrderStatus.COMPLETE),
     RELEASE_CANCELED(9, "출고취소", OrderStatus.CANCEL);
 
-    fun isSyncableStatus(): Boolean {
-        return this in SYNCABLE_STATUSES
-    }
-
     companion object {
-        val SYNCABLE_STATUSES =
-            setOf(BEFORE_RELEASE_REQUEST, RELEASE_REQUESTED, RELEASE_ORDERED, RELEASE_IN_PROGRESS)
+        val SYNCABLE_STATUSES: EnumSet<ReleaseStatus> =
+            EnumSet.of(BEFORE_RELEASE_REQUEST, RELEASE_REQUESTED, RELEASE_ORDERED, RELEASE_IN_PROGRESS)
 
         fun fromReleaseStatus(releaseStatus: Int): ReleaseStatus {
             return values().firstOrNull { it.releaseStatus == releaseStatus }

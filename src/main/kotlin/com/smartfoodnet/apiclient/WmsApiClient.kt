@@ -2,6 +2,7 @@ package com.smartfoodnet.apiclient
 
 import com.smartfoodnet.apiclient.request.*
 import com.smartfoodnet.apiclient.response.*
+import com.smartfoodnet.common.Constants.NOSNOS_INITIAL_PAGE
 import com.smartfoodnet.common.model.response.CommonResponse
 import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.cloud.openfeign.SpringQueryMap
@@ -73,14 +74,14 @@ interface WmsApiClient {
         @RequestParam(required = false) shippingOrderInfoId: Int? = null,
         @RequestParam(required = false) releaseDate: String? = null,
         @RequestParam(required = false) requestShippingDt: String? = null,
-        @RequestParam page: Int = 1
+        @RequestParam page: Int = NOSNOS_INITIAL_PAGE
     ): CommonResponse<CommonDataListModel<NosnosReleaseModel>>
 
     @GetMapping("release/items")
     fun getReleaseItems(
         @RequestParam releaseIds: List<Long>,
         @RequestParam(required = false) shippingOrderInfoId: Int? = null,
-        @RequestParam page: Int = 1
+        @RequestParam page: Int = NOSNOS_INITIAL_PAGE
     ): CommonResponse<CommonDataListModel<NosnosReleaseItemModel>>
 
     // ---------------------------------------------------------------------------------------------

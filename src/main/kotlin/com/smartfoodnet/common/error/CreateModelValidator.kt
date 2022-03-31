@@ -3,7 +3,7 @@ package com.smartfoodnet.common.error
 import org.springframework.validation.Errors
 import org.springframework.validation.Validator
 
-interface CreateModelValidator<T> : Validator {
+interface CreateModelValidator<T : Any> : Validator {
     override fun supports(clazz: Class<*>): Boolean
 
     @Suppress("UNCHECKED_CAST")
@@ -14,7 +14,7 @@ interface CreateModelValidator<T> : Validator {
 
     fun validate(saveState: SaveState, target: T, errors: Errors)
 
-    fun <T> validateCollection(
+    fun <T : Any> validateCollection(
         saveState: SaveState,
         errors: Errors,
         fieldName: String,
@@ -76,15 +76,14 @@ interface CreateModelValidator<T> : Validator {
         errors.popNestedPath()
     }
 
-    private fun <T> invokeValidator(
+    private fun <T : Any> invokeValidator(
         saveState: SaveState,
         validator: CreateModelValidator<T>,
         target: T,
         errors: Errors,
     ) {
-        @Suppress("UNNECESSARY_NOT_NULL_ASSERTION")
-        if (target != null && !validator.supports(target!!::class.java)) {
-            throw IllegalArgumentException("${validator::class.java} Validator 는 ${target!!::class.java} 를 지원하지 않습니다.")
+        if (!validator.supports(target::class.java)) {
+            throw IllegalArgumentException("${validator::class.java} Validator 는 ${target::class.java} 를 지원하지 않습니다.")
         }
         validator.validate(saveState, target, errors)
     }

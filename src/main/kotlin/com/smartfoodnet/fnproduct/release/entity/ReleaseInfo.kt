@@ -3,6 +3,7 @@ package com.smartfoodnet.fnproduct.release.entity
 import com.smartfoodnet.apiclient.response.NosnosReleaseModel
 import com.smartfoodnet.common.entity.SimpleBaseEntity
 import com.smartfoodnet.fnproduct.order.entity.ConfirmOrder
+import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
 import com.smartfoodnet.fnproduct.release.model.vo.ReleaseStatus
 import com.smartfoodnet.fnproduct.release.model.vo.ShippingCodeStatus
 import java.time.LocalDateTime
@@ -64,12 +65,17 @@ class ReleaseInfo(
         releaseProduct.releaseInfo = this
     }
 
-    fun update(request: NosnosReleaseModel, releaseProductRequests: Set<ReleaseProduct>) {
+    fun update(
+        request: NosnosReleaseModel,
+        releaseProductRequests: Set<ReleaseProduct>,
+        uploadType: OrderUploadType
+    ) {
         releaseStatus = ReleaseStatus.fromReleaseStatus(request.releaseStatus!!)
         deliveryAgencyId = request.deliveryAgencyId?.toLong()
         shippingCode = request.shippingCode
         if (shippingCode != null) {
-            shippingCodeStatus = shippingCodeStatus ?: ShippingCodeStatus.UNREGISTERED
+            shippingCodeStatus = shippingCodeStatus
+                ?: ShippingCodeStatus.getInitialStatus(uploadType)
             shippingCodeCreatedAt = shippingCodeCreatedAt ?: LocalDateTime.now()
         }
 
