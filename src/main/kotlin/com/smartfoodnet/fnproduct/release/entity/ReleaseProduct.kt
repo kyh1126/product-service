@@ -18,6 +18,9 @@ class ReleaseProduct(
     @JoinColumn(name = "release_info_id", columnDefinition = "BIGINT UNSIGNED")
     var releaseInfo: ReleaseInfo? = null,
 
+    @Column(name = "release_item_id")
+    var releaseItemId: Long? = null,
+
     @Column(name = "basic_product_id", columnDefinition = "BIGINT UNSIGNED")
     var basicProductId: Long,
 
