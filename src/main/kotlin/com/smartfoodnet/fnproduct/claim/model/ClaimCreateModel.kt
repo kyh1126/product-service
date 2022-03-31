@@ -13,7 +13,6 @@ data class ClaimCreateModel(
     val returnAddress: String? = null,
     val returnZipcode: String? = null,
     val returnRequestedAt: LocalDateTime? = null,
-    val returnProducts:
 )
 
 data class returnProduct(

@@ -3,7 +3,14 @@ package com.smartfoodnet.fnproduct.claim.entity
 import com.smartfoodnet.fnproduct.claim.model.vo.ClaimReason
 import com.smartfoodnet.fnproduct.claim.model.vo.ClaimStatus
 import java.time.LocalDateTime
-import javax.persistence.*
+import javax.persistence.Column
+import javax.persistence.Embeddable
+import javax.persistence.Embedded
+import javax.persistence.Entity
+import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType
+import javax.persistence.Id
+import javax.persistence.Table
 
 @Entity
 @Table(name = "claim")
@@ -37,73 +44,73 @@ class Claim(
     @Embedded
     var exchangeProductDetail: ExchangeProductDetail? = null,
 
-    @Column(name = "")
+    @Column(name = "return_customer_name")
     var returnCustomerName: String? = null,
 
-    @Column(name = "")
+    @Column(name = "return_phone_number")
     var returnPhoneNumber: String? = null,
 
-    @Column(name = "")
+    @Column(name = "return_address")
     var returnAddress: String? = null,
 
-    @Column(name = "")
+    @Column(name = "return_zipcode")
     var returnZipcode: String? = null,
 
-    @Column(name = "")
+    @Column(name = "return_tracking_number")
     var returnTrackingNumber: String? = null,
 
-    @Column(name = "")
+    @Column(name = "exchange_shipping_completed_at")
     var exchangeShippingCompletedAt: LocalDateTime? = null,
 
-    @Column(name = "")
+    @Column(name = "exchange_tracking_number_registered_at")
     var exchangeTrackingNumberRegisteredAt: LocalDateTime? = null,
 
-    @Column(name = "")
+    @Column(name = "return_shipping_completed_at")
     var returnShippingCompletedAt: LocalDateTime? = null,
 
-    @Column(name = "")
+    @Column(name = "return_requested_at")
     var returnRequestedAt: LocalDateTime? = null
 )
 
 @Embeddable
 data class ReturnRequestDetail(
-    @Column(name = "")
+    @Column(name = "returning_product_name")
     var returningProductName: String? = null,
 
-    @Column(name = "")
+    @Column(name = "returning_product_code")
     var returningProductCode: String? = null,
 
-    @Column(name = "")
+    @Column(name = "return_request_quantity")
     var returnRequestQuantity: Int? = null,
 
-    @Column(name = "")
+    @Column(name = "inbound_quantity")
     var inboundQuantity: Int? = null,
 
-    @Column(name = "")
+    @Column(name = "discarded_quantity")
     var discardedQuantity: Int? = null,
 )
 
 @Embeddable
 data class ExchangeProductDetail(
-    @Column(name = "")
+    @Column(name = "exchanged_product_name")
     var exchangedProductName: String? = null,
 
-    @Column(name = "")
+    @Column(name = "exchanged_product_code")
     var exchangedProductCode: String? = null,
 
-    @Column(name = "")
+    @Column(name = "exchanged_quantity")
     var exchangeQuantity: Int? = null,
 
     @Column(name = "exchange_receiver")
     var exchangeReceiver: String? = null,
 
-    @Column(name = "exchange_receiver")
+    @Column(name = "exchange_address")
     var exchangeAddress: String? = null,
 
-    @Column(name = "")
+    @Column(name = "exchange_zipcode")
     var exchangeZipcode: String? = null,
 
-    @Column(name = "")
+    @Column(name = "exchange_phonenumber")
     var exchangePhoneNumber: String? = null
 )
 

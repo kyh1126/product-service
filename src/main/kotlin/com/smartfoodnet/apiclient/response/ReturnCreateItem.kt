@@ -6,8 +6,8 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming
 
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy::class)
 data class ReturnCreateItem(
-    val releaseReturnItemRenualId: Long,
-    val releaseItemId: Long,
+    val releaseReturnItemRenualId: Long? = null,
+    val releaseItemId: Long? = null,
     val shippingProductId: Long,
     val quantity: Long
 )
