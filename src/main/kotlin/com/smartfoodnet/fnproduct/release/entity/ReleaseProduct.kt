@@ -1,6 +1,7 @@
 package com.smartfoodnet.fnproduct.release.entity
 
 import com.smartfoodnet.common.entity.BaseEntity
+import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import org.hibernate.annotations.Where
 import java.time.LocalDateTime
 import javax.persistence.*
@@ -21,8 +22,9 @@ class ReleaseProduct(
     @Column(name = "release_item_id")
     var releaseItemId: Long,
 
-    @Column(name = "basic_product_id", columnDefinition = "BIGINT UNSIGNED")
-    var basicProductId: Long,
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "basic_product_id", columnDefinition = "BIGINT UNSIGNED")
+    var basicProduct: BasicProduct,
 
     @Column(name = "quantity")
     var quantity: Int,

@@ -21,7 +21,7 @@ data class NosnosReleaseItemModel(
     fun toEntity(basicProduct: BasicProduct): ReleaseProduct {
         return ReleaseProduct(
             releaseItemId = releaseItemId!!.toLong(),
-            basicProductId = basicProduct.id!!,
+            basicProduct = basicProduct,
             quantity = quantity ?: 0
         )
     }
