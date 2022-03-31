@@ -131,7 +131,9 @@ class ReleaseInfoService(
         return releases
     }
 
-    private fun getReleaseItems(releasesByOrderId: Map<Long, List<NosnosReleaseModel>>): List<NosnosReleaseItemModel> {
+    private fun getReleaseItems(
+        releasesByOrderId: Map<Long, List<NosnosReleaseModel>>
+    ): List<NosnosReleaseItemModel> {
         val releaseIds = releasesByOrderId.values.flatten().mapNotNull { it.releaseId?.toLong() }
         val releaseItems = mutableListOf<NosnosReleaseItemModel>()
         var page = NOSNOS_INITIAL_PAGE

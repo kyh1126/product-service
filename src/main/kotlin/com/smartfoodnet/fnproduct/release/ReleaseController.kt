@@ -17,9 +17,7 @@ import org.springframework.web.bind.annotation.*
 @Api(description = "릴리즈 관련 API")
 @RestController
 @RequestMapping("release-info")
-class ReleaseController(
-    private val releaseInfoService: ReleaseInfoService,
-) {
+class ReleaseController(private val releaseInfoService: ReleaseInfoService) {
     @Operation(summary = "릴리즈 정보 리스트 조회")
     @GetMapping
     fun getReleaseInfoList(
