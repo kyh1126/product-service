@@ -2,7 +2,6 @@ package com.smartfoodnet.fnproduct.release.model.response
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.smartfoodnet.apiclient.response.NosnosDeliveryAgencyInfoModel
-import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
 import com.smartfoodnet.fnproduct.order.enums.DeliveryType
 import com.smartfoodnet.fnproduct.order.model.ReceiverModel
 import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
@@ -78,9 +77,10 @@ data class ReleaseInfoModel(
     companion object {
         fun fromEntity(
             releaseInfo: ReleaseInfo,
-            collectedOrders: List<CollectedOrder>,
             deliveryAgencyModelsByDeliveryAgencyId: Map<Long, NosnosDeliveryAgencyInfoModel>
         ): ReleaseInfoModel {
+            val collectedOrders = getCollectedOrders(releaseInfo)
+
             return releaseInfo.run {
                 val deliveryAgencyModel = deliveryAgencyModelsByDeliveryAgencyId[deliveryAgencyId]
                 val firstCollectedOrder = collectedOrders.firstOrNull()
@@ -107,5 +107,9 @@ data class ReleaseInfoModel(
                 )
             }
         }
+
+        private fun getCollectedOrders(releaseInfo: ReleaseInfo) =
+            releaseInfo.confirmOrder?.requestOrderList
+                ?.map { it.collectedOrder } ?: emptyList()
     }
 }
