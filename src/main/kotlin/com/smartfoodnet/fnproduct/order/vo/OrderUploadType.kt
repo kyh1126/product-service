@@ -1,10 +1,9 @@
 package com.smartfoodnet.fnproduct.order.vo
 
 enum class OrderUploadType(
-    val description: String,
-    val descriptionKr: String
+    val description: String
 ) {
-    API("API", "API"),
-    UPLOAD("EXCEL", "엑셀"),
-    MANUAL("MANUAL", "수동"),
+    API("API"),
+    UPLOAD("업로드"), // 엑셀 업로드
+    MANUAL("수동"), // 수동으로 출고할 경우(주문외출고)
 }
