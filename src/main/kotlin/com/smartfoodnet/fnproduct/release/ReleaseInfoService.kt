@@ -32,10 +32,15 @@ class ReleaseInfoService(
         condition: ReleaseInfoSearchCondition,
         page: Pageable
     ): PageResponse<ReleaseInfoModel> {
-        return releaseInfoRepository.findAllByCondition(condition, page).map { it ->
+        val releaseInfoPage = releaseInfoRepository.findAllByCondition(condition, page)
+        val deliveryAgencyModelsByDeliveryAgencyId =
+            wmsApiClient.getDeliveryAgencyInfoList().payload?.dataList
+                ?.associateBy { it.deliveryAgencyId!!.toLong() } ?: emptyMap()
+
+        return releaseInfoPage.map { it ->
             val collectedOrders = it.confirmOrder?.requestOrderList
                 ?.map { it.collectedOrder } ?: emptyList()
-            ReleaseInfoModel.fromEntity(it, collectedOrders)
+            ReleaseInfoModel.fromEntity(it, collectedOrders, deliveryAgencyModelsByDeliveryAgencyId)
         }.run { PageResponse.of(this) }
     }
 
