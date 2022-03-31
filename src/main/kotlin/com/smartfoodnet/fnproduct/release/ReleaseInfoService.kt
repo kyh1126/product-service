@@ -10,7 +10,9 @@ import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.fnproduct.product.BasicProductService
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
+import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
 import com.smartfoodnet.fnproduct.release.model.request.ReleaseInfoSearchCondition
+import com.smartfoodnet.fnproduct.release.model.response.OrderProductModel
 import com.smartfoodnet.fnproduct.release.model.response.ReleaseInfoModel
 import com.smartfoodnet.fnproduct.release.model.vo.ReleaseStatus
 import org.springframework.data.domain.PageRequest
@@ -36,10 +38,8 @@ class ReleaseInfoService(
             wmsApiClient.getDeliveryAgencyInfoList().payload?.dataList
                 ?.associateBy { it.deliveryAgencyId!!.toLong() } ?: emptyMap()
 
-        return releaseInfoPage.map { it ->
-            val collectedOrders = it.confirmOrder?.requestOrderList
-                ?.map { it.collectedOrder } ?: emptyList()
-            ReleaseInfoModel.fromEntity(it, collectedOrders, deliveryAgencyModelsByDeliveryAgencyId)
+        return releaseInfoPage.map {
+            ReleaseInfoModel.fromEntity(it, deliveryAgencyModelsByDeliveryAgencyId)
         }.run { PageResponse.of(this) }
     }
 
@@ -83,6 +83,28 @@ class ReleaseInfoService(
             page = page.next()
             doneOrderIds.addAll(orderIds)
         }
+    }
+
+    fun getOrderProductsByOrderCode(orderCode: String): List<OrderProductModel> {
+        val releaseInfoList = releaseInfoRepository.findByOrderCode(orderCode)
+        return releaseInfoList.flatMap(::getOrderProducts)
+    }
+
+    fun getOrderProductsByReleaseCode(releaseCode: String): List<OrderProductModel> {
+        val releaseInfo = releaseInfoRepository.findByReleaseCode(releaseCode) ?: return emptyList()
+        return getOrderProducts(releaseInfo)
+    }
+
+    fun getOrderProducts(releaseInfo: ReleaseInfo): List<OrderProductModel> {
+        return releaseInfo.releaseProducts.map { OrderProductModel.fromEntity(it, releaseInfo) }
+            .ifEmpty {
+                val confirmProducts = releaseInfo.confirmOrder?.requestOrderList
+                    ?.flatMap { it.collectedOrder.confirmProductList } ?: emptyList()
+
+                confirmProducts.map { it ->
+                    OrderProductModel.fromEntity(it, releaseInfo)
+                }
+            }
     }
 
     private fun getReleases(orderIds: Set<Long>): List<NosnosReleaseModel> {
