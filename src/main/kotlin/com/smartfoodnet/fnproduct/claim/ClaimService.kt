@@ -16,6 +16,7 @@ class ClaimService(
     private val releaseInfoRepository: ReleaseInfoRepository
 ) {
     fun createClaim(claimCreateModel: ClaimCreateModel) {
+        val claim = claimCreateModel.toEntity()
 
     }
 
