@@ -12,8 +12,8 @@ import javax.persistence.ManyToOne
 import javax.persistence.Table
 
 @Entity
-@Table(name = "return_product")
-class ReturnProduct(
+@Table(name = "exchange_product")
+class ExchangeProduct(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", columnDefinition = "BIGINT UNSIGNED")
@@ -25,15 +25,6 @@ class ReturnProduct(
 
     @Column(name = "request_quantity")
     var requestQuantity: Int,
-
-    @Column(name = "release_item_id")
-    var releaseItemId: Long? = null,
-
-    @Column(name = "inbound_quantity")
-    var inboundQuantity: Int? = null,
-
-    @Column(name = "discarded_quantity")
-    var discardedQuantity: Int? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "claim_id", columnDefinition = "BIGINT UNSIGNED")

@@ -41,9 +41,6 @@ class Claim(
     var status: ClaimStatus? = null,
 
     @Embedded
-    var returnRequestDetail: ReturnRequestDetail? = null,
-
-    @Embedded
     var exchangeProductDetail: ExchangeProductDetail? = null,
 
     @Column(name = "return_customer_name")
@@ -75,11 +72,6 @@ class Claim(
 
     @OneToMany(mappedBy = "claim", cascade = [CascadeType.PERSIST])
     var returnProducts: MutableList<ReturnProduct> = mutableListOf()
-)
-
-@Embeddable
-data class ReturnRequestDetail(
-
 )
 
 @Embeddable

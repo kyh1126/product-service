@@ -9,6 +9,7 @@ data class ClaimCreateModel(
     val originalTrackingNumber: String,
     val customerName: String,
     val claimReason: ClaimReason,
+    val releaseInfoId: Long,
     val returnCustomerName: String? = null,
     val returnPhoneNumber: String? = null,
     val returnAddress: String? = null,
