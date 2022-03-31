@@ -19,7 +19,7 @@ class ReleaseProduct(
     var releaseInfo: ReleaseInfo? = null,
 
     @Column(name = "release_item_id")
-    var releaseItemId: Long? = null,
+    var releaseItemId: Long,
 
     @Column(name = "basic_product_id", columnDefinition = "BIGINT UNSIGNED")
     var basicProductId: Long,

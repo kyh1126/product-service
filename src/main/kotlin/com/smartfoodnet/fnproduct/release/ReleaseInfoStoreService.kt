@@ -101,11 +101,11 @@ class ReleaseInfoStoreService(
             ?: (releaseInfoRepository.findByReleaseId(releaseId) ?: return)
 
         // 릴리즈상품 저장
-        val entityByBasicProductId =
-            targetReleaseInfo.releaseProducts.associateBy { it.basicProductId }
+        val entityByReleaseItemId =
+            targetReleaseInfo.releaseProducts.associateBy { it.releaseItemId }
         val releaseProducts = createOrUpdateReleaseProducts(
             releaseItemModels,
-            entityByBasicProductId,
+            entityByReleaseItemId,
             basicProductByShippingProductId
         )
 
@@ -131,22 +131,23 @@ class ReleaseInfoStoreService(
 
     private fun createOrUpdateReleaseProducts(
         releaseItemModels: List<NosnosReleaseItemModel>,
-        entityByBasicProductId: Map<Long, ReleaseProduct> = emptyMap(),
+        entityByReleaseItemId: Map<Long, ReleaseProduct> = emptyMap(),
         basicProductByShippingProductId: Map<Long, BasicProduct>,
     ): Set<ReleaseProduct> {
         val releaseProducts = releaseItemModels.map {
             val basicProduct = basicProductByShippingProductId[it.shippingProductId!!.toLong()]
                 ?: throw BaseRuntimeException(errorCode = ErrorCode.NO_ELEMENT)
-            if (basicProduct.id !in entityByBasicProductId.keys) it.toEntity(basicProduct)
+            val releaseItemId = it.releaseItemId!!.toLong()
+            if (releaseItemId !in entityByReleaseItemId.keys) it.toEntity(basicProduct)
             else {
-                val entity = entityByBasicProductId[basicProduct.id]
+                val entity = entityByReleaseItemId[releaseItemId]
                 entity!!.update(it.quantity ?: 0)
                 entity
             }
         }.run { LinkedHashSet(this) }
 
         // 연관관계 끊긴 entity 삭제처리
-        entityByBasicProductId.values.toSet().minus(releaseProducts)
+        entityByReleaseItemId.values.toSet().minus(releaseProducts)
             .forEach(ReleaseProduct::delete)
 
         return releaseProducts
