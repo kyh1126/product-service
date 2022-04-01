@@ -22,10 +22,10 @@ data class OrderProductModel(
     var releaseCode: String? = null,
 
     @ApiModelProperty(value = "출고상품명")
-    var productName: String? = null,
+    var basicProductName: String? = null,
 
     @ApiModelProperty(value = "출고상품코드")
-    var productCode: String? = null,
+    var basicProductCode: String? = null,
 
     @ApiModelProperty(value = "출고상품수량")
     var quantity: Int
@@ -44,8 +44,8 @@ data class OrderProductModel(
                 orderNumbers = collectedOrders.joinToString { it.orderNumber },
                 releaseId = releaseInfo.releaseId,
                 releaseCode = releaseInfo.releaseCode,
-                productName = releaseProduct.basicProduct.name,
-                productCode = releaseProduct.basicProduct.code,
+                basicProductName = releaseProduct.basicProduct.name,
+                basicProductCode = releaseProduct.basicProduct.code,
                 quantity = releaseProduct.quantity
             )
         }
@@ -62,8 +62,8 @@ data class OrderProductModel(
                 orderNumbers = collectedOrders.joinToString { it.orderNumber },
                 releaseId = releaseInfo.releaseId,
                 releaseCode = releaseInfo.releaseCode,
-                productName = confirmProduct.basicProduct.name,
-                productCode = confirmProduct.basicProduct.code,
+                basicProductName = confirmProduct.basicProduct.name,
+                basicProductCode = confirmProduct.basicProduct.code,
                 quantity = confirmProduct.quantity
             )
         }
