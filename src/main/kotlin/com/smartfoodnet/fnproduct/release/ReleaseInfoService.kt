@@ -8,10 +8,13 @@ import com.smartfoodnet.common.Constants.NOSNOS_INITIAL_PAGE
 import com.smartfoodnet.common.error.exception.BaseRuntimeException
 import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.common.utils.Log
+import com.smartfoodnet.fnproduct.order.ConfirmOrderService
+import com.smartfoodnet.fnproduct.order.support.condition.ConfirmProductSearchCondition
 import com.smartfoodnet.fnproduct.product.BasicProductService
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
 import com.smartfoodnet.fnproduct.release.model.request.ReleaseInfoSearchCondition
+import com.smartfoodnet.fnproduct.release.model.response.OrderConfirmProductModel
 import com.smartfoodnet.fnproduct.release.model.response.OrderProductModel
 import com.smartfoodnet.fnproduct.release.model.response.ReleaseInfoModel
 import com.smartfoodnet.fnproduct.release.model.vo.ReleaseStatus
@@ -26,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional
 class ReleaseInfoService(
     private val releaseInfoStoreService: ReleaseInfoStoreService,
     private val basicProductService: BasicProductService,
+    private val confirmOrderService: ConfirmOrderService,
     private val releaseInfoRepository: ReleaseInfoRepository,
     private val wmsApiClient: WmsApiClient,
 ) {
@@ -105,6 +109,13 @@ class ReleaseInfoService(
                     OrderProductModel.fromEntity(it, releaseInfo)
                 }
             }
+    }
+
+    fun getConfirmProducts(partnerId: Long, orderNumber: String): List<OrderConfirmProductModel> {
+        val condition = ConfirmProductSearchCondition(partnerId = partnerId, orderNumber = orderNumber)
+        val confirmProducts = confirmOrderService.getConfirmProduct(condition)
+
+        return confirmProducts.map(OrderConfirmProductModel::from)
     }
 
     private fun getReleases(orderIds: Set<Long>): List<NosnosReleaseModel> {
