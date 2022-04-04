@@ -36,10 +36,10 @@ data class ReleaseInfoModel(
     var shippingCode: String? = null,
 
     @ApiModelProperty(
-        value = "쇼핑몰송장등록 (REGISTERED:자동송장등록성공/REGISTER_FAILED:자동송장등록실패/UNREGISTERED:자동송장등록전/EXCEL_REGISTER:수기등록)",
-        allowableValues = "REGISTERED,REGISTER_FAILED,BEFORE_REGISTER,EXCEL_REGISTER"
+        value = "쇼핑몰송장등록 (NONE:송장없음/REGISTERED:자동송장등록성공/REGISTER_FAILED:자동송장등록실패/UNREGISTERED:자동송장등록전/EXCEL_REGISTER:수기등록)",
+        allowableValues = "NONE,REGISTERED,REGISTER_FAILED,BEFORE_REGISTER,EXCEL_REGISTER"
     )
-    var shippingCodeStatus: ShippingCodeStatus? = null,
+    var shippingCodeStatus: ShippingCodeStatus,
 
     @ApiModelProperty(value = "송장번호부여일시")
     var shippingCodeCreatedAt: LocalDateTime? = null,
