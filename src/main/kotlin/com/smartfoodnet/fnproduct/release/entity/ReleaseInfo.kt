@@ -41,7 +41,7 @@ class ReleaseInfo(
 
     @Enumerated(EnumType.STRING)
     @Column(name = "shipping_code_status")
-    var shippingCodeStatus: ShippingCodeStatus? = null,
+    var shippingCodeStatus: ShippingCodeStatus = ShippingCodeStatus.NONE,
 
     @Column(name = "shipping_code_created_at")
     var shippingCodeCreatedAt: LocalDateTime? = null,
@@ -74,8 +74,9 @@ class ReleaseInfo(
         deliveryAgencyId = request.deliveryAgencyId?.toLong()
         shippingCode = request.shippingCode
         if (shippingCode != null) {
-            shippingCodeStatus = shippingCodeStatus
-                ?: ShippingCodeStatus.getInitialStatus(uploadType)
+            shippingCodeStatus =
+                if (shippingCodeStatus.isInProgress()) shippingCodeStatus
+                else ShippingCodeStatus.getInitialStatus(uploadType)
             shippingCodeCreatedAt = shippingCodeCreatedAt ?: LocalDateTime.now()
         }
 
