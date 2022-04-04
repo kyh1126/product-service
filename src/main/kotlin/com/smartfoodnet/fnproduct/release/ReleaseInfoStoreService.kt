@@ -2,6 +2,7 @@ package com.smartfoodnet.fnproduct.release
 
 import com.smartfoodnet.apiclient.response.NosnosReleaseItemModel
 import com.smartfoodnet.apiclient.response.NosnosReleaseModel
+import com.smartfoodnet.apiclient.response.PostOutboundModel
 import com.smartfoodnet.common.error.exception.BaseRuntimeException
 import com.smartfoodnet.common.error.exception.ErrorCode
 import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
@@ -18,6 +19,15 @@ import org.springframework.transaction.annotation.Transactional
 class ReleaseInfoStoreService(
     private val releaseInfoRepository: ReleaseInfoRepository,
 ) {
+    /**
+     * 노스노스에서 응답 받은 데이터로 ReleaseInfo 엔티티를 생성하는 함수
+     */
+    @Transactional
+    fun createFromOrderInfo(orderInfo : PostOutboundModel){
+        releaseInfoRepository.save(orderInfo.toReleaseInfo())
+    }
+
+
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun createOrUpdateReleaseInfo(
         releaseModels: List<NosnosReleaseModel>,
