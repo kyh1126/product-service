@@ -9,5 +9,5 @@ data class ReturnCreateItem(
     val releaseReturnItemRenualId: Long? = null,
     val releaseItemId: Long? = null,
     val shippingProductId: Long,
-    val quantity: Long
+    val quantity: Int
 )

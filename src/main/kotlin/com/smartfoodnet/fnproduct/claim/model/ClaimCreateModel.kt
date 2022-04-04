@@ -5,6 +5,7 @@ import com.smartfoodnet.fnproduct.claim.model.vo.ClaimReason
 import java.time.LocalDateTime
 
 data class ClaimCreateModel(
+    val partnerId: Long,
     val claimedAt: LocalDateTime,
     val originalTrackingNumber: String,
     val customerName: String,
@@ -15,10 +16,12 @@ data class ClaimCreateModel(
     val returnAddress: String? = null,
     val returnZipcode: String? = null,
     val returnRequestedAt: LocalDateTime? = null,
+    val memo: String,
     val returnProducts: List<ReturnProductCreateModel>
 ) {
     fun toEntity(): Claim {
         return Claim(
+            partnerId = partnerId,
             claimedAt = claimedAt,
             originalTrackingNumber = originalTrackingNumber,
             customerName = customerName,
@@ -27,7 +30,8 @@ data class ClaimCreateModel(
             returnPhoneNumber = returnPhoneNumber,
             returnAddress = returnAddress,
             returnZipcode = returnZipcode,
-            returnRequestedAt = returnRequestedAt
+            returnRequestedAt = returnRequestedAt,
+            memo = memo
         )
     }
 }

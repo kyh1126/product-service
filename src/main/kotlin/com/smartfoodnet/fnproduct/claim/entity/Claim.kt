@@ -3,16 +3,7 @@ package com.smartfoodnet.fnproduct.claim.entity
 import com.smartfoodnet.fnproduct.claim.model.vo.ClaimReason
 import com.smartfoodnet.fnproduct.claim.model.vo.ClaimStatus
 import java.time.LocalDateTime
-import javax.persistence.CascadeType
-import javax.persistence.Column
-import javax.persistence.Embeddable
-import javax.persistence.Embedded
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
-import javax.persistence.Id
-import javax.persistence.OneToMany
-import javax.persistence.Table
+import javax.persistence.*
 
 @Entity
 @Table(name = "claim")
@@ -21,6 +12,9 @@ class Claim(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", columnDefinition = "BIGINT UNSIGNED")
     var id: Long? = null,
+
+    @Column(name = "partner_id")
+    var partnerId: Long,
 
     @Column(name = "claimed_at")
     var claimedAt: LocalDateTime,
@@ -69,6 +63,9 @@ class Claim(
 
     @Column(name = "return_requested_at")
     var returnRequestedAt: LocalDateTime? = null,
+
+    @Column(name = "memo")
+    var memo: String? = null,
 
     @OneToMany(mappedBy = "claim", cascade = [CascadeType.PERSIST])
     var returnProducts: MutableList<ReturnProduct> = mutableListOf()

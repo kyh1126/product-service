@@ -25,7 +25,7 @@ class ClaimController(
 //        @ModelAttribute condition: ReleaseInfoSearchCondition,
         @PageableDefault(size = 50, sort = ["id"], direction = Sort.Direction.DESC) page: Pageable,
     ){
-        return claimService.getReturnInfo()
+
     }
 
     @Operation(summary = "클레임 등록")

@@ -3,11 +3,15 @@ package com.smartfoodnet.fnproduct.claim
 import com.smartfoodnet.apiclient.WmsApiClient
 import com.smartfoodnet.apiclient.response.ReturnCreateItem
 import com.smartfoodnet.apiclient.response.ReturnCreateModel
+import com.smartfoodnet.common.error.exception.NoSuchElementError
+import com.smartfoodnet.fnproduct.claim.entity.Claim
 import com.smartfoodnet.fnproduct.claim.entity.ReturnProduct
 import com.smartfoodnet.fnproduct.claim.model.ClaimCreateModel
-import com.smartfoodnet.fnproduct.claim.model.vo.ClaimReason
+import com.smartfoodnet.fnproduct.product.BasicProductRepository
 import com.smartfoodnet.fnproduct.release.ReleaseInfoRepository
 import com.smartfoodnet.fnproduct.release.ReleaseInfoService
+import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -16,43 +20,46 @@ import org.springframework.transaction.annotation.Transactional
 class ClaimService(
     private val wmsApiClient: WmsApiClient,
     private val releaseInfoService: ReleaseInfoService,
-    private val releaseInfoRepository: ReleaseInfoRepository
+    private val releaseInfoRepository: ReleaseInfoRepository,
+    private val basicProductRepository: BasicProductRepository
 ) {
     fun createClaim(claimCreateModel: ClaimCreateModel) {
         val claim = claimCreateModel.toEntity()
+        claim.returnProducts = buildReturnProducts(claimCreateModel, claim).toMutableList()
 
-        val returnProducts = buildReturnProducts(claimCreateModel)
-        claim.returnProducts = returnProducts.toMutableList()
+        val releaseInfo = releaseInfoRepository.findByIdOrNull(claimCreateModel.releaseInfoId) ?: throw NoSuchElementError("releaseInfo가 존재하지 않습니다.")
+        claim.
+
+        sendReleaseReturn(claim, releaseInfo)
 
 
     }
 
-    private fun buildReturnProducts(claimCreateModel: ClaimCreateModel): List<ReturnProduct> {
+    private fun buildReturnProducts(claimCreateModel: ClaimCreateModel, claim: Claim): List<ReturnProduct> {
         return claimCreateModel.returnProducts.map {
+            val basicProduct = basicProductRepository.findByShippingProductId(it.shippingProductId) ?: throw NoSuchElementError("기본상품이 존재하지 않습니다. [shippingProductId: ${it.shippingProductId}]")
             ReturnProduct(
-                basicProductId = it.basicProductId,
-                shippingProductId = it.shippingProductId,
-                quantity = it.quantity
+                requestQuantity = it.quantity,
+                claim = claim,
+                basicProduct = basicProduct
             )
         }
     }
 
-    fun getReturnInfo() {
-        val releaseInfo = releaseInfoRepository.findById(1).get()
-
-        val releaseItems = getReleaseItems()
+    fun sendReleaseReturn(claim: Claim, releaseInfo: ReleaseInfo) {
+        val releaseItems = claim.returnProducts.map {
+            ReturnCreateItem(shippingProductId = it.basicProduct.shippingProductId!!, quantity = it.requestQuantity)
+        }
 
         val returnCreateModel = ReturnCreateModel(
-            partnerId = 11,
+            partnerId = claim.partnerId,
             releaseId = releaseInfo.releaseId?.toInt(),
-            returnReasonId = ClaimReason.CHANGED_MIND.returnReasonId?.toInt(),
-            memo = "memo",
-            returnAddress1 = "returnAddress1",
-            returnAddress2 = "returnAddress2",
-            receivingName = "회수 고객명",
-            zipcode = "463-859",
-            tel1 = "124124124",
-            tel2 = "tel2",
+            returnReasonId = claim.claimReason.returnReasonId?.toInt(),
+            memo = claim.memo,
+            returnAddress1 = releaseInfo.confirmOrder?.receiver?.address,
+            receivingName = releaseInfo.confirmOrder?.receiver?.name,
+            zipcode = releaseInfo.confirmOrder?.receiver?.zipCode,
+            tel1 = releaseInfo.confirmOrder?.receiver?.phoneNumber,
             releaseItemList = releaseItems
         )
         val returnModel = wmsApiClient.createReleaseReturn(returnCreateModel)
