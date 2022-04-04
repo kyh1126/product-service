@@ -8,6 +8,7 @@ enum class OrderStatus(val code: Int, val description: String) {
     RELEASE_WORKING(3, "출고작업중"),
     IN_TRANSIT(4, "배송중"),
     COMPLETE(5, "배송완료"),
+    EXCHANGED_RELEASE(8, "교환출고"),
     CANCEL(9, "취소");
 
     fun next() = when (this) {
@@ -17,6 +18,7 @@ enum class OrderStatus(val code: Int, val description: String) {
         RELEASE_WORKING -> IN_TRANSIT
         IN_TRANSIT -> COMPLETE
         COMPLETE -> COMPLETE
+        EXCHANGED_RELEASE -> EXCHANGED_RELEASE
         CANCEL -> CANCEL
     }
 
@@ -27,6 +29,7 @@ enum class OrderStatus(val code: Int, val description: String) {
         RELEASE_WORKING -> RELEASE_REGISTRATION
         IN_TRANSIT -> RELEASE_WORKING
         COMPLETE -> IN_TRANSIT
+        EXCHANGED_RELEASE -> EXCHANGED_RELEASE
         CANCEL -> CANCEL
     }
 

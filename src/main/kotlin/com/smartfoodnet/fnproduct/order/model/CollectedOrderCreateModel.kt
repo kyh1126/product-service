@@ -7,6 +7,7 @@ import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
 import com.smartfoodnet.fnproduct.order.enums.DeliveryType
 import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
 import com.smartfoodnet.fnproduct.order.vo.OrderStatus
+import com.smartfoodnet.fnproduct.order.vo.StoreSyncStatus
 import io.swagger.annotations.ApiModelProperty
 import java.time.LocalDateTime
 
@@ -98,6 +99,7 @@ data class CollectedOrderCreateModel(
             statusUpdatedAt = statusUpdatedAt,
             orderNumber = orderNumber,
             status = status,
+            storeSyncStatus = StoreSyncStatus.NEW,
             claimStatus = claimStatus,
             deliveryType = deliveryType,
             expectedDeliveryDate = expectedDeliveryDate,
