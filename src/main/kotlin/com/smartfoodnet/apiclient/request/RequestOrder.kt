@@ -1,6 +1,8 @@
 package com.smartfoodnet.apiclient.request
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.google.common.annotations.VisibleForTesting
 import com.smartfoodnet.common.Constants.NOSNOS_DATE_FORMAT
 import com.smartfoodnet.common.error.exception.BaseRuntimeException
 import com.smartfoodnet.fnproduct.order.entity.ConfirmOrder
@@ -9,6 +11,25 @@ import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import java.time.format.DateTimeFormatter
 
 object RequestOrderMapper {
+
+    fun toOutboundCreateBulkModel(confirmOrders: List<ConfirmOrder>): OutboundCreateBulkModel{
+        val outboundBulkItemList = createOutboundBulkItem(confirmOrders)
+        /**
+         * 각 주문별로 중복되는 상품이 있는지 확인
+         */
+        outboundBulkItemList.map {
+            searchDuplicateProduct(it)
+        }
+
+        return OutboundCreateBulkModel(
+            confirmOrders.first().partnerId,
+            outboundBulkItemList
+        )
+    }
+
+    /**
+     * 기본상품이 PACKAGE 인 경우 BASIC 단위로 풀어서 반환
+     */
     private fun expandPackageProduct(confirmProduct: ConfirmProduct, bundleNumber: String): List<OrderItem> {
         val quantity = confirmProduct.quantity
         val basicProduct = confirmProduct.basicProduct
@@ -18,7 +39,7 @@ object RequestOrderMapper {
                     ?: throw BaseRuntimeException(errorMessage = "${it.selectedBasicProduct.name}의 salesProductId가 없습니다"),
                 quantity = it.quantity * quantity,
                 itemCd1 = bundleNumber,
-                itemCd3 = isBoxShipping(it.quantity * quantity, it.selectedBasicProduct.piecesPerBox?:-1)
+                piecesPerBox = it.selectedBasicProduct.piecesPerBox ?: -1
             )
         }
     }
@@ -32,7 +53,7 @@ object RequestOrderMapper {
                         ?: throw BaseRuntimeException(errorMessage = "${it.basicProduct.name}의 salesProductId가 없습니다"),
                     quantity = it.quantity,
                     itemCd1 = bundleNumber,
-                    itemCd3 = isBoxShipping(it.quantity, it.basicProduct.piecesPerBox?:-1)
+                    piecesPerBox = it.basicProduct.piecesPerBox?:-1
                 )
             }
 
@@ -45,49 +66,33 @@ object RequestOrderMapper {
         return singleProduct + packageProduct
     }
 
-    private fun isBoxShipping(quantity: Int, piecesPerBox : Int) : String? {
-        return if ((quantity / piecesPerBox) == 1) "단수" else null
+    /**
+     * 그룹핑 처리하여 1개 이상의 중복되는 상품은 합쳐서 보낸다
+     */
+    private fun searchDuplicateProduct(outboundBulkItem: OutboundCreateBulkItemModel){
+        val duplicateSalesIds = outboundBulkItem.orderItemList
+            .groupBy { it.salesProductId }
+            .map { sumDuplicateProduct(it.value) }
+
+        outboundBulkItem.orderItemList = duplicateSalesIds
     }
 
-    fun toOutboundCreateModel(confirmOrder: ConfirmOrder): OutboundCreateModel {
-        return confirmOrder.run {
-            OutboundCreateModel(
-                partnerId = partnerId,
-                companyOrderCode = requestOrderList.first().collectedOrder.orderNumber,
-                shippingMethodId = shippingMethodType,
-                requestShippingDt = requestShippingDate.format(DateTimeFormatter.ofPattern(NOSNOS_DATE_FORMAT)),
-                buyerName = receiver.name,
-                receiverName = receiver.name,
-                tel1 = receiver.phoneNumber,
-                // TODO : 2022-03-16 주문수집시 우편번호도 같이 들어와야합니다
-                zipcode = receiver.zipCode,
-                shippingAddress1 = receiver.address,
-                shippingMessage = shippingMessage,
-                memo1 = memo?.memo1,
-                memo2 = memo?.memo2,
-                memo3 = memo?.memo3,
-                memo4 = memo?.memo4,
-                memo5 = memo?.memo5,
-                orderItemList = toOrderItemList(
-                    requestOrderList
-                        .map { it.collectedOrder.confirmProductList }
-                        .flatten()
-                    ,bundleNumber
-                )
-            )
+    private fun sumDuplicateProduct(duplicateOrderItemList : List<OrderItem>): OrderItem {
+        if (duplicateOrderItemList.count() == 1) {
+            return duplicateOrderItemList.first()
         }
-    }
 
-    fun toOutboundCreateBulkModel(confirmOrders: List<ConfirmOrder>): OutboundCreateBulkModel{
-        return OutboundCreateBulkModel(
-            confirmOrders.first().partnerId,
-            createOutboundBulkItem(confirmOrders)
-        )
+        val commonOrderItem = duplicateOrderItemList.first()
+        var quantity : Int = 0
+        duplicateOrderItemList.forEach {
+           quantity += it.quantity
+        }
+        return OrderItem(commonOrderItem.salesProductId, quantity, commonOrderItem.itemCd1, null, commonOrderItem.piecesPerBox)
     }
 
     private fun createOutboundBulkItem(confirmOrders: List<ConfirmOrder>) : List<OutboundCreateBulkItemModel>{
-        return confirmOrders.map {
-            it.run {
+        return confirmOrders.map { confirmOrder ->
+            confirmOrder.run {
                 OutboundCreateBulkItemModel(
                     companyOrderCode = requestOrderList.first().collectedOrder.orderNumber,
                     shippingMethodId = shippingMethodType,
@@ -183,9 +188,12 @@ class OrderItem(
     val itemCd1: String? = null,
     @JsonProperty("item_cd2")
     val itemCd2: String? = null,
+    @JsonIgnore
+    val piecesPerBox: Int = -1
+){
     @JsonProperty("item_cd3")
-    val itemCd3: String? = null
-)
+    val itemCd3: String? = if ((quantity / piecesPerBox) == 1) "단수" else null
+}
 
 class OutboundCreateBulkModel(
     @JsonProperty("partner_id")
@@ -248,5 +256,5 @@ class OutboundCreateBulkItemModel(
     val memo5: String? = null,
 
     @JsonProperty("order_item_list")
-    val orderItemList: List<OrderItem>
+    var orderItemList: List<OrderItem>
 )

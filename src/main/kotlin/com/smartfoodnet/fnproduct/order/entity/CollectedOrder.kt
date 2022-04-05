@@ -2,8 +2,8 @@ package com.smartfoodnet.fnproduct.order.entity
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.smartfoodnet.common.entity.BaseEntity
-import com.smartfoodnet.fnproduct.order.enums.DeliveryType
-import com.smartfoodnet.fnproduct.order.enums.DeliveryTypeConverter
+import com.smartfoodnet.fnproduct.order.vo.DeliveryType
+import com.smartfoodnet.fnproduct.order.vo.DeliveryTypeConverter
 import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
 import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import com.smartfoodnet.fnproduct.order.vo.StoreSyncStatus

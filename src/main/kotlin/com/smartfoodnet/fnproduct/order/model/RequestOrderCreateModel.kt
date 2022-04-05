@@ -1,6 +1,6 @@
 package com.smartfoodnet.fnproduct.order.model
 
-import com.smartfoodnet.fnproduct.order.enums.DeliveryType
+import com.smartfoodnet.fnproduct.order.vo.DeliveryType
 
 class RequestOrderCreateModel(
     val promotion: String? = null,
