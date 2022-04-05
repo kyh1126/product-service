@@ -6,7 +6,7 @@ import com.smartfoodnet.common.error.exception.BaseRuntimeException
 import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.fnproduct.order.dto.ConfirmProductModel
 import com.smartfoodnet.fnproduct.order.entity.*
-import com.smartfoodnet.fnproduct.order.enums.DeliveryType
+import com.smartfoodnet.fnproduct.order.vo.DeliveryType
 import com.smartfoodnet.fnproduct.order.model.ConfirmProductAddModel
 import com.smartfoodnet.fnproduct.order.model.ConfirmProductMappedModel
 import com.smartfoodnet.fnproduct.order.model.RequestOrderCreateModel

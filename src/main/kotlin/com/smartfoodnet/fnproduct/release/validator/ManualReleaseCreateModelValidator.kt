@@ -2,7 +2,6 @@ package com.smartfoodnet.fnproduct.release.validator
 
 import com.smartfoodnet.common.error.CreateModelValidator
 import com.smartfoodnet.common.error.SaveState
-import com.smartfoodnet.fnproduct.order.enums.DeliveryType
 import com.smartfoodnet.fnproduct.release.model.ManualReleaseCreateModel
 import org.springframework.stereotype.Component
 import org.springframework.validation.Errors

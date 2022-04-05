@@ -2,7 +2,7 @@ package com.smartfoodnet.fnproduct.release.model.response
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.smartfoodnet.apiclient.response.NosnosDeliveryAgencyInfoModel
-import com.smartfoodnet.fnproduct.order.enums.DeliveryType
+import com.smartfoodnet.fnproduct.order.vo.DeliveryType
 import com.smartfoodnet.fnproduct.order.model.ReceiverModel
 import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
 import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
