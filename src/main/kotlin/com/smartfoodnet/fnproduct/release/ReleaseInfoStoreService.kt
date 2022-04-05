@@ -2,6 +2,7 @@ package com.smartfoodnet.fnproduct.release
 
 import com.smartfoodnet.apiclient.response.NosnosReleaseItemModel
 import com.smartfoodnet.apiclient.response.NosnosReleaseModel
+import com.smartfoodnet.apiclient.response.PostOutboundModel
 import com.smartfoodnet.common.error.exception.BaseRuntimeException
 import com.smartfoodnet.common.error.exception.ErrorCode
 import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
@@ -9,7 +10,6 @@ import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
 import com.smartfoodnet.fnproduct.release.entity.ReleaseProduct
 import com.smartfoodnet.fnproduct.release.model.dto.ReleaseModelDto
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
@@ -19,6 +19,15 @@ import org.springframework.transaction.annotation.Transactional
 class ReleaseInfoStoreService(
     private val releaseInfoRepository: ReleaseInfoRepository,
 ) {
+    /**
+     * 노스노스에서 응답 받은 데이터로 ReleaseInfo 엔티티를 생성하는 함수
+     */
+    @Transactional
+    fun createFromOrderInfo(orderInfo : PostOutboundModel){
+        releaseInfoRepository.save(orderInfo.toReleaseInfo())
+    }
+
+
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun createOrUpdateReleaseInfo(
         releaseModels: List<NosnosReleaseModel>,
@@ -52,7 +61,7 @@ class ReleaseInfoStoreService(
                 }
                 // Case3: releaseInfo 엔티티 생성
                 else -> {
-                    val uploadType = getUploadType(targetReleaseInfoList.firstOrNull()!!)
+                    val uploadType = getUploadType(targetReleaseInfoList.first())
                     createReleaseInfo(releaseModelDto, basicProductByShippingProductId, uploadType)
                 }
             }
@@ -78,7 +87,7 @@ class ReleaseInfoStoreService(
         releaseModelDto: ReleaseModelDto,
         basicProductByShippingProductId: Map<Long, BasicProduct>
     ) {
-        val targetReleaseInfo = releaseInfoRepository.findByIdOrNull(releaseInfoId) ?: return
+        val targetReleaseInfo = releaseInfoRepository.findById(releaseInfoId).get()
         targetReleaseInfo.updateReleaseId(releaseModelDto.releaseModel)
 
         updateExistingReleaseId(

@@ -2,10 +2,11 @@ package com.smartfoodnet.fnproduct.order.entity
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.smartfoodnet.common.entity.BaseEntity
-import com.smartfoodnet.fnproduct.order.enums.DeliveryType
-import com.smartfoodnet.fnproduct.order.enums.DeliveryTypeConverter
+import com.smartfoodnet.fnproduct.order.vo.DeliveryType
+import com.smartfoodnet.fnproduct.order.vo.DeliveryTypeConverter
 import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
 import com.smartfoodnet.fnproduct.order.vo.OrderStatus
+import com.smartfoodnet.fnproduct.order.vo.StoreSyncStatus
 import com.smartfoodnet.fnproduct.store.entity.StoreProduct
 import org.hibernate.annotations.DynamicUpdate
 import java.time.LocalDateTime
@@ -28,6 +29,13 @@ class CollectedOrder(
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     var status: OrderStatus = OrderStatus.NEW,
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    /**
+     * 쇼핑몰 수집후 동기화시 사용되는 필드
+     */
+    var storeSyncStatus: StoreSyncStatus = StoreSyncStatus.NEW,
 
     val bundleNumber: String,
 

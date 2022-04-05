@@ -6,7 +6,7 @@ import com.smartfoodnet.common.error.exception.BaseRuntimeException
 import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.fnproduct.order.dto.ConfirmProductModel
 import com.smartfoodnet.fnproduct.order.entity.*
-import com.smartfoodnet.fnproduct.order.enums.DeliveryType
+import com.smartfoodnet.fnproduct.order.vo.DeliveryType
 import com.smartfoodnet.fnproduct.order.model.ConfirmProductAddModel
 import com.smartfoodnet.fnproduct.order.model.ConfirmProductMappedModel
 import com.smartfoodnet.fnproduct.order.model.RequestOrderCreateModel
@@ -18,6 +18,7 @@ import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import com.smartfoodnet.fnproduct.product.BasicProductService
 import com.smartfoodnet.fnproduct.product.PackageProductMappingRepository
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
+import com.smartfoodnet.fnproduct.release.ReleaseInfoStoreService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -27,6 +28,7 @@ import java.time.LocalDateTime
 class ConfirmOrderService(
     val orderService: OrderService,
     val basicProductService: BasicProductService,
+    val releaseInfoStoreService: ReleaseInfoStoreService,
     val confirmOrderRepository: ConfirmOrderRepository,
     val confirmProductRepository: ConfirmProductRepository,
     val packageProductMappingRepository: PackageProductMappingRepository,
@@ -119,11 +121,12 @@ class ConfirmOrderService(
         val requestBulkModel = RequestOrderMapper.toOutboundCreateBulkModel(sendOrderList)
         val response =
             wmsApiClient.createOutbounds(requestBulkModel).payload?.processedDataList
-                ?: listOf()
+                ?: emptyList()
 
         for ((index, confirmOrder) in sendOrderList.withIndex()) {
             val orderInfo = response[index]
             confirmOrder.setOrderInfo(orderInfo.orderId, orderInfo.orderCode)
+            releaseInfoStoreService.createFromOrderInfo(orderInfo)
         }
 
         return sendOrderList

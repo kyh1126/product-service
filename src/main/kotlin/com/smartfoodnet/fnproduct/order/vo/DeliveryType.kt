@@ -1,6 +1,5 @@
-package com.smartfoodnet.fnproduct.order.enums
+package com.smartfoodnet.fnproduct.order.vo
 
-import com.smartfoodnet.fnproduct.order.vo.ShippingMethodType
 import javax.persistence.AttributeConverter
 import javax.persistence.Converter
 
