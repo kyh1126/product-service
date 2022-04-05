@@ -1,7 +1,10 @@
 package com.smartfoodnet.fnproduct.claim.entity
 
+import com.smartfoodnet.fnproduct.order.entity.Receiver
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
+import java.time.LocalDateTime
 import javax.persistence.Column
+import javax.persistence.Embedded
 import javax.persistence.Entity
 import javax.persistence.FetchType
 import javax.persistence.GeneratedValue
@@ -21,12 +24,24 @@ class ExchangeProduct(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "basic_product_id", columnDefinition = "BIGINT UNSIGNED")
-    var basicProduct: BasicProduct? = null,
+    var basicProduct: BasicProduct,
 
     @Column(name = "request_quantity")
     var requestQuantity: Int,
 
+    @Column(name = "tracking_number")
+    var trackingNumber: String? = null,
+
+    @Column(name = "tracking_number_registered_at")
+    var trackingNumberRegisteredAt: LocalDateTime? = null,
+
+    @Column(name = "shipping_completed_at")
+    var shippingCompletedAt: LocalDateTime? = null,
+
+    @Embedded
+    var receiver: Receiver,
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "claim_id", columnDefinition = "BIGINT UNSIGNED")
-    var claim: Claim? = null,
+    var claim: Claim,
 )

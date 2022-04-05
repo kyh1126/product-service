@@ -7,10 +7,14 @@ import com.smartfoodnet.common.error.exception.NoSuchElementError
 import com.smartfoodnet.fnproduct.claim.entity.Claim
 import com.smartfoodnet.fnproduct.claim.entity.ReturnProduct
 import com.smartfoodnet.fnproduct.claim.model.ClaimCreateModel
+import com.smartfoodnet.fnproduct.claim.model.ClaimModel
+import com.smartfoodnet.fnproduct.claim.support.ClaimRepository
+import com.smartfoodnet.fnproduct.claim.support.condition.ClaimSearchCondition
 import com.smartfoodnet.fnproduct.product.BasicProductRepository
 import com.smartfoodnet.fnproduct.release.ReleaseInfoRepository
-import com.smartfoodnet.fnproduct.release.ReleaseInfoService
 import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -19,20 +23,25 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional(readOnly = true)
 class ClaimService(
     private val wmsApiClient: WmsApiClient,
-    private val releaseInfoService: ReleaseInfoService,
     private val releaseInfoRepository: ReleaseInfoRepository,
-    private val basicProductRepository: BasicProductRepository
+    private val basicProductRepository: BasicProductRepository,
+    private val claimRepository: ClaimRepository
 ) {
+    fun findClaims(
+        condition: ClaimSearchCondition,
+        page: Pageable
+    ): Page<ClaimModel> {
+        return claimRepository.findAll(condition.toPredicate(), page).map { ClaimModel.from(it) }
+    }
+
     fun createClaim(claimCreateModel: ClaimCreateModel) {
         val claim = claimCreateModel.toEntity()
         claim.returnProducts = buildReturnProducts(claimCreateModel, claim).toMutableList()
-
         val releaseInfo = releaseInfoRepository.findByIdOrNull(claimCreateModel.releaseInfoId) ?: throw NoSuchElementError("releaseInfo가 존재하지 않습니다.")
-        claim.
 
         sendReleaseReturn(claim, releaseInfo)
 
-
+        claimRepository.save(claim)
     }
 
     private fun buildReturnProducts(claimCreateModel: ClaimCreateModel, claim: Claim): List<ReturnProduct> {
@@ -41,7 +50,8 @@ class ClaimService(
             ReturnProduct(
                 requestQuantity = it.quantity,
                 claim = claim,
-                basicProduct = basicProduct
+                basicProduct = basicProduct,
+                receiver = claim.releaseInfo.confirmOrder?.receiver ?: throw NoSuchElementError("수신자 정보가 없습니다. [releaseInfoId:${claim.releaseInfo.id}]")
             )
         }
     }
@@ -65,19 +75,5 @@ class ClaimService(
         val returnModel = wmsApiClient.createReleaseReturn(returnCreateModel)
 
         println(returnModel)
-    }
-
-
-    private fun getReleaseItems(): List<ReturnCreateItem> {
-        val releaseItems = mutableListOf<ReturnCreateItem>()
-
-        releaseItems.add(
-            ReturnCreateItem(
-                shippingProductId = 1031,
-                quantity = 2
-            )
-        )
-
-        return releaseItems
     }
 }
