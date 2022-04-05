@@ -20,34 +20,34 @@ class ReturnProduct(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", columnDefinition = "BIGINT UNSIGNED")
-    var id: Long? = null,
+    val id: Long? = null,
 
     @Column(name = "request_quantity")
-    var requestQuantity: Int,
+    val requestQuantity: Int,
 
     @Column(name = "release_item_id")
-    var releaseItemId: Long? = null,
+    val releaseItemId: Long? = null,
 
-    @Column(name = "return_tracking_number")
-    var trackingNumber: String? = null,
-
-    @Column(name = "return_shipping_completed_at")
-    var shippingCompletedAt: LocalDateTime? = null,
+    //TODO: 반품입고완료로 수정
+    //추적을 어디까지 할 것인가. 배송관리에서 교환출고의 배송정보를 볼 수 있는가
+    //
+    @Column(name = "shipping_completed_at")
+    val shippingCompletedAt: LocalDateTime? = null,
 
     @Column(name = "inbound_quantity")
-    var inboundQuantity: Int? = null,
+    val inboundQuantity: Int? = null,
 
     @Column(name = "discarded_quantity")
-    var discardedQuantity: Int? = null,
+    val discardedQuantity: Int? = null,
 
     @Embedded
-    var receiver: Receiver,
+    val receiver: Receiver,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "basic_product_id", columnDefinition = "BIGINT UNSIGNED")
-    var basicProduct: BasicProduct,
+    val basicProduct: BasicProduct,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "claim_id", columnDefinition = "BIGINT UNSIGNED")
-    var claim: Claim? = null
+    val claim: Claim
 )

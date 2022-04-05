@@ -51,7 +51,7 @@ class ClaimService(
                 requestQuantity = it.quantity,
                 claim = claim,
                 basicProduct = basicProduct,
-                receiver = claim.releaseInfo.confirmOrder?.receiver ?: throw NoSuchElementError("수신자 정보가 없습니다. [releaseInfoId:${claim.releaseInfo.id}]")
+                receiver = claim.releaseInfo?.confirmOrder?.receiver ?: throw NoSuchElementError("수신자 정보가 없습니다. [releaseInfoId:${claim.releaseInfo.id}]")
             )
         }
     }

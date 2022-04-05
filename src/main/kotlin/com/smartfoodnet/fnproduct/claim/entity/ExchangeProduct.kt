@@ -20,28 +20,28 @@ class ExchangeProduct(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", columnDefinition = "BIGINT UNSIGNED")
-    var id: Long? = null,
+    val id: Long? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "basic_product_id", columnDefinition = "BIGINT UNSIGNED")
-    var basicProduct: BasicProduct,
+    val basicProduct: BasicProduct,
 
     @Column(name = "request_quantity")
-    var requestQuantity: Int,
+    val requestQuantity: Int,
 
     @Column(name = "tracking_number")
-    var trackingNumber: String? = null,
+    val trackingNumber: String? = null,
 
     @Column(name = "tracking_number_registered_at")
-    var trackingNumberRegisteredAt: LocalDateTime? = null,
+    val trackingNumberRegisteredAt: LocalDateTime? = null,
 
     @Column(name = "shipping_completed_at")
-    var shippingCompletedAt: LocalDateTime? = null,
+    val shippingCompletedAt: LocalDateTime? = null,
 
     @Embedded
-    var receiver: Receiver,
+    val receiver: Receiver,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "claim_id", columnDefinition = "BIGINT UNSIGNED")
-    var claim: Claim,
+    val claim: Claim
 )

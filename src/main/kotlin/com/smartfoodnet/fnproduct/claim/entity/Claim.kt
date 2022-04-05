@@ -2,10 +2,12 @@ package com.smartfoodnet.fnproduct.claim.entity
 
 import com.smartfoodnet.fnproduct.claim.model.vo.ClaimReason
 import com.smartfoodnet.fnproduct.claim.model.vo.ClaimStatus
+import com.smartfoodnet.fnproduct.order.entity.Receiver
 import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
 import java.time.LocalDateTime
 import javax.persistence.CascadeType
 import javax.persistence.Column
+import javax.persistence.Embedded
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
@@ -21,36 +23,39 @@ class Claim(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", columnDefinition = "BIGINT UNSIGNED")
-    var id: Long? = null,
+    val id: Long? = null,
 
     @Column(name = "partner_id")
-    var partnerId: Long,
+    val partnerId: Long,
 
     @Column(name = "claimed_at")
-    var claimedAt: LocalDateTime,
+    val claimedAt: LocalDateTime,
 
     @Column(name = "original_tracking_number")
-    var originalTrackingNumber: String,
+    val originalTrackingNumber: String,
 
     @Column(name = "customer_name")
-    var customerName: String,
+    val customerName: String,
 
     @Column(name = "claim_reason")
-    var claimReason: ClaimReason,
+    val claimReason: ClaimReason,
 
     @Column(name = "status")
-    var status: ClaimStatus? = null,
+    val status: ClaimStatus? = null,
 
     @Column(name = "memo")
-    var memo: String? = null,
+    val memo: String? = null,
+
+    @Embedded
+    val receiver: Receiver,
 
     @OneToMany(mappedBy = "claim", cascade = [CascadeType.PERSIST])
-    var returnProducts: MutableList<ReturnProduct> = mutableListOf(),
+    var returnProducts: List<ReturnProduct> = listOf(),
 
     @OneToMany(mappedBy = "claim", cascade = [CascadeType.PERSIST])
-    var exchangeProducts: MutableList<ExchangeProduct> = mutableListOf(),
+    val exchangeProducts: MutableList<ExchangeProduct> = mutableListOf(),
 
     @OneToOne(cascade = [CascadeType.PERSIST])
     @JoinColumn(name = "release_info_id", columnDefinition = "BIGINT UNSIGNED")
-    var releaseInfo: ReleaseInfo
+    val releaseInfo: ReleaseInfo? = null
 )
