@@ -63,6 +63,9 @@ sfn:
     fn-message: ${FN_MESSAGE_SERVICE:http://fn-message.sfn-dev:4011/fresh-networks/fn-message}
     fn-warehouse-management-service: ${FN_WAREHOUSE_SERVICE:http://fn-warehouse-service.sfn-dev:4001/fresh-networks/fn-warehouse-service}
     fn-partner: ${FN_PARTNER_SERVICE:http://fn-partner-service.sfn-dev:4007/fresh-networks/fn-partner}
+external:
+  service:
+    lotte: https://ftr.alps.llogis.com:18260/openapi/ftr
 
 sqs:
   queues:

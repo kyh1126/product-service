@@ -71,6 +71,11 @@ abstract class RestTemplateClient(
         return objectMapper.convertValue(res.body?.payload, R::class.java)
     }
 
+    inline fun <reified R> externalPost(url: String, body: Any): R? {
+        val httpEntity = HttpEntity(body, getHeader())
+        return restTemplate.postForEntity(getUrlString(url), httpEntity, R::class.java).body
+    }
+
     inline fun <reified T> put(url: String, body: T) {
         val httpEntity = HttpEntity<T>(body, getHeader())
         restTemplate.exchange(

@@ -5,12 +5,10 @@ import com.smartfoodnet.apiclient.SfnService.FN_PRODUCT
 import com.smartfoodnet.apiclient.model.SfnMessage
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
-import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.client.RestTemplate
 
 @Component
 //@Async("taskExecutor") // 비동기로 메시지 send 할 때 설정
-@Transactional
 class MessageApiClient(
     @Value("\${sfn.service.fn-message}") override val host: String,
     override val restTemplate: RestTemplate,

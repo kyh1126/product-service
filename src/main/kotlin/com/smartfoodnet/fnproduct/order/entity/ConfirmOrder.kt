@@ -2,6 +2,7 @@ package com.smartfoodnet.fnproduct.order.entity
 
 import com.smartfoodnet.common.entity.BaseEntity
 import org.hibernate.annotations.DynamicUpdate
+import java.io.Serializable
 import java.time.LocalDateTime
 import javax.persistence.*
 
@@ -22,7 +23,7 @@ class ConfirmOrder(
     val memo: Memo? = null,
     @OneToMany(mappedBy = "confirmOrder", cascade = [CascadeType.PERSIST], orphanRemoval = true)
     val requestOrderList: MutableList<ConfirmRequestOrder> = mutableListOf()
-) : BaseEntity() {
+) : BaseEntity(), Serializable {
     var orderId: Long? = null
     var orderCode: String? = null
 
@@ -33,6 +34,10 @@ class ConfirmOrder(
     fun setOrderInfo(id: Long, code: String) {
         orderId = id
         orderCode = code
+    }
+
+    companion object {
+        private const val serialVersionUID = -126L
     }
 }
 
