@@ -1,5 +1,6 @@
 package com.smartfoodnet.fnproduct.release
 
+import com.smartfoodnet.apiclient.response.DeliveryInfoDetail
 import com.smartfoodnet.apiclient.response.NosnosReleaseItemModel
 import com.smartfoodnet.apiclient.response.NosnosReleaseModel
 import com.smartfoodnet.common.error.exception.BaseRuntimeException
@@ -54,6 +55,18 @@ class ReleaseInfoStoreService(
                     val uploadType = getUploadType(targetReleaseInfoList.first())
                     createReleaseInfo(releaseModelDto, basicProductByShippingProductId, uploadType)
                 }
+            }
+        }
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    fun updateDeliveryCompletedAt(
+        targetIds: Collection<Long>,
+        deliveryInfoByShippingCode: Map<String, DeliveryInfoDetail>
+    ) {
+        releaseInfoRepository.findAllById(targetIds).forEach { releaseInfo ->
+            deliveryInfoByShippingCode[releaseInfo.shippingCode]?.let {
+                releaseInfo.updateDeliveryCompletedAt(it.procDateTime)
             }
         }
     }

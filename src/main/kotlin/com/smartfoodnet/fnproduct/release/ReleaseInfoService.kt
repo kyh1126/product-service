@@ -1,6 +1,9 @@
 package com.smartfoodnet.fnproduct.release
 
+import com.smartfoodnet.apiclient.DeliveryAgencyApiClient
 import com.smartfoodnet.apiclient.WmsApiClient
+import com.smartfoodnet.apiclient.dto.LotteDeliveryInfoDto
+import com.smartfoodnet.apiclient.dto.LotteTrackingDto
 import com.smartfoodnet.apiclient.response.CommonDataListModel
 import com.smartfoodnet.apiclient.response.NosnosReleaseItemModel
 import com.smartfoodnet.apiclient.response.NosnosReleaseModel
@@ -17,7 +20,11 @@ import com.smartfoodnet.fnproduct.release.model.request.ReleaseInfoSearchConditi
 import com.smartfoodnet.fnproduct.release.model.response.OrderConfirmProductModel
 import com.smartfoodnet.fnproduct.release.model.response.OrderProductModel
 import com.smartfoodnet.fnproduct.release.model.response.ReleaseInfoModel
+import com.smartfoodnet.fnproduct.release.model.vo.DeliveryAgency
+import com.smartfoodnet.fnproduct.release.model.vo.DeliveryAgency.Companion.getDeliveryAgencyByName
+import com.smartfoodnet.fnproduct.release.model.vo.DeliveryStatus
 import com.smartfoodnet.fnproduct.release.model.vo.ReleaseStatus
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
@@ -32,15 +39,15 @@ class ReleaseInfoService(
     private val confirmOrderService: ConfirmOrderService,
     private val releaseInfoRepository: ReleaseInfoRepository,
     private val wmsApiClient: WmsApiClient,
+    private val deliveryAgencyApiClient: DeliveryAgencyApiClient
 ) {
     fun getReleaseInfoList(
         condition: ReleaseInfoSearchCondition,
         page: Pageable
     ): PageResponse<ReleaseInfoModel> {
         val releaseInfoPage = releaseInfoRepository.findAllByCondition(condition, page)
-        val deliveryAgencyModelsByDeliveryAgencyId =
-            wmsApiClient.getDeliveryAgencyInfoList().payload?.dataList
-                ?.associateBy { it.deliveryAgencyId!!.toLong() } ?: emptyMap()
+        val deliveryAgencyModelsByDeliveryAgencyId = getDeliveryAgencyInfoList()
+            ?.associateBy { it.deliveryAgencyId!!.toLong() } ?: emptyMap()
 
         return releaseInfoPage.map {
             ReleaseInfoModel.fromEntity(it, deliveryAgencyModelsByDeliveryAgencyId)
@@ -116,6 +123,33 @@ class ReleaseInfoService(
         val confirmProducts = confirmOrderService.getConfirmProduct(condition)
 
         return confirmProducts.map(OrderConfirmProductModel::from)
+    }
+
+    fun syncDeliveryInfo(deliveryAgency: DeliveryAgency) {
+        var page = PageRequest.of(0, 100, Sort.Direction.DESC, "id")
+
+        val idByDeliveryAgency = getDeliveryAgencyInfoList()
+            ?.associateBy(
+                { getDeliveryAgencyByName(it.deliveryAgencyName) }, { it.deliveryAgencyId!!.toLong() }
+            ) ?: emptyMap()
+
+        while (true) {
+            val targetList = releaseInfoRepository.findAllByReleaseStatusIn(
+                ReleaseStatus.DELIVERY_SYNCABLE_STATUSES,
+                page
+            )
+            if (!targetList.hasContent()) break
+
+            when (deliveryAgency) {
+                DeliveryAgency.LOTTE ->
+                    updateLotteDeliveryCompletedAt(targetList, idByDeliveryAgency[deliveryAgency])
+                DeliveryAgency.CJ -> Unit // TODO
+            }
+
+            if (targetList.isLast) break
+
+            page = page.next()
+        }
     }
 
     private fun getReleases(orderIds: Set<Long>): List<NosnosReleaseModel> {
@@ -194,6 +228,33 @@ class ReleaseInfoService(
             )
         } catch (e: BaseRuntimeException) {
             log.error("orderId: ${orderId} releaseInfo 동기화 실패")
+        }
+    }
+
+    private fun getDeliveryAgencyInfoList() =
+        wmsApiClient.getDeliveryAgencyInfoList().payload?.dataList
+
+    private fun updateLotteDeliveryCompletedAt(
+        targetList: Page<ReleaseInfo>,
+        deliveryAgencyId: Long?
+    ) {
+        val lotteTargetList = targetList.content
+            .filter { it.deliveryAgencyId == deliveryAgencyId }
+        val dtoList = lotteTargetList
+            .map { LotteTrackingDto(it.shippingCode!!, DeliveryStatus.SHIPPING_COMPLETED.code) }
+
+        try {
+            val deliveryInfoByShippingCode =
+                deliveryAgencyApiClient.getLotteDeliveryInfo(LotteDeliveryInfoDto(sendParamList = dtoList))?.rtnList
+                    ?.associateBy { it.invNo } ?: emptyMap()
+
+            releaseInfoStoreService.updateDeliveryCompletedAt(
+                lotteTargetList.map { it.id!! },
+                deliveryInfoByShippingCode
+            )
+        } catch (e: BaseRuntimeException) {
+            log.error("[syncDeliveryInfo] ${DeliveryAgency.LOTTE.playAutoName} 동기화 실패," +
+                " releaseIds: ${lotteTargetList.map { it.releaseId }}")
         }
     }
 
