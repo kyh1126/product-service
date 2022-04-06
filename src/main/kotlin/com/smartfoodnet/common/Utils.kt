@@ -3,12 +3,14 @@ package com.smartfoodnet.common
 import org.springframework.beans.BeanUtils
 import org.springframework.beans.BeanWrapperImpl
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 //// String extensions
-fun parseLocalDateOrNull(text: CharSequence, formatter: DateTimeFormatter): LocalDate? {
+fun parseLocalDateTimeOrNull(text: CharSequence, formatter: String): LocalDateTime? {
     return try {
-        LocalDate.parse(text, formatter)
+        val dtf = DateTimeFormatter.ofPattern(formatter)
+        LocalDateTime.parse(text, dtf)
     } catch (ex: Throwable) {
         null
     }

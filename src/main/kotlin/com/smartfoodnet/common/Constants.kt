@@ -9,6 +9,7 @@ object Constants {
     const val TIMESTAMP_FORMAT = "yyyy-MM-dd HH:mm:ss"
     const val TIMEZONE = "Asia/Seoul"
     const val NOSNOS_DATE_FORMAT = "yyyyMMdd"
+    const val STRING_DATETIME_FORMAT = "yyyyMMddHHmmss"
     const val STARTING_FROM = 100L
     const val EXPIRATION_DATE_MANAGEMENT_YN = "Y"
     const val IS_ACTIVE_YN = "Y"
