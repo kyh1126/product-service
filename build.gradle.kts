@@ -61,7 +61,6 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.testcontainers:junit-jupiter")
 
-
     //query dsl
     implementation("com.querydsl:querydsl-jpa")
     kapt("com.querydsl:querydsl-apt:4.4.0:jpa")
@@ -93,6 +92,9 @@ dependencies {
 
     // slack 로깅 설정
     implementation("com.github.maricn:logback-slack-appender:1.4.0")
+
+    // HTML parser
+    implementation("org.jsoup:jsoup:1.14.3")
 }
 
 dependencyManagement {
