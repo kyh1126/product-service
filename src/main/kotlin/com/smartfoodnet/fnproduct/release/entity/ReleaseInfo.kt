@@ -89,4 +89,8 @@ class ReleaseInfo(
         releaseId = request.releaseId?.toLong()
         releaseCode = request.releaseCode
     }
+
+    fun updateDeliveryCompletedAt(procDateTime: LocalDateTime?) {
+        deliveryCompletedAt = procDateTime
+    }
 }

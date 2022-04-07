@@ -6,6 +6,7 @@ import com.smartfoodnet.fnproduct.release.model.request.ReleaseInfoSearchConditi
 import com.smartfoodnet.fnproduct.release.model.response.OrderConfirmProductModel
 import com.smartfoodnet.fnproduct.release.model.response.OrderProductModel
 import com.smartfoodnet.fnproduct.release.model.response.ReleaseInfoModel
+import com.smartfoodnet.fnproduct.release.model.vo.DeliveryAgency
 import io.swagger.annotations.Api
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -59,5 +60,15 @@ class ReleaseController(private val releaseInfoService: ReleaseInfoService) {
         @Parameter(description = "주문번호", required = true) @RequestParam orderNumber: String,
     ): List<OrderConfirmProductModel> {
         return releaseInfoService.getConfirmProducts(partnerId, orderNumber)
+    }
+
+    @Operation(summary = "택배사 정보 동기화")
+    @PostMapping("delivery-info/sync")
+    fun syncDeliveryInfo(
+        @Parameter(description = "택배사 정보", required = true)
+        @RequestParam deliveryAgency: DeliveryAgency
+    ): CommonResponse<String> {
+        releaseInfoService.syncDeliveryInfo(deliveryAgency)
+        return CommonResponse(HttpStatus.OK.reasonPhrase)
     }
 }
