@@ -2,18 +2,15 @@ package com.smartfoodnet.fnproduct.claim.entity
 
 import com.smartfoodnet.fnproduct.claim.model.vo.ClaimReason
 import com.smartfoodnet.fnproduct.claim.model.vo.ClaimStatus
-import com.smartfoodnet.fnproduct.order.entity.Receiver
 import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
 import java.time.LocalDateTime
 import javax.persistence.CascadeType
 import javax.persistence.Column
-import javax.persistence.Embedded
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.JoinColumn
-import javax.persistence.OneToMany
 import javax.persistence.OneToOne
 import javax.persistence.Table
 
@@ -46,14 +43,11 @@ class Claim(
     @Column(name = "memo")
     val memo: String? = null,
 
-    @Embedded
-    val receiver: Receiver,
+    @OneToOne(mappedBy = "claim", cascade = [CascadeType.PERSIST])
+    var returnInfo: ReturnInfo? = null,
 
-    @OneToMany(mappedBy = "claim", cascade = [CascadeType.PERSIST])
-    var returnProducts: List<ReturnProduct> = listOf(),
-
-    @OneToMany(mappedBy = "claim", cascade = [CascadeType.PERSIST])
-    val exchangeProducts: MutableList<ExchangeProduct> = mutableListOf(),
+    @OneToOne(mappedBy = "claim", cascade = [CascadeType.PERSIST])
+    var exchangeRelease: ExchangeRelease? = null,
 
     @OneToOne(cascade = [CascadeType.PERSIST])
     @JoinColumn(name = "release_info_id", columnDefinition = "BIGINT UNSIGNED")

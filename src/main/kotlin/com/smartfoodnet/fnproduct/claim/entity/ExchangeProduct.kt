@@ -1,10 +1,7 @@
 package com.smartfoodnet.fnproduct.claim.entity
 
-import com.smartfoodnet.fnproduct.order.entity.Receiver
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
-import java.time.LocalDateTime
 import javax.persistence.Column
-import javax.persistence.Embedded
 import javax.persistence.Entity
 import javax.persistence.FetchType
 import javax.persistence.GeneratedValue
@@ -29,19 +26,7 @@ class ExchangeProduct(
     @Column(name = "request_quantity")
     val requestQuantity: Int,
 
-    @Column(name = "tracking_number")
-    val trackingNumber: String? = null,
-
-    @Column(name = "tracking_number_registered_at")
-    val trackingNumberRegisteredAt: LocalDateTime? = null,
-
-    @Column(name = "shipping_completed_at")
-    val shippingCompletedAt: LocalDateTime? = null,
-
-    @Embedded
-    val receiver: Receiver,
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "claim_id", columnDefinition = "BIGINT UNSIGNED")
-    val claim: Claim
+    @JoinColumn(name = "exchange_release_id", columnDefinition = "BIGINT UNSIGNED")
+    val exchangeRelease: ExchangeRelease
 )

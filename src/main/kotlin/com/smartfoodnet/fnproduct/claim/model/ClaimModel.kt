@@ -6,16 +6,16 @@ import com.smartfoodnet.fnproduct.claim.model.vo.ClaimStatus
 import java.time.LocalDateTime
 
 data class ClaimModel(
-    var id: Long? = null,
-    var partnerId: Long,
-    var claimedAt: LocalDateTime,
-    var originalTrackingNumber: String,
-    var customerName: String,
-    var claimReason: ClaimReason,
-    var status: ClaimStatus? = null,
-    var memo: String? = null,
-    var returnProducts: List<ReturnProductModel> = mutableListOf(),
-    var exchangeProducts: List<ExchangeProductModel> = mutableListOf()
+    val id: Long? = null,
+    val partnerId: Long,
+    val claimedAt: LocalDateTime,
+    val originalTrackingNumber: String,
+    val customerName: String,
+    val claimReason: ClaimReason,
+    val status: ClaimStatus? = null,
+    val memo: String? = null,
+    val returnInfo: ReturnInfoModel,
+    var exchangeRelease: ExchangeReleaseModel? = null
 ) {
     companion object {
         fun from(claim: Claim): ClaimModel {
@@ -29,8 +29,8 @@ data class ClaimModel(
                     claimReason = claimReason,
                     status = status,
                     memo = memo,
-                    returnProducts = returnProducts.map { ReturnProductModel.from(it) },
-                    exchangeProducts = exchangeProducts.map { ExchangeProductModel.from(it) }
+                    returnInfo = ReturnInfoModel.from(returnInfo!!),
+                    exchangeRelease = exchangeRelease?.let { ExchangeReleaseModel.from(it) }
                 )
             }
         }

@@ -38,7 +38,7 @@ class ClaimSearchCondition(
         return predicate.orAllOf(
             collectedOrder.partnerId.eq(partnerId),
             originalTrackingNumber?.let { claim.originalTrackingNumber.eq(it) },
-            exchangeTrackingNumber?.let { claim.exchangeTrackingNumber.eq(it) },
+            exchangeTrackingNumber?.let { claim.exchangeRelease.trackingNumber.eq(it) },
             customerName?.let { claim.customerName.eq(it) },
             claimedAt?.let {
                 claim.claimedAt.between(

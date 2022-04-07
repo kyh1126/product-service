@@ -4,7 +4,9 @@ import com.querydsl.core.BooleanBuilder
 import com.querydsl.core.types.Predicate
 import com.smartfoodnet.common.model.request.PredicateSearchCondition
 import com.smartfoodnet.fninventory.stock.entity.QStockByBestBefore.stockByBestBefore
-import com.smartfoodnet.fninventory.stock.support.StockByBestBeforeSearchCondition.SearchType.*
+import com.smartfoodnet.fninventory.stock.support.StockByBestBeforeSearchCondition.SearchType.BARCODE
+import com.smartfoodnet.fninventory.stock.support.StockByBestBeforeSearchCondition.SearchType.CODE
+import com.smartfoodnet.fninventory.stock.support.StockByBestBeforeSearchCondition.SearchType.NAME
 import io.swagger.annotations.ApiModelProperty
 import java.time.LocalDate
 
@@ -89,7 +91,7 @@ class StockByBestBeforeSearchCondition(
                 stockByBestBefore.bestBefore.between(from, to)
             }
         } else {
-            rangeBestBeforeTo?.let { stockByBestBefore.bestBefore.eq(it.toFloat()) }
+            rangeBestBeforeTo.let { stockByBestBefore.bestBefore.eq(it.toFloat()) }
         }
 
     private inline fun <T1 : Any, T2 : Any, R : Any> safeLet(p1: T1?, p2: T2?, block: (T1, T2) -> R?): R? {

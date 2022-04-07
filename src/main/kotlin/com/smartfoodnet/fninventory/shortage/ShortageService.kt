@@ -56,8 +56,8 @@ class ShortageService(
     ): List<NosnosStockModel> {
         val shippingProductIdChunks = shippingProductIds.chunked(API_CALL_LIST_SIZE)
         val futures = mutableListOf<CompletableFuture<List<NosnosStockModel>>>()
-        shippingProductIdChunks.forEach { shippingProductIds ->
-            val future = shortageAsyncService.getNosnosStocksAsync(partnerId = partnerId, shippingProductIds = shippingProductIds)
+        shippingProductIdChunks.forEach { ids ->
+            val future = shortageAsyncService.getNosnosStocksAsync(partnerId = partnerId, shippingProductIds = ids)
 
             futures.add(future)
         }

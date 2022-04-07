@@ -3,6 +3,7 @@ package com.smartfoodnet.fnproduct.claim
 import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.fnproduct.claim.model.ClaimCreateModel
 import com.smartfoodnet.fnproduct.claim.model.ClaimModel
+import com.smartfoodnet.fnproduct.claim.model.ExchangeReleaseCreateModel
 import com.smartfoodnet.fnproduct.claim.support.condition.ClaimSearchCondition
 import io.swagger.annotations.Api
 import io.swagger.v3.oas.annotations.Operation
@@ -25,7 +26,7 @@ class ClaimController(
 ) {
     @Operation(summary = "반품 현황 조회")
     @GetMapping
-    fun getClaims(
+    fun findClaims(
         @Parameter(description = "검색조건")
         @ModelAttribute condition: ClaimSearchCondition,
         @PageableDefault(size = 50, sort = ["id"], direction = Sort.Direction.DESC) page: Pageable,
@@ -38,6 +39,14 @@ class ClaimController(
     fun createClaim(
         @RequestBody claimCreateModel: ClaimCreateModel
     ){
-        return claimService.createClaim(claimCreateModel)
+        claimService.createClaim(claimCreateModel)
+    }
+
+    @Operation(summary = "교환출고 등록")
+    @PostMapping("exchangeRelease")
+    fun createExchangeRelease(
+        @RequestBody exchangeReleaseCreateModel: ExchangeReleaseCreateModel
+    ){
+        claimService.createExchangeRelease(exchangeReleaseCreateModel)
     }
 }
