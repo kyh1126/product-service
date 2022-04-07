@@ -67,6 +67,7 @@ sfn:
 external:
   service:
     lotte: https://ftr.alps.llogis.com:18260/openapi/ftr
+    cj: https://www.cjlogistics.com/ko/tool
 
 sqs:
   queues:

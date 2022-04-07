@@ -1,4 +1,4 @@
-package com.smartfoodnet.apiclient.dto
+package com.smartfoodnet.apiclient.request
 
 import io.swagger.annotations.ApiModelProperty
 
