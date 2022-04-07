@@ -16,10 +16,18 @@ enum class DeliveryStatus(
     val code: String,
     val desc: String,
 ) {
+    // LOTTE
     PARCEL_COLLECTION(DeliveryAgency.LOTTE, "10", "출력"),
     SHIPPING_CODE_REGISTERED(DeliveryAgency.LOTTE, "12", "집하완료"),
-    SHIPPING_IN_PROGRESS(DeliveryAgency.LOTTE, "20", "발송"),
+    IN_PROGRESS_LOTTE(DeliveryAgency.LOTTE, "20", "발송"),
     ARRIVAL(DeliveryAgency.LOTTE, "21", "도착"),
     BEFORE_SHIPPING(DeliveryAgency.LOTTE, "40", "배달전"),
-    SHIPPING_COMPLETED(DeliveryAgency.LOTTE, "41", "배달완료")
+    COMPLETED_LOTTE(DeliveryAgency.LOTTE, "41", "배달완료"),
+
+    //CJ
+    PICK_UP(DeliveryAgency.CJ, "11", "집화처리"),
+    UNLOAD(DeliveryAgency.CJ, "42", "간선하차"),
+    LOAD(DeliveryAgency.CJ, "44", "간선상차"),
+    IN_PROGRESS_CJ(DeliveryAgency.CJ, "82", "배달출발"),
+    COMPLETED_CJ(DeliveryAgency.CJ, "91", "배달완료"),
 }

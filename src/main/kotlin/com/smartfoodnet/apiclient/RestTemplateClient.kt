@@ -4,10 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.smartfoodnet.common.model.response.CommonResponse
 import com.smartfoodnet.common.utils.Log
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpMethod
-import org.springframework.http.MediaType
+import org.springframework.http.*
 import org.springframework.util.MultiValueMap
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
@@ -71,9 +68,32 @@ abstract class RestTemplateClient(
         return objectMapper.convertValue(res.body?.payload, R::class.java)
     }
 
-    inline fun <reified R> externalPost(url: String, body: Any): R? {
-        val httpEntity = HttpEntity(body, getHeader())
-        return restTemplate.postForEntity(getUrlString(url), httpEntity, R::class.java).body
+    inline fun <reified R> externalGet(
+        url: String,
+        uriVariable: Any? = null,
+        header: HttpHeaders = getHeader()
+    ): ResponseEntity<R> {
+        val httpEntity = HttpEntity<Any>(header)
+        val params = convert(objectMapper, uriVariable)
+        val builder = getUriComponentsBuilder(url, params).run {
+            setPageUriComponents(this).build()
+        }
+
+        return restTemplate.exchange(
+            builder.toUriString(),
+            HttpMethod.GET,
+            httpEntity,
+            R::class.java
+        )
+    }
+
+    inline fun <reified R> externalPost(
+        url: String,
+        body: Any,
+        header: HttpHeaders = getHeader()
+    ): ResponseEntity<R> {
+        val httpEntity = HttpEntity(body, header)
+        return restTemplate.postForEntity(getUrlString(url), httpEntity, R::class.java)
     }
 
     inline fun <reified T> put(url: String, body: T) {
@@ -106,9 +126,9 @@ abstract class RestTemplateClient(
      */
     fun setPageUriComponents(
         uriComponentsBuilder: UriComponentsBuilder,
-        page: Int?,
-        pageSize: Int?,
-        sort: Map<String, String>
+        page: Int? = null,
+        pageSize: Int? = null,
+        sort: Map<String, String> = emptyMap()
     ): UriComponentsBuilder {
         page?.let { uriComponentsBuilder.queryParam("page", page) }
         pageSize?.let { uriComponentsBuilder.queryParam("size", pageSize) }

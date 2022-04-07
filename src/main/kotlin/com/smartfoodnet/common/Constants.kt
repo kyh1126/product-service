@@ -7,6 +7,7 @@ object Constants {
     const val TIMESTAMP_MINUTE_FORMAT = "yyyy-MM-dd HH:mm"
     const val DATE_FORMAT = "yyyy-MM-dd"
     const val TIMESTAMP_FORMAT = "yyyy-MM-dd HH:mm:ss"
+    const val TIMESTAMP1_FORMAT = "yyyy-MM-dd HH:mm:ss.S"
     const val TIMEZONE = "Asia/Seoul"
     const val NOSNOS_DATE_FORMAT = "yyyyMMdd"
     const val STRING_DATETIME_FORMAT = "yyyyMMddHHmmss"

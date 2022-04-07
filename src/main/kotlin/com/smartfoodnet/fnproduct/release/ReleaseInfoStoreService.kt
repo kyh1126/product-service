@@ -1,6 +1,7 @@
 package com.smartfoodnet.fnproduct.release
 
-import com.smartfoodnet.apiclient.response.DeliveryInfoDetail
+import com.smartfoodnet.apiclient.response.CjDeliveryInfo
+import com.smartfoodnet.apiclient.response.LotteDeliveryInfoDetail
 import com.smartfoodnet.apiclient.response.NosnosReleaseItemModel
 import com.smartfoodnet.apiclient.response.NosnosReleaseModel
 import com.smartfoodnet.apiclient.response.PostOutboundModel
@@ -72,11 +73,21 @@ class ReleaseInfoStoreService(
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun updateDeliveryCompletedAt(
         targetIds: Collection<Long>,
-        deliveryInfoByShippingCode: Map<String, DeliveryInfoDetail>
+        lotteDeliveryInfoByShippingCode: Map<String, LotteDeliveryInfoDetail> = emptyMap(),
+        cjDeliveryInfoByShippingCode: Map<String, CjDeliveryInfo> = emptyMap(),
     ) {
         releaseInfoRepository.findAllById(targetIds).forEach { releaseInfo ->
-            deliveryInfoByShippingCode[releaseInfo.shippingCode]?.let {
-                releaseInfo.updateDeliveryCompletedAt(it.procDateTime)
+            when {
+                lotteDeliveryInfoByShippingCode.isNotEmpty() -> {
+                    lotteDeliveryInfoByShippingCode[releaseInfo.shippingCode]?.let {
+                        releaseInfo.updateDeliveryCompletedAt(it.procDateTime)
+                    }
+                }
+                cjDeliveryInfoByShippingCode.isNotEmpty() -> {
+                    cjDeliveryInfoByShippingCode[releaseInfo.shippingCode]?.let {
+                        releaseInfo.updateDeliveryCompletedAt(it.deliveryDateTime)
+                    }
+                }
             }
         }
     }

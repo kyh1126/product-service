@@ -1,9 +1,10 @@
 package com.smartfoodnet.fnproduct.release
 
-import com.smartfoodnet.apiclient.DeliveryAgencyApiClient
+import com.smartfoodnet.apiclient.CjDeliveryInfoApiClient
+import com.smartfoodnet.apiclient.LotteDeliveryInfoApiClient
 import com.smartfoodnet.apiclient.WmsApiClient
-import com.smartfoodnet.apiclient.dto.LotteDeliveryInfoDto
-import com.smartfoodnet.apiclient.dto.LotteTrackingDto
+import com.smartfoodnet.apiclient.request.LotteDeliveryInfoDto
+import com.smartfoodnet.apiclient.request.LotteTrackingDto
 import com.smartfoodnet.apiclient.response.CommonDataListModel
 import com.smartfoodnet.apiclient.response.NosnosReleaseItemModel
 import com.smartfoodnet.apiclient.response.NosnosReleaseModel
@@ -40,7 +41,8 @@ class ReleaseInfoService(
     private val confirmOrderService: ConfirmOrderService,
     private val releaseInfoRepository: ReleaseInfoRepository,
     private val wmsApiClient: WmsApiClient,
-    private val deliveryAgencyApiClient: DeliveryAgencyApiClient
+    private val lotteDeliveryInfoApiClient: LotteDeliveryInfoApiClient,
+    private val cjDeliveryInfoApiClient: CjDeliveryInfoApiClient
 ) {
     fun getReleaseInfoList(
         condition: ReleaseInfoSearchCondition,
@@ -144,7 +146,8 @@ class ReleaseInfoService(
             when (deliveryAgency) {
                 DeliveryAgency.LOTTE ->
                     updateLotteDeliveryCompletedAt(targetList, idByDeliveryAgency[deliveryAgency])
-                DeliveryAgency.CJ -> Unit // TODO
+                DeliveryAgency.CJ ->
+                    updateCjDeliveryCompletedAt(targetList, idByDeliveryAgency[deliveryAgency])
             }
 
             if (targetList.isLast) break
@@ -241,21 +244,45 @@ class ReleaseInfoService(
     ) {
         val lotteTargetList = targetList.content
             .filter { it.deliveryAgencyId == deliveryAgencyId }
-        val dtoList = lotteTargetList
-            .map { LotteTrackingDto(it.shippingCode!!, DeliveryStatus.SHIPPING_COMPLETED.code) }
+        val request = lotteTargetList
+            .map { LotteTrackingDto(it.shippingCode!!, DeliveryStatus.COMPLETED_LOTTE.code) }
+            .run { LotteDeliveryInfoDto(sendParamList = this) }
 
         try {
             val deliveryInfoByShippingCode =
-                deliveryAgencyApiClient.getLotteDeliveryInfo(LotteDeliveryInfoDto(sendParamList = dtoList))?.rtnList
+                lotteDeliveryInfoApiClient.getDeliveryInfo(request)?.rtnList
                     ?.associateBy { it.invNo } ?: emptyMap()
 
             releaseInfoStoreService.updateDeliveryCompletedAt(
                 lotteTargetList.map { it.id!! },
-                deliveryInfoByShippingCode
+                lotteDeliveryInfoByShippingCode = deliveryInfoByShippingCode
             )
         } catch (e: BaseRuntimeException) {
             log.error("[syncDeliveryInfo] ${DeliveryAgency.LOTTE.playAutoName} 동기화 실패," +
                 " releaseIds: ${lotteTargetList.map { it.releaseId }}")
+        }
+    }
+
+    private fun updateCjDeliveryCompletedAt(
+        targetList: Page<ReleaseInfo>,
+        deliveryAgencyId: Long?
+    ) {
+        val cjTargetList = targetList.content.filter { it.deliveryAgencyId == deliveryAgencyId }
+        val shippingCodes = cjTargetList.map { it.shippingCode!! }
+
+        try {
+            val deliveryInfoByShippingCode =
+                cjDeliveryInfoApiClient.getDeliveryInfo(shippingCodes)
+                    .filter { it.nsDlvNm == DeliveryStatus.COMPLETED_CJ.code }
+                    .associateBy { it.invcNo }
+
+            releaseInfoStoreService.updateDeliveryCompletedAt(
+                cjTargetList.map { it.id!! },
+                cjDeliveryInfoByShippingCode = deliveryInfoByShippingCode
+            )
+        } catch (e: BaseRuntimeException) {
+            log.error("[syncDeliveryInfo] ${DeliveryAgency.CJ.playAutoName} 동기화 실패," +
+                " releaseIds: ${cjTargetList.map { it.releaseId }}")
         }
     }
 

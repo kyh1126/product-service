@@ -1,12 +1,14 @@
 package com.smartfoodnet.apiclient.response
 
+import com.smartfoodnet.common.Constants
 import com.smartfoodnet.common.Constants.STRING_DATETIME_FORMAT
 import com.smartfoodnet.common.parseLocalDateTimeOrNull
 import io.swagger.annotations.ApiModelProperty
+import java.time.LocalDateTime
 
-class DeliveryInfoModel(
+class LotteDeliveryInfoModel(
     @ApiModelProperty(value = "결과값")
-    val rtnList: List<DeliveryInfoDetail> = emptyList(),
+    val rtnList: List<LotteDeliveryInfoDetail> = emptyList(),
 
     @ApiModelProperty(value = "성공", example = "Y")
     val code: String,
@@ -15,7 +17,7 @@ class DeliveryInfoModel(
     val message: String
 )
 
-class DeliveryInfoDetail(
+class LotteDeliveryInfoDetail(
     @ApiModelProperty(value = "처리결과코드 (Y:성공)", example = "Y")
     val rtnCd: String,
 
@@ -41,5 +43,48 @@ class DeliveryInfoDetail(
     val ustRtgSctNm: String
 ) {
     val procDateTime =
-        parseLocalDateTimeOrNull(this.procYmd + this.procTme, STRING_DATETIME_FORMAT)
+        parseLocalDateTimeOrNull(procYmd + procTme, STRING_DATETIME_FORMAT)
+}
+
+class CjDeliveryInfoModel(
+    val parcelResultMap: ParcelResultMap? = null,
+    val parcelDetailResultMap: ParcelDetailResultMap? = null,
+)
+
+class ParcelResultMap(val resultList: List<CjDeliveryInfo> = emptyList())
+class ParcelDetailResultMap(val resultList: List<CjDeliveryInfoDetail> = emptyList())
+
+class CjDeliveryInfo(
+    @ApiModelProperty(value = "운송장번호", example = "555524895224")
+    val invcNo: String,
+
+    @ApiModelProperty(value = "보내는이", example = "2**")
+    val sendrNm: String,
+
+    @ApiModelProperty(value = "수량", example = "1")
+    val qty: Int,
+
+    @ApiModelProperty(value = "상품명", example = "[상온] 우리 참소스 300g [20입]")
+    private val itemNm: String,
+
+    @ApiModelProperty(value = "받는이", example = "대**")
+    val rcvrNm: String,
+
+    @ApiModelProperty(value = "상태코드", example = "91")
+    val nsDlvNm: String
+) {
+    var deliveryDateTime: LocalDateTime? = null
+}
+
+class CjDeliveryInfoDetail(
+    @ApiModelProperty(value = "상태코드", example = "91")
+    val crgSt: String,
+
+    @ApiModelProperty(value = "처리일시", example = "2022-02-23 11:09:54.0")
+    val dTime: String,
+
+    @ApiModelProperty(value = "상태명", example = "배달완료")
+    val scanNm: String
+) {
+    val deliveryDateTime = parseLocalDateTimeOrNull(dTime, Constants.TIMESTAMP1_FORMAT)
 }
