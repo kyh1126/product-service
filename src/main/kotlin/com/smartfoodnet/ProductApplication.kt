@@ -17,7 +17,7 @@ class ProductApplication(){
     class HealthCheckController {
         @GetMapping
         fun healthCheck(): CommonResponse<String> {
-            return CommonResponse("fn-product ok")
+            return CommonResponse("fn-product ok!")
         }
     }
 }
