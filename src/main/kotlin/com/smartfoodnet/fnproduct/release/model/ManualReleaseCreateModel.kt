@@ -1,14 +1,11 @@
 package com.smartfoodnet.fnproduct.release.model
 
+import com.smartfoodnet.fnproduct.claim.model.vo.ClaimStatus
 import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
 import com.smartfoodnet.fnproduct.order.entity.CollectedProductInfo
 import com.smartfoodnet.fnproduct.order.entity.ConfirmProduct
 import com.smartfoodnet.fnproduct.order.entity.Receiver
-import com.smartfoodnet.fnproduct.order.vo.DeliveryType
-import com.smartfoodnet.fnproduct.order.vo.MatchingType
-import com.smartfoodnet.fnproduct.order.vo.OrderStatus
-import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
-import com.smartfoodnet.fnproduct.order.vo.StoreSyncStatus
+import com.smartfoodnet.fnproduct.order.vo.*
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.store.enums.ReservedStoreCode
 import io.swagger.annotations.ApiModelProperty
@@ -61,7 +58,7 @@ data class ManualReleaseCreateModel(
             orderNumber = orderUniqueKey,
             status = OrderStatus.NEW,
             storeSyncStatus = StoreSyncStatus.NONE,
-            claimStatus = null,
+            claimStatus = ClaimStatus.UNREGISTERED,
             deliveryType = deliveryType,
             expectedDeliveryDate = null,
             price = null,

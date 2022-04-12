@@ -1,7 +1,8 @@
 package com.smartfoodnet.fnproduct.release.model.request
 
-import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
+import com.smartfoodnet.fnproduct.claim.model.vo.ClaimStatus
 import com.smartfoodnet.fnproduct.order.vo.OrderStatus
+import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
 import io.swagger.annotations.ApiModelProperty
 
 class ReleaseInfoSearchCondition(
@@ -24,7 +25,7 @@ class ReleaseInfoSearchCondition(
     var uploadType: OrderUploadType? = null,
 
     @ApiModelProperty(value = "클레임상태")
-    var claimStatus: String? = null,
+    var claimStatus: ClaimStatus? = null,
 
     // ---------------------------------------------------------------------------------------------
     // -- ReleaseInfo field

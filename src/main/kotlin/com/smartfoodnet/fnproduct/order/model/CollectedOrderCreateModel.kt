@@ -2,11 +2,12 @@ package com.smartfoodnet.fnproduct.order.model
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.smartfoodnet.common.Constants
-import com.smartfoodnet.fnproduct.order.entity.CollectedProductInfo
+import com.smartfoodnet.fnproduct.claim.model.vo.ClaimStatus
 import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
+import com.smartfoodnet.fnproduct.order.entity.CollectedProductInfo
 import com.smartfoodnet.fnproduct.order.vo.DeliveryType
-import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
 import com.smartfoodnet.fnproduct.order.vo.OrderStatus
+import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
 import com.smartfoodnet.fnproduct.order.vo.StoreSyncStatus
 import io.swagger.annotations.ApiModelProperty
 import java.time.LocalDateTime
@@ -45,7 +46,7 @@ data class CollectedOrderCreateModel(
     val status: OrderStatus,
 
     @ApiModelProperty(value = "클레임 상태")
-    val claimStatus: String? = null,
+    val claimStatus: ClaimStatus = ClaimStatus.UNREGISTERED,
 
     @ApiModelProperty(value = "쇼핑몰 상품명")
     val storeProductName: String,

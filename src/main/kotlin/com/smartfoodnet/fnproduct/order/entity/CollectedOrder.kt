@@ -2,11 +2,8 @@ package com.smartfoodnet.fnproduct.order.entity
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.smartfoodnet.common.entity.BaseEntity
-import com.smartfoodnet.fnproduct.order.vo.DeliveryType
-import com.smartfoodnet.fnproduct.order.vo.DeliveryTypeConverter
-import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
-import com.smartfoodnet.fnproduct.order.vo.OrderStatus
-import com.smartfoodnet.fnproduct.order.vo.StoreSyncStatus
+import com.smartfoodnet.fnproduct.claim.model.vo.ClaimStatus
+import com.smartfoodnet.fnproduct.order.vo.*
 import com.smartfoodnet.fnproduct.store.entity.StoreProduct
 import org.hibernate.annotations.DynamicUpdate
 import java.time.LocalDateTime
@@ -55,7 +52,8 @@ class CollectedOrder(
 
     val orderNumber: String,
 
-    var claimStatus: String? = null,
+    @Enumerated(EnumType.STRING)
+    var claimStatus: ClaimStatus = ClaimStatus.UNREGISTERED,
 
     @Column(name = "delivery_type")
     @Convert(converter = DeliveryTypeConverter::class)

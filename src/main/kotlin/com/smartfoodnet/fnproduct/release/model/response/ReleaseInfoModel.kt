@@ -2,8 +2,9 @@ package com.smartfoodnet.fnproduct.release.model.response
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.smartfoodnet.apiclient.response.NosnosDeliveryAgencyInfoModel
-import com.smartfoodnet.fnproduct.order.vo.DeliveryType
+import com.smartfoodnet.fnproduct.claim.model.vo.ClaimStatus
 import com.smartfoodnet.fnproduct.order.model.ReceiverModel
+import com.smartfoodnet.fnproduct.order.vo.DeliveryType
 import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
 import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
 import com.smartfoodnet.fnproduct.release.model.vo.ShippingCodeStatus
@@ -47,8 +48,8 @@ data class ReleaseInfoModel(
     @ApiModelProperty(value = "배송완료일시")
     var deliveryCompletedAt: LocalDateTime? = null,
 
-    @ApiModelProperty(value = "클레임상태")
-    var claimStatuses: String? = null,
+    @ApiModelProperty(value = "클레임상태 (UNREGISTERED:미등록/RETURN_REQUESTED:반품요청/RETURN_IN_PROGRESS:반품진행/RETURN_INBOUND_COMPLETED:반품입고완료/RETURN_CANCELLED:반품취소/EXCHANGE_RELEASE_IN_PROGRESS:교환출고중/EXCHANGE_DELIVERY_COMPLETED:교환배송완료)")
+    var claimStatuses: List<ClaimStatus> = emptyList(),
 
     @ApiModelProperty(
         value = "배송방식 (PARCEL:택배/VEHICLE:차량/DAWN:새벽배송/SAME_DAY:당일배송)",
@@ -97,7 +98,7 @@ data class ReleaseInfoModel(
                     shippingCodeStatus = shippingCodeStatus,
                     shippingCodeCreatedAt = shippingCodeCreatedAt,
                     deliveryCompletedAt = deliveryCompletedAt,
-                    claimStatuses = collectedOrders.joinToString { it.claimStatus ?: "" },
+                    claimStatuses = collectedOrders.map { it.claimStatus },
                     deliveryType = firstCollectedOrder?.deliveryType,
                     receiverModel = firstCollectedOrder?.receiver?.run(ReceiverModel::from),
                     storeName = firstCollectedOrder?.storeName,

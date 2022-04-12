@@ -1,6 +1,7 @@
 package com.smartfoodnet.fnproduct.release
 
 import com.smartfoodnet.config.Querydsl4RepositorySupport
+import com.smartfoodnet.fnproduct.claim.model.vo.ClaimStatus
 import com.smartfoodnet.fnproduct.order.entity.QCollectedOrder.collectedOrder
 import com.smartfoodnet.fnproduct.order.entity.QConfirmOrder.confirmOrder
 import com.smartfoodnet.fnproduct.order.entity.QConfirmRequestOrder.confirmRequestOrder
@@ -48,7 +49,7 @@ class ReleaseInfoRepositoryImpl : Querydsl4RepositorySupport(ReleaseInfo::class.
     private fun eqUploadType(uploadType: OrderUploadType?) =
         uploadType?.let { collectedOrder.uploadType.eq(it) }
 
-    private fun eqClaimStatus(claimStatus: String?) =
+    private fun eqClaimStatus(claimStatus: ClaimStatus?) =
         claimStatus?.let { collectedOrder.claimStatus.eq(it) }
 
     private fun containsOrderCode(orderCode: String?) =
