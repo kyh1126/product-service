@@ -1,5 +1,6 @@
 package com.smartfoodnet.fnproduct.claim.entity
 
+import com.smartfoodnet.common.entity.BaseEntity
 import com.smartfoodnet.fnproduct.order.entity.Receiver
 import java.time.LocalDateTime
 import javax.persistence.CascadeType
@@ -7,6 +8,7 @@ import javax.persistence.Column
 import javax.persistence.Embedded
 import javax.persistence.Entity
 import javax.persistence.FetchType
+import javax.persistence.ForeignKey
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
@@ -24,7 +26,7 @@ class ExchangeRelease(
     val id: Long? = null,
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "claim_id", columnDefinition = "BIGINT UNSIGNED")
+    @JoinColumn(name = "claim_id", foreignKey = ForeignKey(name = "FK_claim__exchange_release"), columnDefinition = "BIGINT UNSIGNED")
     val claim: Claim,
 
     @Embedded
@@ -39,6 +41,12 @@ class ExchangeRelease(
     @Column(name = "shipping_completed_at")
     val shippingCompletedAt: LocalDateTime? = null,
 
+    @Column(name = "nosnos_order_id")
+    var nosnosOrderId: Long? = null,
+
+    @Column(name = "nosnos_order_code")
+    var nosnosOrderCode: String? = null,
+
     @OneToMany(mappedBy = "exchangeRelease", cascade = [CascadeType.PERSIST])
     val exchangeProducts: MutableList<ExchangeProduct> = mutableListOf()
-)
+): BaseEntity()

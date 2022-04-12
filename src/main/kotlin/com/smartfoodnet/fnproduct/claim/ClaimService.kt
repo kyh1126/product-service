@@ -6,6 +6,7 @@ import com.smartfoodnet.apiclient.request.OutboundCreateModel
 import com.smartfoodnet.apiclient.response.ReturnCreateItem
 import com.smartfoodnet.apiclient.response.ReturnCreateModel
 import com.smartfoodnet.common.Constants
+import com.smartfoodnet.common.error.exception.ExternalApiError
 import com.smartfoodnet.common.error.exception.NoSuchElementError
 import com.smartfoodnet.fnproduct.claim.entity.Claim
 import com.smartfoodnet.fnproduct.claim.entity.ExchangeProduct
@@ -71,8 +72,8 @@ class ClaimService(
             releaseItemList = releaseItems
         )
         val returnModel = wmsApiClient.createReleaseReturn(returnCreateModel)
-
-        println(returnModel)
+        claim.returnInfo?.nosnosReleaseReturnInfoId = returnModel?.releaseReturnInfoId
+        claim.returnInfo?.returnCode = returnModel?.returnCode
     }
 
     @Transactional
@@ -86,14 +87,18 @@ class ClaimService(
 
         exchangeRelease.exchangeProducts.addAll(buildExchangeProducts(exchangeReleaseCreateModel, exchangeRelease))
         claim.exchangeRelease = exchangeRelease
-        exchangeReleaseRepository.save(exchangeRelease)
 
         sendExchangeReleaseOutbound(exchangeRelease)
+
+        exchangeReleaseRepository.save(exchangeRelease)
     }
 
     private fun sendExchangeReleaseOutbound(exchangeRelease: ExchangeRelease) {
         val outboundCreateModel = buildOutboundCreateModel(exchangeRelease)
-        wmsApiClient.createOutbound(outboundCreateModel)
+        val postOutboundModel = wmsApiClient.createOutbound(outboundCreateModel).payload ?: throw ExternalApiError("Nosnos에 교환발주를 요청하는데 실패하였습니다. [claimId: ${exchangeRelease.claim.id}")
+
+        exchangeRelease.nosnosOrderId = postOutboundModel.orderId
+        exchangeRelease.nosnosOrderCode = postOutboundModel.orderCode
     }
 
     private fun buildOutboundCreateModel(exchangeRelease: ExchangeRelease): OutboundCreateModel {

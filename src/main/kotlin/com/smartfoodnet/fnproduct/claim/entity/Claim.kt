@@ -1,5 +1,6 @@
 package com.smartfoodnet.fnproduct.claim.entity
 
+import com.smartfoodnet.common.entity.BaseEntity
 import com.smartfoodnet.fnproduct.claim.model.vo.ClaimReason
 import com.smartfoodnet.fnproduct.claim.model.vo.ClaimStatus
 import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
@@ -7,6 +8,7 @@ import java.time.LocalDateTime
 import javax.persistence.CascadeType
 import javax.persistence.Column
 import javax.persistence.Entity
+import javax.persistence.ForeignKey
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
@@ -50,6 +52,6 @@ class Claim(
     var exchangeRelease: ExchangeRelease? = null,
 
     @OneToOne(cascade = [CascadeType.PERSIST])
-    @JoinColumn(name = "release_info_id", columnDefinition = "BIGINT UNSIGNED")
+    @JoinColumn(name = "release_info_id", foreignKey = ForeignKey(name = "FK_release_info__claim"), columnDefinition = "BIGINT UNSIGNED")
     val releaseInfo: ReleaseInfo? = null
-)
+): BaseEntity()
