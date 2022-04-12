@@ -5,9 +5,9 @@ import com.smartfoodnet.fnproduct.order.entity.CollectedProductInfo
 import com.smartfoodnet.fnproduct.order.entity.ConfirmProduct
 import com.smartfoodnet.fnproduct.order.entity.Receiver
 import com.smartfoodnet.fnproduct.order.vo.DeliveryType
-import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
 import com.smartfoodnet.fnproduct.order.vo.MatchingType
 import com.smartfoodnet.fnproduct.order.vo.OrderStatus
+import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
 import com.smartfoodnet.fnproduct.order.vo.StoreSyncStatus
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.store.enums.ReservedStoreCode
@@ -35,7 +35,6 @@ data class ManualReleaseCreateModel(
     @ApiModelProperty(value = "출고상품", example = "[{productId, quantity}, ...]")
     var products: List<ManualReleaseProductInfo>
 ) {
-
 
     fun toCollectOrderEntity(
         partnerId: Long,

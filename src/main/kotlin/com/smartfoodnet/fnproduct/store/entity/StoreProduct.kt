@@ -3,15 +3,7 @@ package com.smartfoodnet.fnproduct.store.entity
 import com.smartfoodnet.common.entity.BaseEntity
 import com.smartfoodnet.fnproduct.store.model.request.StoreProductUpdateModel
 import org.hibernate.annotations.Where
-import javax.persistence.CascadeType
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
-import javax.persistence.Id
-import javax.persistence.OneToMany
-import javax.persistence.Table
-import javax.persistence.UniqueConstraint
+import javax.persistence.*
 
 @Entity
 @Table(
@@ -60,5 +52,4 @@ class StoreProduct(
         name = storeProductUpdateModel.name
         optionName = storeProductUpdateModel.optionName
     }
-
 }

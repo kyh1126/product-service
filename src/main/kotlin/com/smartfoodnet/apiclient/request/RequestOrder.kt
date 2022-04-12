@@ -2,11 +2,11 @@ package com.smartfoodnet.apiclient.request
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.google.common.annotations.VisibleForTesting
 import com.smartfoodnet.common.Constants.NOSNOS_DATE_FORMAT
 import com.smartfoodnet.common.error.exception.BaseRuntimeException
 import com.smartfoodnet.fnproduct.order.entity.ConfirmOrder
 import com.smartfoodnet.fnproduct.order.entity.ConfirmProduct
+import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import java.time.format.DateTimeFormatter
 
@@ -17,7 +17,7 @@ object RequestOrderMapper {
         /**
          * 각 주문별로 중복되는 상품이 있는지 확인
          */
-        outboundBulkItemList.map {
+        outboundBulkItemList.forEach {
             searchDuplicateProduct(it)
         }
 
@@ -33,6 +33,10 @@ object RequestOrderMapper {
     private fun expandPackageProduct(confirmProduct: ConfirmProduct, bundleNumber: String): List<OrderItem> {
         val quantity = confirmProduct.quantity
         val basicProduct = confirmProduct.basicProduct
+        return packageProductToOrderItemList(basicProduct, quantity, bundleNumber)
+    }
+
+    private fun packageProductToOrderItemList(basicProduct: BasicProduct, quantity: Int, bundleNumber: String): List<OrderItem> {
         return basicProduct.packageProductMappings.map {
             OrderItem(
                 salesProductId = it.selectedBasicProduct.salesProductId
@@ -118,6 +122,8 @@ object RequestOrderMapper {
             }
         }
     }
+
+
 }
 
 class OutboundCreateModel(
