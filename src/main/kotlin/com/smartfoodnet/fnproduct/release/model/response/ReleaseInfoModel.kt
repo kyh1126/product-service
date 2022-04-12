@@ -36,8 +36,8 @@ data class ReleaseInfoModel(
     var shippingCode: String? = null,
 
     @ApiModelProperty(
-        value = "쇼핑몰송장등록 (NONE:송장없음/REGISTERED:자동송장등록성공/REGISTER_FAILED:자동송장등록실패/UNREGISTERED:자동송장등록전/EXCEL_REGISTER:수기등록)",
-        allowableValues = "NONE,REGISTERED,REGISTER_FAILED,BEFORE_REGISTER,EXCEL_REGISTER"
+        value = "쇼핑몰송장등록 (NONE:송장없음/REGISTERED:자동등록성공/REGISTER_FAILED:자동등록실패/BEFORE_REGISTER:자동등록전/WAITING_CALLBACK:자동등록전(콜백대기중)/EXCEL_REGISTER:수기등록)",
+        allowableValues = "NONE,REGISTERED,REGISTER_FAILED,BEFORE_REGISTER,WAITING_CALLBACK,EXCEL_REGISTER"
     )
     var shippingCodeStatus: ShippingCodeStatus,
 

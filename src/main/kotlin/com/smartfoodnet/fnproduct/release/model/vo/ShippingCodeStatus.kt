@@ -5,10 +5,10 @@ import java.util.*
 
 enum class ShippingCodeStatus(val description: String, val uploadType: OrderUploadType?) {
     NONE("송장없음", null),
-    REGISTERED("자동송장등록성공", OrderUploadType.API),
-    REGISTER_FAILED("자동송장등록실패", OrderUploadType.API),
-    BEFORE_REGISTER("자동송장등록전", OrderUploadType.API),
-    WAITING_CALLBACK("콜백대기중", OrderUploadType.API),
+    REGISTERED("자동등록성공", OrderUploadType.API),
+    REGISTER_FAILED("자동등록실패", OrderUploadType.API),
+    BEFORE_REGISTER("자동등록전", OrderUploadType.API),
+    WAITING_CALLBACK("자동등록전(콜백대기중)", OrderUploadType.API),
     EXCEL_REGISTER("수기등록", OrderUploadType.UPLOAD);
 
     fun isInProgress(): Boolean {
