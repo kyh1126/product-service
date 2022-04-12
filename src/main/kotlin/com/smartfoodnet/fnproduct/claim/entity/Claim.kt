@@ -32,9 +32,6 @@ class Claim(
     @Column(name = "claimed_at")
     val claimedAt: LocalDateTime,
 
-    @Column(name = "original_tracking_number")
-    val originalTrackingNumber: String,
-
     @Column(name = "customer_name")
     val customerName: String,
 
@@ -44,7 +41,7 @@ class Claim(
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
-    val status: ClaimStatus? = null,
+    val status: ClaimStatus = ClaimStatus.UNREGISTERED,
 
     @Column(name = "memo")
     val memo: String? = null,

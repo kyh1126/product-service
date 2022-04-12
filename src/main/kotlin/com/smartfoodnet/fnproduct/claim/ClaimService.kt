@@ -163,7 +163,6 @@ class ClaimService(
             Claim(
                 partnerId = partnerId,
                 claimedAt = claimedAt,
-                originalTrackingNumber = originalTrackingNumber,
                 customerName = customerName,
                 claimReason = claimReason,
                 memo = memo,
