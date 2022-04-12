@@ -8,6 +8,8 @@ import java.time.LocalDateTime
 import javax.persistence.CascadeType
 import javax.persistence.Column
 import javax.persistence.Entity
+import javax.persistence.EnumType
+import javax.persistence.Enumerated
 import javax.persistence.ForeignKey
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
@@ -36,9 +38,11 @@ class Claim(
     @Column(name = "customer_name")
     val customerName: String,
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "claim_reason")
     val claimReason: ClaimReason,
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status")
     val status: ClaimStatus? = null,
 
