@@ -13,7 +13,7 @@ data class OrderProductModel(
     var orderCode: String,
 
     @ApiModelProperty(value = "주문번호")
-    var orderNumbers: String,
+    var orderNumbers: List<String>,
 
     @ApiModelProperty(value = "NOSNOS 출고 id")
     var releaseId: Long? = null,
@@ -41,7 +41,7 @@ data class OrderProductModel(
             return OrderProductModel(
                 orderId = releaseInfo.orderId,
                 orderCode = releaseInfo.orderCode,
-                orderNumbers = collectedOrders.joinToString { it.orderNumber },
+                orderNumbers = collectedOrders.map { it.orderNumber },
                 releaseId = releaseInfo.releaseId,
                 releaseCode = releaseInfo.releaseCode,
                 basicProductName = releaseProduct.basicProduct.name,
@@ -59,7 +59,7 @@ data class OrderProductModel(
             return OrderProductModel(
                 orderId = releaseInfo.orderId,
                 orderCode = releaseInfo.orderCode,
-                orderNumbers = collectedOrders.joinToString { it.orderNumber },
+                orderNumbers = collectedOrders.map { it.orderNumber },
                 releaseId = releaseInfo.releaseId,
                 releaseCode = releaseInfo.releaseCode,
                 basicProductName = confirmProduct.basicProduct.name,
