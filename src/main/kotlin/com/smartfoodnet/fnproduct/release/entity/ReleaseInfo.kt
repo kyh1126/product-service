@@ -90,6 +90,10 @@ class ReleaseInfo(
         releaseCode = request.releaseCode
     }
 
+    fun updateShippingCodeStatus(status: ShippingCodeStatus) {
+        shippingCodeStatus = status
+    }
+
     fun updateDeliveryCompletedAt(procDateTime: LocalDateTime?) {
         deliveryCompletedAt = procDateTime
     }

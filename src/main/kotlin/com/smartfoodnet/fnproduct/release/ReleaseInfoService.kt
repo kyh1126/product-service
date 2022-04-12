@@ -25,6 +25,7 @@ import com.smartfoodnet.fnproduct.release.model.vo.DeliveryAgency
 import com.smartfoodnet.fnproduct.release.model.vo.DeliveryAgency.Companion.getDeliveryAgencyByName
 import com.smartfoodnet.fnproduct.release.model.vo.DeliveryStatus
 import com.smartfoodnet.fnproduct.release.model.vo.ReleaseStatus
+import com.smartfoodnet.fnproduct.release.model.vo.ShippingCodeStatus
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
@@ -147,6 +148,38 @@ class ReleaseInfoService(
                     updateLotteDeliveryCompletedAt(targetList, idByDeliveryAgency[deliveryAgency])
                 DeliveryAgency.CJ ->
                     updateCjDeliveryCompletedAt(targetList, idByDeliveryAgency[deliveryAgency])
+            }
+
+            if (targetList.isLast) break
+
+            page = page.next()
+        }
+    }
+
+    fun registerShippingCode() {
+        var page = PageRequest.of(0, 100, Sort.Direction.DESC, "id")
+
+        val deliveryAgencyById = getDeliveryAgencyInfoList()
+            ?.associateBy(
+                { it.deliveryAgencyId!!.toLong() }, { getDeliveryAgencyByName(it.deliveryAgencyName) }
+            ) ?: emptyMap()
+
+        while (true) {
+            val targetList =
+                releaseInfoRepository.findByShippingCodeStatusAndShippingCodeIsNotNull(
+                    ShippingCodeStatus.BEFORE_REGISTER,
+                    page
+                )
+            if (!targetList.hasContent()) break
+
+            try {
+                releaseInfoStoreService.updateShippingCodeStatus(
+                    targetList.content.map { it.id!! },
+                    deliveryAgencyById
+                )
+            } catch (e: BaseRuntimeException) {
+                log.error("[registerShippingCode] 플레이오토 송장등록 실패," +
+                    " releaseIds: ${targetList.map { it.releaseId }}")
             }
 
             if (targetList.isLast) break

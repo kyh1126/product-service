@@ -1,5 +1,9 @@
 package com.smartfoodnet.fnproduct.release
 
+import com.smartfoodnet.apiclient.OrderManagementServiceApiClient
+import com.smartfoodnet.apiclient.request.ShippingCodeRegisterModel
+import com.smartfoodnet.apiclient.request.TrackingDataModel
+import com.smartfoodnet.apiclient.request.TrackingOptionModel
 import com.smartfoodnet.apiclient.response.CjDeliveryInfo
 import com.smartfoodnet.apiclient.response.LotteDeliveryInfoDetail
 import com.smartfoodnet.apiclient.response.NosnosReleaseItemModel
@@ -11,6 +15,8 @@ import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
 import com.smartfoodnet.fnproduct.release.entity.ReleaseProduct
 import com.smartfoodnet.fnproduct.release.model.dto.ReleaseModelDto
+import com.smartfoodnet.fnproduct.release.model.vo.DeliveryAgency
+import com.smartfoodnet.fnproduct.release.model.vo.ShippingCodeStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
@@ -19,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class ReleaseInfoStoreService(
     private val releaseInfoRepository: ReleaseInfoRepository,
+    private val orderManagementServiceApiClient: OrderManagementServiceApiClient
 ) {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun createOrUpdateReleaseInfo(
@@ -79,6 +86,31 @@ class ReleaseInfoStoreService(
                     }
                 }
             }
+        }
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    fun updateShippingCodeStatus(ids: List<Long>, deliveryAgencyById: Map<Long, DeliveryAgency?>) {
+        val targetList = releaseInfoRepository.findAllById(ids)
+
+        val targetMap = targetList
+            .flatMap { ShippingCodeRegisterModel.fromEntity(it, deliveryAgencyById) }
+            .groupBy { Pair(it.partnerId, it.storeCode!!) }
+
+        targetMap.entries.forEach { (key, models) ->
+            val (partnerId, storeCode) = key
+            val trackingOptionModel =
+                TrackingOptionModel(dataModelList = models.map(TrackingDataModel::fromModel))
+
+            orderManagementServiceApiClient.sendTrackingNumber(
+                partnerId,
+                storeCode,
+                trackingOptionModel
+            )
+        }
+
+        targetList.forEach {
+            it.updateShippingCodeStatus(ShippingCodeStatus.WAITING_CALLBACK)
         }
     }
 
