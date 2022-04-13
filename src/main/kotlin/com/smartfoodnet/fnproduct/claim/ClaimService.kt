@@ -106,7 +106,7 @@ class ClaimService(
 
         return OutboundCreateModel(
             partnerId = originalConfirmOrder.partnerId,
-            companyOrderCode = originalConfirmOrder.requestOrderList.first().collectedOrder.orderNumber,
+            companyOrderCode = originalConfirmOrder.requestOrderList.first().collectedOrder.orderNumber + "-" + exchangeRelease.id,
             shippingMethodId = originalConfirmOrder.shippingMethodType,
             requestShippingDt = originalConfirmOrder.requestShippingDate.format(DateTimeFormatter.ofPattern(Constants.NOSNOS_DATE_FORMAT)),
             buyerName = exchangeRelease.receiver.name,
