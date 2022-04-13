@@ -13,6 +13,7 @@ import org.springframework.data.domain.Sort
 import org.springframework.data.web.PageableDefault
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.ModelAttribute
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -25,8 +26,10 @@ class ClaimController(
     private val claimService: ClaimService
 ) {
     @Operation(summary = "반품 현황 조회")
-    @GetMapping
+    @GetMapping("partner/{partnerId}")
     fun findClaims(
+        @Parameter(description = "화주(고객사) ID", required = true)
+        @PathVariable partnerId: Long,
         @Parameter(description = "검색조건")
         @ModelAttribute condition: ClaimSearchCondition,
         @PageableDefault(size = 50, sort = ["id"], direction = Sort.Direction.DESC) page: Pageable,

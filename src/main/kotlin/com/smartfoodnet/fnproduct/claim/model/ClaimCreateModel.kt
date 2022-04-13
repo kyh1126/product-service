@@ -39,8 +39,6 @@ data class ClaimCreateModel(
 }
 
 data class ReturnProductCreateModel(
-    @ApiModelProperty(value = "출고상품 ID", example = "14")
-    val shippingProductId: Long,
     @ApiModelProperty(value = "기본상품 ID", example = "14")
     val basicProductId: Long,
     @ApiModelProperty(value = "반품요청수량", example = "14")

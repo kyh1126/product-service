@@ -189,8 +189,8 @@ class ClaimService(
 
     private fun buildReturnProducts(claimCreateModel: ClaimCreateModel, returnInfo: ReturnInfo): List<ReturnProduct> {
         return claimCreateModel.returnProducts.map {
-            val basicProduct = basicProductRepository.findByShippingProductId(it.shippingProductId)
-                ?: throw NoSuchElementError("기본상품이 존재하지 않습니다. [shippingProductId: ${it.shippingProductId}]")
+            val basicProduct = basicProductRepository.findByIdOrNull(it.basicProductId)
+                ?: throw NoSuchElementError("기본상품이 존재하지 않습니다. [basicProductId: ${it.basicProductId}]")
             ReturnProduct(
                 requestQuantity = it.quantity,
                 basicProduct = basicProduct,

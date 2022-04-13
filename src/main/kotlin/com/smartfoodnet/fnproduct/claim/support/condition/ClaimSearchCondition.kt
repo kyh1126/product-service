@@ -1,6 +1,7 @@
 package com.smartfoodnet.fnproduct.claim.support.condition
 
 import com.fasterxml.jackson.annotation.JsonFormat
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.querydsl.core.BooleanBuilder
 import com.querydsl.core.types.Predicate
 import com.smartfoodnet.common.Constants
@@ -11,7 +12,8 @@ import io.swagger.annotations.ApiModelProperty
 import java.time.LocalDate
 
 class ClaimSearchCondition(
-    @ApiModelProperty(value = "반품접수일")
+    @JsonIgnore
+    @ApiModelProperty(hidden = true)
     var partnerId: Long? = null,
 
     @JsonFormat(pattern = Constants.TIMESTAMP_FORMAT)

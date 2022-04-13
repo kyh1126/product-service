@@ -9,7 +9,6 @@ data class ExchangeReleaseCreateModel(
 )
 
 data class ExchangeProductCreateModel(
-    val shippingProductId: Long,
     val basicProductId: Long,
     val quantity: Int
 )
