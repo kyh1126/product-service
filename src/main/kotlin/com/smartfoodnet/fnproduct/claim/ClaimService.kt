@@ -105,6 +105,7 @@ class ClaimService(
         val originalConfirmOrder = exchangeRelease.claim.releaseInfo?.confirmOrder ?: throw NoSuchElementError("원 발주정보가 존재하지 않습니다. [releaseInfoId = ${exchangeRelease.claim.releaseInfo?.id}]")
 
         return OutboundCreateModel(
+            partnerId = originalConfirmOrder.partnerId,
             companyOrderCode = originalConfirmOrder.requestOrderList.first().collectedOrder.orderNumber,
             shippingMethodId = originalConfirmOrder.shippingMethodType,
             requestShippingDt = originalConfirmOrder.requestShippingDate.format(DateTimeFormatter.ofPattern(Constants.NOSNOS_DATE_FORMAT)),
