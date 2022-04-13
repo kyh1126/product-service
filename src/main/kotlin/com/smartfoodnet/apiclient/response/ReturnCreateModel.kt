@@ -16,5 +16,5 @@ data class ReturnCreateModel(
     val zipcode: String? = null,
     val tel1: String? = null,
     val tel2: String? = null,
-    val releaseItemList: List<ReturnCreateItem>?
+    val returnItemList: List<ReturnItemCreateModel>?
 )

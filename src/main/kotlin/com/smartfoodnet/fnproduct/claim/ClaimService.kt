@@ -3,8 +3,8 @@ package com.smartfoodnet.fnproduct.claim
 import com.smartfoodnet.apiclient.WmsApiClient
 import com.smartfoodnet.apiclient.request.OrderItem
 import com.smartfoodnet.apiclient.request.OutboundCreateModel
-import com.smartfoodnet.apiclient.response.ReturnCreateItem
 import com.smartfoodnet.apiclient.response.ReturnCreateModel
+import com.smartfoodnet.apiclient.response.ReturnItemCreateModel
 import com.smartfoodnet.common.Constants
 import com.smartfoodnet.common.error.exception.ExternalApiError
 import com.smartfoodnet.common.error.exception.NoSuchElementError
@@ -56,8 +56,8 @@ class ClaimService(
     }
 
     private fun sendReleaseReturn(claim: Claim) {
-        val releaseItems = claim.returnInfo?.returnProducts?.map {
-            ReturnCreateItem(shippingProductId = it.basicProduct.shippingProductId!!, quantity = it.requestQuantity)
+        val returnItems = claim.returnInfo?.returnProducts?.map {
+            ReturnItemCreateModel(shippingProductId = it.basicProduct.shippingProductId!!, quantity = it.requestQuantity)
         }
 
         val returnCreateModel = ReturnCreateModel(
@@ -69,7 +69,7 @@ class ClaimService(
             receivingName = claim.releaseInfo?.confirmOrder?.receiver?.name,
             zipcode = claim.releaseInfo?.confirmOrder?.receiver?.zipCode,
             tel1 = claim.releaseInfo?.confirmOrder?.receiver?.phoneNumber,
-            releaseItemList = releaseItems
+            returnItemList = returnItems
         )
         val returnModel = wmsApiClient.createReleaseReturn(returnCreateModel)
         claim.returnInfo?.nosnosReleaseReturnInfoId = returnModel?.releaseReturnInfoId
