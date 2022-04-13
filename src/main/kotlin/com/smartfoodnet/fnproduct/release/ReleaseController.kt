@@ -73,7 +73,7 @@ class ReleaseController(private val releaseInfoService: ReleaseInfoService) {
     }
 
     @Operation(summary = "플레이오토 송장 등록")
-    @PostMapping("shipping-codes/play-auto")
+    @PostMapping("tracking-numbers/play-auto")
     fun registerTrackingNumber(): CommonResponse<String> {
         releaseInfoService.registerTrackingNumber()
         return CommonResponse(HttpStatus.OK.reasonPhrase)
