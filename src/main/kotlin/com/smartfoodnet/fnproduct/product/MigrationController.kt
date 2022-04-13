@@ -2,7 +2,6 @@ package com.smartfoodnet.fnproduct.product
 
 import com.smartfoodnet.common.Constants.NOSNOS_INITIAL_PAGE
 import com.smartfoodnet.common.model.response.CommonResponse
-import com.smartfoodnet.common.utils.Log
 import io.swagger.annotations.Api
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -131,6 +130,4 @@ class MigrationController(private val migrationService: MigrationService) {
         migrationService.createProductMappings(memberId, shippingProductIds)
         return CommonResponse(HttpStatus.OK.reasonPhrase)
     }
-
-    companion object : Log
 }

@@ -96,6 +96,14 @@ interface WmsApiClient {
     fun updateSalesProduct(@PathVariable salesProductId: Long, preModel: PreSalesProductModel)
 
     // ---------------------------------------------------------------------------------------------
+    // -- 상품연결 정보
+    // ---------------------------------------------------------------------------------------------
+    @PostMapping("product-mappings/bulk")
+    fun createProductMappings(
+        @RequestBody preModel: CommonCreateBulkModel<PreProductMappingModel>
+    )
+
+    // ---------------------------------------------------------------------------------------------
     // -- 입/출고관리
     // ---------------------------------------------------------------------------------------------
     @GetMapping("inventory/inbounds/work")

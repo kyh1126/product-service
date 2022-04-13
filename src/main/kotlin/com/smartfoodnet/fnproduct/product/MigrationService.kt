@@ -2,10 +2,7 @@ package com.smartfoodnet.fnproduct.product
 
 import com.smartfoodnet.apiclient.PartnerApiClient
 import com.smartfoodnet.apiclient.WmsApiClient
-import com.smartfoodnet.apiclient.request.BasicProductReadModel
-import com.smartfoodnet.apiclient.request.CommonCreateBulkModel
-import com.smartfoodnet.apiclient.request.PreSalesProductModel
-import com.smartfoodnet.apiclient.request.PreShippingProductSimpleModel
+import com.smartfoodnet.apiclient.request.*
 import com.smartfoodnet.apiclient.response.CommonDataListModel
 import com.smartfoodnet.apiclient.response.NosnosShippingProductModel
 import com.smartfoodnet.common.Constants.NOSNOS_INITIAL_PAGE
@@ -63,7 +60,7 @@ class MigrationService(
 
         // nosnos 쪽 출고상품 productCode 업데이트
         basicProductsByPartnerId.entries.forEach { (partnerId, basicProducts) ->
-            log.info("partnerId: $partnerId start!")
+            log.info("[updateProductCodes] partnerId: $partnerId start!")
 
             var start = 0
             while (start < basicProducts.size) {
@@ -101,7 +98,7 @@ class MigrationService(
 
         // nosnos 쪽 판매상품 일괄 등록, 판매상품 id 업데이트
         basicProductsByPartnerId.entries.forEach { (partnerId, basicProducts) ->
-            log.info("partnerId: $partnerId start!")
+            log.info("[createNosnosSalesProducts] partnerId: $partnerId start!")
 
             var start = 0
             while (start < basicProducts.size) {
@@ -147,7 +144,7 @@ class MigrationService(
 
         // nosnos 쪽 기존 출고상품-판매상품 연결
         basicProductsByPartnerId.entries.forEach { (partnerId, basicProducts) ->
-            log.info("partnerId: $partnerId start!")
+            log.info("[createProductMappings] partnerId: $partnerId start!")
 
             var start = 0
             while (start < basicProducts.size) {
@@ -155,7 +152,14 @@ class MigrationService(
                 val subList = basicProducts.subList(start, end)
                 log.info("start: $start, end: $end, rowIdx: ${subList.map { rowIdxList[it.shippingProductId] }}")
 
-                // TODO: nosnos 쪽 상품연결 정보 등록(벌크)
+                // nosnos 쪽 상품연결 정보 일괄 등록
+                wmsApiClient.createProductMappings(
+                    CommonCreateBulkModel(
+                        partnerId = partnerId,
+                        requestDataList = basicProducts.map { PreProductMappingModel.fromEntity(it) }
+                    )
+                )
+
                 start = end
             }
         }
@@ -174,7 +178,7 @@ class MigrationService(
             try {
                 model = wmsApiClient.getShippingProducts(BasicProductReadModel(memberId = memberId, page = page)).payload!!
             } catch (e: Exception) {
-                log.error("page: $page, error: ${e.message}")
+                log.error("[nosnosToBasicProducts] page: $page, error: ${e.message}")
                 throw BaseRuntimeException(errorMessage = "출고상품 생성 실패, memberId: ${memberId}, page: ${page}")
             }
 
@@ -202,7 +206,7 @@ class MigrationService(
             else shippingProductIds.map { basicProductService.updateProductCode(it) }
 
         // nosnos 쪽 출고상품 productCode 업데이트
-        log.info("basicProductIds: ${basicProducts.map { it.id!! }}, shippingProductIds: ${basicProducts.map { it.shippingProductId!! }}")
+        log.info("[updateProductCodes] basicProductIds: ${basicProducts.map { it.id!! }}, shippingProductIds: ${basicProducts.map { it.shippingProductId!! }}")
         wmsApiClient.updateShippingProducts(
             CommonCreateBulkModel(
                 partnerId = partnerId,
@@ -223,7 +227,7 @@ class MigrationService(
             else basicProductService.getBasicProductsByShippingProductIds(shippingProductIds)
 
         // nosnos 쪽 판매상품 일괄 등록
-        log.info("basicProductIds: ${basicProducts.map { it.id!! }}, shippingProductIds: ${basicProducts.map { it.shippingProductId!! }}")
+        log.info("[createNosnosSalesProducts] basicProductIds: ${basicProducts.map { it.id!! }}, shippingProductIds: ${basicProducts.map { it.shippingProductId!! }}")
         val postSalesProductModels = wmsApiClient.createSalesProducts(
             CommonCreateBulkModel(
                 partnerId = partnerId,
@@ -240,8 +244,22 @@ class MigrationService(
     }
 
     @Transactional
-    fun createProductMappings(fileName: Long, shippingProductIds: List<Long>?) {
-        // TODO: nosnos 쪽 상품연결 정보 등록(벌크)
+    fun createProductMappings(memberId: Long, shippingProductIds: List<Long>?) {
+        val basicProducts: List<BasicProduct>
+        val partnerId = partnerApiClient.getPartner(memberId).payload!!.partnerId
+
+        basicProducts =
+            if (shippingProductIds.isNullOrEmpty()) basicProductService.getBasicProductsByPartnerId(partnerId)
+            else basicProductService.getBasicProductsByShippingProductIds(shippingProductIds)
+
+        // nosnos 쪽 상품연결 정보 일괄 등록
+        log.info("[createProductMappings] basicProductIds: ${basicProducts.map { it.id!! }}")
+        wmsApiClient.createProductMappings(
+            CommonCreateBulkModel(
+                partnerId = partnerId,
+                requestDataList = basicProducts.map { PreProductMappingModel.fromEntity(it) }
+            )
+        )
     }
 
     private fun getBasicProductExcelModel(
