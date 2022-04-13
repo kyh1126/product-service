@@ -56,13 +56,14 @@ class ReleaseInfoStoreService(
                         basicProductByShippingProductId = basicProductByShippingProductId
                     )
                 // Case2: releaseId 가 null 인 releaseInfo 업데이트
-                isNeedToBeUpdatedReleaseId(targetReleaseInfoList, releaseModels) -> {
-                    val targetReleaseInfoId = releaseInfoByReleaseId[null]!!.id!!
+                isNeedToBeUpdatedReleaseId(releaseInfoByReleaseId) -> {
+                    val targetReleaseInfo = releaseInfoByReleaseId[null]!!
                     updateReleaseId(
-                        targetReleaseInfoId,
+                        targetReleaseInfo.id!!,
                         releaseModelDto,
                         basicProductByShippingProductId
                     )
+                    targetReleaseInfo.releaseId = releaseId
                 }
                 // Case3: releaseInfo 엔티티 생성
                 else -> {
@@ -120,10 +121,8 @@ class ReleaseInfoStoreService(
         }
     }
 
-    private fun isNeedToBeUpdatedReleaseId(
-        targetReleaseInfoList: List<ReleaseInfo>,
-        releaseModels: List<NosnosReleaseModel>
-    ) = targetReleaseInfoList.size == releaseModels.size
+    private fun isNeedToBeUpdatedReleaseId(releaseInfoByReleaseId: Map<Long?, ReleaseInfo>) =
+        releaseInfoByReleaseId.containsKey(null)
 
     private fun isExistingReleaseId(
         releaseId: Long,
