@@ -1,14 +1,10 @@
 package com.smartfoodnet.fnproduct.release
 
 import com.smartfoodnet.apiclient.OrderManagementServiceApiClient
-import com.smartfoodnet.apiclient.request.ShippingCodeRegisterModel
 import com.smartfoodnet.apiclient.request.TrackingDataModel
+import com.smartfoodnet.apiclient.request.TrackingNumberRegisterModel
 import com.smartfoodnet.apiclient.request.TrackingOptionModel
-import com.smartfoodnet.apiclient.response.CjDeliveryInfo
-import com.smartfoodnet.apiclient.response.LotteDeliveryInfoDetail
-import com.smartfoodnet.apiclient.response.NosnosReleaseItemModel
-import com.smartfoodnet.apiclient.response.NosnosReleaseModel
-import com.smartfoodnet.apiclient.response.PostOutboundModel
+import com.smartfoodnet.apiclient.response.*
 import com.smartfoodnet.common.error.exception.BaseRuntimeException
 import com.smartfoodnet.common.error.exception.ErrorCode
 import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
@@ -17,7 +13,7 @@ import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
 import com.smartfoodnet.fnproduct.release.entity.ReleaseProduct
 import com.smartfoodnet.fnproduct.release.model.dto.ReleaseModelDto
 import com.smartfoodnet.fnproduct.release.model.vo.DeliveryAgency
-import com.smartfoodnet.fnproduct.release.model.vo.ShippingCodeStatus
+import com.smartfoodnet.fnproduct.release.model.vo.TrackingNumberStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
@@ -32,7 +28,7 @@ class ReleaseInfoStoreService(
      * 노스노스에서 응답 받은 데이터로 ReleaseInfo 엔티티를 생성하는 함수
      */
     @Transactional
-    fun createFromOrderInfo(orderInfo : PostOutboundModel){
+    fun createFromOrderInfo(orderInfo: PostOutboundModel) {
         releaseInfoRepository.save(orderInfo.toReleaseInfo())
     }
 
@@ -80,18 +76,18 @@ class ReleaseInfoStoreService(
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun updateDeliveryCompletedAt(
         targetIds: Collection<Long>,
-        lotteDeliveryInfoByShippingCode: Map<String, LotteDeliveryInfoDetail> = emptyMap(),
-        cjDeliveryInfoByShippingCode: Map<String, CjDeliveryInfo> = emptyMap(),
+        lotteDeliveryInfoByTrackingNumber: Map<String, LotteDeliveryInfoDetail> = emptyMap(),
+        cjDeliveryInfoByTrackingNumber: Map<String, CjDeliveryInfo> = emptyMap(),
     ) {
         releaseInfoRepository.findAllById(targetIds).forEach { releaseInfo ->
             when {
-                lotteDeliveryInfoByShippingCode.isNotEmpty() -> {
-                    lotteDeliveryInfoByShippingCode[releaseInfo.shippingCode]?.let {
+                lotteDeliveryInfoByTrackingNumber.isNotEmpty() -> {
+                    lotteDeliveryInfoByTrackingNumber[releaseInfo.trackingNumber]?.let {
                         releaseInfo.updateDeliveryCompletedAt(it.procDateTime)
                     }
                 }
-                cjDeliveryInfoByShippingCode.isNotEmpty() -> {
-                    cjDeliveryInfoByShippingCode[releaseInfo.shippingCode]?.let {
+                cjDeliveryInfoByTrackingNumber.isNotEmpty() -> {
+                    cjDeliveryInfoByTrackingNumber[releaseInfo.trackingNumber]?.let {
                         releaseInfo.updateDeliveryCompletedAt(it.deliveryDateTime)
                     }
                 }
@@ -100,11 +96,11 @@ class ReleaseInfoStoreService(
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    fun updateShippingCodeStatus(ids: List<Long>, deliveryAgencyById: Map<Long, DeliveryAgency?>) {
+    fun updateTrackingNumberStatus(ids: List<Long>, deliveryAgencyById: Map<Long, DeliveryAgency?>) {
         val targetList = releaseInfoRepository.findAllById(ids)
 
         val targetMap = targetList
-            .flatMap { ShippingCodeRegisterModel.fromEntity(it, deliveryAgencyById) }
+            .flatMap { TrackingNumberRegisterModel.fromEntity(it, deliveryAgencyById) }
             .groupBy { Pair(it.partnerId, it.storeCode!!) }
 
         targetMap.entries.forEach { (key, models) ->
@@ -120,7 +116,7 @@ class ReleaseInfoStoreService(
         }
 
         targetList.forEach {
-            it.updateShippingCodeStatus(ShippingCodeStatus.WAITING_CALLBACK)
+            it.updateTrackingNumberStatus(TrackingNumberStatus.WAITING_CALLBACK)
         }
     }
 

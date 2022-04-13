@@ -29,24 +29,24 @@ class CjDeliveryInfoApiClient(
     override val restTemplate: RestTemplate,
 ) : RestTemplateClient(host, restTemplate) {
 
-    fun getDeliveryInfo(shippingCodes: List<String>): List<CjDeliveryInfo> {
+    fun getDeliveryInfo(trackingNumbers: List<String>): List<CjDeliveryInfo> {
         val responseEntity = externalGet<String>("/parcel/tracking")
         val csrf = getCSRF(responseEntity.body!!)
         val cookies = responseEntity.headers[HttpHeaders.SET_COOKIE] ?: emptyList()
 
-        return shippingCodes.mapNotNull { getDeliveryInfo(it, csrf, cookies) }
+        return trackingNumbers.mapNotNull { getDeliveryInfo(it, csrf, cookies) }
     }
 
     private fun getDeliveryInfo(
-        shippingCode: String,
+        trackingNumber: String,
         csrf: String,
         cookies: List<String>
     ): CjDeliveryInfo? {
-        if (csrf.isEmpty() || shippingCode.isEmpty() || cookies.isEmpty()) return null
+        if (csrf.isEmpty() || trackingNumber.isEmpty() || cookies.isEmpty()) return null
 
         val body = LinkedMultiValueMap<String, String>().apply {
             add("_csrf", csrf)
-            add("paramInvcNo", shippingCode)
+            add("paramInvcNo", trackingNumber)
         }
         val headers = HttpHeaders().apply {
             contentType = MediaType.APPLICATION_FORM_URLENCODED
@@ -55,11 +55,11 @@ class CjDeliveryInfoApiClient(
         val response =
             externalPost<CjDeliveryInfoModel>("/parcel/tracking-detail", body, headers).body
 
-        val deliveryDateTimeByShippingCode = response?.parcelDetailResultMap?.resultList
+        val deliveryDateTimeByTrackingNumber = response?.parcelDetailResultMap?.resultList
             ?.associateBy({ it.crgSt }, { it.deliveryDateTime }) ?: emptyMap()
 
         return response?.parcelResultMap?.resultList?.firstOrNull()?.apply {
-            deliveryDateTime = deliveryDateTimeByShippingCode[nsDlvNm]
+            deliveryDateTime = deliveryDateTimeByTrackingNumber[nsDlvNm]
         }
     }
 

@@ -18,7 +18,7 @@ enum class DeliveryStatus(
 ) {
     // LOTTE
     PARCEL_COLLECTION(DeliveryAgency.LOTTE, "10", "출력"),
-    SHIPPING_CODE_REGISTERED(DeliveryAgency.LOTTE, "12", "집하완료"),
+    TRACKING_NUMBER_REGISTERED(DeliveryAgency.LOTTE, "12", "집하완료"),
     IN_PROGRESS_LOTTE(DeliveryAgency.LOTTE, "20", "발송"),
     ARRIVAL(DeliveryAgency.LOTTE, "21", "도착"),
     BEFORE_SHIPPING(DeliveryAgency.LOTTE, "40", "배달전"),

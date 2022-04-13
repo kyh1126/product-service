@@ -1,12 +1,13 @@
 package com.smartfoodnet.apiclient.response
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
 import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
 import com.smartfoodnet.fnproduct.release.entity.ReleaseProduct
 import com.smartfoodnet.fnproduct.release.model.vo.ReleaseStatus
-import com.smartfoodnet.fnproduct.release.model.vo.ShippingCodeStatus
+import com.smartfoodnet.fnproduct.release.model.vo.TrackingNumberStatus
 import java.time.LocalDateTime
 
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy::class)
@@ -23,7 +24,8 @@ data class NosnosReleaseModel(
     val releaseStatus: Int? = null,
     val shippingOrderInfoId: Int? = null,
     val deliveryAgencyId: Int? = null,
-    val shippingCode: String? = null,
+    @JsonProperty("shipping_code")
+    val trackingNumber: String? = null,
     val etc1: String? = null,
     val etc2: String? = null,
     val etc3: String? = null,
@@ -48,13 +50,13 @@ data class NosnosReleaseModel(
             releaseCode = releaseCode!!,
             releaseStatus = ReleaseStatus.fromReleaseStatus(releaseStatus!!),
             deliveryAgencyId = deliveryAgencyId?.toLong(),
-            shippingCode = shippingCode,
+            trackingNumber = trackingNumber,
         )
 
         return releaseInfo.apply {
-            if (shippingCode != null) {
-                shippingCodeStatus = ShippingCodeStatus.getInitialStatus(uploadType)
-                shippingCodeCreatedAt = LocalDateTime.now()
+            if (trackingNumber != null) {
+                trackingNumberStatus = TrackingNumberStatus.getInitialStatus(uploadType)
+                trackingNumberCreatedAt = LocalDateTime.now()
             }
             releaseProducts.forEach { addReleaseProducts(it) }
         }

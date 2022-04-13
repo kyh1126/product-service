@@ -9,7 +9,6 @@ import com.smartfoodnet.apiclient.response.GetInboundModel
 import com.smartfoodnet.apiclient.response.GetInboundWorkModel
 import com.smartfoodnet.fninventory.inbound.entity.Inbound
 import org.springframework.stereotype.Service
-import java.lang.RuntimeException
 import java.time.format.DateTimeFormatter
 
 @Service
@@ -37,21 +36,21 @@ class NosnosClientService(
         return wmsApiClient.getInboundWork(params).payload!!
     }
 
-    fun getInbound(receivingPlanId : Long) : GetInboundModel?{
+    fun getInbound(receivingPlanId: Long): GetInboundModel? {
         return wmsApiClient.getInbound(receivingPlanId).payload
     }
 
-    fun cancelInbound(partnerId:Long, receivingPlanId : Long){
+    fun cancelInbound(partnerId: Long, receivingPlanId: Long) {
         wmsApiClient.cancelInbound(partnerId, receivingPlanId)
     }
 
-    fun sendInboundAndSetRegisterNo(inbound : Inbound){
-        val planProductList : List<PlanProduct> = inbound.expectedList.map {
+    fun sendInboundAndSetRegisterNo(inbound: Inbound) {
+        val planProductList: List<PlanProduct> = inbound.expectedList.map {
             PlanProduct(it.basicProduct.shippingProductId!!, it.requestQuantity)
         }
 
         val trackingNumbers = inbound.expectedList.mapNotNull {
-            if (it.trackingNo.isNullOrBlank()) null else it.trackingNo
+            if (it.trackingNumber.isNullOrBlank()) null else it.trackingNumber
         }.joinToString { it }
 
         val nosnosInboundCreateModel = NosnosInboundCreateModel(

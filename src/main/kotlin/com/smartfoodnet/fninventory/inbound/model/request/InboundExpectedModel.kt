@@ -3,7 +3,6 @@ package com.smartfoodnet.fninventory.inbound.model.request
 import com.smartfoodnet.fninventory.inbound.entity.InboundExpectedDetail
 import com.smartfoodnet.fninventory.inbound.model.vo.InboundMethodType
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
-import com.smartfoodnet.apiclient.request.PlanProduct
 import io.swagger.annotations.ApiModelProperty
 import org.hibernate.validator.constraints.Range
 import org.springframework.validation.annotation.Validated
@@ -21,7 +20,7 @@ data class InboundExpectedModel(
 
     @ApiModelProperty(value = "입고요청수량", example = "10")
     @field:NotNull(message = "입고요청수량을 입력하세요")
-    @field:Range(min=1, max=9999, message = "요청수량은 0~9,999까지 가능합니다")
+    @field:Range(min = 1, max = 9999, message = "요청수량은 0~9,999까지 가능합니다")
     val requestQuantity: Long = 0,
 
     @ApiModelProperty(value = "입고방식", example = "DELIVERY")
@@ -35,14 +34,14 @@ data class InboundExpectedModel(
     val deliveryName: String? = null,
 
     @ApiModelProperty(value = "택배송장번호", example = "123456789")
-    val trackingNo: String? = null
-){
-    fun toEntity(basicProduct : BasicProduct) = InboundExpectedDetail(
+    val trackingNumber: String? = null
+) {
+    fun toEntity(basicProduct: BasicProduct) = InboundExpectedDetail(
         basicProduct = basicProduct,
         requestQuantity = requestQuantity,
         method = inboundMethod,
         deliveryFlag = deliveryFlag,
         deliveryName = deliveryName,
-        trackingNo = trackingNo
+        trackingNumber = trackingNumber
     )
 }

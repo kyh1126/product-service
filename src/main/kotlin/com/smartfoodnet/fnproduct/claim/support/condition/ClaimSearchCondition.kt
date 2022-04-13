@@ -22,7 +22,7 @@ class ClaimSearchCondition(
     val claimedAt: LocalDate? = null,
 
     @ApiModelProperty(value = "원송장번호")
-    val originalShippingCode: String? = null,
+    val originalTrackingNumber: String? = null,
 
     @ApiModelProperty(value = "교환송장번호")
     val exchangeTrackingNumber: String? = null,
@@ -37,7 +37,7 @@ class ClaimSearchCondition(
     override fun assemblePredicate(predicate: BooleanBuilder): Predicate {
         return predicate.orAllOf(
             collectedOrder.partnerId.eq(partnerId),
-            originalShippingCode?.let { claim.releaseInfo.shippingCode.eq(it) },
+            originalTrackingNumber?.let { claim.releaseInfo.trackingNumber.eq(it) },
             exchangeTrackingNumber?.let { claim.exchangeRelease.trackingNumber.eq(it) },
             customerName?.let { claim.customerName.eq(it) },
             claimedAt?.let {

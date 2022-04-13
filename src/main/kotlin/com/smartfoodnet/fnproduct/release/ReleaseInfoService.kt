@@ -8,7 +8,6 @@ import com.smartfoodnet.apiclient.request.LotteTrackingDto
 import com.smartfoodnet.apiclient.response.CommonDataListModel
 import com.smartfoodnet.apiclient.response.NosnosReleaseItemModel
 import com.smartfoodnet.apiclient.response.NosnosReleaseModel
-import com.smartfoodnet.apiclient.response.PostOutboundModel
 import com.smartfoodnet.common.Constants.NOSNOS_INITIAL_PAGE
 import com.smartfoodnet.common.error.exception.BaseRuntimeException
 import com.smartfoodnet.common.model.response.PageResponse
@@ -26,7 +25,7 @@ import com.smartfoodnet.fnproduct.release.model.vo.DeliveryAgency
 import com.smartfoodnet.fnproduct.release.model.vo.DeliveryAgency.Companion.getDeliveryAgencyByName
 import com.smartfoodnet.fnproduct.release.model.vo.DeliveryStatus
 import com.smartfoodnet.fnproduct.release.model.vo.ReleaseStatus
-import com.smartfoodnet.fnproduct.release.model.vo.ShippingCodeStatus
+import com.smartfoodnet.fnproduct.release.model.vo.TrackingNumberStatus
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
@@ -157,7 +156,7 @@ class ReleaseInfoService(
         }
     }
 
-    fun registerShippingCode() {
+    fun registerTrackingNumber() {
         var page = PageRequest.of(0, 100, Sort.Direction.DESC, "id")
 
         val deliveryAgencyById = getDeliveryAgencyInfoList()
@@ -167,19 +166,19 @@ class ReleaseInfoService(
 
         while (true) {
             val targetList =
-                releaseInfoRepository.findByShippingCodeStatusAndShippingCodeIsNotNull(
-                    ShippingCodeStatus.BEFORE_REGISTER,
+                releaseInfoRepository.findByTrackingNumberStatusAndTrackingNumberIsNotNull(
+                    TrackingNumberStatus.BEFORE_REGISTER,
                     page
                 )
             if (!targetList.hasContent()) break
 
             try {
-                releaseInfoStoreService.updateShippingCodeStatus(
+                releaseInfoStoreService.updateTrackingNumberStatus(
                     targetList.content.map { it.id!! },
                     deliveryAgencyById
                 )
             } catch (e: BaseRuntimeException) {
-                log.error("[registerShippingCode] 플레이오토 송장등록 실패," +
+                log.error("[registerTrackingNumber] 플레이오토 송장등록 실패," +
                     " releaseIds: ${targetList.map { it.releaseId }}")
             }
 
@@ -278,17 +277,17 @@ class ReleaseInfoService(
         val lotteTargetList = targetList.content
             .filter { it.deliveryAgencyId == deliveryAgencyId }
         val request = lotteTargetList
-            .map { LotteTrackingDto(it.shippingCode!!, DeliveryStatus.COMPLETED_LOTTE.code) }
+            .map { LotteTrackingDto(it.trackingNumber!!, DeliveryStatus.COMPLETED_LOTTE.code) }
             .run { LotteDeliveryInfoDto(sendParamList = this) }
 
         try {
-            val deliveryInfoByShippingCode =
+            val deliveryInfoByTrackingNumber =
                 lotteDeliveryInfoApiClient.getDeliveryInfo(request)?.rtnList
                     ?.associateBy { it.invNo } ?: emptyMap()
 
             releaseInfoStoreService.updateDeliveryCompletedAt(
                 lotteTargetList.map { it.id!! },
-                lotteDeliveryInfoByShippingCode = deliveryInfoByShippingCode
+                lotteDeliveryInfoByTrackingNumber = deliveryInfoByTrackingNumber
             )
         } catch (e: BaseRuntimeException) {
             log.error("[syncDeliveryInfo] ${DeliveryAgency.LOTTE.playAutoName} 동기화 실패," +
@@ -301,17 +300,17 @@ class ReleaseInfoService(
         deliveryAgencyId: Long?
     ) {
         val cjTargetList = targetList.content.filter { it.deliveryAgencyId == deliveryAgencyId }
-        val shippingCodes = cjTargetList.map { it.shippingCode!! }
+        val trackingNumbers = cjTargetList.map { it.trackingNumber!! }
 
         try {
-            val deliveryInfoByShippingCode =
-                cjDeliveryInfoApiClient.getDeliveryInfo(shippingCodes)
+            val deliveryInfoByTrackingNumber =
+                cjDeliveryInfoApiClient.getDeliveryInfo(trackingNumbers)
                     .filter { it.nsDlvNm == DeliveryStatus.COMPLETED_CJ.code }
                     .associateBy { it.invcNo }
 
             releaseInfoStoreService.updateDeliveryCompletedAt(
                 cjTargetList.map { it.id!! },
-                cjDeliveryInfoByShippingCode = deliveryInfoByShippingCode
+                cjDeliveryInfoByTrackingNumber = deliveryInfoByTrackingNumber
             )
         } catch (e: BaseRuntimeException) {
             log.error("[syncDeliveryInfo] ${DeliveryAgency.CJ.playAutoName} 동기화 실패," +

@@ -3,7 +3,6 @@ package com.smartfoodnet.fninventory.inbound.entity
 import com.smartfoodnet.common.entity.BaseEntity
 import com.smartfoodnet.fninventory.inbound.model.vo.InboundMethodType
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
-import java.time.LocalDateTime
 import javax.persistence.*
 
 // 등록된 입고 정보 상세 Entity
@@ -34,7 +33,7 @@ class InboundExpectedDetail(
 
     val deliveryName: String? = null,
 
-    val trackingNo: String? = null
+    val trackingNumber: String? = null
 
-    ) : BaseEntity() {
+) : BaseEntity() {
 }

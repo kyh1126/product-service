@@ -28,7 +28,7 @@ class ReleaseInfoRepositoryImpl : Querydsl4RepositorySupport(ReleaseInfo::class.
                     eqUploadType(condition.uploadType),
                     eqClaimStatus(condition.claimStatus),
                     containsOrderCode(condition.orderCode),
-                    containsShippingCode(condition.shippingCode),
+                    containsTrackingNumber(condition.trackingNumber),
                 )
                 .groupBy(releaseInfo)
         }
@@ -55,6 +55,6 @@ class ReleaseInfoRepositoryImpl : Querydsl4RepositorySupport(ReleaseInfo::class.
     private fun containsOrderCode(orderCode: String?) =
         orderCode?.let { releaseInfo.orderCode.contains(it) }
 
-    private fun containsShippingCode(shippingCode: String?) =
-        shippingCode?.let { releaseInfo.shippingCode.contains(it) }
+    private fun containsTrackingNumber(trackingNumber: String?) =
+        trackingNumber?.let { releaseInfo.trackingNumber.contains(it) }
 }

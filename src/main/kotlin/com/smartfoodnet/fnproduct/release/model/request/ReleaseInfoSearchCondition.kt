@@ -34,5 +34,5 @@ class ReleaseInfoSearchCondition(
     var orderCode: String? = null,
 
     @ApiModelProperty(value = "송장번호")
-    var shippingCode: String? = null,
+    var trackingNumber: String? = null,
 )

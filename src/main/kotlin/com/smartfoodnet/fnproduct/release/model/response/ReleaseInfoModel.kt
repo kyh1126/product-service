@@ -8,7 +8,7 @@ import com.smartfoodnet.fnproduct.order.vo.DeliveryType
 import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
 import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
-import com.smartfoodnet.fnproduct.release.model.vo.ShippingCodeStatus
+import com.smartfoodnet.fnproduct.release.model.vo.TrackingNumberStatus
 import io.swagger.annotations.ApiModelProperty
 import java.time.LocalDateTime
 
@@ -35,16 +35,16 @@ data class ReleaseInfoModel(
     var deliveryAgencyName: String? = null,
 
     @ApiModelProperty(value = "송장번호")
-    var shippingCode: String? = null,
+    var trackingNumber: String? = null,
 
     @ApiModelProperty(
         value = "쇼핑몰송장등록 (NONE:송장없음/REGISTERED:자동등록성공/REGISTER_FAILED:자동등록실패/BEFORE_REGISTER:자동등록전/WAITING_CALLBACK:자동등록전(콜백대기중)/EXCEL_REGISTER:수기등록)",
         allowableValues = "NONE,REGISTERED,REGISTER_FAILED,BEFORE_REGISTER,WAITING_CALLBACK,EXCEL_REGISTER"
     )
-    var shippingCodeStatus: ShippingCodeStatus,
+    var trackingNumberStatus: TrackingNumberStatus,
 
     @ApiModelProperty(value = "송장번호부여일시")
-    var shippingCodeCreatedAt: LocalDateTime? = null,
+    var trackingNumberCreatedAt: LocalDateTime? = null,
 
     @ApiModelProperty(value = "배송완료일시")
     var deliveryCompletedAt: LocalDateTime? = null,
@@ -95,9 +95,9 @@ data class ReleaseInfoModel(
                     releaseId = releaseId,
                     releaseCode = releaseCode,
                     deliveryAgencyName = deliveryAgencyModel?.deliveryAgencyName,
-                    shippingCode = shippingCode,
-                    shippingCodeStatus = shippingCodeStatus,
-                    shippingCodeCreatedAt = shippingCodeCreatedAt,
+                    trackingNumber = trackingNumber,
+                    trackingNumberStatus = trackingNumberStatus,
+                    trackingNumberCreatedAt = trackingNumberCreatedAt,
                     deliveryCompletedAt = deliveryCompletedAt,
                     claimStatuses = collectedOrders.map { it.claimStatus },
                     deliveryType = firstCollectedOrder.deliveryType,

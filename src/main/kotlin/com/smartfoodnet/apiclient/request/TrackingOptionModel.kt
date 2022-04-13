@@ -19,18 +19,18 @@ class TrackingDataModel(
     val sendno: String? = null
 ) {
     companion object {
-        fun fromModel(model: ShippingCodeRegisterModel): TrackingDataModel {
+        fun fromModel(model: TrackingNumberRegisterModel): TrackingDataModel {
             return TrackingDataModel(
                 ocode = model.orderNumber,
                 gname = model.receiverName,
                 sender = model.deliveryAgency?.playAutoName,
-                sendno = model.shippingCode
+                sendno = model.trackingNumber
             )
         }
     }
 }
 
-class ShippingCodeRegisterModel(
+class TrackingNumberRegisterModel(
     @ApiModelProperty(value = "화주(고객사) ID")
     val partnerId: Long,
     @ApiModelProperty(value = "쇼핑몰 코드")
@@ -42,23 +42,23 @@ class ShippingCodeRegisterModel(
     @ApiModelProperty(value = "택배사")
     val deliveryAgency: DeliveryAgency? = null,
     @ApiModelProperty(value = "송장번호")
-    val shippingCode: String? = null
+    val trackingNumber: String? = null
 ) {
     companion object {
         fun fromEntity(
             releaseInfo: ReleaseInfo,
             deliveryAgencyById: Map<Long, DeliveryAgency?>
-        ): List<ShippingCodeRegisterModel> {
+        ): List<TrackingNumberRegisterModel> {
             val collectedOrders = getCollectedOrders(releaseInfo)
 
             return collectedOrders.map {
-                ShippingCodeRegisterModel(
+                TrackingNumberRegisterModel(
                     partnerId = it.partnerId,
                     storeCode = it.storeCode,
                     orderNumber = it.orderNumber,
                     receiverName = it.receiver.name,
                     deliveryAgency = deliveryAgencyById[releaseInfo.deliveryAgencyId],
-                    shippingCode = releaseInfo.shippingCode
+                    trackingNumber = releaseInfo.trackingNumber
                 )
             }
         }

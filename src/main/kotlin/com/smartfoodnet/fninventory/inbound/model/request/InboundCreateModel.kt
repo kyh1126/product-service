@@ -26,16 +26,16 @@ data class InboundCreateModel(
     @field:Valid
     val expectedList: List<InboundExpectedModel> = listOf()
 
-){
+) {
     fun toEntity() = Inbound(
         partnerId = partnerId,
         expectedDate = expectedDate,
         status = InboundStatusType.EXPECTED
     )
 
-    fun toNosNosModel(planProductList : List<PlanProduct>) : NosnosInboundCreateModel {
+    fun toNosNosModel(planProductList: List<PlanProduct>): NosnosInboundCreateModel {
 
-        val trackingNumbers = expectedList.map { it.trackingNo }.joinToString { it!! }
+        val trackingNumbers = expectedList.map { it.trackingNumber }.joinToString { it!! }
 
         return NosnosInboundCreateModel(
             memberId = partnerId,

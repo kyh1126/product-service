@@ -5,7 +5,7 @@ import com.smartfoodnet.common.entity.SimpleBaseEntity
 import com.smartfoodnet.fnproduct.order.entity.ConfirmOrder
 import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
 import com.smartfoodnet.fnproduct.release.model.vo.ReleaseStatus
-import com.smartfoodnet.fnproduct.release.model.vo.ShippingCodeStatus
+import com.smartfoodnet.fnproduct.release.model.vo.TrackingNumberStatus
 import java.time.LocalDateTime
 import javax.persistence.*
 
@@ -36,15 +36,15 @@ class ReleaseInfo(
     @Column(name = "delivery_agency_id")
     var deliveryAgencyId: Long? = null,
 
-    @Column(name = "shipping_code")
-    var shippingCode: String? = null,
+    @Column(name = "tracking_number")
+    var trackingNumber: String? = null,
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "shipping_code_status")
-    var shippingCodeStatus: ShippingCodeStatus = ShippingCodeStatus.NONE,
+    @Column(name = "tracking_number_status")
+    var trackingNumberStatus: TrackingNumberStatus = TrackingNumberStatus.NONE,
 
-    @Column(name = "shipping_code_created_at")
-    var shippingCodeCreatedAt: LocalDateTime? = null,
+    @Column(name = "tracking_number_created_at")
+    var trackingNumberCreatedAt: LocalDateTime? = null,
 
     @Column(name = "delivery_completed_at")
     var deliveryCompletedAt: LocalDateTime? = null,
@@ -72,12 +72,12 @@ class ReleaseInfo(
     ) {
         releaseStatus = ReleaseStatus.fromReleaseStatus(request.releaseStatus!!)
         deliveryAgencyId = request.deliveryAgencyId?.toLong()
-        shippingCode = request.shippingCode
-        if (shippingCode != null) {
-            shippingCodeStatus =
-                if (shippingCodeStatus.isInProgress()) shippingCodeStatus
-                else ShippingCodeStatus.getInitialStatus(uploadType)
-            shippingCodeCreatedAt = shippingCodeCreatedAt ?: LocalDateTime.now()
+        trackingNumber = request.trackingNumber
+        if (trackingNumber != null) {
+            trackingNumberStatus =
+                if (trackingNumberStatus.isInProgress()) trackingNumberStatus
+                else TrackingNumberStatus.getInitialStatus(uploadType)
+            trackingNumberCreatedAt = trackingNumberCreatedAt ?: LocalDateTime.now()
         }
 
         // 양방향
@@ -90,8 +90,8 @@ class ReleaseInfo(
         releaseCode = request.releaseCode
     }
 
-    fun updateShippingCodeStatus(status: ShippingCodeStatus) {
-        shippingCodeStatus = status
+    fun updateTrackingNumberStatus(status: TrackingNumberStatus) {
+        trackingNumberStatus = status
     }
 
     fun updateDeliveryCompletedAt(procDateTime: LocalDateTime?) {

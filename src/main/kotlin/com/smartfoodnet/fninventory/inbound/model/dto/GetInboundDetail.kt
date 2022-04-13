@@ -1,7 +1,6 @@
 package com.smartfoodnet.fninventory.inbound.model.dto
 
 import com.fasterxml.jackson.annotation.JsonFormat
-import com.querydsl.core.annotations.QueryProjection
 import com.smartfoodnet.common.Constants
 import com.smartfoodnet.fninventory.inbound.entity.InboundActualDetail
 import com.smartfoodnet.fninventory.inbound.entity.InboundExpectedDetail
@@ -11,12 +10,12 @@ import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import java.time.LocalDateTime
 
 data class InboundBasicProductModel(
-    val basicProductId : Long,
-    val basicProductName : String,
-    val basicProductCode : String
-){
-    companion object{
-        fun toDto(basicProduct: BasicProduct): InboundBasicProductModel{
+    val basicProductId: Long,
+    val basicProductName: String,
+    val basicProductCode: String
+) {
+    companion object {
+        fun toDto(basicProduct: BasicProduct): InboundBasicProductModel {
             return basicProduct.run {
                 InboundBasicProductModel(
                     basicProductId = id!!,
@@ -37,19 +36,19 @@ data class GetInboundDetailModel(
     val registrationId: Long? = null,
     val memo: String? = null,
     val status: InboundStatusType,
-    val basicProduct : InboundBasicProductModel,
-    val expectedDetailId : Long,
+    val basicProduct: InboundBasicProductModel,
+    val expectedDetailId: Long,
     val requestQuantity: Long,
     val method: InboundMethodType? = null,
     val deliveryFlag: Boolean = false,
     val deliveryName: String? = null,
-    val trackingNo: String? = null,
+    val trackingNumber: String? = null,
     val inboundActualList: List<InboundActualModel>,
     @JsonFormat(pattern = Constants.TIMESTAMP_FORMAT)
     val createdAt: LocalDateTime
-){
+) {
     companion object {
-        fun toDto(inboundExpectedDetail: InboundExpectedDetail) : GetInboundDetailModel {
+        fun toDto(inboundExpectedDetail: InboundExpectedDetail): GetInboundDetailModel {
             val inbound = inboundExpectedDetail.inbound!!
 
             return GetInboundDetailModel(
@@ -66,8 +65,9 @@ data class GetInboundDetailModel(
                 method = inboundExpectedDetail.method,
                 deliveryFlag = inboundExpectedDetail.deliveryFlag,
                 deliveryName = inboundExpectedDetail.deliveryName,
-                trackingNo = inboundExpectedDetail.trackingNo,
-                inboundActualList = inboundExpectedDetail.inboundActualDetail?.map{ InboundActualModel.toDto(it) }?: listOf(),
+                trackingNumber = inboundExpectedDetail.trackingNumber,
+                inboundActualList = inboundExpectedDetail.inboundActualDetail?.map { InboundActualModel.toDto(it) }
+                    ?: listOf(),
                 createdAt = inbound.createdAt!!
             )
         }
@@ -83,9 +83,9 @@ data class InboundActualModel(
     val palletQuantity: Long? = null,
     val manufactureDate: LocalDateTime? = null,
     val expirationDate: LocalDateTime? = null
-){
-    companion object{
-        fun toDto(inboundActualDetail : InboundActualDetail) : InboundActualModel{
+) {
+    companion object {
+        fun toDto(inboundActualDetail: InboundActualDetail): InboundActualModel {
             return inboundActualDetail.run {
                 InboundActualModel(
                     actualDetailId = id!!,
