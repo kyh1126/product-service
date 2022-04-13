@@ -40,9 +40,8 @@ class ReleaseInfoStoreService(
         basicProductByShippingProductId: Map<Long, BasicProduct>,
         targetReleaseInfoList: List<ReleaseInfo>
     ) {
-        val releaseInfoByReleaseId = targetReleaseInfoList.associateBy { it.releaseId }
-
         releaseModels.map { model ->
+            val releaseInfoByReleaseId = targetReleaseInfoList.associateBy { it.releaseId }
             val releaseId = model.releaseId!!.toLong()
             val releaseItemModels = itemModelsByReleaseId[releaseId] ?: emptyList()
             val releaseModelDto = ReleaseModelDto(model, releaseItemModels)
