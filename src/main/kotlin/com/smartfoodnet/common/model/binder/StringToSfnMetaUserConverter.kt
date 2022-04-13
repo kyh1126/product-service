@@ -9,5 +9,9 @@ import org.springframework.stereotype.Component
 class StringToSfnMetaUserConverter(
     private val objectMapper: ObjectMapper
 ) : Converter<String, SfnMetaUser?> {
-    override fun convert(source: String): SfnMetaUser? = objectMapper.readValue(source, SfnMetaUser::class.java)
+    override fun convert(source: String): SfnMetaUser? {
+        val sfnMetaUser: SfnMetaUser? = objectMapper.readValue(source, SfnMetaUser::class.java)
+        sfnMetaUser?.decodeName()
+        return sfnMetaUser
+    }
 }
