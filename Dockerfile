@@ -5,6 +5,6 @@ COPY build/libs/app.jar app.jar
 ENV SPRING_PROFILE 'dev'
 
 ENV TZ=Asia/Seoul
-RUN apt-get install -y tzdata
+RUN apt-get update ; apt-get upgrade -y ; apt-get install -y tzdata curl
 
 ENTRYPOINT ["java","-jar","-Dspring.profiles.active=${SPRING_PROFILE}", "/app.jar"]
