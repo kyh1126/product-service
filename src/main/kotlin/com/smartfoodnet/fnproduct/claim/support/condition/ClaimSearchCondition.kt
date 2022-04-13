@@ -1,20 +1,17 @@
 package com.smartfoodnet.fnproduct.claim.support.condition
 
 import com.fasterxml.jackson.annotation.JsonFormat
-import com.fasterxml.jackson.annotation.JsonIgnore
 import com.querydsl.core.BooleanBuilder
 import com.querydsl.core.types.Predicate
 import com.smartfoodnet.common.Constants
 import com.smartfoodnet.common.model.request.PredicateSearchCondition
 import com.smartfoodnet.fnproduct.claim.entity.QClaim.claim
 import com.smartfoodnet.fnproduct.claim.model.vo.ClaimStatus
-import com.smartfoodnet.fnproduct.order.entity.QCollectedOrder.collectedOrder
 import io.swagger.annotations.ApiModelProperty
 import java.time.LocalDate
 
 class ClaimSearchCondition(
-    @JsonIgnore
-    @ApiModelProperty(hidden = true)
+    @ApiModelProperty(value = "반품접수일")
     var partnerId: Long? = null,
 
     @JsonFormat(pattern = Constants.TIMESTAMP_FORMAT)
@@ -36,7 +33,7 @@ class ClaimSearchCondition(
 ) : PredicateSearchCondition() {
     override fun assemblePredicate(predicate: BooleanBuilder): Predicate {
         return predicate.orAllOf(
-            collectedOrder.partnerId.eq(partnerId),
+            partnerId?.let { claim.partnerId.eq(partnerId) },
             originalShippingCode?.let { claim.releaseInfo.shippingCode.eq(it) },
             exchangeTrackingNumber?.let { claim.exchangeRelease.trackingNumber.eq(it) },
             customerName?.let { claim.customerName.eq(it) },
