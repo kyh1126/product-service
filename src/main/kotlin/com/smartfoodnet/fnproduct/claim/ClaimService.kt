@@ -88,9 +88,9 @@ class ClaimService(
         exchangeRelease.exchangeProducts.addAll(buildExchangeProducts(exchangeReleaseCreateModel, exchangeRelease))
         claim.exchangeRelease = exchangeRelease
 
-        sendExchangeReleaseOutbound(exchangeRelease)
-
         exchangeReleaseRepository.save(exchangeRelease)
+
+        sendExchangeReleaseOutbound(exchangeRelease)
     }
 
     private fun sendExchangeReleaseOutbound(exchangeRelease: ExchangeRelease) {
