@@ -160,18 +160,20 @@ class ClaimService(
 
         val returnInfo = buildReturnInfo(claimCreateModel, receiver)
 
-        return claimCreateModel.run {
+        val claim = claimCreateModel.run {
             Claim(
                 partnerId = partnerId,
                 claimedAt = claimedAt,
                 customerName = customerName,
                 claimReason = claimReason,
                 memo = memo,
-                releaseInfo = releaseInfo,
-                returnInfo = returnInfo
+                releaseInfo = releaseInfo
             )
         }
 
+        claim.addReturnInfo(returnInfo)
+
+        return claim
     }
 
     private fun buildReturnInfo(claimCreateModel: ClaimCreateModel, receiver: Receiver): ReturnInfo {

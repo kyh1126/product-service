@@ -55,4 +55,9 @@ class Claim(
     @OneToOne(cascade = [CascadeType.PERSIST])
     @JoinColumn(name = "release_info_id", foreignKey = ForeignKey(name = "FK_release_info__claim"), columnDefinition = "BIGINT UNSIGNED")
     val releaseInfo: ReleaseInfo? = null
-): BaseEntity()
+): BaseEntity() {
+    fun addReturnInfo(returnInfo: ReturnInfo) {
+        this.returnInfo = returnInfo
+        returnInfo.claim = this
+    }
+}

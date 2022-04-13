@@ -51,5 +51,5 @@ class ReturnInfo(
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "claim_id", foreignKey = ForeignKey(name = "FK_claim__return_info"), columnDefinition = "BIGINT UNSIGNED")
-    val claim: Claim? = null
+    var claim: Claim? = null
 ): BaseEntity()
