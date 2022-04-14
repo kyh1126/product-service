@@ -17,6 +17,9 @@ class ReleaseInfo(
     @Column(name = "id", columnDefinition = "BIGINT UNSIGNED")
     var id: Long? = null,
 
+    @Column(name = "partner_id", columnDefinition = "BIGINT UNSIGNED")
+    var partnerId: Long,
+
     @Column(name = "order_id")
     var orderId: Long,
 

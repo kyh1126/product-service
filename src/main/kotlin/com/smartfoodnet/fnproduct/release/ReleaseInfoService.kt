@@ -1,6 +1,7 @@
 package com.smartfoodnet.fnproduct.release
 
 import com.smartfoodnet.apiclient.LotteDeliveryInfoApiClient
+import com.smartfoodnet.apiclient.PartnerApiClient
 import com.smartfoodnet.apiclient.WmsApiClient
 import com.smartfoodnet.apiclient.request.LotteDeliveryInfoDto
 import com.smartfoodnet.apiclient.request.LotteTrackingDto
@@ -40,6 +41,7 @@ class ReleaseInfoService(
     private val confirmOrderService: ConfirmOrderService,
     private val releaseInfoRepository: ReleaseInfoRepository,
     private val wmsApiClient: WmsApiClient,
+    private val partnerApiClient: PartnerApiClient,
     private val lotteDeliveryInfoApiClient: LotteDeliveryInfoApiClient,
 ) {
     fun getReleaseInfoList(
@@ -55,13 +57,15 @@ class ReleaseInfoService(
         }.run { PageResponse.of(this) }
     }
 
-    fun syncReleaseInfo() {
+    fun syncReleaseInfo(partnerId: Long?) {
         var page = PageRequest.of(0, 100, Sort.Direction.DESC, "id")
         val doneOrderIds = mutableSetOf<Long>()
 
         while (true) {
             val targetList =
-                releaseInfoRepository.findAllByReleaseStatusIn(ReleaseStatus.SYNCABLE_STATUSES, page)
+                if (partnerId == null) releaseInfoRepository.findAllByReleaseStatusIn(ReleaseStatus.SYNCABLE_STATUSES, page)
+                else releaseInfoRepository.findAllByReleaseStatusInAndPartnerId(ReleaseStatus.SYNCABLE_STATUSES, partnerId, page)
+
             if (!targetList.hasContent()) break
 
             val orderIds = targetList.filter { it.orderId !in doneOrderIds }
@@ -72,7 +76,7 @@ class ReleaseInfoService(
             }
 
             try {
-                val releaseModelsByOrderId = getReleases(orderIds = orderIds)
+                val releaseModelsByOrderId = getReleases(partnerId = partnerId, orderIds = orderIds)
                     .groupBy { it.orderId!!.toLong() }
                 val itemModelsByReleaseId = getReleaseItems(releaseModelsByOrderId)
                     .groupBy { it.releaseId!!.toLong() }
@@ -186,7 +190,7 @@ class ReleaseInfoService(
         }
     }
 
-    private fun getReleases(orderIds: Set<Long>): List<NosnosReleaseModel> {
+    private fun getReleases(partnerId: Long?, orderIds: Set<Long>): List<NosnosReleaseModel> {
         val releases = mutableListOf<NosnosReleaseModel>()
         var page = NOSNOS_INITIAL_PAGE
         var totalPage = NOSNOS_INITIAL_PAGE
@@ -194,7 +198,7 @@ class ReleaseInfoService(
         while (page <= totalPage) {
             val model: CommonDataListModel<NosnosReleaseModel>?
             try {
-                model = wmsApiClient.getReleases(orderIds = orderIds.toList(), page = page).payload
+                model = wmsApiClient.getReleases(partnerId = partnerId, orderIds = orderIds.toList(), page = page).payload
             } catch (e: Exception) {
                 log.error("[getReleases] orderIds: ${orderIds}, page: ${page}, error: ${e.message}")
                 throw BaseRuntimeException(errorMessage = "출고 정보 조회 실패, orderIds: ${orderIds}, page: ${page}")
@@ -252,13 +256,13 @@ class ReleaseInfoService(
         itemModelsByReleaseId: Map<Long, List<NosnosReleaseItemModel>>,
         basicProductByShippingProductId: Map<Long, BasicProduct>
     ) {
-        val releaseInfoListByOrderId = releaseInfoRepository.findByOrderId(orderId)
+        val targetReleaseInfoList = releaseInfoRepository.findByOrderId(orderId)
         try {
             releaseInfoStoreService.createOrUpdateReleaseInfo(
                 releaseModels,
                 itemModelsByReleaseId,
                 basicProductByShippingProductId,
-                releaseInfoListByOrderId
+                targetReleaseInfoList,
             )
         } catch (e: BaseRuntimeException) {
             log.error("orderId: ${orderId} releaseInfo 동기화 실패")
