@@ -17,6 +17,7 @@ import com.smartfoodnet.fnproduct.release.model.vo.TrackingNumberStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Service
 @Transactional
@@ -77,7 +78,7 @@ class ReleaseInfoStoreService(
     fun updateDeliveryCompletedAt(
         targetIds: Collection<Long>,
         lotteDeliveryInfoByTrackingNumber: Map<String, LotteDeliveryInfoDetail> = emptyMap(),
-        cjDeliveryInfoByTrackingNumber: Map<String, CjDeliveryInfo> = emptyMap(),
+        cjDeliveryInfoByTrackingNumber: Map<String, CjDeliveryStatusModel> = emptyMap(),
     ) {
         releaseInfoRepository.findAllById(targetIds).forEach { releaseInfo ->
             when {
@@ -88,7 +89,7 @@ class ReleaseInfoStoreService(
                 }
                 cjDeliveryInfoByTrackingNumber.isNotEmpty() -> {
                     cjDeliveryInfoByTrackingNumber[releaseInfo.trackingNumber]?.let {
-                        releaseInfo.updateDeliveryCompletedAt(it.deliveryDateTime)
+                        releaseInfo.updateDeliveryCompletedAt(LocalDateTime.now()) // TODO: 노스노스측 답변 기다려보기
                     }
                 }
             }

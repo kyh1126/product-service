@@ -151,8 +151,13 @@ interface WmsApiClient {
     // ---------------------------------------------------------------------------------------------
     // -- 로케이션,택배
     // ---------------------------------------------------------------------------------------------
-    @GetMapping("delivery-agency/info/bulk")
+    @GetMapping("delivery/agency/info/bulk")
     fun getDeliveryAgencyInfoList(): CommonResponse<CommonDataListModel<NosnosDeliveryAgencyInfoModel>>
+
+    @GetMapping("delivery/cj/status/bulk")
+    fun getCjDeliveryStatuses(
+        @RequestParam shippingCodes: List<String>? = null
+    ): CommonResponse<CommonDataListModel<CjDeliveryStatusModel>>
 
 }
 
