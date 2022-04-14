@@ -16,6 +16,9 @@ data class ReleaseInfoModel(
     @ApiModelProperty(value = "id")
     val id: Long,
 
+    @ApiModelProperty(value = "화주(고객)사 ID", example = "11")
+    var partnerId: Long,
+
     @ApiModelProperty(value = "NOSNOS 발주 id")
     var orderId: Long,
 
@@ -89,6 +92,7 @@ data class ReleaseInfoModel(
 
                 ReleaseInfoModel(
                     id = id!!,
+                    partnerId = partnerId,
                     orderId = orderId,
                     orderCode = orderCode,
                     orderStatus = releaseStatus.orderStatus,

@@ -69,6 +69,7 @@ interface WmsApiClient {
     // ---------------------------------------------------------------------------------------------
     @GetMapping("release/bulk")
     fun getReleases(
+        @RequestParam(required = false) partnerId: Long? = null,
         @RequestParam(required = false) releaseIds: List<Long>? = null,
         @RequestParam(required = false) orderIds: List<Long>? = null,
         @RequestParam(required = false) shippingOrderInfoId: Int? = null,

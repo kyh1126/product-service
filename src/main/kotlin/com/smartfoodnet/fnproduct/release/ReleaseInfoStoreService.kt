@@ -29,11 +29,13 @@ class ReleaseInfoStoreService(
      * 노스노스에서 응답 받은 데이터로 ReleaseInfo 엔티티를 생성하는 함수
      */
     @Transactional
-    fun createFromOrderInfo(orderInfo: PostOutboundModel) {
-        releaseInfoRepository.save(orderInfo.toReleaseInfo())
+    fun createFromOrderInfo(partnerId: Long, orderInfo: PostOutboundModel) {
+        releaseInfoRepository.save(orderInfo.toReleaseInfo(partnerId))
     }
 
-
+    /**
+     * OrderId 별 트랜잭션 시작
+     */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun createOrUpdateReleaseInfo(
         releaseModels: List<NosnosReleaseModel>,
@@ -67,8 +69,12 @@ class ReleaseInfoStoreService(
                 }
                 // Case3: releaseInfo 엔티티 생성
                 else -> {
-                    val uploadType = getUploadType(targetReleaseInfoList.first())
-                    createReleaseInfo(releaseModelDto, basicProductByShippingProductId, uploadType)
+                    val firstTargetReleaseInfo = targetReleaseInfoList.first()
+                    createReleaseInfo(
+                        releaseModelDto,
+                        basicProductByShippingProductId,
+                        firstTargetReleaseInfo
+                    )
                 }
             }
         }
@@ -89,7 +95,7 @@ class ReleaseInfoStoreService(
                 }
                 cjDeliveryInfoByTrackingNumber.isNotEmpty() -> {
                     cjDeliveryInfoByTrackingNumber[releaseInfo.trackingNumber]?.let {
-                        releaseInfo.updateDeliveryCompletedAt(LocalDateTime.now()) // TODO: 노스노스측 답변 기다려보기
+                        releaseInfo.updateDeliveryCompletedAt(LocalDateTime.now())
                     }
                 }
             }
@@ -175,7 +181,7 @@ class ReleaseInfoStoreService(
     private fun createReleaseInfo(
         releaseModelDto: ReleaseModelDto,
         basicProductByShippingProductId: Map<Long, BasicProduct>,
-        uploadType: OrderUploadType
+        firstTargetReleaseInfo: ReleaseInfo,
     ) {
         val (releaseModel, releaseItemModels) = releaseModelDto
 
@@ -185,7 +191,10 @@ class ReleaseInfoStoreService(
             basicProductByShippingProductId = basicProductByShippingProductId
         )
 
-        val releaseInfo = releaseModel.toEntity(releaseProducts, uploadType)
+        val uploadType = getUploadType(firstTargetReleaseInfo)
+        val partnerId = firstTargetReleaseInfo.partnerId
+
+        val releaseInfo = releaseModel.toEntity(releaseProducts, uploadType, partnerId)
         releaseInfoRepository.save(releaseInfo)
     }
 

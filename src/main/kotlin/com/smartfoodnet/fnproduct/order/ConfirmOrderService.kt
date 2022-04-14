@@ -5,11 +5,7 @@ import com.smartfoodnet.apiclient.request.RequestOrderMapper
 import com.smartfoodnet.common.error.exception.BaseRuntimeException
 import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.fnproduct.order.dto.ConfirmProductModel
-import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
-import com.smartfoodnet.fnproduct.order.entity.ConfirmOrder
-import com.smartfoodnet.fnproduct.order.entity.ConfirmProduct
-import com.smartfoodnet.fnproduct.order.entity.ConfirmRequestOrder
-import com.smartfoodnet.fnproduct.order.entity.Memo
+import com.smartfoodnet.fnproduct.order.entity.*
 import com.smartfoodnet.fnproduct.order.model.ConfirmProductAddModel
 import com.smartfoodnet.fnproduct.order.model.ConfirmProductMappedModel
 import com.smartfoodnet.fnproduct.order.model.RequestOrderCreateModel
@@ -130,7 +126,7 @@ class ConfirmOrderService(
         for ((index, confirmOrder) in sendOrderList.withIndex()) {
             val orderInfo = response[index]
             confirmOrder.setOrderInfo(orderInfo.orderId, orderInfo.orderCode)
-            releaseInfoStoreService.createFromOrderInfo(orderInfo)
+            releaseInfoStoreService.createFromOrderInfo(partnerId, orderInfo)
         }
 
         return sendOrderList

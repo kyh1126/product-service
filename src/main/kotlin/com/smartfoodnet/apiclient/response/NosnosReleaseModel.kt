@@ -42,8 +42,13 @@ data class NosnosReleaseModel(
     val shippingMessage: String? = null,
     val channelId: Int? = null,
 ) {
-    fun toEntity(releaseProducts: Set<ReleaseProduct>, uploadType: OrderUploadType): ReleaseInfo {
+    fun toEntity(
+        releaseProducts: Set<ReleaseProduct>,
+        uploadType: OrderUploadType,
+        partnerId: Long
+    ): ReleaseInfo {
         val releaseInfo = ReleaseInfo(
+            partnerId = partnerId,
             orderId = orderId!!.toLong(),
             orderCode = orderCode!!,
             releaseId = releaseId!!.toLong(),

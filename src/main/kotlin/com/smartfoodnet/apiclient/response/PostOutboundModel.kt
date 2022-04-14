@@ -10,8 +10,9 @@ class PostOutboundModel(
     @JsonProperty("order_id")
     val orderId: Long
 ) {
-    fun toReleaseInfo(): ReleaseInfo {
+    fun toReleaseInfo(partnerId: Long): ReleaseInfo {
         return ReleaseInfo(
+            partnerId = partnerId,
             orderId = orderId,
             orderCode = orderCode,
             trackingNumberStatus = TrackingNumberStatus.NONE
