@@ -55,6 +55,29 @@ class ClaimService(
         claimRepository.save(claim)
     }
 
+    @Transactional
+    fun createExchangeRelease(exchangeReleaseCreateModel: ExchangeReleaseCreateModel) {
+        val claim = claimRepository.findByIdOrNull(exchangeReleaseCreateModel.claimId)
+            ?: throw NoSuchElementError("Claim이 존재하지 않습니다: [claimId: ${exchangeReleaseCreateModel.claimId}]")
+        val exchangeRelease = ExchangeRelease(
+            receiver = exchangeReleaseCreateModel.receiver?.toEntity() ?: claim.returnInfo!!.receiver,
+            claim = claim
+        )
+
+        exchangeRelease.exchangeProducts.addAll(buildExchangeProducts(exchangeReleaseCreateModel, exchangeRelease))
+        claim.exchangeRelease = exchangeRelease
+
+        exchangeReleaseRepository.save(exchangeRelease)
+
+        sendExchangeReleaseOutbound(exchangeRelease)
+    }
+
+    fun syncReturnInfoWithNosnos(claim: Claim) {
+        val nosnosReturnModel = wmsApiClient.getReleaseReturn(claim.returnInfo?.nosnosReleaseReturnInfoId
+            ?: throw NoSuchElementError("반품정보가 존재하지 않습니다. [claimId: ${claim.id}]"))
+//        claim.returnInfo.
+    }
+
     private fun sendReleaseReturn(claim: Claim) {
         val returnItems = claim.returnInfo?.returnProducts?.map {
             ReturnItemCreateModel(shippingProductId = it.basicProduct.shippingProductId!!, quantity = it.requestQuantity)
@@ -74,23 +97,6 @@ class ClaimService(
         val returnModel = wmsApiClient.createReleaseReturn(returnCreateModel)
         claim.returnInfo?.nosnosReleaseReturnInfoId = returnModel?.releaseReturnInfoId
         claim.returnInfo?.returnCode = returnModel?.returnCode
-    }
-
-    @Transactional
-    fun createExchangeRelease(exchangeReleaseCreateModel: ExchangeReleaseCreateModel) {
-        val claim = claimRepository.findByIdOrNull(exchangeReleaseCreateModel.claimId)
-            ?: throw NoSuchElementError("Claim이 존재하지 않습니다: [claimId: ${exchangeReleaseCreateModel.claimId}]")
-        val exchangeRelease = ExchangeRelease(
-            receiver = exchangeReleaseCreateModel.receiver?.toEntity() ?: claim.returnInfo!!.receiver,
-            claim = claim
-        )
-
-        exchangeRelease.exchangeProducts.addAll(buildExchangeProducts(exchangeReleaseCreateModel, exchangeRelease))
-        claim.exchangeRelease = exchangeRelease
-
-        exchangeReleaseRepository.save(exchangeRelease)
-
-        sendExchangeReleaseOutbound(exchangeRelease)
     }
 
     private fun sendExchangeReleaseOutbound(exchangeRelease: ExchangeRelease) {
