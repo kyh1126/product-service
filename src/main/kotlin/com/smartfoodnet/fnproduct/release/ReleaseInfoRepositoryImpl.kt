@@ -27,6 +27,7 @@ class ReleaseInfoRepositoryImpl : Querydsl4RepositorySupport(ReleaseInfo::class.
                     eqReceiverName(condition.receiverName),
                     eqUploadType(condition.uploadType),
                     eqClaimStatus(condition.claimStatus),
+                    eqPartnerId(condition.partnerId),
                     containsOrderCode(condition.orderCode),
                     containsTrackingNumber(condition.trackingNumber),
                 )
@@ -51,6 +52,9 @@ class ReleaseInfoRepositoryImpl : Querydsl4RepositorySupport(ReleaseInfo::class.
 
     private fun eqClaimStatus(claimStatus: ClaimStatus?) =
         claimStatus?.let { collectedOrder.claimStatus.eq(it) }
+
+    private fun eqPartnerId(partnerId: Long?) =
+        partnerId?.let { releaseInfo.partnerId.eq(partnerId) }
 
     private fun containsOrderCode(orderCode: String?) =
         orderCode?.let { releaseInfo.orderCode.contains(it) }
