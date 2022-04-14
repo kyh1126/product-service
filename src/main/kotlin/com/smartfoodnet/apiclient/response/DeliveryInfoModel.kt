@@ -94,8 +94,6 @@ class CjDeliveryInfoDetail(
 
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy::class)
 class CjDeliveryStatusModel(
-    val deliveryAgencyId: Int,
-    val deliveryAgencyName: String,
     @JsonProperty("shipping_code")
     val trackingNumber: String,
     val releaseId: Int,
