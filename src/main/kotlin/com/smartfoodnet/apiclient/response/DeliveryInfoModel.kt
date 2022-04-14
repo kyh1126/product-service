@@ -1,5 +1,8 @@
 package com.smartfoodnet.apiclient.response
 
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.databind.PropertyNamingStrategies
+import com.fasterxml.jackson.databind.annotation.JsonNaming
 import com.smartfoodnet.common.Constants
 import com.smartfoodnet.common.Constants.STRING_DATETIME_FORMAT
 import com.smartfoodnet.common.parseLocalDateTimeOrNull
@@ -88,3 +91,14 @@ class CjDeliveryInfoDetail(
 ) {
     val deliveryDateTime = parseLocalDateTimeOrNull(dTime, Constants.TIMESTAMP1_FORMAT)
 }
+
+@JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy::class)
+class CjDeliveryStatusModel(
+    val deliveryAgencyId: Int,
+    val deliveryAgencyName: String,
+    @JsonProperty("shipping_code")
+    val trackingNumber: String,
+    val releaseId: Int,
+    val releaseStatus: Int,
+    val deliveryStatus: String,
+)

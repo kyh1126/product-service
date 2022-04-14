@@ -1,6 +1,5 @@
 package com.smartfoodnet.fnproduct.release
 
-import com.smartfoodnet.apiclient.CjDeliveryInfoApiClient
 import com.smartfoodnet.apiclient.LotteDeliveryInfoApiClient
 import com.smartfoodnet.apiclient.WmsApiClient
 import com.smartfoodnet.apiclient.request.LotteDeliveryInfoDto
@@ -42,7 +41,6 @@ class ReleaseInfoService(
     private val releaseInfoRepository: ReleaseInfoRepository,
     private val wmsApiClient: WmsApiClient,
     private val lotteDeliveryInfoApiClient: LotteDeliveryInfoApiClient,
-    private val cjDeliveryInfoApiClient: CjDeliveryInfoApiClient
 ) {
     fun getReleaseInfoList(
         condition: ReleaseInfoSearchCondition,
@@ -304,9 +302,9 @@ class ReleaseInfoService(
 
         try {
             val deliveryInfoByTrackingNumber =
-                cjDeliveryInfoApiClient.getDeliveryInfo(trackingNumbers)
-                    .filter { it.nsDlvNm == DeliveryStatus.COMPLETED_CJ.code }
-                    .associateBy { it.invcNo }
+                wmsApiClient.getCjDeliveryStatuses(trackingNumbers).payload?.dataList
+                    ?.filter { it.deliveryStatus == DeliveryStatus.COMPLETED_CJ.desc }
+                    ?.associateBy { it.trackingNumber } ?: emptyMap()
 
             releaseInfoStoreService.updateDeliveryCompletedAt(
                 cjTargetList.map { it.id!! },
