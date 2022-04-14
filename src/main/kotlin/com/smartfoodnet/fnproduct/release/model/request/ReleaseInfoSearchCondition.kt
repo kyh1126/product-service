@@ -1,5 +1,6 @@
 package com.smartfoodnet.fnproduct.release.model.request
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.smartfoodnet.fnproduct.claim.model.vo.ClaimStatus
 import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
@@ -30,6 +31,10 @@ class ReleaseInfoSearchCondition(
     // ---------------------------------------------------------------------------------------------
     // -- ReleaseInfo field
     // ---------------------------------------------------------------------------------------------
+    @ApiModelProperty(hidden = true)
+    @JsonIgnore
+    var partnerId: Long? = null,
+
     @ApiModelProperty(value = "출고번호")
     var orderCode: String? = null,
 
