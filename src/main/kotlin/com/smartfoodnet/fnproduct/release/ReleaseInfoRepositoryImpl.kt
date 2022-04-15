@@ -1,7 +1,8 @@
 package com.smartfoodnet.fnproduct.release
 
 import com.smartfoodnet.config.Querydsl4RepositorySupport
-import com.smartfoodnet.fnproduct.claim.model.vo.ClaimStatus
+import com.smartfoodnet.fnproduct.claim.model.vo.ExchangeStatus
+import com.smartfoodnet.fnproduct.claim.model.vo.ReturnStatus
 import com.smartfoodnet.fnproduct.order.entity.QCollectedOrder.collectedOrder
 import com.smartfoodnet.fnproduct.order.entity.QConfirmOrder.confirmOrder
 import com.smartfoodnet.fnproduct.order.entity.QConfirmRequestOrder.confirmRequestOrder
@@ -26,7 +27,8 @@ class ReleaseInfoRepositoryImpl : Querydsl4RepositorySupport(ReleaseInfo::class.
                     eqOrderStatus(condition.orderStatus),
                     eqReceiverName(condition.receiverName),
                     eqUploadType(condition.uploadType),
-                    eqClaimStatus(condition.claimStatus),
+                    eqReturnStatus(condition.returnStatus),
+                    eqExchangeStatus(condition.exchangeStatus),
                     eqPartnerId(condition.partnerId),
                     containsOrderCode(condition.orderCode),
                     containsTrackingNumber(condition.trackingNumber),
@@ -50,8 +52,11 @@ class ReleaseInfoRepositoryImpl : Querydsl4RepositorySupport(ReleaseInfo::class.
     private fun eqUploadType(uploadType: OrderUploadType?) =
         uploadType?.let { collectedOrder.uploadType.eq(it) }
 
-    private fun eqClaimStatus(claimStatus: ClaimStatus?) =
-        claimStatus?.let { collectedOrder.claimStatus.eq(it) }
+    private fun eqReturnStatus(returnStatus: ReturnStatus?) =
+        returnStatus?.let { collectedOrder.returnStatus.eq(it) }
+
+    private fun eqExchangeStatus(exchangeStatus: ExchangeStatus?) =
+        exchangeStatus?.let { collectedOrder.exchangeStatus.eq(it) }
 
     private fun eqPartnerId(partnerId: Long?) =
         partnerId?.let { releaseInfo.partnerId.eq(partnerId) }

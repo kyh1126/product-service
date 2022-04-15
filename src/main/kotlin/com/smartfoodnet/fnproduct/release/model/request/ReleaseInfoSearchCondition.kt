@@ -1,7 +1,8 @@
 package com.smartfoodnet.fnproduct.release.model.request
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import com.smartfoodnet.fnproduct.claim.model.vo.ClaimStatus
+import com.smartfoodnet.fnproduct.claim.model.vo.ExchangeStatus
+import com.smartfoodnet.fnproduct.claim.model.vo.ReturnStatus
 import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
 import io.swagger.annotations.ApiModelProperty
@@ -25,8 +26,11 @@ class ReleaseInfoSearchCondition(
     @ApiModelProperty(value = "업로드방식")
     var uploadType: OrderUploadType? = null,
 
-    @ApiModelProperty(value = "클레임상태")
-    var claimStatus: ClaimStatus? = null,
+    @ApiModelProperty(value = "반품상태")
+    var returnStatus: ReturnStatus? = null,
+
+    @ApiModelProperty(value = "교환출고상태")
+    var exchangeStatus: ExchangeStatus? = null,
 
     // ---------------------------------------------------------------------------------------------
     // -- ReleaseInfo field
