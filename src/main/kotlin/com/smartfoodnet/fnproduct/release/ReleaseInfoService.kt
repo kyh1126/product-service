@@ -58,6 +58,8 @@ class ReleaseInfoService(
     }
 
     fun syncReleaseInfo(partnerId: Long?) {
+        log.info("[syncReleaseInfo] partnerId: $partnerId start!")
+
         var page = PageRequest.of(0, 100, Sort.Direction.DESC, "id")
         val doneOrderIds = mutableSetOf<Long>()
 
@@ -131,6 +133,8 @@ class ReleaseInfoService(
     }
 
     fun syncDeliveryInfo(deliveryAgency: DeliveryAgency) {
+        log.info("[syncDeliveryInfo] deliveryAgency: $deliveryAgency start!")
+
         var page = PageRequest.of(0, 100, Sort.Direction.DESC, "id")
 
         val idByDeliveryAgency = getDeliveryAgencyInfoList()
