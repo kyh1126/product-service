@@ -26,7 +26,7 @@ data class ReleaseInfoModel(
     @ApiModelProperty(value = "출고번호")
     var orderCode: String,
 
-    @ApiModelProperty(value = "출고상태 (NEW:신규주문/ORDER_CONFIRM:주문확인/RELEASE_REGISTRATION:출고등록완료/RELEASE_WORKING:출고작업중/IN_TRANSIT:배송중/COMPLETE:배송완료/EXCHANGED_RELEASE:교환출고/CANCEL:취소)")
+    @ApiModelProperty(value = "출고상태 (NEW:신규주문/ORDER_CONFIRM:주문접수완료/BEFORE_RELEASE_REQUEST:출고요청전/RELEASE_REQUESTED:출고요청/RELEASE_ORDERED:출고지시/RELEASE_IN_PROGRESS:출고작업중/IN_TRANSIT:배송중/COMPLETE:배송완료/RELEASE_PAUSED:출고정지/RELEASE_CANCELLED:출고취소/CANCEL:주문취소)")
     var orderStatus: OrderStatus,
 
     @ApiModelProperty(value = "NOSNOS 출고 id")

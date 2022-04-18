@@ -10,7 +10,7 @@ enum class ReleaseStatus(val releaseStatus: Int?, val description: String, val o
     RELEASE_IN_PROGRESS(5, "출고작업중", OrderStatus.RELEASE_IN_PROGRESS),
     DELIVERY_IN_TRANSIT(7, "출고완료", OrderStatus.IN_TRANSIT),
     DELIVERY_COMPLETED(7, "출고완료", OrderStatus.COMPLETE),
-    RELEASE_CANCELLED(9, "출고취소", OrderStatus.CANCEL);
+    RELEASE_CANCELLED(9, "출고취소", OrderStatus.RELEASE_CANCELLED);
 
     companion object {
         val SYNCABLE_STATUSES: EnumSet<ReleaseStatus> =
