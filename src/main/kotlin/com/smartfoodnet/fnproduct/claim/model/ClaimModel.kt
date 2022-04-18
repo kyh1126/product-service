@@ -2,7 +2,8 @@ package com.smartfoodnet.fnproduct.claim.model
 
 import com.smartfoodnet.fnproduct.claim.entity.Claim
 import com.smartfoodnet.fnproduct.claim.model.vo.ClaimReason
-import com.smartfoodnet.fnproduct.claim.model.vo.ClaimStatus
+import com.smartfoodnet.fnproduct.claim.model.vo.ExchangeStatus
+import com.smartfoodnet.fnproduct.claim.model.vo.ReturnStatus
 import java.time.LocalDateTime
 
 data class ClaimModel(
@@ -12,7 +13,8 @@ data class ClaimModel(
     val originalTrackingNumber: String? = null,
     val customerName: String,
     val claimReason: ClaimReason,
-    val status: ClaimStatus? = null,
+    val returnStatus: ReturnStatus = ReturnStatus.RETURN_REQUESTED,
+    val exchangeStatus: ExchangeStatus = ExchangeStatus.UNREGISTERED,
     val memo: String? = null,
     val returnInfo: ReturnInfoModel,
     var exchangeRelease: ExchangeReleaseModel? = null
@@ -27,7 +29,8 @@ data class ClaimModel(
                     originalTrackingNumber = releaseInfo?.trackingNumber,
                     customerName = customerName,
                     claimReason = claimReason,
-                    status = status,
+                    returnStatus = returnStatus,
+                    exchangeStatus = exchangeStatus,
                     memo = memo,
                     returnInfo = ReturnInfoModel.from(returnInfo!!),
                     exchangeRelease = exchangeRelease?.let { ExchangeReleaseModel.from(it) }

@@ -1,6 +1,6 @@
 package com.smartfoodnet.fnproduct.claim.model.vo
 
-enum class ClaimStatus(val returnStatus: Int?, val description: String) {
+/*enum class ClaimStatus(val returnStatus: Int?, val description: String) {
     UNREGISTERED(null, "미등록"),
     RETURN_REQUESTED(1, "반품요청"),
     RETURN_IN_PROGRESS(3, "반품진행"),
@@ -20,7 +20,7 @@ enum class ClaimStatus(val returnStatus: Int?, val description: String) {
             RETURN_CANCELLED -> null
         }
     }
-}
+}*/
 
 /**
  * 반품상태	                        교환출고상태

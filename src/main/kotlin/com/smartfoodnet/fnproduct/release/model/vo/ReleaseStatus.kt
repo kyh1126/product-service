@@ -8,7 +8,7 @@ enum class ReleaseStatus(val releaseStatus: Int?, val description: String, val o
     RELEASE_REQUESTED(1, "출고요청", OrderStatus.RELEASE_REQUESTED),
     RELEASE_ORDERED(3, "출고지시", OrderStatus.RELEASE_ORDERED),
     RELEASE_IN_PROGRESS(5, "출고작업중", OrderStatus.RELEASE_IN_PROGRESS),
-    RELEASE_COMPLETED(7, "출고완료", OrderStatus.COMPLETE), // TODO: 배송중/배송완료로 컨버팅 필요
+    RELEASE_COMPLETED(7, "출고완료", OrderStatus.IN_TRANSIT), // TODO: 배송중/배송완료로 컨버팅 필요
     RELEASE_CANCELLED(9, "출고취소", OrderStatus.CANCEL);
 
     companion object {

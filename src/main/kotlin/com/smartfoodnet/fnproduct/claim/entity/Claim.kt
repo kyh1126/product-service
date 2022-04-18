@@ -2,21 +2,11 @@ package com.smartfoodnet.fnproduct.claim.entity
 
 import com.smartfoodnet.common.entity.BaseEntity
 import com.smartfoodnet.fnproduct.claim.model.vo.ClaimReason
-import com.smartfoodnet.fnproduct.claim.model.vo.ClaimStatus
+import com.smartfoodnet.fnproduct.claim.model.vo.ExchangeStatus
+import com.smartfoodnet.fnproduct.claim.model.vo.ReturnStatus
 import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
 import java.time.LocalDateTime
-import javax.persistence.CascadeType
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.EnumType
-import javax.persistence.Enumerated
-import javax.persistence.ForeignKey
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
-import javax.persistence.Id
-import javax.persistence.JoinColumn
-import javax.persistence.OneToOne
-import javax.persistence.Table
+import javax.persistence.*
 
 @Entity
 @Table(name = "claim")
@@ -41,7 +31,11 @@ class Claim(
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
-    val status: ClaimStatus = ClaimStatus.UNREGISTERED,
+    val returnStatus: ReturnStatus = ReturnStatus.RETURN_REQUESTED,
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    val exchangeStatus: ExchangeStatus = ExchangeStatus.UNREGISTERED,
 
     @Column(name = "memo")
     val memo: String? = null,
