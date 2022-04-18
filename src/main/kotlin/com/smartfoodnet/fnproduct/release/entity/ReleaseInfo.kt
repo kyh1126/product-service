@@ -98,6 +98,7 @@ class ReleaseInfo(
     }
 
     fun updateDeliveryCompletedAt(procDateTime: LocalDateTime?) {
+        releaseStatus = ReleaseStatus.DELIVERY_COMPLETED
         deliveryCompletedAt = procDateTime
     }
 }
