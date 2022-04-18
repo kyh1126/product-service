@@ -53,7 +53,6 @@ data class ReleaseInfoModel(
     @ApiModelProperty(value = "배송완료일시")
     var deliveryCompletedAt: LocalDateTime? = null,
 
-    // TODO: 이넘 고치기
     @ApiModelProperty(value = "반품상태 (UNREGISTERED:미등록/RETURN_REQUESTED:반품요청/RETURN_IN_PROGRESS:반품진행/RETURN_INBOUND_COMPLETED:반품입고완료/RETURN_CANCELLED:반품취소)")
     var returnStatuses: List<ReturnStatus> = emptyList(),
 
