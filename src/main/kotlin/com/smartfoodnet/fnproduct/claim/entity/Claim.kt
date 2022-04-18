@@ -30,11 +30,11 @@ class Claim(
     val claimReason: ClaimReason,
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status")
+    @Column(name = "return_status")
     val returnStatus: ReturnStatus = ReturnStatus.RETURN_REQUESTED,
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status")
+    @Column(name = "exchange_status")
     val exchangeStatus: ExchangeStatus = ExchangeStatus.UNREGISTERED,
 
     @Column(name = "memo")
