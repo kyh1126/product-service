@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.Parameter
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.web.PageableDefault
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.PatchMapping
@@ -61,6 +62,12 @@ class StoreProductController(
     @PatchMapping("")
     fun updateStoreProduct(@Valid @RequestBody storeProductUpdateModel: StoreProductUpdateModel): StoreProductModel {
         return storeProductService.updateStoreProduct(storeProductUpdateModel)
+    }
+
+    @Operation(summary = "쇼핑몰상품 삭제")
+    @DeleteMapping("{id}")
+    fun deleteStoreProduct(@PathVariable id: Long) {
+        storeProductService.deleteStoreProduct(id)
     }
 
     @Operation(summary = "쇼핑몰상품 기본상품 매핑")
