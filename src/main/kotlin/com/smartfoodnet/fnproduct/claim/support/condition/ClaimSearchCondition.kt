@@ -7,7 +7,6 @@ import com.querydsl.core.types.Predicate
 import com.smartfoodnet.common.Constants
 import com.smartfoodnet.common.model.request.PredicateSearchCondition
 import com.smartfoodnet.fnproduct.claim.entity.QClaim.claim
-import com.smartfoodnet.fnproduct.claim.model.vo.ClaimStatus
 import io.swagger.annotations.ApiModelProperty
 import java.time.LocalDate
 
@@ -27,10 +26,7 @@ class ClaimSearchCondition(
     val exchangeTrackingNumber: String? = null,
 
     @ApiModelProperty(value = "주문자이름")
-    val customerName: String? = null,
-
-    @ApiModelProperty(value = "클레임상태")
-    val claimStatus: ClaimStatus? = null
+    val customerName: String? = null
 
 ) : PredicateSearchCondition() {
     override fun assemblePredicate(predicate: BooleanBuilder): Predicate {

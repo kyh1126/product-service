@@ -2,7 +2,8 @@ package com.smartfoodnet.fnproduct.release.model.response
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.smartfoodnet.apiclient.response.NosnosDeliveryAgencyInfoModel
-import com.smartfoodnet.fnproduct.claim.model.vo.ClaimStatus
+import com.smartfoodnet.fnproduct.claim.model.vo.ExchangeStatus
+import com.smartfoodnet.fnproduct.claim.model.vo.ReturnStatus
 import com.smartfoodnet.fnproduct.order.model.ReceiverModel
 import com.smartfoodnet.fnproduct.order.vo.DeliveryType
 import com.smartfoodnet.fnproduct.order.vo.OrderStatus
@@ -16,13 +17,16 @@ data class ReleaseInfoModel(
     @ApiModelProperty(value = "id")
     val id: Long,
 
+    @ApiModelProperty(value = "화주(고객)사 ID", example = "11")
+    var partnerId: Long,
+
     @ApiModelProperty(value = "NOSNOS 발주 id")
     var orderId: Long,
 
     @ApiModelProperty(value = "출고번호")
     var orderCode: String,
 
-    @ApiModelProperty(value = "출고상태 (NEW:신규주문/ORDER_CONFIRM:주문확인/RELEASE_REGISTRATION:출고등록완료/RELEASE_WORKING:출고작업중/IN_TRANSIT:배송중/COMPLETE:배송완료/EXCHANGED_RELEASE:교환출고/CANCEL:취소)")
+    @ApiModelProperty(value = "출고상태 (NEW:신규주문/ORDER_CONFIRM:주문접수완료/BEFORE_RELEASE_REQUEST:출고요청전/RELEASE_REQUESTED:출고요청/RELEASE_ORDERED:출고지시/RELEASE_IN_PROGRESS:출고작업중/IN_TRANSIT:배송중/COMPLETE:배송완료/RELEASE_PAUSED:출고정지/RELEASE_CANCELLED:출고취소/CANCEL:주문취소)")
     var orderStatus: OrderStatus,
 
     @ApiModelProperty(value = "NOSNOS 출고 id")
@@ -49,8 +53,11 @@ data class ReleaseInfoModel(
     @ApiModelProperty(value = "배송완료일시")
     var deliveryCompletedAt: LocalDateTime? = null,
 
-    @ApiModelProperty(value = "클레임상태 (UNREGISTERED:미등록/RETURN_REQUESTED:반품요청/RETURN_IN_PROGRESS:반품진행/RETURN_INBOUND_COMPLETED:반품입고완료/RETURN_CANCELLED:반품취소/EXCHANGE_RELEASE_IN_PROGRESS:교환출고중/EXCHANGE_DELIVERY_COMPLETED:교환배송완료)")
-    var claimStatuses: List<ClaimStatus> = emptyList(),
+    @ApiModelProperty(value = "반품상태 (UNREGISTERED:미등록/RETURN_REQUESTED:반품요청/RETURN_IN_PROGRESS:반품진행/RETURN_INBOUND_COMPLETED:반품입고완료/RETURN_CANCELLED:반품취소)")
+    var returnStatuses: List<ReturnStatus> = emptyList(),
+
+    @ApiModelProperty(value = "교환출고상태 (UNREGISTERED:미등록/EXCHANGE_RELEASE_IN_PROGRESS:교환출고중/EXCHANGE_DELIVERY_COMPLETED:교환배송완료)")
+    var exchangeStatuses: List<ExchangeStatus> = emptyList(),
 
     @ApiModelProperty(
         value = "배송방식 (PARCEL:택배/VEHICLE:차량/DAWN:새벽배송/SAME_DAY:당일배송)",
@@ -89,6 +96,7 @@ data class ReleaseInfoModel(
 
                 ReleaseInfoModel(
                     id = id!!,
+                    partnerId = partnerId,
                     orderId = orderId,
                     orderCode = orderCode,
                     orderStatus = releaseStatus.orderStatus,
@@ -99,7 +107,8 @@ data class ReleaseInfoModel(
                     trackingNumberStatus = trackingNumberStatus,
                     trackingNumberCreatedAt = trackingNumberCreatedAt,
                     deliveryCompletedAt = deliveryCompletedAt,
-                    claimStatuses = collectedOrders.map { it.claimStatus },
+                    returnStatuses = collectedOrders.map { it.returnStatus },
+                    exchangeStatuses = collectedOrders.map { it.exchangeStatus },
                     deliveryType = firstCollectedOrder.deliveryType,
                     receiverModel = firstCollectedOrder.receiver.run(ReceiverModel::from),
                     storeName = firstCollectedOrder.storeName,

@@ -20,20 +20,26 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("release-info")
 class ReleaseController(private val releaseInfoService: ReleaseInfoService) {
-    @Operation(summary = "릴리즈 정보 리스트 조회")
-    @GetMapping
+    @Operation(summary = "특정 화주(고객사) ID 의 릴리즈 정보 리스트 조회")
+    @GetMapping("partners/{partnerId}")
     fun getReleaseInfoList(
+        @Parameter(description = "화주(고객사) ID", required = true)
+        @PathVariable partnerId: Long,
         @Parameter(description = "검색조건")
         @ModelAttribute condition: ReleaseInfoSearchCondition,
         @PageableDefault(size = 50, sort = ["id"], direction = Sort.Direction.DESC) page: Pageable,
     ): PageResponse<ReleaseInfoModel> {
+        condition.apply { this.partnerId = partnerId }
         return releaseInfoService.getReleaseInfoList(condition, page)
     }
 
     @Operation(summary = "릴리즈 정보 동기화")
     @PostMapping("sync")
-    fun syncReleaseInfo(): CommonResponse<String> {
-        releaseInfoService.syncReleaseInfo()
+    fun syncReleaseInfo(
+        @Parameter(description = "화주(고객사) ID")
+        @RequestParam(required = false) partnerId: Long? = null,
+    ): CommonResponse<String> {
+        releaseInfoService.syncReleaseInfo(partnerId)
         return CommonResponse(HttpStatus.OK.reasonPhrase)
     }
 

@@ -102,6 +102,7 @@ interface WmsApiClient {
     // ---------------------------------------------------------------------------------------------
     @GetMapping("release/bulk")
     fun getReleases(
+        @RequestParam(required = false) partnerId: Long? = null,
         @RequestParam(required = false) releaseIds: List<Long>? = null,
         @RequestParam(required = false) orderIds: List<Long>? = null,
         @RequestParam(required = false) shippingOrderInfoId: Int? = null,
@@ -189,8 +190,13 @@ interface WmsApiClient {
     // ---------------------------------------------------------------------------------------------
     // -- 로케이션,택배
     // ---------------------------------------------------------------------------------------------
-    @GetMapping("delivery-agency/info/bulk")
+    @GetMapping("delivery/agency/info/bulk")
     fun getDeliveryAgencyInfoList(): CommonResponse<CommonDataListModel<NosnosDeliveryAgencyInfoModel>>
+
+    @GetMapping("delivery/cj/status/bulk")
+    fun getCjDeliveryStatuses(
+        @RequestParam shippingCodes: List<String>? = null
+    ): CommonResponse<CommonDataListModel<CjDeliveryStatusModel>>
 
 }
 

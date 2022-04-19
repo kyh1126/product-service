@@ -1,36 +1,28 @@
 package com.smartfoodnet.fnproduct.order.vo
 
 
-enum class OrderStatus(val code: Int, val description: String) {
-    NEW(0, "신규주문"),
-    ORDER_CONFIRM(1, "주문확인"),
-    RELEASE_REGISTRATION(2, "출고등록완료"),
-    RELEASE_WORKING(3, "출고작업중"),
-    IN_TRANSIT(4, "배송중"),
-    COMPLETE(5, "배송완료"),
-    EXCHANGED_RELEASE(8, "교환출고"),
-    CANCEL(9, "취소");
+enum class OrderStatus(val description: String) {
+    NEW("신규주문"),
+    ORDER_CONFIRM("주문접수완료"),
+    BEFORE_RELEASE_REQUEST("출고요청전"),
+    RELEASE_REQUESTED("출고요청"),
+    RELEASE_ORDERED("출고지시"),
+    RELEASE_IN_PROGRESS("출고작업중"),
+    IN_TRANSIT("배송중"),
+    COMPLETE("배송완료"),
+    RELEASE_PAUSED("출고정지"),
+    RELEASE_CANCELLED("출고취소"),
+    CANCEL( "주문취소");
 
     fun next() = when (this) {
         NEW -> ORDER_CONFIRM
-        ORDER_CONFIRM -> RELEASE_REGISTRATION
-        RELEASE_REGISTRATION -> RELEASE_WORKING
-        RELEASE_WORKING -> IN_TRANSIT
+        ORDER_CONFIRM -> BEFORE_RELEASE_REQUEST
+        BEFORE_RELEASE_REQUEST -> RELEASE_REQUESTED
+        RELEASE_REQUESTED -> RELEASE_ORDERED
+        RELEASE_ORDERED -> RELEASE_IN_PROGRESS
+        RELEASE_IN_PROGRESS -> IN_TRANSIT
         IN_TRANSIT -> COMPLETE
-        COMPLETE -> COMPLETE
-        EXCHANGED_RELEASE -> EXCHANGED_RELEASE
-        CANCEL -> CANCEL
-    }
-
-    fun previous() = when (this){
-        NEW -> NEW
-        ORDER_CONFIRM -> NEW
-        RELEASE_REGISTRATION -> ORDER_CONFIRM
-        RELEASE_WORKING -> RELEASE_REGISTRATION
-        IN_TRANSIT -> RELEASE_WORKING
-        COMPLETE -> IN_TRANSIT
-        EXCHANGED_RELEASE -> EXCHANGED_RELEASE
-        CANCEL -> CANCEL
+        else -> this
     }
 
     fun cancel() : OrderStatus {
