@@ -75,7 +75,11 @@ class ClaimService(
     fun syncReturnInfoWithNosnos(claim: Claim) {
         val nosnosReturnModel = wmsApiClient.getReleaseReturn(claim.returnInfo?.nosnosReleaseReturnInfoId
             ?: throw NoSuchElementError("반품정보가 존재하지 않습니다. [claimId: ${claim.id}]"))
-//        claim.returnInfo.
+
+    }
+
+    fun getNosnosReturnByCoroutine(claims: List<Claim>) {
+        val coroutines = mutableListOf<>()
     }
 
     private fun sendReleaseReturn(claim: Claim) {

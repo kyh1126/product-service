@@ -35,7 +35,9 @@ data class ClaimModel(
                     exchangeStatus = exchangeStatus,
                     memo = memo,
                     returnInfo = ReturnInfoModel.from(returnInfo!!),
-                    exchangeRelease = exchangeRelease?.let { ExchangeReleaseModel.from(it) }
+                    exchangeRelease = exchangeRelease?.let { ExchangeReleaseModel.from(it) },
+                    createdAt = createdAt,
+                    updatedAt = updatedAt
                 )
             }
         }
