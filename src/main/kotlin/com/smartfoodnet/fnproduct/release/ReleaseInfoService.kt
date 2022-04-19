@@ -64,9 +64,7 @@ class ReleaseInfoService(
         val doneOrderIds = mutableSetOf<Long>()
 
         while (true) {
-            val targetList =
-                if (partnerId == null) releaseInfoRepository.findAllByReleaseStatusIn(ReleaseStatus.SYNCABLE_STATUSES, page)
-                else releaseInfoRepository.findAllByReleaseStatusInAndPartnerId(ReleaseStatus.SYNCABLE_STATUSES, partnerId, page)
+            val targetList = getSyncableReleaseInfoList(partnerId, page)
 
             if (!targetList.hasContent()) break
 
@@ -132,7 +130,7 @@ class ReleaseInfoService(
         return confirmProducts.map(OrderConfirmProductModel::from)
     }
 
-    fun syncDeliveryInfo(deliveryAgency: DeliveryAgency) {
+    fun syncDeliveryInfo(deliveryAgency: DeliveryAgency?) {
         log.info("[syncDeliveryInfo] deliveryAgency: $deliveryAgency start!")
 
         var page = PageRequest.of(0, 100, Sort.Direction.DESC, "id")
@@ -143,10 +141,8 @@ class ReleaseInfoService(
             ) ?: emptyMap()
 
         while (true) {
-            val targetList = releaseInfoRepository.findAllByReleaseStatusIn(
-                ReleaseStatus.DELIVERY_SYNCABLE_STATUSES,
-                page
-            )
+            val targetList = getDeliverySyncableReleaseInfoList(deliveryAgency, page, idByDeliveryAgency)
+
             if (!targetList.hasContent()) break
 
             when (deliveryAgency) {
@@ -154,6 +150,10 @@ class ReleaseInfoService(
                     updateLotteDeliveryCompletedAt(targetList, idByDeliveryAgency[deliveryAgency])
                 DeliveryAgency.CJ ->
                     updateCjDeliveryCompletedAt(targetList, idByDeliveryAgency[deliveryAgency])
+                null -> {
+                    updateLotteDeliveryCompletedAt(targetList, idByDeliveryAgency[DeliveryAgency.LOTTE])
+                    updateCjDeliveryCompletedAt(targetList, idByDeliveryAgency[DeliveryAgency.CJ])
+                }
             }
 
             if (targetList.isLast) break
@@ -193,6 +193,19 @@ class ReleaseInfoService(
             page = page.next()
         }
     }
+
+    private fun getSyncableReleaseInfoList(partnerId: Long?, page: PageRequest) =
+        when (partnerId) {
+            null -> releaseInfoRepository.findAllByReleaseStatusIn(
+                ReleaseStatus.SYNCABLE_STATUSES,
+                page
+            )
+            else -> releaseInfoRepository.findAllByReleaseStatusInAndPartnerId(
+                ReleaseStatus.SYNCABLE_STATUSES,
+                partnerId,
+                page
+            )
+        }
 
     private fun getReleases(partnerId: Long?, orderIds: Set<Long>): List<NosnosReleaseModel> {
         val releases = mutableListOf<NosnosReleaseModel>()
@@ -275,6 +288,19 @@ class ReleaseInfoService(
 
     private fun getDeliveryAgencyInfoList() =
         wmsApiClient.getDeliveryAgencyInfoList().payload?.dataList
+
+    private fun getDeliverySyncableReleaseInfoList(deliveryAgency: DeliveryAgency?, page: PageRequest, idByDeliveryAgency: Map<DeliveryAgency?, Long>) =
+        when (deliveryAgency) {
+            null -> releaseInfoRepository.findAllByReleaseStatusIn(
+                ReleaseStatus.DELIVERY_SYNCABLE_STATUSES,
+                page
+            )
+            else -> releaseInfoRepository.findAllByReleaseStatusInAndDeliveryAgencyId(
+                ReleaseStatus.DELIVERY_SYNCABLE_STATUSES,
+                idByDeliveryAgency[deliveryAgency]!!,
+                page
+            )
+        }
 
     private fun updateLotteDeliveryCompletedAt(
         targetList: Page<ReleaseInfo>,
