@@ -55,7 +55,7 @@ class TrackingNumberRegisterModel(
                 TrackingNumberRegisterModel(
                     partnerId = it.partnerId,
                     storeCode = it.storeCode,
-                    orderNumber = it.orderNumber,
+                    orderNumber = it.orderNumber.split(' ').first(),
                     receiverName = it.receiver.name,
                     deliveryAgency = deliveryAgencyById[releaseInfo.deliveryAgencyId],
                     trackingNumber = releaseInfo.trackingNumber

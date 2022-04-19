@@ -108,6 +108,7 @@ class ReleaseInfoStoreService(
 
         val targetMap = targetList
             .flatMap { TrackingNumberRegisterModel.fromEntity(it, deliveryAgencyById) }
+            .distinctBy { it.orderNumber }
             .groupBy { Pair(it.partnerId, it.storeCode!!) }
 
         targetMap.entries.forEach { (key, models) ->
