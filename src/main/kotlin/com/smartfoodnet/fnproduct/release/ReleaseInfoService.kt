@@ -320,7 +320,8 @@ class ReleaseInfoService(
         try {
             val deliveryInfoByTrackingNumber =
                 lotteDeliveryInfoApiClient.getDeliveryInfo(request)?.rtnList
-                    ?.associateBy { it.invNo } ?: emptyMap()
+                    ?.filter { it.invNo != null }
+                    ?.associateBy { it.invNo!! } ?: emptyMap()
 
             releaseInfoStoreService.updateDeliveryCompletedAt(
                 lotteTargetList.map { it.id!! },

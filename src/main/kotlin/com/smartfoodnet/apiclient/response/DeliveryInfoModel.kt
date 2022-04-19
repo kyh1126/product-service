@@ -25,7 +25,7 @@ class LotteDeliveryInfoDetail(
     val rtnCd: String,
 
     @ApiModelProperty(value = "운송장번호", example = "403601798014")
-    val invNo: String,
+    val invNo: String? = null,
 
     @ApiModelProperty(value = "화물상태코드", example = "41")
     val gdsStatCd: String,
@@ -34,16 +34,16 @@ class LotteDeliveryInfoDetail(
     val gdsStatNm: String,
 
     @ApiModelProperty(value = "처리일자", example = "20220223")
-    val procYmd: String,
+    val procYmd: String? = null,
 
     @ApiModelProperty(value = "처리시간", example = "142356")
-    val procTme: String,
+    val procTme: String? = null,
 
     @ApiModelProperty(value = "출고반품구분 (01:출고,02:반품)", example = "01")
-    val ustRtgSctCd: String,
+    val ustRtgSctCd: String? = null,
 
     @ApiModelProperty(value = "출고반품구분명", example = "출고")
-    val ustRtgSctNm: String
+    val ustRtgSctNm: String? = null
 ) {
     val procDateTime =
         parseLocalDateTimeOrNull(procYmd + procTme, STRING_DATETIME_FORMAT)
