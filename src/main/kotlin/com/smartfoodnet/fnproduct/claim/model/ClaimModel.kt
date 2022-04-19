@@ -17,7 +17,9 @@ data class ClaimModel(
     val exchangeStatus: ExchangeStatus = ExchangeStatus.UNREGISTERED,
     val memo: String? = null,
     val returnInfo: ReturnInfoModel,
-    var exchangeRelease: ExchangeReleaseModel? = null
+    var exchangeRelease: ExchangeReleaseModel? = null,
+    var createdAt: LocalDateTime? = null,
+    var updatedAt: LocalDateTime? = null
 ) {
     companion object {
         fun from(claim: Claim): ClaimModel {

@@ -13,7 +13,6 @@ import com.smartfoodnet.fnproduct.store.model.response.StoreProductModel
 import com.smartfoodnet.fnproduct.store.support.StoreProductMappingRepository
 import com.smartfoodnet.fnproduct.store.support.StoreProductRepository
 import com.smartfoodnet.fnproduct.store.support.StoreProductSearchCondition
-import org.reflections.Store
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
@@ -91,6 +90,15 @@ class StoreProductService(
             buildNewStoreProductMappings(storeProductModel, storeProduct)?.toMutableSet() ?: mutableSetOf()
 
         return StoreProductModel.from(storeProduct)
+    }
+
+    @Transactional
+    fun deleteStoreProduct(storeProductId: Long) {
+        val storeProduct = storeProductRepository.findByIdOrNull(storeProductId)
+            ?: throw NoSuchElementError(errorMessage = "존재하지 않는 상품입니다. [storeProductId = ${storeProductId}]")
+        storeProduct.delete()
+
+        storeProductRepository.save(storeProduct)
     }
 
     fun buildNewStoreProductMappings(
