@@ -289,18 +289,21 @@ class ReleaseInfoService(
     private fun getDeliveryAgencyInfoList() =
         wmsApiClient.getDeliveryAgencyInfoList().payload?.dataList
 
-    private fun getDeliverySyncableReleaseInfoList(deliveryAgency: DeliveryAgency?, page: PageRequest, idByDeliveryAgency: Map<DeliveryAgency?, Long>) =
-        when (deliveryAgency) {
-            null -> releaseInfoRepository.findAllByReleaseStatusIn(
-                ReleaseStatus.DELIVERY_SYNCABLE_STATUSES,
-                page
-            )
-            else -> releaseInfoRepository.findAllByReleaseStatusInAndDeliveryAgencyId(
-                ReleaseStatus.DELIVERY_SYNCABLE_STATUSES,
-                idByDeliveryAgency[deliveryAgency]!!,
-                page
-            )
-        }
+    private fun getDeliverySyncableReleaseInfoList(
+        deliveryAgency: DeliveryAgency?,
+        page: PageRequest,
+        idByDeliveryAgency: Map<DeliveryAgency?, Long>
+    ) = when (deliveryAgency) {
+        null -> releaseInfoRepository.findAllByReleaseStatusIn(
+            ReleaseStatus.DELIVERY_SYNCABLE_STATUSES,
+            page
+        )
+        else -> releaseInfoRepository.findAllByReleaseStatusInAndDeliveryAgencyId(
+            ReleaseStatus.DELIVERY_SYNCABLE_STATUSES,
+            idByDeliveryAgency[deliveryAgency]!!,
+            page
+        )
+    }
 
     private fun updateLotteDeliveryCompletedAt(
         targetList: Page<ReleaseInfo>,
