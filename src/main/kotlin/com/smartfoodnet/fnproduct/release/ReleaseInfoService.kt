@@ -1,7 +1,6 @@
 package com.smartfoodnet.fnproduct.release
 
 import com.smartfoodnet.apiclient.LotteDeliveryInfoApiClient
-import com.smartfoodnet.apiclient.PartnerApiClient
 import com.smartfoodnet.apiclient.WmsApiClient
 import com.smartfoodnet.apiclient.request.LotteDeliveryInfoDto
 import com.smartfoodnet.apiclient.request.LotteTrackingDto
@@ -41,7 +40,6 @@ class ReleaseInfoService(
     private val confirmOrderService: ConfirmOrderService,
     private val releaseInfoRepository: ReleaseInfoRepository,
     private val wmsApiClient: WmsApiClient,
-    private val partnerApiClient: PartnerApiClient,
     private val lotteDeliveryInfoApiClient: LotteDeliveryInfoApiClient,
 ) {
     fun getReleaseInfoList(
@@ -215,7 +213,11 @@ class ReleaseInfoService(
         while (page <= totalPage) {
             val model: CommonDataListModel<NosnosReleaseModel>?
             try {
-                model = wmsApiClient.getReleases(partnerId = partnerId, orderIds = orderIds.toList(), page = page).payload
+                model = wmsApiClient.getReleases(
+                    partnerId = partnerId,
+                    orderIds = orderIds.toList(),
+                    page = page
+                ).payload
             } catch (e: Exception) {
                 log.error("[getReleases] orderIds: ${orderIds}, page: ${page}, error: ${e.message}")
                 throw BaseRuntimeException(errorMessage = "출고 정보 조회 실패, orderIds: ${orderIds}, page: ${page}")
