@@ -13,6 +13,12 @@ interface ReleaseInfoRepository : JpaRepository<ReleaseInfo, Long>, ReleaseInfoC
         page: Pageable
     ): Page<ReleaseInfo>
 
+    fun findAllByReleaseStatusInAndDeliveryAgencyId(
+        syncableStatuses: Collection<ReleaseStatus>,
+        deliveryAgencyId: Long,
+        page: Pageable
+    ): Page<ReleaseInfo>
+
     fun findAllByReleaseStatusInAndPartnerId(
         syncableStatuses: Collection<ReleaseStatus>,
         partnerId: Long,

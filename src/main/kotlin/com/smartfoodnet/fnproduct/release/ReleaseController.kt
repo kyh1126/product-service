@@ -71,8 +71,8 @@ class ReleaseController(private val releaseInfoService: ReleaseInfoService) {
     @Operation(summary = "택배사 정보 동기화")
     @PostMapping("delivery-info/sync")
     fun syncDeliveryInfo(
-        @Parameter(description = "택배사 정보", required = true)
-        @RequestParam deliveryAgency: DeliveryAgency
+        @Parameter(description = "택배사 정보")
+        @RequestParam(required = false) deliveryAgency: DeliveryAgency? = null
     ): CommonResponse<String> {
         releaseInfoService.syncDeliveryInfo(deliveryAgency)
         return CommonResponse(HttpStatus.OK.reasonPhrase)
