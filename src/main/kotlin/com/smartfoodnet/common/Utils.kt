@@ -45,6 +45,29 @@ fun copyNonNullProperty(source: Any, target: Any) {
 fun convertYnToInt(yn: String?) = if (yn == "Y") 1 else 0
 
 /**
+ * FeignException 의 message 에서 노스노스 에러 메시지를 반환한다.
+ * ex>
+ * [400 ] during [PATCH] to [http://localhost:4001/fresh-networks/fn-warehouse-service/release/cancel/193353] [WmsApiClient#cancelRelease(long)]: [{"serviceCode":"FN-NOSNOS-SERVICE","errorCode":"500","errorMessage":"4117-출고요청 상태인 경우만 출고취소가 가능합니다."}]
+ *
+ * @see com.smartfoodnet.common.error.handleFeignException
+ */
+fun getNosnosErrorMessage(message: String?): String? {
+    if (message == null) return null
+
+    // "serviceCode":"FN-NOSNOS-SERVICE","errorCode":"500","errorMessage":"4117-출고요청 상태인 경우만 출고취소가 가능합니다."
+    val responseJson = message.split("[", "{", "}", "]")
+        .firstOrNull { it.contains("errorMessage") }
+
+    // 4117-출고요청 상태인 경우만 출고취소가 가능합니다.
+    val codeAndMessage = responseJson?.split(",")
+        ?.firstOrNull { it.contains("errorMessage") }
+        ?.split(":")?.lastOrNull()
+        ?.replace("\"", "")
+
+    return codeAndMessage?.split("-")?.lastOrNull()
+}
+
+/**
  * Kotlin 에서, 일반적인 경우 런타임에 generic parameter 를 확인할 방법은 없다.
  * <p>
  * @see <a href="https://stackoverflow.com/questions/36569421/kotlin-how-to-work-with-list-casts-unchecked-cast-kotlin-collections-listkot#answer-36570969">동일 이슈</a>
