@@ -74,8 +74,6 @@ class StoreProductService(
             }
         } ?: listOf(storeProductCreateModel.toEntity())
 
-
-
         return storeProductRepository.saveAll(storeProducts).map(StoreProductModel::from)
     }
 
@@ -105,15 +103,19 @@ class StoreProductService(
         storeProductModel: StoreProductUpdateModel,
         storeProduct: StoreProduct
     ): List<StoreProductMapping>? {
-        val newBasicProductIds = storeProductModel.storeProductBasicProductMappings?.map { it.basicProductId }
+        val newBasicProductIds = storeProductModel.storeProductBasicProductMappings.map { it.basicProductId }
+
+        if(newBasicProductIds.size != newBasicProductIds.toSet().size) {
+            throw ValidateError("중복된 기본상품이 존재합니다.")
+        }
 
         val unMappedBasicProducts = storeProduct.storeProductMappings.filterNot { mapping ->
-            newBasicProductIds?.contains(mapping.basicProduct.id) ?: false
+            newBasicProductIds.contains(mapping.basicProduct.id)
         }
 
         unMappedBasicProducts.forEach { it.delete() }
 
-        val storeProductMappings = storeProductModel.storeProductBasicProductMappings?.map { mapping ->
+        val storeProductMappings = storeProductModel.storeProductBasicProductMappings.map { mapping ->
             val storeProductMapping = mapping.id?.let { id -> storeProductMappingRepository.findByIdOrNull(id) }
                 ?: StoreProductMapping(
                     storeProduct = storeProduct,

@@ -8,6 +8,7 @@ import com.smartfoodnet.apiclient.response.ReturnItemCreateModel
 import com.smartfoodnet.common.Constants
 import com.smartfoodnet.common.error.exception.ExternalApiError
 import com.smartfoodnet.common.error.exception.NoSuchElementError
+import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.fnproduct.claim.entity.Claim
 import com.smartfoodnet.fnproduct.claim.entity.ExchangeProduct
 import com.smartfoodnet.fnproduct.claim.entity.ExchangeRelease
@@ -17,12 +18,17 @@ import com.smartfoodnet.fnproduct.claim.entity.ReturnProduct
 import com.smartfoodnet.fnproduct.claim.model.ClaimCreateModel
 import com.smartfoodnet.fnproduct.claim.model.ClaimModel
 import com.smartfoodnet.fnproduct.claim.model.ExchangeReleaseCreateModel
+import com.smartfoodnet.fnproduct.claim.model.vo.ReturnStatus
 import com.smartfoodnet.fnproduct.claim.support.ClaimRepository
 import com.smartfoodnet.fnproduct.claim.support.ExchangeReleaseRepository
 import com.smartfoodnet.fnproduct.claim.support.condition.ClaimSearchCondition
 import com.smartfoodnet.fnproduct.order.entity.Receiver
 import com.smartfoodnet.fnproduct.product.BasicProductRepository
 import com.smartfoodnet.fnproduct.release.ReleaseInfoRepository
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.runBlocking
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
@@ -43,7 +49,10 @@ class ClaimService(
         condition: ClaimSearchCondition,
         page: Pageable
     ): Page<ClaimModel> {
-        return claimRepository.findAll(condition.toPredicate(), page).map { ClaimModel.from(it) }
+        val claims = claimRepository.findAll(condition.toPredicate(), page)
+        syncReturnInfosByCoroutine(claims.content)
+
+        return claims.map { ClaimModel.from(it) }
     }
 
     @Transactional
@@ -53,27 +62,6 @@ class ClaimService(
         sendReleaseReturn(claim)
 
         claimRepository.save(claim)
-    }
-
-    private fun sendReleaseReturn(claim: Claim) {
-        val returnItems = claim.returnInfo?.returnProducts?.map {
-            ReturnItemCreateModel(shippingProductId = it.basicProduct.shippingProductId!!, quantity = it.requestQuantity)
-        }
-
-        val returnCreateModel = ReturnCreateModel(
-            partnerId = claim.partnerId,
-            releaseId = claim.releaseInfo?.releaseId?.toInt(),
-            returnReasonId = claim.claimReason.returnReasonId?.toInt(),
-            memo = claim.memo,
-            returnAddress1 = claim.releaseInfo?.confirmOrder?.receiver?.address,
-            receivingName = claim.releaseInfo?.confirmOrder?.receiver?.name,
-            zipcode = claim.releaseInfo?.confirmOrder?.receiver?.zipCode,
-            tel1 = claim.releaseInfo?.confirmOrder?.receiver?.phoneNumber,
-            returnItemList = returnItems
-        )
-        val returnModel = wmsApiClient.createReleaseReturn(returnCreateModel)
-        claim.returnInfo?.nosnosReleaseReturnInfoId = returnModel?.releaseReturnInfoId
-        claim.returnInfo?.returnCode = returnModel?.returnCode
     }
 
     @Transactional
@@ -93,16 +81,75 @@ class ClaimService(
         sendExchangeReleaseOutbound(exchangeRelease)
     }
 
+    private fun syncReturnInfoFromWms(claim: Claim) {
+        val returnModel = claim.returnInfo?.nosnosReleaseReturnInfoId?.let {
+            wmsApiClient.getReleaseReturn(it)
+        }?.payload
+
+        returnModel?.let {
+            claim.returnStatus = ReturnStatus.fromCode(it.returnStatus)
+        }
+    }
+
+    @Transactional
+    fun syncReturnInfosByCoroutine(claims: List<Claim>) {
+        val coroutines = mutableListOf<Deferred<Unit>>()
+        runBlocking {
+            claims.forEach { claim ->
+                coroutines.add(
+                    async {
+                        syncReturnInfoFromWms(claim)
+                    }
+                )
+            }
+
+            coroutines.awaitAll()
+        }
+    }
+
+    @Transactional
+    fun syncReturnInfos(claims: List<Claim>) {
+        claims.forEach { claim ->
+            syncReturnInfoFromWms(claim)
+        }
+    }
+
+    private fun sendReleaseReturn(claim: Claim) {
+        val returnItems = claim.returnInfo?.returnProducts?.map {
+            ReturnItemCreateModel(
+                shippingProductId = it.basicProduct.shippingProductId!!,
+                quantity = it.requestQuantity
+            )
+        }
+
+        val returnCreateModel = ReturnCreateModel(
+            partnerId = claim.partnerId,
+            releaseId = claim.releaseInfo?.releaseId?.toInt(),
+            returnReasonId = claim.claimReason.returnReasonId?.toInt(),
+            memo = claim.memo,
+            returnAddress1 = claim.releaseInfo?.confirmOrder?.receiver?.address,
+            receivingName = claim.releaseInfo?.confirmOrder?.receiver?.name,
+            zipcode = claim.releaseInfo?.confirmOrder?.receiver?.zipCode,
+            tel1 = claim.releaseInfo?.confirmOrder?.receiver?.phoneNumber,
+            returnItemList = returnItems
+        )
+        val returnModel = wmsApiClient.createReleaseReturn(returnCreateModel)?.payload
+        claim.returnInfo?.nosnosReleaseReturnInfoId = returnModel?.releaseReturnInfoId
+        claim.returnInfo?.returnCode = returnModel?.returnCode
+    }
+
     private fun sendExchangeReleaseOutbound(exchangeRelease: ExchangeRelease) {
         val outboundCreateModel = buildOutboundCreateModel(exchangeRelease)
-        val postOutboundModel = wmsApiClient.createOutbound(outboundCreateModel).payload ?: throw ExternalApiError("Nosnos에 교환발주를 요청하는데 실패하였습니다. [claimId: ${exchangeRelease.claim.id}")
+        val postOutboundModel = wmsApiClient.createOutbound(outboundCreateModel).payload
+            ?: throw ExternalApiError("Nosnos에 교환발주를 요청하는데 실패하였습니다. [claimId: ${exchangeRelease.claim.id}")
 
         exchangeRelease.nosnosOrderId = postOutboundModel.orderId
         exchangeRelease.nosnosOrderCode = postOutboundModel.orderCode
     }
 
     private fun buildOutboundCreateModel(exchangeRelease: ExchangeRelease): OutboundCreateModel {
-        val originalConfirmOrder = exchangeRelease.claim.releaseInfo?.confirmOrder ?: throw NoSuchElementError("원 발주정보가 존재하지 않습니다. [releaseInfoId = ${exchangeRelease.claim.releaseInfo?.id}]")
+        val originalConfirmOrder = exchangeRelease.claim.releaseInfo?.confirmOrder
+            ?: throw NoSuchElementError("원 발주정보가 존재하지 않습니다. [releaseInfoId = ${exchangeRelease.claim.releaseInfo?.id}]")
 
         return OutboundCreateModel(
             partnerId = originalConfirmOrder.partnerId,
@@ -130,7 +177,8 @@ class ClaimService(
     private fun buildOrderItemList(exchangeProducts: List<ExchangeProduct>): List<OrderItem> {
         return exchangeProducts.map {
             OrderItem(
-                salesProductId = it.basicProduct.salesProductId ?: throw NoSuchElementError("salesProductId가 존재하지 않습니다. [basicProductId: ${it.basicProduct.id}]"),
+                salesProductId = it.basicProduct.salesProductId
+                    ?: throw NoSuchElementError("salesProductId가 존재하지 않습니다. [basicProductId: ${it.basicProduct.id}]"),
                 quantity = it.requestQuantity
             )
         }
@@ -200,4 +248,6 @@ class ClaimService(
             )
         }
     }
+
+    companion object : Log
 }
