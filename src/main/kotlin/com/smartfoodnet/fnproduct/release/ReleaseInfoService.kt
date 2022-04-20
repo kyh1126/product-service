@@ -25,6 +25,7 @@ import com.smartfoodnet.fnproduct.release.model.vo.DeliveryAgency.Companion.getD
 import com.smartfoodnet.fnproduct.release.model.vo.DeliveryStatus
 import com.smartfoodnet.fnproduct.release.model.vo.ReleaseStatus
 import com.smartfoodnet.fnproduct.release.model.vo.TrackingNumberStatus
+import feign.FeignException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
@@ -88,7 +89,7 @@ class ReleaseInfoService(
                         basicProductByShippingProductId
                     )
                 }
-            } catch (e: BaseRuntimeException) {
+            } catch (e: RuntimeException) {
                 log.error("[syncReleaseInfo] orderIds: ${orderIds} 동기화 실패")
             }
 
@@ -181,7 +182,7 @@ class ReleaseInfoService(
                     targetList.content.map { it.id!! },
                     deliveryAgencyById
                 )
-            } catch (e: BaseRuntimeException) {
+            } catch (e: RuntimeException) {
                 log.error("[registerTrackingNumber] 플레이오토 송장등록 실패," +
                     " releaseIds: ${targetList.map { it.releaseId }}")
             }
@@ -218,7 +219,7 @@ class ReleaseInfoService(
                     orderIds = orderIds.toList(),
                     page = page
                 ).payload
-            } catch (e: Exception) {
+            } catch (e: FeignException) {
                 log.error("[getReleases] orderIds: ${orderIds}, page: ${page}, error: ${e.message}")
                 throw BaseRuntimeException(errorMessage = "출고 정보 조회 실패, orderIds: ${orderIds}, page: ${page}")
             }
@@ -245,7 +246,7 @@ class ReleaseInfoService(
             val model: CommonDataListModel<NosnosReleaseItemModel>?
             try {
                 model = wmsApiClient.getReleaseItems(releaseIds = releaseIds, page = page).payload
-            } catch (e: Exception) {
+            } catch (e: FeignException) {
                 log.error("[getReleaseItems] releaseIds: ${releaseIds}, page: ${page}, error: ${e.message}")
                 throw BaseRuntimeException(errorMessage = "출고 대상 상품 조회 실패, releaseIds: ${releaseIds}, page: ${page}")
             }
@@ -283,7 +284,7 @@ class ReleaseInfoService(
                 basicProductByShippingProductId,
                 targetReleaseInfoList,
             )
-        } catch (e: BaseRuntimeException) {
+        } catch (e: RuntimeException) {
             log.error("orderId: ${orderId} releaseInfo 동기화 실패")
         }
     }
@@ -327,7 +328,7 @@ class ReleaseInfoService(
                 lotteTargetList.map { it.id!! },
                 lotteDeliveryInfoByTrackingNumber = deliveryInfoByTrackingNumber
             )
-        } catch (e: BaseRuntimeException) {
+        } catch (e: RuntimeException) {
             log.error("[syncDeliveryInfo] ${DeliveryAgency.LOTTE.playAutoName} 동기화 실패," +
                 " releaseIds: ${lotteTargetList.map { it.releaseId }}")
         }
@@ -350,7 +351,7 @@ class ReleaseInfoService(
                 cjTargetList.map { it.id!! },
                 cjDeliveryInfoByTrackingNumber = deliveryInfoByTrackingNumber
             )
-        } catch (e: BaseRuntimeException) {
+        } catch (e: RuntimeException) {
             log.error("[syncDeliveryInfo] ${DeliveryAgency.CJ.playAutoName} 동기화 실패," +
                 " releaseIds: ${cjTargetList.map { it.releaseId }}")
         }
