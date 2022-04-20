@@ -80,6 +80,15 @@ class ReleaseController(
         return CommonResponse(HttpStatus.OK.reasonPhrase)
     }
 
+    @Operation(summary = "출고 철회")
+    @PatchMapping("cancel/{id}")
+    fun cancelReleaseInfo(
+        @Parameter(description = "릴리즈 정보 ID", required = true) @PathVariable id: Long,
+    ): CommonResponse<String> {
+        releaseInfoStoreService.cancelReleaseInfo(id)
+        return CommonResponse(HttpStatus.OK.reasonPhrase)
+    }
+
     @Operation(summary = "택배사 정보 동기화")
     @PostMapping("delivery-info/sync")
     fun syncDeliveryInfo(

@@ -105,4 +105,8 @@ class ReleaseInfo(
     fun pause() {
         releaseStatus = ReleaseStatus.RELEASE_PAUSED
     }
+
+    fun cancel() {
+        releaseStatus = ReleaseStatus.RELEASE_CANCELLED
+    }
 }

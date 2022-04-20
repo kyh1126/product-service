@@ -16,6 +16,7 @@ import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
 import com.smartfoodnet.fnproduct.release.entity.ReleaseProduct
 import com.smartfoodnet.fnproduct.release.model.dto.ReleaseModelDto
 import com.smartfoodnet.fnproduct.release.model.vo.DeliveryAgency
+import com.smartfoodnet.fnproduct.release.model.vo.ReleaseStatus
 import com.smartfoodnet.fnproduct.release.model.vo.TrackingNumberStatus
 import feign.FeignException
 import org.springframework.stereotype.Service
@@ -142,6 +143,15 @@ class ReleaseInfoStoreService(
             throw e
         }
         releaseInfo.pause()
+    }
+
+    fun cancelReleaseInfo(id: Long) {
+        val releaseInfo = releaseInfoRepository.findById(id).get()
+        if (releaseInfo.releaseStatus != ReleaseStatus.RELEASE_PAUSED) {
+            throw BaseRuntimeException(errorMessage = "출고정지 상태인 경우만 출고 철회가 가능합니다. id: ${id}")
+        }
+
+        releaseInfo.cancel()
     }
 
     private fun isNeedToBeUpdatedReleaseId(releaseInfoByReleaseId: Map<Long?, ReleaseInfo>) =
