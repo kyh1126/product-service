@@ -71,6 +71,9 @@ dependencies {
     implementation("io.springfox:springfox-boot-starter:3.0.0")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.6.5")
 
+    //kotlin coroutines
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1")
+
     //HttpClient
     implementation("org.apache.httpcomponents:httpclient")
 

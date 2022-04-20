@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming
 import com.smartfoodnet.common.Constants
 import java.time.LocalDateTime
 
+@JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy::class)
 data class GetReturnModel(
     val releaseReturnInfoId: Long? = null,
     val memberId: Long? = null,

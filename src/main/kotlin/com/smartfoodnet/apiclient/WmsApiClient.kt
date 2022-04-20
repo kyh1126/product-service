@@ -11,6 +11,7 @@ import com.smartfoodnet.apiclient.request.PreProductMappingModel
 import com.smartfoodnet.apiclient.request.PreSalesProductModel
 import com.smartfoodnet.apiclient.request.PreShippingProductModel
 import com.smartfoodnet.apiclient.request.PreShippingProductSimpleModel
+import com.smartfoodnet.apiclient.response.CjDeliveryStatusModel
 import com.smartfoodnet.apiclient.response.CommonDataListModel
 import com.smartfoodnet.apiclient.response.CommonProcessBulkModel
 import com.smartfoodnet.apiclient.response.GetInboundModel
@@ -180,12 +181,12 @@ interface WmsApiClient {
     @PostMapping("return")
     fun createReleaseReturn(
         @RequestBody returnCreateModel: ReturnCreateModel
-    ): PostReturnModel?
+    ): CommonResponse<PostReturnModel>?
 
-    @GetMapping("{releaseReturnInfoId}")
+    @GetMapping("return/{releaseReturnInfoId}")
     fun getReleaseReturn(
         @PathVariable releaseReturnInfoId: Long
-    ): GetReturnModel
+    ): CommonResponse<GetReturnModel>
 
     // ---------------------------------------------------------------------------------------------
     // -- 로케이션,택배

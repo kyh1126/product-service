@@ -10,5 +10,5 @@ data class StoreProductUpdateModel(
     @ApiModelProperty(value = "옵션코드")
     val optionName: String? = null,
     @ApiModelProperty(value = "쇼핑몰 상품 기본/모음상품 매핑")
-    val storeProductBasicProductMappings: List<StoreProductBasicProductMappingCreateModel>? = null
+    val storeProductBasicProductMappings: List<StoreProductBasicProductMappingCreateModel>
 )

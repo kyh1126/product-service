@@ -6,7 +6,18 @@ import com.smartfoodnet.fnproduct.claim.model.vo.ExchangeStatus
 import com.smartfoodnet.fnproduct.claim.model.vo.ReturnStatus
 import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
 import java.time.LocalDateTime
-import javax.persistence.*
+import javax.persistence.CascadeType
+import javax.persistence.Column
+import javax.persistence.Entity
+import javax.persistence.EnumType
+import javax.persistence.Enumerated
+import javax.persistence.ForeignKey
+import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType
+import javax.persistence.Id
+import javax.persistence.JoinColumn
+import javax.persistence.OneToOne
+import javax.persistence.Table
 
 @Entity
 @Table(name = "claim")
@@ -31,7 +42,7 @@ class Claim(
 
     @Enumerated(EnumType.STRING)
     @Column(name = "return_status")
-    val returnStatus: ReturnStatus = ReturnStatus.RETURN_REQUESTED,
+    var returnStatus: ReturnStatus = ReturnStatus.RETURN_REQUESTED,
 
     @Enumerated(EnumType.STRING)
     @Column(name = "exchange_status")
