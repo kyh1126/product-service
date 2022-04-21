@@ -1,19 +1,24 @@
 package com.smartfoodnet.fnproduct.release
 
 import com.smartfoodnet.apiclient.OrderManagementServiceApiClient
+import com.smartfoodnet.apiclient.WmsApiClient
 import com.smartfoodnet.apiclient.request.TrackingDataModel
 import com.smartfoodnet.apiclient.request.TrackingNumberRegisterModel
 import com.smartfoodnet.apiclient.request.TrackingOptionModel
 import com.smartfoodnet.apiclient.response.*
 import com.smartfoodnet.common.error.exception.BaseRuntimeException
 import com.smartfoodnet.common.error.exception.ErrorCode
+import com.smartfoodnet.common.getNosnosErrorMessage
+import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
 import com.smartfoodnet.fnproduct.release.entity.ReleaseProduct
 import com.smartfoodnet.fnproduct.release.model.dto.ReleaseModelDto
 import com.smartfoodnet.fnproduct.release.model.vo.DeliveryAgency
+import com.smartfoodnet.fnproduct.release.model.vo.ReleaseStatus
 import com.smartfoodnet.fnproduct.release.model.vo.TrackingNumberStatus
+import feign.FeignException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
@@ -23,7 +28,8 @@ import java.time.LocalDateTime
 @Transactional
 class ReleaseInfoStoreService(
     private val releaseInfoRepository: ReleaseInfoRepository,
-    private val orderManagementServiceApiClient: OrderManagementServiceApiClient
+    private val orderManagementServiceApiClient: OrderManagementServiceApiClient,
+    private val wmsApiClient: WmsApiClient,
 ) {
     /**
      * 노스노스에서 응답 받은 데이터로 ReleaseInfo 엔티티를 생성하는 함수
@@ -128,6 +134,26 @@ class ReleaseInfoStoreService(
         }
     }
 
+    fun pauseReleaseInfo(id: Long) {
+        val releaseInfo = releaseInfoRepository.findById(id).get()
+        try {
+            wmsApiClient.cancelRelease(releaseInfo.releaseId!!)
+        } catch (e: FeignException) {
+            log.error("[pauseReleaseInfo] ${getNosnosErrorMessage(e.message)}", e)
+            throw e
+        }
+        releaseInfo.pause()
+    }
+
+    fun cancelReleaseInfo(id: Long) {
+        val releaseInfo = releaseInfoRepository.findById(id).get()
+        if (releaseInfo.releaseStatus != ReleaseStatus.RELEASE_PAUSED) {
+            throw BaseRuntimeException(errorMessage = "출고중지 상태인 경우만 출고 철회가 가능합니다. id: ${id}")
+        }
+
+        releaseInfo.cancel()
+    }
+
     private fun isNeedToBeUpdatedReleaseId(releaseInfoByReleaseId: Map<Long?, ReleaseInfo>) =
         releaseInfoByReleaseId.containsKey(null)
 
@@ -222,4 +248,6 @@ class ReleaseInfoStoreService(
 
         return releaseProducts
     }
+
+    companion object : Log
 }

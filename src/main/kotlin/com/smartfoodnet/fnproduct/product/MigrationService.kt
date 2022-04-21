@@ -178,7 +178,7 @@ class MigrationService(
             try {
                 model = wmsApiClient.getShippingProducts(BasicProductReadModel(memberId = memberId, page = page)).payload!!
             } catch (e: Exception) {
-                log.error("[nosnosToBasicProducts] page: $page, error: ${e.message}")
+                log.error("[nosnosToBasicProducts] page: $page", e)
                 throw BaseRuntimeException(errorMessage = "출고상품 생성 실패, memberId: ${memberId}, page: ${page}")
             }
 

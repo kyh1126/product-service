@@ -101,4 +101,12 @@ class ReleaseInfo(
         releaseStatus = ReleaseStatus.DELIVERY_COMPLETED
         deliveryCompletedAt = procDateTime
     }
+
+    fun pause() {
+        releaseStatus = ReleaseStatus.RELEASE_PAUSED
+    }
+
+    fun cancel() {
+        releaseStatus = ReleaseStatus.RELEASE_CANCELLED
+    }
 }

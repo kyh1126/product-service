@@ -19,7 +19,10 @@ import org.springframework.web.bind.annotation.*
 @Api(description = "릴리즈 관련 API")
 @RestController
 @RequestMapping("release-info")
-class ReleaseController(private val releaseInfoService: ReleaseInfoService) {
+class ReleaseController(
+    private val releaseInfoService: ReleaseInfoService,
+    private val releaseInfoStoreService: ReleaseInfoStoreService,
+) {
     @Operation(summary = "특정 화주(고객사) ID 의 릴리즈 정보 리스트 조회")
     @GetMapping("partners/{partnerId}")
     fun getReleaseInfoList(
@@ -66,6 +69,24 @@ class ReleaseController(private val releaseInfoService: ReleaseInfoService) {
         @Parameter(description = "주문번호", required = true) @RequestParam orderNumber: String,
     ): List<OrderConfirmProductModel> {
         return releaseInfoService.getConfirmProducts(partnerId, orderNumber)
+    }
+
+    @Operation(summary = "출고 중지")
+    @PatchMapping("pause/{id}")
+    fun pauseReleaseInfo(
+        @Parameter(description = "릴리즈 정보 ID", required = true) @PathVariable id: Long,
+    ): CommonResponse<String> {
+        releaseInfoStoreService.pauseReleaseInfo(id)
+        return CommonResponse(HttpStatus.OK.reasonPhrase)
+    }
+
+    @Operation(summary = "출고 철회")
+    @PatchMapping("cancel/{id}")
+    fun cancelReleaseInfo(
+        @Parameter(description = "릴리즈 정보 ID", required = true) @PathVariable id: Long,
+    ): CommonResponse<String> {
+        releaseInfoStoreService.cancelReleaseInfo(id)
+        return CommonResponse(HttpStatus.OK.reasonPhrase)
     }
 
     @Operation(summary = "택배사 정보 동기화")

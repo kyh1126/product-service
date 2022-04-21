@@ -90,7 +90,7 @@ class ReleaseInfoService(
                     )
                 }
             } catch (e: RuntimeException) {
-                log.error("[syncReleaseInfo] orderIds: ${orderIds} 동기화 실패")
+                log.error("[syncReleaseInfo] orderIds: ${orderIds} 동기화 실패", e)
             }
 
             if (targetList.isLast) break
@@ -184,7 +184,7 @@ class ReleaseInfoService(
                 )
             } catch (e: RuntimeException) {
                 log.error("[registerTrackingNumber] 플레이오토 송장등록 실패," +
-                    " releaseIds: ${targetList.map { it.releaseId }}")
+                    " releaseIds: ${targetList.map { it.releaseId }}", e)
             }
 
             if (targetList.isLast) break
@@ -220,7 +220,7 @@ class ReleaseInfoService(
                     page = page
                 ).payload
             } catch (e: FeignException) {
-                log.error("[getReleases] orderIds: ${orderIds}, page: ${page}, error: ${e.message}")
+                log.error("[getReleases] orderIds: ${orderIds}, page: ${page}", e)
                 throw BaseRuntimeException(errorMessage = "출고 정보 조회 실패, orderIds: ${orderIds}, page: ${page}")
             }
 
@@ -247,7 +247,7 @@ class ReleaseInfoService(
             try {
                 model = wmsApiClient.getReleaseItems(releaseIds = releaseIds, page = page).payload
             } catch (e: FeignException) {
-                log.error("[getReleaseItems] releaseIds: ${releaseIds}, page: ${page}, error: ${e.message}")
+                log.error("[getReleaseItems] releaseIds: ${releaseIds}, page: ${page}", e)
                 throw BaseRuntimeException(errorMessage = "출고 대상 상품 조회 실패, releaseIds: ${releaseIds}, page: ${page}")
             }
 
@@ -285,7 +285,7 @@ class ReleaseInfoService(
                 targetReleaseInfoList,
             )
         } catch (e: RuntimeException) {
-            log.error("orderId: ${orderId} releaseInfo 동기화 실패")
+            log.error("orderId: ${orderId} releaseInfo 동기화 실패", e)
         }
     }
 
@@ -330,7 +330,7 @@ class ReleaseInfoService(
             )
         } catch (e: RuntimeException) {
             log.error("[syncDeliveryInfo] ${DeliveryAgency.LOTTE.playAutoName} 동기화 실패," +
-                " releaseIds: ${lotteTargetList.map { it.releaseId }}")
+                " releaseIds: ${lotteTargetList.map { it.releaseId }}", e)
         }
     }
 
@@ -353,7 +353,7 @@ class ReleaseInfoService(
             )
         } catch (e: RuntimeException) {
             log.error("[syncDeliveryInfo] ${DeliveryAgency.CJ.playAutoName} 동기화 실패," +
-                " releaseIds: ${cjTargetList.map { it.releaseId }}")
+                " releaseIds: ${cjTargetList.map { it.releaseId }}", e)
         }
     }
 
