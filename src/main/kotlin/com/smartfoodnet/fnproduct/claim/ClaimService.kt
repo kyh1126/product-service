@@ -82,9 +82,8 @@ class ClaimService(
     }
 
     @Transactional
-    fun syncReturnInfos(partnerId: Long) {
+    fun syncReturnInfos() {
         val condition = ClaimSearchCondition(
-            partnerId = partnerId,
             returnStates = listOf(ReturnStatus.RETURN_REQUESTED, ReturnStatus.RETURN_IN_PROGRESS)
         )
         val claims = claimRepository.findAllByCondition(condition)

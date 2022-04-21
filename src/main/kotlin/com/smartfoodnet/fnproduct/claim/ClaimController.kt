@@ -45,7 +45,7 @@ class ClaimController(
         @Parameter(description = "화주(고객사) ID", required = true)
         @PathVariable partnerId: Long
     ): CommonResponse<String> {
-        claimService.syncReturnInfos(partnerId)
+        claimService.syncReturnInfos()
         return CommonResponse(HttpStatus.OK.reasonPhrase)
     }
 
