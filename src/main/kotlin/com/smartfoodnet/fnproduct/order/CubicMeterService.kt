@@ -17,4 +17,5 @@ class CubicMeterService(
     fun getById(id: Long): CubicMeter? {
         return cubicMeterRepository.findById(id).get()
     }
+
 }

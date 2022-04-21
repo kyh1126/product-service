@@ -5,7 +5,7 @@ import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
 import javax.persistence.*
 
 @Entity
-class CubicMeter(
+data class CubicMeter(
     val above : Long,
     val below : Long,
     @Enumerated(EnumType.STRING)
