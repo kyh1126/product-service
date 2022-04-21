@@ -14,15 +14,6 @@ class StockByBestBeforeSearchCondition(
     @ApiModelProperty(hidden = true)
     var partnerId: Long? = null,
 
-//    @ApiModelProperty(value = "기본상품명")
-//    var basicProductName: String? = null,
-//
-//    @ApiModelProperty(value = "기본상품코드")
-//    var basicProductCode: String? = null,
-//
-//    @ApiModelProperty(value = "상품바코드")
-//    var barcode: String? = null,
-
     @ApiModelProperty(value = "유통기한관리여부")
     var expirationDateManagementYn: String? = null,
 
@@ -48,13 +39,10 @@ class StockByBestBeforeSearchCondition(
         NAME, CODE, BARCODE
     }
 
-
     override fun assemblePredicate(predicate: BooleanBuilder): Predicate {
         return predicate.orAllOf(
             eqCollectDateToday(),
             eqPartnerId(partnerId),
-//            likeBasicProductName(basicProductName),
-//            eqBasicProductCode(basicProductCode),
             searchType?.let { toPredicate(it) },
             eqExpirationDateManagementYn(expirationDateManagementYn),
             betweenBestBeforeFromTo(rangeBestBeforeFrom, rangeBestBeforeTo)

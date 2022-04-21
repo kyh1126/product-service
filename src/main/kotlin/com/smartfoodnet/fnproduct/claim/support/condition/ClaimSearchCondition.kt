@@ -7,6 +7,8 @@ import com.querydsl.core.types.Predicate
 import com.smartfoodnet.common.Constants
 import com.smartfoodnet.common.model.request.PredicateSearchCondition
 import com.smartfoodnet.fnproduct.claim.entity.QClaim.claim
+import com.smartfoodnet.fnproduct.claim.model.vo.ExchangeStatus
+import com.smartfoodnet.fnproduct.claim.model.vo.ReturnStatus
 import io.swagger.annotations.ApiModelProperty
 import java.time.LocalDate
 
@@ -26,7 +28,13 @@ class ClaimSearchCondition(
     val exchangeTrackingNumber: String? = null,
 
     @ApiModelProperty(value = "주문자이름")
-    val customerName: String? = null
+    val customerName: String? = null,
+
+    @ApiModelProperty(value = "반품상태 리스트")
+    val returnStates: List<ReturnStatus>? = null,
+
+    @ApiModelProperty(value = "교환출고상태 리스트")
+    val exchangeStates: List<ExchangeStatus>? = null
 
 ) : PredicateSearchCondition() {
     override fun assemblePredicate(predicate: BooleanBuilder): Predicate {
@@ -40,7 +48,9 @@ class ClaimSearchCondition(
                     it.atStartOfDay(),
                     it.plusDays(1).atStartOfDay()
                 )
-            }
+            },
+            returnStates?.let{ claim.returnStatus.`in`(it) },
+            exchangeStates?.let{ claim.exchangeStatus.`in`(it) }
         )
     }
 }
