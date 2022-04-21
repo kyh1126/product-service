@@ -34,23 +34,6 @@ class ConfirmOrderService(
     val packageProductMappingRepository: PackageProductMappingRepository,
     val wmsApiClient: WmsApiClient
 ) : Log {
-    private fun validateConfirmProduct(
-        partnerId: Long,
-        collectedOrderIds: List<Long>,
-    ): List<CollectedOrder> {
-        val collectedList = orderService.getCollectedOrders(collectedOrderIds)
-        val subtractList = collectedOrderIds.subtract(collectedList.map { it.id }.toSet())
-
-        if (subtractList.isNotEmpty()) {
-            throw BaseRuntimeException(errorMessage = "주문수집 Key[${subtractList.joinToString { it.toString() }}]를 찾을 수 없습니다")
-        }
-
-        if (!collectedList.all { it.partnerId == partnerId })
-            throw BaseRuntimeException(errorMessage = "해당 고객사의 주문건이 아닙니다")
-
-        return collectedList
-    }
-
     @Transactional
     fun createConfirmProduct(partnerId: Long, collectedOrderIds: List<Long>) {
         val collectedList = validateConfirmProduct(partnerId, collectedOrderIds)
@@ -80,6 +63,78 @@ class ConfirmOrderService(
         }
     }
 
+    @Transactional
+    fun requestOrders(partnerId: Long, requestOrderCreateModel: RequestOrderCreateModel): List<ConfirmOrder> {
+        val collectedOrderList =
+            orderService.getCollectedOrders(requestOrderCreateModel.collectedOrderIds)
+
+        if (collectedOrderList.all { it.status != OrderStatus.ORDER_CONFIRM }) {
+            throw BaseRuntimeException(errorMessage = "출고지시 상태가 아닌 주문건이 있습니다")
+        }
+
+        val sendOrderList = collectedOrderList
+            .groupBy { it.bundleNumber }
+            .map {
+                createConfirmOrder(partnerId, requestOrderCreateModel, it)
+            }
+
+        val requestBulkModel = RequestOrderMapper.toOutboundCreateBulkModel(sendOrderList)
+        val response =
+            wmsApiClient.createOutbounds(requestBulkModel).payload?.processedDataList
+                ?: emptyList()
+
+        for ((index, confirmOrder) in sendOrderList.withIndex()) {
+            val orderInfo = response[index]
+            confirmOrder.setOrderInfo(orderInfo.orderId, orderInfo.orderCode)
+            releaseInfoStoreService.createFromOrderInfo(partnerId, orderInfo)
+        }
+
+        return sendOrderList
+    }
+
+    fun getConfirmProduct(condition: ConfirmProductSearchCondition): List<ConfirmProductModel> {
+        val partnerId = condition.partnerId!!
+        val response = confirmProductRepository.findAllCollectedOrderWithConfirmProduct(condition)
+        val shippingProductIds = response.filter { it.basicProductType == BasicProductType.BASIC }
+            .mapNotNull { it.basicProductShippingProductId }
+        val availableStocks = getAvailableStocks(partnerId, shippingProductIds).toMutableMap()
+
+        response.forEach {
+            it.availableQuantity =
+                if (it.basicProductType == BasicProductType.PACKAGE) getPackageAvailableMinStocks(
+                    it,
+                    availableStocks
+                )
+                else availableStocks[it.basicProductShippingProductId]?.toInt() ?: -1
+        }
+
+        return response
+    }
+
+    @Transactional
+    fun replaceConfirmProducts(confirmProductAddModel: ConfirmProductAddModel) {
+        confirmProductAddModel.confirmProductList.forEach {
+            replaceConfirmProduct(it)
+        }
+    }
+
+    private fun validateConfirmProduct(
+        partnerId: Long,
+        collectedOrderIds: List<Long>,
+    ): List<CollectedOrder> {
+        val collectedList = orderService.getCollectedOrders(collectedOrderIds)
+        val subtractList = collectedOrderIds.subtract(collectedList.map { it.id }.toSet())
+
+        if (subtractList.isNotEmpty()) {
+            throw BaseRuntimeException(errorMessage = "주문수집 Key[${subtractList.joinToString { it.toString() }}]를 찾을 수 없습니다")
+        }
+
+        if (!collectedList.all { it.partnerId == partnerId })
+            throw BaseRuntimeException(errorMessage = "해당 고객사의 주문건이 아닙니다")
+
+        return collectedList
+    }
+
     private fun restoreConfirmProduct(collectedOrder: CollectedOrder) {
         collectedOrder.clearConfirmProduct()
         collectedOrderAddConfirmProduct(collectedOrder)
@@ -103,36 +158,7 @@ class ConfirmOrderService(
         }
     }
 
-    @Transactional
-    fun requestOrders(partnerId: Long, requestOrderCreateModel: RequestOrderCreateModel): List<ConfirmOrder> {
-        val collectedOrderList =
-            orderService.getCollectedOrders(requestOrderCreateModel.collectedOrderIds)
-
-        if (collectedOrderList.all { it.status != OrderStatus.ORDER_CONFIRM }) {
-            throw BaseRuntimeException(errorMessage = "출고지시 상태가 아닌 주문건이 있습니다")
-        }
-
-        val sendOrderList = collectedOrderList
-            .groupBy { it.bundleNumber }
-            .map {
-                createSendOrder(partnerId, requestOrderCreateModel, it)
-            }
-
-        val requestBulkModel = RequestOrderMapper.toOutboundCreateBulkModel(sendOrderList)
-        val response =
-            wmsApiClient.createOutbounds(requestBulkModel).payload?.processedDataList
-                ?: emptyList()
-
-        for ((index, confirmOrder) in sendOrderList.withIndex()) {
-            val orderInfo = response[index]
-            confirmOrder.setOrderInfo(orderInfo.orderId, orderInfo.orderCode)
-            releaseInfoStoreService.createFromOrderInfo(partnerId, orderInfo)
-        }
-
-        return sendOrderList
-    }
-
-    private fun createSendOrder(
+    private fun createConfirmOrder(
         partnerId: Long,
         requestOrderCreateModel: RequestOrderCreateModel,
         orderGroup: Map.Entry<String, List<CollectedOrder>>
@@ -151,9 +177,9 @@ class ConfirmOrderService(
             memo = Memo(
                 firstCollectedOrder.storeName,
                 requestOrderCreateModel.promotion,
-                requestOrderCreateModel.reShipmentReason,
+                "",
                 firstCollectedOrder.shippingPrice?.toInt().toString(),
-                null
+                requestOrderCreateModel.reShipmentReason,
             )
         )
 
@@ -236,32 +262,6 @@ class ConfirmOrderService(
         }.minOf { it.toInt() }
 
         return minQuantity
-    }
-
-    fun getConfirmProduct(condition: ConfirmProductSearchCondition): List<ConfirmProductModel> {
-        val partnerId = condition.partnerId!!
-        val response = confirmProductRepository.findAllCollectedOrderWithConfirmProduct(condition)
-        val shippingProductIds = response.filter { it.basicProductType == BasicProductType.BASIC }
-            .mapNotNull { it.basicProductShippingProductId }
-        val availableStocks = getAvailableStocks(partnerId, shippingProductIds).toMutableMap()
-
-        response.forEach {
-            it.availableQuantity =
-                if (it.basicProductType == BasicProductType.PACKAGE) getPackageAvailableMinStocks(
-                    it,
-                    availableStocks
-                )
-                else availableStocks[it.basicProductShippingProductId]?.toInt() ?: -1
-        }
-
-        return response
-    }
-
-    @Transactional
-    fun replaceConfirmProducts(confirmProductAddModel: ConfirmProductAddModel) {
-        confirmProductAddModel.confirmProductList.forEach {
-            replaceConfirmProduct(it)
-        }
     }
 
     private fun replaceConfirmProduct(mappedModel: ConfirmProductMappedModel) {
