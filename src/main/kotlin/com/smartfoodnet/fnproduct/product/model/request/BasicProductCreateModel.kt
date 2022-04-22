@@ -63,6 +63,15 @@ class BasicProductCreateModel {
     @ApiModelProperty(value = "유통기한관리여부 (default: N)", allowableValues = "Y,N")
     var expirationDateManagementYn: String = "N"
 
+    @JsonUnwrapped
+    var expirationDateInfoModel: ExpirationDateInfoCreateModel? = null
+
+    @JsonUnwrapped
+    var singleDimensionCreateModel: SingleDimensionCreateModel? = null
+
+    @JsonUnwrapped
+    var boxDimensionCreateModel: BoxDimensionCreateModel? = null
+
     @ApiModelProperty(value = "박스입수")
     var piecesPerBox: Int? = null
 
@@ -74,9 +83,6 @@ class BasicProductCreateModel {
 
     @ApiModelProperty(value = "활성화여부 (default: Y)", allowableValues = "Y,N")
     var activeYn: String = "Y"
-
-    @JsonUnwrapped
-    var expirationDateInfoModel: ExpirationDateInfoCreateModel? = null
 
     fun toEntity(
         code: String?,
@@ -98,6 +104,8 @@ class BasicProductCreateModel {
             supplyPrice = supplyPrice,
             expirationDateManagementYn = expirationDateManagementYn,
             expirationDateInfo = expirationDateInfoModel?.toEntity(),
+            singleDimension = singleDimensionCreateModel?.toEntity(),
+            boxDimension = boxDimensionCreateModel?.toEntity(),
             piecesPerBox = piecesPerBox,
             piecesPerPalette = piecesPerPalette,
             imageUrl = imageUrl,
