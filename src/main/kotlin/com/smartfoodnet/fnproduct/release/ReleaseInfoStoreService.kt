@@ -148,7 +148,7 @@ class ReleaseInfoStoreService(
     fun cancelReleaseInfo(id: Long) {
         val releaseInfo = releaseInfoRepository.findById(id).get()
         if (releaseInfo.releaseStatus != ReleaseStatus.RELEASE_PAUSED) {
-            throw BaseRuntimeException(errorMessage = "출고정지 상태인 경우만 출고 철회가 가능합니다. id: ${id}")
+            throw BaseRuntimeException(errorMessage = "출고중지 상태인 경우만 출고 철회가 가능합니다. id: ${id}")
         }
 
         releaseInfo.cancel()

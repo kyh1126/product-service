@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 import com.smartfoodnet.common.Constants
+import com.smartfoodnet.common.Constants.NOSNOS_DATE_FORMAT
+import com.smartfoodnet.common.toLocalDateTime
 import com.smartfoodnet.fninventory.inbound.entity.InboundActualDetail
 import com.smartfoodnet.fninventory.inbound.entity.InboundExpectedDetail
 import com.smartfoodnet.fninventory.inbound.entity.InboundUnplanned
@@ -11,6 +13,7 @@ import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import kotlin.math.exp
 
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy::class)
 data class GetInboundWorkModel(
@@ -32,7 +35,7 @@ data class GetInboundWorkModel(
 ) {
     fun toEntity(
         inboundExpectedDetail: InboundExpectedDetail,
-        basicProduct: BasicProduct
+        basicProduct : BasicProduct
     ): InboundActualDetail {
 
         val expireMakeDate = convertExpireAndMakeDate(basicProduct)
@@ -62,8 +65,8 @@ data class GetInboundWorkModel(
             workDate = workDate,
             receivingType = receivingType,
             quantity = quantity,
-            makeDate = expireMakeDate.makeDate,
             expireDate = expireMakeDate.expireDate,
+            makeDate = expireMakeDate.makeDate,
             locationId = locationId,
             boxQuantity = boxQuantity,
             palletQuantity = palletQuantity,
@@ -78,33 +81,52 @@ data class GetInboundWorkModel(
     )
 
     private fun convertExpireAndMakeDate(basicProduct: BasicProduct?): ExpireMakeDate {
-        if (basicProduct == null) return ExpireMakeDate()
+        if (basicProduct == null || !basicProduct.expireDateManage()) return ExpireMakeDate()
 
         if (!expireDate.isNullOrBlank() && !makeDate.isNullOrBlank()) {
             return ExpireMakeDate(
-                LocalDate.parse(expireDate, DateTimeFormatter.ofPattern("yyyyMMdd")).atTime(0, 0),
-                LocalDate.parse(makeDate, DateTimeFormatter.ofPattern("yyyyMMdd")).atTime(0, 0)
+                expireDate.toLocalDateTime(NOSNOS_DATE_FORMAT),
+                makeDate.toLocalDateTime(NOSNOS_DATE_FORMAT)
             )
         } else if (!expireDate.isNullOrBlank() && makeDate.isNullOrBlank()) {
-            val expireDate =
-                LocalDate.parse(expireDate, DateTimeFormatter.ofPattern("yyyyMMdd")).atTime(0, 0)
-            var makeDate: LocalDateTime? = null
-            if (basicProduct.expirationDateManagementYn == "Y" && basicProduct.expirationDateInfo?.manufactureDateWriteYn == "Y") {
-                makeDate =
-                    expireDate.minusDays(basicProduct.expirationDateInfo!!.manufactureToExpirationDate?.toLong()!!)
-            }
+            val expireDate : LocalDateTime? = expireDate.toLocalDateTime(NOSNOS_DATE_FORMAT)
+            val makeDate: LocalDateTime? =
+                if (basicProduct.expireDateManage() && basicProduct.manufactureDateWrite()) {
+                    expireDate?.minusDays(basicProduct.manufactureToExpirationDate())
+                } else
+                    null
             return ExpireMakeDate(expireDate, makeDate)
+
         } else if (expireDate.isNullOrBlank() && !makeDate.isNullOrBlank()) {
-            val makeDate =
-                LocalDate.parse(makeDate, DateTimeFormatter.ofPattern("yyyyMMdd")).atTime(0, 0)
-            var expireDate: LocalDateTime? = null
-            if (basicProduct.expirationDateManagementYn == "Y" && basicProduct.expirationDateInfo?.expirationDateWriteYn == "Y") {
-                expireDate =
-                    makeDate.plusDays(basicProduct.expirationDateInfo!!.manufactureToExpirationDate?.toLong()!!)
-            }
+            val makeDate = makeDate.toLocalDateTime(NOSNOS_DATE_FORMAT)
+            val expireDate: LocalDateTime? =
+                if (basicProduct.expireDateManage() && basicProduct.expirationDateWrite()) {
+                        makeDate?.plusDays(basicProduct.manufactureToExpirationDate())
+                } else
+                    null
             return ExpireMakeDate(expireDate, makeDate)
         }
 
         return ExpireMakeDate()
+    }
+
+    companion object{
+        fun testModel(expireDate : String?, makeDate: String?) : GetInboundWorkModel{
+            return GetInboundWorkModel(
+                receivingWorkHistoryId = 104227,
+                workDate = LocalDateTime.now(),
+                workType = 1,
+                receivingPlanId = 876,
+                receivingType = 1,
+                shippingProductId = 4488,
+                quantity = 10,
+                makeDate = makeDate,
+                expireDate = expireDate,
+                boxQuantity = 5,
+                palletQuantity = 1,
+                workerMemberId = 10,
+                workMemo = "메모"
+            )
+        }
     }
 }

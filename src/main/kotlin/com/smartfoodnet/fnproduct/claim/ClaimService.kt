@@ -49,7 +49,7 @@ class ClaimService(
         condition: ClaimSearchCondition,
         page: Pageable
     ): Page<ClaimModel> {
-        val claims = claimRepository.findAll(condition.toPredicate(), page)
+        val claims = claimRepository.findAllByCondition(condition, page)
         syncReturnInfosByCoroutine(claims.content)
 
         return claims.map { ClaimModel.from(it) }
@@ -81,6 +81,15 @@ class ClaimService(
         sendExchangeReleaseOutbound(exchangeRelease)
     }
 
+    @Transactional
+    fun syncReturnInfos() {
+        val condition = ClaimSearchCondition(
+            returnStates = listOf(ReturnStatus.RETURN_REQUESTED, ReturnStatus.RETURN_IN_PROGRESS)
+        )
+        val claims = claimRepository.findAllByCondition(condition)
+        syncReturnInfosByCoroutine(claims)
+    }
+
     private fun syncReturnInfoFromWms(claim: Claim) {
         val returnModel = claim.returnInfo?.nosnosReleaseReturnInfoId?.let {
             wmsApiClient.getReleaseReturn(it)
@@ -104,13 +113,6 @@ class ClaimService(
             }
 
             coroutines.awaitAll()
-        }
-    }
-
-    @Transactional
-    fun syncReturnInfos(claims: List<Claim>) {
-        claims.forEach { claim ->
-            syncReturnInfoFromWms(claim)
         }
     }
 

@@ -11,6 +11,7 @@ import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.EnumType
 import javax.persistence.Enumerated
+import javax.persistence.FetchType
 import javax.persistence.ForeignKey
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
@@ -51,13 +52,13 @@ class Claim(
     @Column(name = "memo")
     val memo: String? = null,
 
-    @OneToOne(mappedBy = "claim", cascade = [CascadeType.PERSIST])
+    @OneToOne(mappedBy = "claim", cascade = [CascadeType.PERSIST], fetch = FetchType.EAGER)
     var returnInfo: ReturnInfo? = null,
 
-    @OneToOne(mappedBy = "claim", cascade = [CascadeType.PERSIST])
+    @OneToOne(mappedBy = "claim", cascade = [CascadeType.PERSIST], fetch = FetchType.LAZY)
     var exchangeRelease: ExchangeRelease? = null,
 
-    @OneToOne(cascade = [CascadeType.PERSIST])
+    @OneToOne(cascade = [CascadeType.PERSIST], fetch = FetchType.LAZY)
     @JoinColumn(name = "release_info_id", foreignKey = ForeignKey(name = "FK_release_info__claim"), columnDefinition = "BIGINT UNSIGNED")
     val releaseInfo: ReleaseInfo? = null
 ): BaseEntity() {

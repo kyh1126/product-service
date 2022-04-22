@@ -10,9 +10,9 @@ enum class OrderStatus(val description: String) {
     RELEASE_IN_PROGRESS("출고작업중"),
     IN_TRANSIT("배송중"),
     COMPLETE("배송완료"),
-    RELEASE_PAUSED("출고정지"),
+    RELEASE_PAUSED("출고중지"),
     RELEASE_CANCELLED("출고취소"),
-    CANCEL( "주문취소");
+    CANCEL("주문취소");
 
     fun next() = when (this) {
         NEW -> ORDER_CONFIRM
@@ -25,7 +25,7 @@ enum class OrderStatus(val description: String) {
         else -> this
     }
 
-    fun cancel() : OrderStatus {
+    fun cancel(): OrderStatus {
         return CANCEL
     }
 }

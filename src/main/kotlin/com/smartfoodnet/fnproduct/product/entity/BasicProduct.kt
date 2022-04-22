@@ -61,6 +61,12 @@ class BasicProduct(
     @Embedded
     var expirationDateInfo: ExpirationDateInfo? = null,
 
+    @Embedded
+    val singleDimension: SingleDimension? = null,
+
+    @Embedded
+    val boxDimension: BoxDimension? = null,
+
     @Column(name = "pieces_per_box")
     var piecesPerBox: Int? = null,
 
@@ -143,5 +149,21 @@ class BasicProduct(
 
     fun updateSalesProductId(salesProductId: Long) {
         this.salesProductId = salesProductId
+    }
+
+    fun expireDateManage(): Boolean {
+        return expirationDateManagementYn == "Y"
+    }
+
+    fun manufactureDateWrite(): Boolean {
+        return expirationDateInfo?.manufactureDateWriteYn == "Y"
+    }
+
+    fun expirationDateWrite(): Boolean {
+        return expirationDateInfo?.expirationDateWriteYn == "Y"
+    }
+
+    fun manufactureToExpirationDate(): Long {
+        return expirationDateInfo?.manufactureToExpirationDate?.toLong() ?: 0
     }
 }
