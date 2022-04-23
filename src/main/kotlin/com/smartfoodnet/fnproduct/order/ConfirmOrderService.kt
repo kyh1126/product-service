@@ -187,11 +187,12 @@ class ConfirmOrderService(
             memo = Memo(
                 memo1 = firstCollectedOrder.storeName,
                 memo2 = requestOrderCreateModel.promotion,
-                memo3 = firstCollectedOrder.shippingPrice?.toInt().toString(),
-                memo4 = requestOrderCreateModel.reShipmentReason,
+                memo4 = firstCollectedOrder.shippingPrice?.toInt().toString(),
+                memo5 = requestOrderCreateModel.reShipmentReason,
             )
         )
-
+        // 추천 박스 처리
+        confirmOrder.memo!!.memo3 = getRecommendBox(orderGroup.value).description
 
         orderGroup.value.forEach {
             val confirmRequestOrder = ConfirmRequestOrder(
@@ -201,6 +202,8 @@ class ConfirmOrderService(
             confirmOrder.addRequestOrder(confirmRequestOrder)
             it.nextStep()
         }
+
+
 
         return confirmOrderRepository.save(confirmOrder)
     }
@@ -305,36 +308,22 @@ class ConfirmOrderService(
 
     private fun getRecommendBox(collectedOrderList: List<CollectedOrder>): BoxType {
         val totalCbm = sumProductCbm(collectedOrderList)
-//        cubicMeterService.
+        val handleTemperature = getProductHandleTemperature(collectedOrderList)
+
+        return cubicMeterService.getByCBM(totalCbm, handleTemperature)?.box ?: BoxType.CHECK
     }
 
-    private fun sumProductCbm(collectedOrderList: List<CollectedOrder>): Long {
-        var cbm: Long = 0
-
-        getAllProduct(collectedOrderList)
-            .forEach { b ->
-                cbm += when (b.type) {
-                    BasicProductType.BASIC -> b.singleCbm()
-                    BasicProductType.PACKAGE -> expandPackageProductSumCbm(b)
-                    else -> 0
-                }
-            }
-
-        return cbm
-    }
+    private fun sumProductCbm(collectedOrderList: List<CollectedOrder>): Long =
+        getAllProduct(collectedOrderList).sumOf { b -> b.singleCbm() }
 
     /**
      * 상온, 저온을 반환한다 만약 상온/저온 복합일 경우 저온으로 반환한다
      */
     private fun getProductHandleTemperature(collectedOrderList: List<CollectedOrder>): HandlingTemperatureType {
-        var temperatureType : HandlingTemperatureType = HandlingTemperatureType.ROOM
-
-        getAllProduct(collectedOrderList)
-            .forEach { b ->
-                when (b.type){
-                    BasicProductType.BASIC ->
-                }
-            }
+        return if (getAllProduct(collectedOrderList).all { b -> b.handlingTemperature == HandlingTemperatureType.ROOM })
+            HandlingTemperatureType.ROOM
+        else
+            HandlingTemperatureType.REFRIGERATE
     }
 
     /**
@@ -346,6 +335,12 @@ class ConfirmOrderService(
             .map { it.confirmProductList }
             .flatten()
             .map { it.basicProduct }
+            .map { b ->
+                when (b.type) {
+                    BasicProductType.PACKAGE -> expandPackageProduct(b)
+                    else -> listOf(b)
+                }
+            }.flatten()
     }
 
     /**
