@@ -12,12 +12,15 @@ import com.smartfoodnet.fnproduct.order.model.RequestOrderCreateModel
 import com.smartfoodnet.fnproduct.order.support.ConfirmOrderRepository
 import com.smartfoodnet.fnproduct.order.support.ConfirmProductRepository
 import com.smartfoodnet.fnproduct.order.support.condition.ConfirmProductSearchCondition
+import com.smartfoodnet.fnproduct.order.vo.BoxType
 import com.smartfoodnet.fnproduct.order.vo.DeliveryType
 import com.smartfoodnet.fnproduct.order.vo.MatchingType
 import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import com.smartfoodnet.fnproduct.product.BasicProductService
 import com.smartfoodnet.fnproduct.product.PackageProductMappingRepository
+import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
+import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
 import com.smartfoodnet.fnproduct.release.ReleaseInfoStoreService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -29,9 +32,12 @@ class ConfirmOrderService(
     val orderService: OrderService,
     val basicProductService: BasicProductService,
     val releaseInfoStoreService: ReleaseInfoStoreService,
+    val cubicMeterService: CubicMeterService,
+
     val confirmOrderRepository: ConfirmOrderRepository,
     val confirmProductRepository: ConfirmProductRepository,
     val packageProductMappingRepository: PackageProductMappingRepository,
+
     val wmsApiClient: WmsApiClient
 ) : Log {
     @Transactional
@@ -64,7 +70,10 @@ class ConfirmOrderService(
     }
 
     @Transactional
-    fun requestOrders(partnerId: Long, requestOrderCreateModel: RequestOrderCreateModel): List<ConfirmOrder> {
+    fun requestOrders(
+        partnerId: Long,
+        requestOrderCreateModel: RequestOrderCreateModel
+    ): List<ConfirmOrder> {
         val collectedOrderList =
             orderService.getCollectedOrders(requestOrderCreateModel.collectedOrderIds)
 
@@ -79,6 +88,7 @@ class ConfirmOrderService(
             }
 
         val requestBulkModel = RequestOrderMapper.toOutboundCreateBulkModel(sendOrderList)
+
         val response =
             wmsApiClient.createOutbounds(requestBulkModel).payload?.processedDataList
                 ?: emptyList()
@@ -175,13 +185,13 @@ class ConfirmOrderService(
             requestShippingDate = LocalDateTime.now(),
             receiver = firstCollectedOrder.receiver,
             memo = Memo(
-                firstCollectedOrder.storeName,
-                requestOrderCreateModel.promotion,
-                "",
-                firstCollectedOrder.shippingPrice?.toInt().toString(),
-                requestOrderCreateModel.reShipmentReason,
+                memo1 = firstCollectedOrder.storeName,
+                memo2 = requestOrderCreateModel.promotion,
+                memo3 = firstCollectedOrder.shippingPrice?.toInt().toString(),
+                memo4 = requestOrderCreateModel.reShipmentReason,
             )
         )
+
 
         orderGroup.value.forEach {
             val confirmRequestOrder = ConfirmRequestOrder(
@@ -292,4 +302,62 @@ class ConfirmOrderService(
     private fun getBasicProductsAndRequestQuantityMapping(mappedModel: ConfirmProductMappedModel): Map<Long, Int> {
         return mappedModel.basicProducts.associateBy({ it.basicProductId }, { it.quantity })
     }
+
+    private fun getRecommendBox(collectedOrderList: List<CollectedOrder>): BoxType {
+        val totalCbm = sumProductCbm(collectedOrderList)
+//        cubicMeterService.
+    }
+
+    private fun sumProductCbm(collectedOrderList: List<CollectedOrder>): Long {
+        var cbm: Long = 0
+
+        getAllProduct(collectedOrderList)
+            .forEach { b ->
+                cbm += when (b.type) {
+                    BasicProductType.BASIC -> b.singleCbm()
+                    BasicProductType.PACKAGE -> expandPackageProductSumCbm(b)
+                    else -> 0
+                }
+            }
+
+        return cbm
+    }
+
+    /**
+     * 상온, 저온을 반환한다 만약 상온/저온 복합일 경우 저온으로 반환한다
+     */
+    private fun getProductHandleTemperature(collectedOrderList: List<CollectedOrder>): HandlingTemperatureType {
+        var temperatureType : HandlingTemperatureType = HandlingTemperatureType.ROOM
+
+        getAllProduct(collectedOrderList)
+            .forEach { b ->
+                when (b.type){
+                    BasicProductType.BASIC ->
+                }
+            }
+    }
+
+    /**
+     * BASIC, PACKAGE를 포함한 리스트를 반환한다
+     * PACKAGE는 그 후에 expand~함수로 가져온다
+     */
+    private fun getAllProduct(collectedOrderList: List<CollectedOrder>): List<BasicProduct> {
+        return collectedOrderList
+            .map { it.confirmProductList }
+            .flatten()
+            .map { it.basicProduct }
+    }
+
+    /**
+     * 이하 함수는 BasicProductType = PACKAGE 일 경우다
+     */
+    private fun expandPackageProduct(basicProduct: BasicProduct): List<BasicProduct> =
+        basicProduct.packageProductMappings.map { it.selectedBasicProduct }
+
+    private fun expandPackageProductSumCbm(basicProduct: BasicProduct): Long {
+        return expandPackageProduct(basicProduct).sumOf {
+            it.singleCbm()
+        }
+    }
+
 }

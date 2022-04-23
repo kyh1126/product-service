@@ -166,4 +166,24 @@ class BasicProduct(
     fun manufactureToExpirationDate(): Long {
         return expirationDateInfo?.manufactureToExpirationDate?.toLong() ?: 0
     }
+
+    fun singleCbm(): Long {
+        if (singleDimension == null) return 0
+        val singleDimension = singleDimension!!
+        return (
+                (singleDimension.height ?: 0) *
+                (singleDimension.width ?: 0) *
+                (singleDimension.length ?: 0)
+                ).toLong()
+    }
+
+    fun boxCbm(): Long {
+        if (boxDimension == null) return 0
+        val boxDimension = boxDimension!!
+        return (
+                (boxDimension.height ?: 0) *
+                (boxDimension.width ?: 0) *
+                (boxDimension.length ?: 0)
+                ).toLong()
+    }
 }
