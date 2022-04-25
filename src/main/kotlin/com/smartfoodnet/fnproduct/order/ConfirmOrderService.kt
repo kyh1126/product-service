@@ -203,8 +203,6 @@ class ConfirmOrderService(
             it.nextStep()
         }
 
-
-
         return confirmOrderRepository.save(confirmOrder)
     }
 
@@ -306,6 +304,11 @@ class ConfirmOrderService(
         return mappedModel.basicProducts.associateBy({ it.basicProductId }, { it.quantity })
     }
 
+    /**
+     * 추천 박스를 계산하여 가져온다
+     * @param collectedOrderList 주문 수집된 리스트
+     * @return BoxType
+     */
     private fun getRecommendBox(collectedOrderList: List<CollectedOrder>): BoxType {
         val totalCbm = sumProductCbm(collectedOrderList)
         val handleTemperature = getProductHandleTemperature(collectedOrderList)
@@ -314,10 +317,13 @@ class ConfirmOrderService(
     }
 
     private fun sumProductCbm(collectedOrderList: List<CollectedOrder>): Long =
-        getAllProduct(collectedOrderList).sumOf { b -> b.singleCbm() }
+        getAllProduct(collectedOrderList).sumOf(BasicProduct::singleCbm)
 
     /**
-     * 상온, 저온을 반환한다 만약 상온/저온 복합일 경우 저온으로 반환한다
+     * 상온, 저온을 반환한다
+     * 만약 상온/저온 복합일 경우 저온으로 반환한다
+     * @param collectedOrderList 주문 수집된 리스트
+     * @return HandlingTemperatureType
      */
     private fun getProductHandleTemperature(collectedOrderList: List<CollectedOrder>): HandlingTemperatureType {
         return if (getAllProduct(collectedOrderList).all { b -> b.handlingTemperature == HandlingTemperatureType.ROOM })
@@ -327,8 +333,8 @@ class ConfirmOrderService(
     }
 
     /**
-     * BASIC, PACKAGE를 포함한 리스트를 반환한다
-     * PACKAGE는 그 후에 expand~함수로 가져온다
+     * BASIC, PACKAGE을 전부 BASIC으로 변환한 리스트를 반환한다
+     * 건수가 많지 않아 asSequence()는 사용하지 않음
      */
     private fun getAllProduct(collectedOrderList: List<CollectedOrder>): List<BasicProduct> {
         return collectedOrderList
@@ -341,6 +347,7 @@ class ConfirmOrderService(
                     else -> listOf(b)
                 }
             }.flatten()
+            .toList()
     }
 
     /**
@@ -348,11 +355,5 @@ class ConfirmOrderService(
      */
     private fun expandPackageProduct(basicProduct: BasicProduct): List<BasicProduct> =
         basicProduct.packageProductMappings.map { it.selectedBasicProduct }
-
-    private fun expandPackageProductSumCbm(basicProduct: BasicProduct): Long {
-        return expandPackageProduct(basicProduct).sumOf {
-            it.singleCbm()
-        }
-    }
 
 }
