@@ -12,12 +12,15 @@ import com.smartfoodnet.fnproduct.order.model.RequestOrderCreateModel
 import com.smartfoodnet.fnproduct.order.support.ConfirmOrderRepository
 import com.smartfoodnet.fnproduct.order.support.ConfirmProductRepository
 import com.smartfoodnet.fnproduct.order.support.condition.ConfirmProductSearchCondition
+import com.smartfoodnet.fnproduct.order.vo.BoxType
 import com.smartfoodnet.fnproduct.order.vo.DeliveryType
 import com.smartfoodnet.fnproduct.order.vo.MatchingType
 import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import com.smartfoodnet.fnproduct.product.BasicProductService
 import com.smartfoodnet.fnproduct.product.PackageProductMappingRepository
+import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
+import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
 import com.smartfoodnet.fnproduct.release.ReleaseInfoStoreService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -29,28 +32,14 @@ class ConfirmOrderService(
     val orderService: OrderService,
     val basicProductService: BasicProductService,
     val releaseInfoStoreService: ReleaseInfoStoreService,
+    val cubicMeterService: CubicMeterService,
+
     val confirmOrderRepository: ConfirmOrderRepository,
     val confirmProductRepository: ConfirmProductRepository,
     val packageProductMappingRepository: PackageProductMappingRepository,
+
     val wmsApiClient: WmsApiClient
 ) : Log {
-    private fun validateConfirmProduct(
-        partnerId: Long,
-        collectedOrderIds: List<Long>,
-    ): List<CollectedOrder> {
-        val collectedList = orderService.getCollectedOrders(collectedOrderIds)
-        val subtractList = collectedOrderIds.subtract(collectedList.map { it.id }.toSet())
-
-        if (subtractList.isNotEmpty()) {
-            throw BaseRuntimeException(errorMessage = "주문수집 Key[${subtractList.joinToString { it.toString() }}]를 찾을 수 없습니다")
-        }
-
-        if (!collectedList.all { it.partnerId == partnerId })
-            throw BaseRuntimeException(errorMessage = "해당 고객사의 주문건이 아닙니다")
-
-        return collectedList
-    }
-
     @Transactional
     fun createConfirmProduct(partnerId: Long, collectedOrderIds: List<Long>) {
         val collectedList = validateConfirmProduct(partnerId, collectedOrderIds)
@@ -80,6 +69,82 @@ class ConfirmOrderService(
         }
     }
 
+    @Transactional
+    fun requestOrders(
+        partnerId: Long,
+        requestOrderCreateModel: RequestOrderCreateModel
+    ): List<ConfirmOrder> {
+        val collectedOrderList =
+            orderService.getCollectedOrders(requestOrderCreateModel.collectedOrderIds)
+
+        if (collectedOrderList.all { it.status != OrderStatus.ORDER_CONFIRM }) {
+            throw BaseRuntimeException(errorMessage = "출고지시 상태가 아닌 주문건이 있습니다")
+        }
+
+        val sendOrderList = collectedOrderList
+            .groupBy { it.bundleNumber }
+            .map {
+                createConfirmOrder(partnerId, requestOrderCreateModel, it)
+            }
+
+        val requestBulkModel = RequestOrderMapper.toOutboundCreateBulkModel(sendOrderList)
+
+        val response =
+            wmsApiClient.createOutbounds(requestBulkModel).payload?.processedDataList
+                ?: emptyList()
+
+        for ((index, confirmOrder) in sendOrderList.withIndex()) {
+            val orderInfo = response[index]
+            confirmOrder.setOrderInfo(orderInfo.orderId, orderInfo.orderCode)
+            releaseInfoStoreService.createFromOrderInfo(partnerId, orderInfo)
+        }
+
+        return sendOrderList
+    }
+
+    fun getConfirmProduct(condition: ConfirmProductSearchCondition): List<ConfirmProductModel> {
+        val partnerId = condition.partnerId!!
+        val response = confirmProductRepository.findAllCollectedOrderWithConfirmProduct(condition)
+        val shippingProductIds = response.filter { it.basicProductType == BasicProductType.BASIC }
+            .mapNotNull { it.basicProductShippingProductId }
+        val availableStocks = getAvailableStocks(partnerId, shippingProductIds).toMutableMap()
+
+        response.forEach {
+            it.availableQuantity =
+                if (it.basicProductType == BasicProductType.PACKAGE) getPackageAvailableMinStocks(
+                    it,
+                    availableStocks
+                )
+                else availableStocks[it.basicProductShippingProductId]?.toInt() ?: -1
+        }
+
+        return response
+    }
+
+    @Transactional
+    fun replaceConfirmProducts(confirmProductAddModel: ConfirmProductAddModel) {
+        confirmProductAddModel.confirmProductList.forEach {
+            replaceConfirmProduct(it)
+        }
+    }
+
+    private fun validateConfirmProduct(
+        partnerId: Long,
+        collectedOrderIds: List<Long>,
+    ): List<CollectedOrder> {
+        val collectedList = orderService.getCollectedOrders(collectedOrderIds)
+        val subtractList = collectedOrderIds.subtract(collectedList.map { it.id }.toSet())
+
+        if (subtractList.isNotEmpty()) {
+            throw BaseRuntimeException(errorMessage = "주문수집 Key[${subtractList.joinToString { it.toString() }}]를 찾을 수 없습니다")
+        }
+
+        if (!collectedList.all { it.partnerId == partnerId })
+            throw BaseRuntimeException(errorMessage = "해당 고객사의 주문건이 아닙니다")
+
+        return collectedList
+    }
+
     private fun restoreConfirmProduct(collectedOrder: CollectedOrder) {
         collectedOrder.clearConfirmProduct()
         collectedOrderAddConfirmProduct(collectedOrder)
@@ -103,36 +168,7 @@ class ConfirmOrderService(
         }
     }
 
-    @Transactional
-    fun requestOrders(partnerId: Long, requestOrderCreateModel: RequestOrderCreateModel): List<ConfirmOrder> {
-        val collectedOrderList =
-            orderService.getCollectedOrders(requestOrderCreateModel.collectedOrderIds)
-
-        if (collectedOrderList.all { it.status != OrderStatus.ORDER_CONFIRM }) {
-            throw BaseRuntimeException(errorMessage = "출고지시 상태가 아닌 주문건이 있습니다")
-        }
-
-        val sendOrderList = collectedOrderList
-            .groupBy { it.bundleNumber }
-            .map {
-                createSendOrder(partnerId, requestOrderCreateModel, it)
-            }
-
-        val requestBulkModel = RequestOrderMapper.toOutboundCreateBulkModel(sendOrderList)
-        val response =
-            wmsApiClient.createOutbounds(requestBulkModel).payload?.processedDataList
-                ?: emptyList()
-
-        for ((index, confirmOrder) in sendOrderList.withIndex()) {
-            val orderInfo = response[index]
-            confirmOrder.setOrderInfo(orderInfo.orderId, orderInfo.orderCode)
-            releaseInfoStoreService.createFromOrderInfo(partnerId, orderInfo)
-        }
-
-        return sendOrderList
-    }
-
-    private fun createSendOrder(
+    private fun createConfirmOrder(
         partnerId: Long,
         requestOrderCreateModel: RequestOrderCreateModel,
         orderGroup: Map.Entry<String, List<CollectedOrder>>
@@ -149,13 +185,14 @@ class ConfirmOrderService(
             requestShippingDate = LocalDateTime.now(),
             receiver = firstCollectedOrder.receiver,
             memo = Memo(
-                firstCollectedOrder.storeName,
-                requestOrderCreateModel.promotion,
-                requestOrderCreateModel.reShipmentReason,
-                firstCollectedOrder.shippingPrice?.toInt().toString(),
-                null
+                memo1 = firstCollectedOrder.storeName,
+                memo2 = requestOrderCreateModel.promotion,
+                memo4 = firstCollectedOrder.shippingPrice?.toInt().toString(),
+                memo5 = requestOrderCreateModel.reShipmentReason,
             )
         )
+        // 추천 박스 처리
+        confirmOrder.memo!!.memo3 = getRecommendBox(orderGroup.value).description
 
         orderGroup.value.forEach {
             val confirmRequestOrder = ConfirmRequestOrder(
@@ -238,32 +275,6 @@ class ConfirmOrderService(
         return minQuantity
     }
 
-    fun getConfirmProduct(condition: ConfirmProductSearchCondition): List<ConfirmProductModel> {
-        val partnerId = condition.partnerId!!
-        val response = confirmProductRepository.findAllCollectedOrderWithConfirmProduct(condition)
-        val shippingProductIds = response.filter { it.basicProductType == BasicProductType.BASIC }
-            .mapNotNull { it.basicProductShippingProductId }
-        val availableStocks = getAvailableStocks(partnerId, shippingProductIds).toMutableMap()
-
-        response.forEach {
-            it.availableQuantity =
-                if (it.basicProductType == BasicProductType.PACKAGE) getPackageAvailableMinStocks(
-                    it,
-                    availableStocks
-                )
-                else availableStocks[it.basicProductShippingProductId]?.toInt() ?: -1
-        }
-
-        return response
-    }
-
-    @Transactional
-    fun replaceConfirmProducts(confirmProductAddModel: ConfirmProductAddModel) {
-        confirmProductAddModel.confirmProductList.forEach {
-            replaceConfirmProduct(it)
-        }
-    }
-
     private fun replaceConfirmProduct(mappedModel: ConfirmProductMappedModel) {
         val collectedOrder = orderService.getCollectedOrder(mappedModel.collectedOrderId)
         collectedOrder.clearConfirmProduct()
@@ -292,4 +303,57 @@ class ConfirmOrderService(
     private fun getBasicProductsAndRequestQuantityMapping(mappedModel: ConfirmProductMappedModel): Map<Long, Int> {
         return mappedModel.basicProducts.associateBy({ it.basicProductId }, { it.quantity })
     }
+
+    /**
+     * 추천 박스를 계산하여 가져온다. null인 경우 검토필요로 가져온다
+     * @param collectedOrderList 주문 수집된 리스트
+     * @return BoxType
+     */
+    private fun getRecommendBox(collectedOrderList: List<CollectedOrder>): BoxType {
+        val totalCbm = sumProductCbm(collectedOrderList)
+        val handleTemperature = getProductHandleTemperature(collectedOrderList)
+        log.info("totalCbm -> {}", totalCbm)
+        return cubicMeterService.getByCBM(totalCbm, handleTemperature)?.box ?: BoxType.CHECK
+    }
+
+    private fun sumProductCbm(collectedOrderList: List<CollectedOrder>): Long =
+        getAllProduct(collectedOrderList).sumOf(BasicProduct::singleCbm)
+
+    /**
+     * 상온, 저온을 반환한다
+     * 만약 상온/저온 복합일 경우 저온으로 반환한다
+     * @param collectedOrderList 주문 수집된 리스트
+     * @return HandlingTemperatureType
+     */
+    private fun getProductHandleTemperature(collectedOrderList: List<CollectedOrder>): HandlingTemperatureType {
+        return if (getAllProduct(collectedOrderList).all { b -> b.handlingTemperature == HandlingTemperatureType.ROOM })
+            HandlingTemperatureType.ROOM
+        else
+            HandlingTemperatureType.REFRIGERATE
+    }
+
+    /**
+     * BASIC, PACKAGE을 전부 BASIC으로 변환한 리스트를 반환한다
+     * 건수가 많지 않아 asSequence()는 사용하지 않음
+     */
+    private fun getAllProduct(collectedOrderList: List<CollectedOrder>): List<BasicProduct> {
+        return collectedOrderList
+            .map { it.confirmProductList }
+            .flatten()
+            .map { it.basicProduct }
+            .map { b ->
+                when (b.type) {
+                    BasicProductType.PACKAGE -> expandPackageProduct(b)
+                    else -> listOf(b)
+                }
+            }.flatten()
+            .toList()
+    }
+
+    /**
+     * 이하 함수는 BasicProductType = PACKAGE 일 경우다
+     */
+    private fun expandPackageProduct(basicProduct: BasicProduct): List<BasicProduct> =
+        basicProduct.packageProductMappings.map { it.selectedBasicProduct }
+
 }
