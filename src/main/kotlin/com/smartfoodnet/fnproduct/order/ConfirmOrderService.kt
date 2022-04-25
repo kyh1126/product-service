@@ -305,14 +305,14 @@ class ConfirmOrderService(
     }
 
     /**
-     * 추천 박스를 계산하여 가져온다
+     * 추천 박스를 계산하여 가져온다. null인 경우 검토필요로 가져온다
      * @param collectedOrderList 주문 수집된 리스트
      * @return BoxType
      */
     private fun getRecommendBox(collectedOrderList: List<CollectedOrder>): BoxType {
         val totalCbm = sumProductCbm(collectedOrderList)
         val handleTemperature = getProductHandleTemperature(collectedOrderList)
-
+        log.info("totalCbm -> {}", totalCbm)
         return cubicMeterService.getByCBM(totalCbm, handleTemperature)?.box ?: BoxType.CHECK
     }
 
