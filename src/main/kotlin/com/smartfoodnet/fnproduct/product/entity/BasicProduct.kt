@@ -62,10 +62,10 @@ class BasicProduct(
     var expirationDateInfo: ExpirationDateInfo? = null,
 
     @Embedded
-    val singleDimension: SingleDimension? = null,
+    val singleDimension: SingleDimension,
 
     @Embedded
-    val boxDimension: BoxDimension? = null,
+    val boxDimension: BoxDimension,
 
     @Column(name = "pieces_per_box")
     var piecesPerBox: Int? = null,

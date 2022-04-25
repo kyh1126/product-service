@@ -5,9 +5,11 @@ import com.smartfoodnet.common.toLocalDateTime
 import com.smartfoodnet.fninventory.inbound.entity.InboundActualDetail
 import com.smartfoodnet.fninventory.inbound.entity.InboundExpectedDetail
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
+import com.smartfoodnet.fnproduct.product.entity.BoxDimension
 import com.smartfoodnet.fnproduct.product.entity.ExpirationDateInfo
+import com.smartfoodnet.fnproduct.product.entity.SingleDimension
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -25,7 +27,9 @@ internal class GetInboundWorkModelTest {
             val basicProduct: BasicProduct = BasicProduct(
                 type = BasicProductType.BASIC,
                 expirationDateManagementYn = "Y",
-                expirationDateInfo = ExpirationDateInfo("Y", "Y", 30)
+                expirationDateInfo = ExpirationDateInfo("Y", "Y", 30),
+                singleDimension = SingleDimension.default,
+                boxDimension = BoxDimension.default
             )
             val inboundExpectedDetail: InboundExpectedDetail = InboundExpectedDetail(
                 basicProduct = basicProduct
@@ -42,13 +46,15 @@ internal class GetInboundWorkModelTest {
 
         @Test
         @DisplayName("유통기한이 없고 제조일자가 있다. 제조일로부터 30일")
-        fun toEntityForMakeDate (){
+        fun toEntityForMakeDate() {
             val inboundWorkModel: GetInboundWorkModel =
                 GetInboundWorkModel.testModel(null, "20230104")
             val basicProduct: BasicProduct = BasicProduct(
                 type = BasicProductType.BASIC,
                 expirationDateManagementYn = "Y",
-                expirationDateInfo = ExpirationDateInfo("Y", "Y", 30)
+                expirationDateInfo = ExpirationDateInfo("Y", "Y", 30),
+                singleDimension = SingleDimension.default,
+                boxDimension = BoxDimension.default
             )
             val inboundExpectedDetail: InboundExpectedDetail = InboundExpectedDetail(
                 basicProduct = basicProduct
@@ -65,13 +71,15 @@ internal class GetInboundWorkModelTest {
 
         @Test
         @DisplayName("유통기한, 제조일자가 없다")
-        fun toEntityNoDate (){
+        fun toEntityNoDate() {
             val inboundWorkModel: GetInboundWorkModel =
                 GetInboundWorkModel.testModel(null, null)
             val basicProduct: BasicProduct = BasicProduct(
                 type = BasicProductType.BASIC,
                 expirationDateManagementYn = "Y",
-                expirationDateInfo = ExpirationDateInfo("Y", "Y", 30)
+                expirationDateInfo = ExpirationDateInfo("Y", "Y", 30),
+                singleDimension = SingleDimension.default,
+                boxDimension = BoxDimension.default
             )
             val inboundExpectedDetail: InboundExpectedDetail = InboundExpectedDetail(
                 basicProduct = basicProduct
@@ -86,14 +94,16 @@ internal class GetInboundWorkModelTest {
 
         @Test
         @DisplayName("유통기한을 관리하지 않는다 - 제조일자 입력")
-        fun toEntityNoManageExpireDate (){
-            val date : String = "20220421"
+        fun toEntityNoManageExpireDate() {
+            val date: String = "20220421"
             val inboundWorkModel: GetInboundWorkModel =
                 GetInboundWorkModel.testModel(null, date)
             val basicProduct: BasicProduct = BasicProduct(
                 type = BasicProductType.BASIC,
                 expirationDateManagementYn = "Y",
-                expirationDateInfo = ExpirationDateInfo("Y", "N", 30)
+                expirationDateInfo = ExpirationDateInfo("Y", "N", 30),
+                singleDimension = SingleDimension.default,
+                boxDimension = BoxDimension.default
             )
             val inboundExpectedDetail: InboundExpectedDetail = InboundExpectedDetail(
                 basicProduct = basicProduct
@@ -108,14 +118,16 @@ internal class GetInboundWorkModelTest {
 
         @Test
         @DisplayName("제조일자를 관리하지 않는다 - 유통기한 입력")
-        fun toEntityNoManageMakeDate (){
-            val date : String = "20220421"
+        fun toEntityNoManageMakeDate() {
+            val date: String = "20220421"
             val inboundWorkModel: GetInboundWorkModel =
                 GetInboundWorkModel.testModel(date, null)
             val basicProduct: BasicProduct = BasicProduct(
                 type = BasicProductType.BASIC,
                 expirationDateManagementYn = "Y",
-                expirationDateInfo = ExpirationDateInfo("N", "Y", 30)
+                expirationDateInfo = ExpirationDateInfo("N", "Y", 30),
+                singleDimension = SingleDimension.default,
+                boxDimension = BoxDimension.default
             )
             val inboundExpectedDetail: InboundExpectedDetail = InboundExpectedDetail(
                 basicProduct = basicProduct
@@ -130,14 +142,16 @@ internal class GetInboundWorkModelTest {
 
         @Test
         @DisplayName("유통기한 관리여부를 사용하지 않는다")
-        fun toEntityNoManageAll (){
-            val date : String = "20220421"
+        fun toEntityNoManageAll() {
+            val date: String = "20220421"
             val inboundWorkModel: GetInboundWorkModel =
                 GetInboundWorkModel.testModel(date, date)
             val basicProduct: BasicProduct = BasicProduct(
                 type = BasicProductType.BASIC,
                 expirationDateManagementYn = "N",
-                expirationDateInfo = null
+                expirationDateInfo = null,
+                singleDimension = SingleDimension.default,
+                boxDimension = BoxDimension.default
             )
             val inboundExpectedDetail: InboundExpectedDetail = InboundExpectedDetail(
                 basicProduct = basicProduct

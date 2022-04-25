@@ -1,27 +1,26 @@
 package com.smartfoodnet.fnproduct.product.model.request
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import com.smartfoodnet.fnproduct.product.entity.SingleDimension
 import io.swagger.annotations.ApiModelProperty
+import javax.validation.constraints.NotNull
 
-data class SingleDimensionCreateModel(
-    @JsonProperty("singleWidth")
+class SingleDimensionCreateModel {
+    @NotNull
     @ApiModelProperty(value = "낱개-가로(mm)")
-    var width: Int? = null,
+    var singleWidth: Int? = null
 
-    @JsonProperty("singleLength")
+    @NotNull
     @ApiModelProperty(value = "낱개-세로(mm)")
-    var length: Int? = null,
+    var singleLength: Int? = null
 
-    @JsonProperty("singleHeight")
+    @NotNull
     @ApiModelProperty(value = "낱개-높이(mm)")
-    var height: Int? = null,
+    var singleHeight: Int? = null
 
-    @JsonProperty("singleWeight")
     @ApiModelProperty(value = "낱개-무게(g)")
-    var weight: Int? = null
-) {
+    var singleWeight: Int? = null
+
     fun toEntity(): SingleDimension {
-        return SingleDimension(width = width, length = length, height = height, weight = weight)
+        return SingleDimension(width = singleWidth!!, length = singleLength!!, height = singleHeight!!, weight = singleWeight)
     }
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
 import io.swagger.annotations.ApiModelProperty
+import javax.validation.Valid
 import javax.validation.constraints.NotNull
 
 class TestBasicProductCreateModel(
@@ -22,6 +23,9 @@ class TestBasicProductCreateModel(
 
     @ApiModelProperty(value = "화주(고객사) 코드", example = "0001")
     val partnerCode: String? = null,
+
+    @ApiModelProperty(value = "출고상품 ID (nosnos)")
+    val shippingProductId: Long? = null,
 
     @ApiModelProperty(value = "상품명")
     val name: String? = null,
@@ -56,6 +60,9 @@ class TestBasicProductCreateModel(
     @ApiModelProperty(value = "유통기한관리여부 (default: N)", allowableValues = "Y,N")
     val expirationDateManagementYn: String = "N",
 
+    @JsonUnwrapped
+    var expirationDateInfoModel: ExpirationDateInfoCreateModel? = null,
+
     @ApiModelProperty(value = "박스입수")
     val piecesPerBox: Int? = null,
 
@@ -67,10 +74,17 @@ class TestBasicProductCreateModel(
 
     @ApiModelProperty(value = "활성화여부 (default: Y)", allowableValues = "Y,N")
     val activeYn: String = "Y",
-
-    @JsonUnwrapped
-    var expirationDateInfoModel: ExpirationDateInfoCreateModel? = null
 ) {
+    @NotNull
+    @Valid
+    @JsonUnwrapped
+    lateinit var singleDimensionCreateModel: SingleDimensionCreateModel
+
+    @NotNull
+    @Valid
+    @JsonUnwrapped
+    lateinit var boxDimensionCreateModel: BoxDimensionCreateModel
+
     fun toModel(): BasicProductCreateModel {
         return BasicProductCreateModel().also {
             it.id = id
@@ -92,6 +106,8 @@ class TestBasicProductCreateModel(
             it.imageUrl = imageUrl
             it.activeYn = activeYn
             it.expirationDateInfoModel = expirationDateInfoModel
+            it.singleDimensionCreateModel = SingleDimensionCreateModel(0, 0, 0)
+            it.boxDimensionCreateModel = BoxDimensionCreateModel(0, 0, 0)
         }
     }
 }

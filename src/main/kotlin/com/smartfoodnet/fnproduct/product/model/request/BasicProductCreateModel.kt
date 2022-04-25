@@ -8,6 +8,7 @@ import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
 import com.smartfoodnet.fnproduct.warehouse.entity.InWarehouse
 import io.swagger.annotations.ApiModelProperty
+import javax.validation.Valid
 import javax.validation.constraints.NotNull
 
 class BasicProductCreateModel {
@@ -66,11 +67,15 @@ class BasicProductCreateModel {
     @JsonUnwrapped
     var expirationDateInfoModel: ExpirationDateInfoCreateModel? = null
 
+    @NotNull
+    @Valid
     @JsonUnwrapped
-    var singleDimensionCreateModel: SingleDimensionCreateModel? = null
+    lateinit var singleDimensionCreateModel: SingleDimensionCreateModel
 
+    @NotNull
+    @Valid
     @JsonUnwrapped
-    var boxDimensionCreateModel: BoxDimensionCreateModel? = null
+    lateinit var boxDimensionCreateModel: BoxDimensionCreateModel
 
     @ApiModelProperty(value = "박스입수")
     var piecesPerBox: Int? = null
@@ -104,8 +109,8 @@ class BasicProductCreateModel {
             supplyPrice = supplyPrice,
             expirationDateManagementYn = expirationDateManagementYn,
             expirationDateInfo = expirationDateInfoModel?.toEntity(),
-            singleDimension = singleDimensionCreateModel?.toEntity(),
-            boxDimension = boxDimensionCreateModel?.toEntity(),
+            singleDimension = singleDimensionCreateModel.toEntity(),
+            boxDimension = boxDimensionCreateModel.toEntity(),
             piecesPerBox = piecesPerBox,
             piecesPerPalette = piecesPerPalette,
             imageUrl = imageUrl,

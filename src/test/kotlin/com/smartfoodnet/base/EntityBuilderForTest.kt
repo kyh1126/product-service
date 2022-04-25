@@ -1,9 +1,7 @@
 package com.smartfoodnet.base
 
 import com.smartfoodnet.fnproduct.code.entity.Code
-import com.smartfoodnet.fnproduct.product.entity.BasicProduct
-import com.smartfoodnet.fnproduct.product.entity.BasicProductCategory
-import com.smartfoodnet.fnproduct.product.entity.SubsidiaryMaterialCategory
+import com.smartfoodnet.fnproduct.product.entity.*
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import com.smartfoodnet.fnproduct.warehouse.entity.InWarehouse
 import kotlin.random.Random
@@ -136,6 +134,8 @@ fun buildBasicProduct_SUB(
         subsidiaryMaterialCategory = subsidiaryMaterialCategory,
         warehouse = buildWarehouse(partnerId),
         supplyPrice = 120,
-        activeYn = "Y"
+        activeYn = "Y",
+        singleDimension = SingleDimension.default,
+        boxDimension = BoxDimension.default
     )
 }

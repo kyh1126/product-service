@@ -1,7 +1,9 @@
 package com.smartfoodnet.fnproduct.product.model.request
 
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
+import com.smartfoodnet.fnproduct.product.entity.BoxDimension
 import com.smartfoodnet.fnproduct.product.entity.ExpirationDateInfo
+import com.smartfoodnet.fnproduct.product.entity.SingleDimension
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
 import io.swagger.annotations.ApiModelProperty
@@ -36,6 +38,8 @@ class BasicProductPackageCreateModel {
             handlingTemperature = HandlingTemperatureType.MIX,
             expirationDateInfo = ExpirationDateInfo.default,
             activeYn = activeYn,
+            singleDimension = SingleDimension.default,
+            boxDimension = BoxDimension.default
         )
     }
 }

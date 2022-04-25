@@ -1,27 +1,26 @@
 package com.smartfoodnet.fnproduct.product.model.request
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import com.smartfoodnet.fnproduct.product.entity.BoxDimension
 import io.swagger.annotations.ApiModelProperty
+import javax.validation.constraints.NotNull
 
-data class BoxDimensionCreateModel(
-    @JsonProperty("boxWidth")
+class BoxDimensionCreateModel {
+    @NotNull
     @ApiModelProperty(value = "카톤박스-가로(mm)")
-    var width: Int? = null,
+    var boxWidth: Int? = null
 
-    @JsonProperty("boxLength")
+    @NotNull
     @ApiModelProperty(value = "카톤박스-세로(mm)")
-    var length: Int? = null,
+    var boxLength: Int? = null
 
-    @JsonProperty("boxHeight")
+    @NotNull
     @ApiModelProperty(value = "카톤박스-높이(mm)")
-    var height: Int? = null,
+    var boxHeight: Int? = null
 
-    @JsonProperty("boxWeight")
     @ApiModelProperty(value = "카톤박스-무게(g)")
-    var weight: Int? = null
-) {
+    var boxWeight: Int? = null
+
     fun toEntity(): BoxDimension {
-        return BoxDimension(width = width, length = length, height = height, weight = weight)
+        return BoxDimension(width = boxWidth!!, length = boxLength!!, height = boxHeight!!, weight = boxWeight)
     }
 }
