@@ -106,8 +106,18 @@ class TestBasicProductCreateModel(
             it.imageUrl = imageUrl
             it.activeYn = activeYn
             it.expirationDateInfoModel = expirationDateInfoModel
-            it.singleDimensionCreateModel = SingleDimensionCreateModel(0, 0, 0)
-            it.boxDimensionCreateModel = BoxDimensionCreateModel(0, 0, 0)
+            it.singleDimensionCreateModel = SingleDimensionCreateModel().also {
+                it.singleWidth = 0
+                it.singleLength = 0
+                it.singleHeight = 0
+                it.singleWeight = null
+            }
+            it.boxDimensionCreateModel = BoxDimensionCreateModel().also {
+                it.boxWidth = 0
+                it.boxLength = 0
+                it.boxHeight = 0
+                it.boxWeight = null
+            }
         }
     }
 }
