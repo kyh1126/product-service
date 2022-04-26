@@ -33,8 +33,8 @@ class StoreProductSearchCondition(
     @ApiModelProperty(value = "매칭상품 타입 (기본/묶음)")
     val basicProductType: BasicProductType? = null,
     @ApiModelProperty(value = "매칭 여부")
-    val basicProductMatchFlag: Boolean? = null,
-) : PredicateSearchCondition() {
+    val basicProductMatchFlag: Boolean? = null
+    ) : PredicateSearchCondition() {
     override fun assemblePredicate(predicate: BooleanBuilder): Predicate {
         return predicate.orAllOf(
             storeProduct.partnerId.eq(partnerId),

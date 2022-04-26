@@ -7,7 +7,6 @@ import com.smartfoodnet.fnproduct.product.BasicProductRepository
 import com.smartfoodnet.fnproduct.store.entity.StoreProduct
 import com.smartfoodnet.fnproduct.store.entity.StoreProductMapping
 import com.smartfoodnet.fnproduct.store.model.request.StoreProductCreateModel
-import com.smartfoodnet.fnproduct.store.model.request.StoreProductMappingCreateModel
 import com.smartfoodnet.fnproduct.store.model.request.StoreProductUpdateModel
 import com.smartfoodnet.fnproduct.store.model.response.StoreProductModel
 import com.smartfoodnet.fnproduct.store.support.StoreProductMappingRepository
@@ -84,8 +83,12 @@ class StoreProductService(
 
         storeProduct.update(storeProductModel)
 
-        storeProduct.storeProductMappings =
-            buildNewStoreProductMappings(storeProductModel, storeProduct)?.toMutableSet() ?: mutableSetOf()
+        val newMappings = buildStoreProductMappings(storeProductModel, storeProduct)
+        newMappings?.let {
+            if(it.isNotEmpty()){
+                storeProduct.updateStoreProductMappings(it)
+            }
+        }
 
         return StoreProductModel.from(storeProduct)
     }
@@ -99,13 +102,13 @@ class StoreProductService(
         storeProductRepository.save(storeProduct)
     }
 
-    fun buildNewStoreProductMappings(
+    fun buildStoreProductMappings(
         storeProductModel: StoreProductUpdateModel,
         storeProduct: StoreProduct
-    ): List<StoreProductMapping>? {
-        val newBasicProductIds = storeProductModel.storeProductBasicProductMappings.map { it.basicProductId }
+    ): Set<StoreProductMapping>? {
+        val newBasicProductIds = storeProductModel.storeProductBasicProductMappings?.map { it.basicProductId } ?: return null
 
-        if(newBasicProductIds.size != newBasicProductIds.toSet().size) {
+        if (newBasicProductIds.size != newBasicProductIds.toSet().size) {
             throw ValidateError("중복된 기본상품이 존재합니다.")
         }
 
@@ -113,49 +116,19 @@ class StoreProductService(
             newBasicProductIds.contains(mapping.basicProduct.id)
         }
 
-        unMappedBasicProducts.forEach { it.delete() }
+        val newMappings = storeProductModel.storeProductBasicProductMappings.map { model ->
+            val newMapping = storeProduct.storeProductMappings.firstOrNull { mapping ->
+                mapping.basicProduct.id == model.basicProductId
+            } ?: StoreProductMapping(
+                storeProduct = storeProduct,
+                basicProduct = basicProductRepository.findByIdOrNull(model.basicProductId)
+                    ?: throw NoSuchElementError("기본상품이 존재하지 않습니다. [basicProductId: ${model.basicProductId}]")
+            )
 
-        val storeProductMappings = storeProductModel.storeProductBasicProductMappings.map { mapping ->
-            val storeProductMapping = mapping.id?.let { id -> storeProductMappingRepository.findByIdOrNull(id) }
-                ?: StoreProductMapping(
-                    storeProduct = storeProduct,
-                    basicProduct = basicProductRepository.findByIdOrNull(mapping.basicProductId)
-                        ?: throw NoSuchElementError(errorMessage = "기본상품이 존재하지 않습니다 [id = ${mapping.basicProductId}]")
-                )
-            storeProductMapping.quantity = mapping.quantity
+            newMapping.quantity = model.quantity
+            newMapping
+        }.toSet()
 
-            storeProductMapping
-        }
-
-        return storeProductMappings
-    }
-
-    @Transactional
-    fun mapBasicProducts(storeProductMappingModel: StoreProductMappingCreateModel): StoreProductModel {
-        val storeProduct = storeProductRepository.findById(storeProductMappingModel.storeProductId)
-            .orElseThrow { ValidateError(errorMessage = "store product does not exist.") }
-
-        storeProductMappingModel.mappings.forEach { mappingModel ->
-            val basicProduct =
-                basicProductRepository.findByIdOrNull(mappingModel.basicProductId) ?: throw NoSuchElementError(
-                    errorMessage = "기본상품이 존재하지 않습니다 [id = ${mappingModel.basicProductId}]"
-                )
-
-            if (mappingModel.id != null) {
-                val storeProductMapping =
-                    storeProduct.storeProductMappings.firstOrNull { storeProductMapping -> mappingModel.id == storeProductMapping.id }
-                storeProductMapping?.basicProduct = basicProduct
-                storeProductMapping?.quantity = mappingModel.quantity
-            } else {
-                val storeProductMapping = StoreProductMapping(
-                    basicProduct = basicProduct,
-                    storeProduct = storeProduct,
-                    quantity = mappingModel.quantity
-                )
-                storeProduct.storeProductMappings.add(storeProductMapping)
-            }
-        }
-
-        return StoreProductModel.from(storeProductRepository.save(storeProduct))
+        return newMappings
     }
 }

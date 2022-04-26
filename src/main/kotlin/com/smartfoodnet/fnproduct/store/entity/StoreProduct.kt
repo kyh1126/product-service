@@ -53,16 +53,26 @@ class StoreProduct(
     @Column(name = "option_code")
     var optionCode: String? = null,
 
-    @OneToMany(mappedBy = "storeProduct", cascade = [CascadeType.PERSIST])
+    @OneToMany(mappedBy = "storeProduct", cascade = [CascadeType.PERSIST], orphanRemoval = true)
     var storeProductMappings: MutableSet<StoreProductMapping> = mutableSetOf()
 
 ) : BaseEntity() {
     fun update(storeProductUpdateModel: StoreProductUpdateModel) {
-        name = storeProductUpdateModel.name
-        optionName = storeProductUpdateModel.optionName
+        storeProductUpdateModel.name?.let { name = it }
+        storeProductUpdateModel.optionName?.let { optionName = it }
     }
 
     fun delete() {
         deletedAt = LocalDateTime.now()
+    }
+
+    fun addStoreProductMapping(storeProductMapping: StoreProductMapping) {
+        storeProductMappings.add(storeProductMapping)
+        storeProductMapping.storeProduct = this
+    }
+
+    fun updateStoreProductMappings(newMappings: Set<StoreProductMapping>) {
+        storeProductMappings.clear()
+        newMappings.forEach { addStoreProductMapping(it) }
     }
 }
