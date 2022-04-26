@@ -341,6 +341,8 @@ class ReleaseInfoService(
         val cjTargetList = targetList.content.filter { it.deliveryAgencyId == deliveryAgencyId }
         val trackingNumbers = cjTargetList.map { it.trackingNumber!! }
 
+        if (trackingNumbers.isEmpty()) return
+
         try {
             val deliveryInfoByTrackingNumber =
                 wmsApiClient.getCjDeliveryStatuses(trackingNumbers).payload?.dataList
