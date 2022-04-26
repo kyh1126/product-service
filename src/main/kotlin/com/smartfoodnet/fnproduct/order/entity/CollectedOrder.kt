@@ -3,7 +3,6 @@ package com.smartfoodnet.fnproduct.order.entity
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.smartfoodnet.common.entity.BaseEntity
 import com.smartfoodnet.fnproduct.claim.model.vo.ExchangeStatus
-import com.smartfoodnet.fnproduct.claim.model.vo.ReturnStatus
 import com.smartfoodnet.fnproduct.order.vo.*
 import com.smartfoodnet.fnproduct.store.entity.StoreProduct
 import org.hibernate.annotations.DynamicUpdate
@@ -52,9 +51,6 @@ class CollectedOrder(
     val statusUpdatedAt: LocalDateTime? = null,
 
     val orderNumber: String,
-
-    @Enumerated(EnumType.STRING)
-    var returnStatus: ReturnStatus = ReturnStatus.UNREGISTERED,
 
     @Enumerated(EnumType.STRING)
     var exchangeStatus: ExchangeStatus = ExchangeStatus.UNREGISTERED,

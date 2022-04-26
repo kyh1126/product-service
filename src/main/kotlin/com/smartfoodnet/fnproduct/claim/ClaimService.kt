@@ -9,12 +9,8 @@ import com.smartfoodnet.common.Constants
 import com.smartfoodnet.common.error.exception.ExternalApiError
 import com.smartfoodnet.common.error.exception.NoSuchElementError
 import com.smartfoodnet.common.utils.Log
-import com.smartfoodnet.fnproduct.claim.entity.Claim
-import com.smartfoodnet.fnproduct.claim.entity.ExchangeProduct
-import com.smartfoodnet.fnproduct.claim.entity.ExchangeRelease
+import com.smartfoodnet.fnproduct.claim.entity.*
 import com.smartfoodnet.fnproduct.claim.entity.QClaim.claim
-import com.smartfoodnet.fnproduct.claim.entity.ReturnInfo
-import com.smartfoodnet.fnproduct.claim.entity.ReturnProduct
 import com.smartfoodnet.fnproduct.claim.model.ClaimCreateModel
 import com.smartfoodnet.fnproduct.claim.model.ClaimModel
 import com.smartfoodnet.fnproduct.claim.model.ExchangeReleaseCreateModel
@@ -69,7 +65,8 @@ class ClaimService(
         val claim = claimRepository.findByIdOrNull(exchangeReleaseCreateModel.claimId)
             ?: throw NoSuchElementError("Claim이 존재하지 않습니다: [claimId: ${exchangeReleaseCreateModel.claimId}]")
         val exchangeRelease = ExchangeRelease(
-            receiver = exchangeReleaseCreateModel.receiver?.toEntity() ?: claim.returnInfo!!.receiver,
+            receiver = exchangeReleaseCreateModel.receiver?.toEntity()
+                ?: claim.returnInfo!!.receiver,
             claim = claim
         )
 
@@ -216,12 +213,12 @@ class ClaimService(
                 claimedAt = claimedAt,
                 customerName = customerName,
                 claimReason = claimReason,
-                memo = memo,
-                releaseInfo = releaseInfo
+                memo = memo
             )
         }
 
         claim.addReturnInfo(returnInfo)
+        claim.addReleaseInfo(releaseInfo)
 
         return claim
     }

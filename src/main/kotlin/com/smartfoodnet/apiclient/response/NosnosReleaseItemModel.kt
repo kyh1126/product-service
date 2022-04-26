@@ -8,9 +8,9 @@ import com.smartfoodnet.fnproduct.release.entity.ReleaseProduct
 
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy::class)
 data class NosnosReleaseItemModel(
-    val releaseItemId: Int? = null,
-    val releaseId: Int? = null,
-    val shippingProductId: Int? = null,
+    val releaseItemId: Long? = null,
+    val releaseId: Long? = null,
+    val shippingProductId: Long? = null,
     val quantity: Int? = null,
     val releaseCode: String? = null,
     val releaseStatus: String? = null,
@@ -20,7 +20,7 @@ data class NosnosReleaseItemModel(
 ) {
     fun toEntity(basicProduct: BasicProduct): ReleaseProduct {
         return ReleaseProduct(
-            releaseItemId = releaseItemId!!.toLong(),
+            releaseItemId = releaseItemId!!,
             basicProduct = basicProduct,
             quantity = quantity ?: 0
         )

@@ -44,6 +44,8 @@ fun copyNonNullProperty(source: Any, target: Any) {
 
 fun convertYnToInt(yn: String?) = if (yn == "Y") 1 else 0
 
+fun convertYnToLong(yn: String?) = if (yn == "Y") 1L else 0L
+
 /**
  * FeignException 의 message 에서 노스노스 에러 메시지를 반환한다.
  * ex>

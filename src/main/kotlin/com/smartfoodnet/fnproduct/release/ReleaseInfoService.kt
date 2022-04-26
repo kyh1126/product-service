@@ -18,6 +18,7 @@ import com.smartfoodnet.fnproduct.order.support.condition.ConfirmProductSearchCo
 import com.smartfoodnet.fnproduct.product.BasicProductService
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
+import com.smartfoodnet.fnproduct.release.model.dto.OrderReleaseInfoDto
 import com.smartfoodnet.fnproduct.release.model.request.ReleaseInfoSearchCondition
 import com.smartfoodnet.fnproduct.release.model.response.OrderConfirmProductModel
 import com.smartfoodnet.fnproduct.release.model.response.OrderProductModel
@@ -51,7 +52,7 @@ class ReleaseInfoService(
     ): PageResponse<ReleaseInfoModel> {
         val releaseInfoPage = releaseInfoRepository.findAllByCondition(condition, page)
         val deliveryAgencyModelsByDeliveryAgencyId = getDeliveryAgencyInfoList()
-            ?.associateBy { it.deliveryAgencyId!!.toLong() } ?: emptyMap()
+            ?.associateBy { it.deliveryAgencyId!! } ?: emptyMap()
 
         return releaseInfoPage.map {
             ReleaseInfoModel.fromEntity(it, deliveryAgencyModelsByDeliveryAgencyId)
@@ -78,9 +79,9 @@ class ReleaseInfoService(
 
             try {
                 val releaseModelsByOrderId = getReleases(partnerId = partnerId, orderIds = orderIds)
-                    .groupBy { it.orderId!!.toLong() }
+                    .groupBy { it.orderId!! }
                 val itemModelsByReleaseId = getReleaseItems(releaseModelsByOrderId)
-                    .groupBy { it.releaseId!!.toLong() }
+                    .groupBy { it.releaseId!! }
                 val basicProductByShippingProductId = getBasicProductBy(itemModelsByReleaseId)
 
                 releaseModelsByOrderId.entries.forEach { (orderId, releaseModels) ->
@@ -138,7 +139,7 @@ class ReleaseInfoService(
 
         val idByDeliveryAgency = getDeliveryAgencyInfoList()
             ?.associateBy(
-                { getDeliveryAgencyByName(it.deliveryAgencyName) }, { it.deliveryAgencyId!!.toLong() }
+                { getDeliveryAgencyByName(it.deliveryAgencyName) }, { it.deliveryAgencyId!! }
             ) ?: emptyMap()
 
         while (true) {
@@ -168,7 +169,7 @@ class ReleaseInfoService(
 
         val deliveryAgencyById = getDeliveryAgencyInfoList()
             ?.associateBy(
-                { it.deliveryAgencyId!!.toLong() }, { getDeliveryAgencyByName(it.deliveryAgencyName) }
+                { it.deliveryAgencyId!! }, { getDeliveryAgencyByName(it.deliveryAgencyName) }
             ) ?: emptyMap()
 
         while (true) {
@@ -243,7 +244,7 @@ class ReleaseInfoService(
     private fun getReleaseItems(
         releasesByOrderId: Map<Long, List<NosnosReleaseModel>>
     ): List<NosnosReleaseItemModel> {
-        val releaseIds = releasesByOrderId.values.flatten().mapNotNull { it.releaseId?.toLong() }
+        val releaseIds = releasesByOrderId.values.flatten().mapNotNull { it.releaseId }
         val releaseItems = mutableListOf<NosnosReleaseItemModel>()
         var page = NOSNOS_INITIAL_PAGE
         var totalPage = NOSNOS_INITIAL_PAGE
@@ -271,7 +272,7 @@ class ReleaseInfoService(
         itemsByReleaseId: Map<Long, List<NosnosReleaseItemModel>>
     ): Map<Long, BasicProduct> {
         val shippingProductIdsFromModel = itemsByReleaseId.values.flatten()
-            .mapNotNull { it.shippingProductId?.toLong() }.toSet()
+            .mapNotNull { it.shippingProductId }.toSet()
         return basicProductService.getBasicProductsByShippingProductIds(shippingProductIdsFromModel)
             .associateBy { it.shippingProductId!! }
     }
@@ -283,12 +284,15 @@ class ReleaseInfoService(
         basicProductByShippingProductId: Map<Long, BasicProduct>
     ) {
         val targetReleaseInfoList = releaseInfoRepository.findByOrderId(orderId)
+        val confirmOrder = confirmOrderService.getConfirmOrderByOrderId(orderId)
+        val orderReleaseInfoDto = OrderReleaseInfoDto(confirmOrder, targetReleaseInfoList)
+
         try {
             releaseInfoStoreService.createOrUpdateReleaseInfo(
                 releaseModels,
                 itemModelsByReleaseId,
                 basicProductByShippingProductId,
-                targetReleaseInfoList,
+                orderReleaseInfoDto,
             )
         } catch (e: RuntimeException) {
             log.error("orderId: ${orderId} releaseInfo 동기화 실패", e)

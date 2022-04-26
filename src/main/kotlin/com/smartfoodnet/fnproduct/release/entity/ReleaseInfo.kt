@@ -1,7 +1,9 @@
 package com.smartfoodnet.fnproduct.release.entity
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.smartfoodnet.apiclient.response.NosnosReleaseModel
 import com.smartfoodnet.common.entity.SimpleBaseEntity
+import com.smartfoodnet.fnproduct.claim.entity.Claim
 import com.smartfoodnet.fnproduct.order.entity.ConfirmOrder
 import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
 import com.smartfoodnet.fnproduct.release.model.vo.ReleaseStatus
@@ -56,12 +58,12 @@ class ReleaseInfo(
     var releaseProducts: MutableSet<ReleaseProduct> = LinkedHashSet(),
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-        name = "order_id", referencedColumnName = "orderId",
-        insertable = false, updatable = false, // read-only
-        foreignKey = ForeignKey(value = ConstraintMode.NO_CONSTRAINT)
-    )
-    var confirmOrder: ConfirmOrder? = null
+    @JoinColumn(name = "confirm_order_id", columnDefinition = "BIGINT UNSIGNED")
+    var confirmOrder: ConfirmOrder? = null,
+
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "releaseInfo")
+    @JsonIgnore
+    var claim: Claim? = null
 ) : SimpleBaseEntity() {
     fun addReleaseProducts(releaseProduct: ReleaseProduct) {
         releaseProducts.add(releaseProduct)
@@ -74,7 +76,7 @@ class ReleaseInfo(
         uploadType: OrderUploadType
     ) {
         releaseStatus = ReleaseStatus.fromReleaseStatus(request.releaseStatus!!)
-        deliveryAgencyId = request.deliveryAgencyId?.toLong()
+        deliveryAgencyId = request.deliveryAgencyId
         trackingNumber = request.trackingNumber
         if (trackingNumber != null) {
             trackingNumberStatus =
@@ -89,7 +91,7 @@ class ReleaseInfo(
     }
 
     fun updateReleaseId(request: NosnosReleaseModel) {
-        releaseId = request.releaseId?.toLong()
+        releaseId = request.releaseId
         releaseCode = request.releaseCode
     }
 

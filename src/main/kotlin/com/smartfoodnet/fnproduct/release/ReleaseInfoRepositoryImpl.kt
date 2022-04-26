@@ -1,6 +1,7 @@
 package com.smartfoodnet.fnproduct.release
 
 import com.smartfoodnet.config.Querydsl4RepositorySupport
+import com.smartfoodnet.fnproduct.claim.entity.QClaim.claim
 import com.smartfoodnet.fnproduct.claim.model.vo.ExchangeStatus
 import com.smartfoodnet.fnproduct.claim.model.vo.ReturnStatus
 import com.smartfoodnet.fnproduct.order.entity.QCollectedOrder.collectedOrder
@@ -18,6 +19,7 @@ class ReleaseInfoRepositoryImpl : Querydsl4RepositorySupport(ReleaseInfo::class.
     override fun findAllByCondition(condition: ReleaseInfoSearchCondition, page: Pageable): Page<ReleaseInfo> {
         return applyPagination(page) {
             it.selectFrom(releaseInfo)
+                .leftJoin(releaseInfo.claim, claim)
                 .innerJoin(releaseInfo.confirmOrder, confirmOrder)
                 .innerJoin(confirmOrder.requestOrderList, confirmRequestOrder)
                 .innerJoin(confirmRequestOrder.collectedOrder, collectedOrder)
@@ -37,6 +39,12 @@ class ReleaseInfoRepositoryImpl : Querydsl4RepositorySupport(ReleaseInfo::class.
         }
     }
 
+    private fun eqReturnStatus(returnStatus: ReturnStatus?) =
+        returnStatus?.let { claim.returnStatus.eq(it) }
+
+    private fun eqExchangeStatus(exchangeStatus: ExchangeStatus?) =
+        exchangeStatus?.let { claim.exchangeStatus.eq(it) }
+
     private fun containsOrderNumber(orderNumber: String?) =
         orderNumber?.let { collectedOrder.orderNumber.contains(it) }
 
@@ -51,12 +59,6 @@ class ReleaseInfoRepositoryImpl : Querydsl4RepositorySupport(ReleaseInfo::class.
 
     private fun eqUploadType(uploadType: OrderUploadType?) =
         uploadType?.let { collectedOrder.uploadType.eq(it) }
-
-    private fun eqReturnStatus(returnStatus: ReturnStatus?) =
-        returnStatus?.let { collectedOrder.returnStatus.eq(it) }
-
-    private fun eqExchangeStatus(exchangeStatus: ExchangeStatus?) =
-        exchangeStatus?.let { collectedOrder.exchangeStatus.eq(it) }
 
     private fun eqPartnerId(partnerId: Long?) =
         partnerId?.let { releaseInfo.partnerId.eq(partnerId) }

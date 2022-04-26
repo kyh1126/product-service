@@ -10,10 +10,12 @@ import com.smartfoodnet.common.error.exception.BaseRuntimeException
 import com.smartfoodnet.common.error.exception.ErrorCode
 import com.smartfoodnet.common.getNosnosErrorMessage
 import com.smartfoodnet.common.utils.Log
+import com.smartfoodnet.fnproduct.order.entity.ConfirmOrder
 import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
 import com.smartfoodnet.fnproduct.release.entity.ReleaseProduct
+import com.smartfoodnet.fnproduct.release.model.dto.OrderReleaseInfoDto
 import com.smartfoodnet.fnproduct.release.model.dto.ReleaseModelDto
 import com.smartfoodnet.fnproduct.release.model.vo.DeliveryAgency
 import com.smartfoodnet.fnproduct.release.model.vo.ReleaseStatus
@@ -47,11 +49,13 @@ class ReleaseInfoStoreService(
         releaseModels: List<NosnosReleaseModel>,
         itemModelsByReleaseId: Map<Long, List<NosnosReleaseItemModel>>,
         basicProductByShippingProductId: Map<Long, BasicProduct>,
-        targetReleaseInfoList: List<ReleaseInfo>
+        orderReleaseInfoDto: OrderReleaseInfoDto
     ) {
+        val (confirmOrder, targetReleaseInfoList) = orderReleaseInfoDto
+
         releaseModels.map { model ->
             val releaseInfoByReleaseId = targetReleaseInfoList.associateBy { it.releaseId }
-            val releaseId = model.releaseId!!.toLong()
+            val releaseId = model.releaseId!!
             val releaseItemModels = itemModelsByReleaseId[releaseId] ?: emptyList()
             val releaseModelDto = ReleaseModelDto(model, releaseItemModels)
 
@@ -79,7 +83,8 @@ class ReleaseInfoStoreService(
                     createReleaseInfo(
                         releaseModelDto,
                         basicProductByShippingProductId,
-                        firstTargetReleaseInfo
+                        firstTargetReleaseInfo,
+                        confirmOrder
                     )
                 }
             }
@@ -209,6 +214,7 @@ class ReleaseInfoStoreService(
         releaseModelDto: ReleaseModelDto,
         basicProductByShippingProductId: Map<Long, BasicProduct>,
         firstTargetReleaseInfo: ReleaseInfo,
+        confirmOrder: ConfirmOrder,
     ) {
         val (releaseModel, releaseItemModels) = releaseModelDto
 
@@ -219,9 +225,8 @@ class ReleaseInfoStoreService(
         )
 
         val uploadType = getUploadType(firstTargetReleaseInfo)
-        val partnerId = firstTargetReleaseInfo.partnerId
 
-        val releaseInfo = releaseModel.toEntity(releaseProducts, uploadType, partnerId)
+        val releaseInfo = releaseModel.toEntity(releaseProducts, uploadType, confirmOrder)
         releaseInfoRepository.save(releaseInfo)
     }
 
@@ -231,9 +236,9 @@ class ReleaseInfoStoreService(
         basicProductByShippingProductId: Map<Long, BasicProduct>,
     ): Set<ReleaseProduct> {
         val releaseProducts = releaseItemModels.map {
-            val basicProduct = basicProductByShippingProductId[it.shippingProductId!!.toLong()]
+            val basicProduct = basicProductByShippingProductId[it.shippingProductId!!]
                 ?: throw BaseRuntimeException(errorCode = ErrorCode.NO_ELEMENT)
-            val releaseItemId = it.releaseItemId!!.toLong()
+            val releaseItemId = it.releaseItemId!!
             if (releaseItemId !in entityByReleaseItemId.keys) it.toEntity(basicProduct)
             else {
                 val entity = entityByReleaseItemId[releaseItemId]

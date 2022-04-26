@@ -10,9 +10,9 @@ import sfn.excel.module.workbook.read.models.SimpleWorkbookModels
 class BasicProductExcelModelMapper {
 
     fun toBasicProductExcelModel(
-            workbook: SimpleWorkbookModels.Workbook,
-            startIdx: Int,
-            endIdx: Int
+        workbook: SimpleWorkbookModels.Workbook,
+        startIdx: Int,
+        endIdx: Int
     ): List<BasicProductExcelModel> {
         val worksheet = workbook.worksheets[0]
         return toBasicProductExcelModel(worksheet, startIdx, endIdx)
@@ -26,9 +26,9 @@ class BasicProductExcelModelMapper {
     //      ["",          "",                    "양반 백합미역국 ",           "8801047169413",  "상온",                     "20",                  "",                      "1",                           "0",                        "",                                 "1"],
     // ]
     private fun toBasicProductExcelModel(
-            worksheet: SimpleWorkbookModels.Worksheet,
-            startIdx: Int,
-            endIdx: Int
+        worksheet: SimpleWorkbookModels.Worksheet,
+        startIdx: Int,
+        endIdx: Int
     ): List<BasicProductExcelModel> {
         var memberIdIdx = Int.MAX_VALUE
         var shippingProductIdIdx = Int.MAX_VALUE
@@ -64,19 +64,19 @@ class BasicProductExcelModelMapper {
             val row = worksheet.rows[i]
             try {
                 result += BasicProductExcelModel(
-                        rowIdx = i,
-                        memberId = validateNumberFormat("화주(고객사) ID", convertToLong(row[memberIdIdx])),
-                        shippingProductId = validateNumberFormat("출고상품 ID", convertToLong(row[shippingProductIdIdx])),
-                        productName = row[productNameIdx],
-                        barcode = row[barcodeIdx],
-                        piecesPerBox = validateNumberFormat("박스입수", convertToInt(row[piecesPerBoxIdx])),
-                        piecesPerPalette = convertToInt(row[piecesPerPaletteIdx]),
-                        expirationDateInfoExcelModel = ExpirationDateInfoExcelModel(
-                                manufactureDateWriteYn = convertToYN(row[manufactureDateWriteYnIdx]),
-                                expirationDateWriteYn = convertToYN(row[expirationDateWriteYnIdx]),
-                                manufactureToExpirationDate = convertToInt(row[expirationDateIdx])
-                        ),
-                        activeYn = convertToYN(row[activeYnIdx])
+                    rowIdx = i,
+                    memberId = validateNumberFormat("화주(고객사) ID", convertToLong(row[memberIdIdx])),
+                    shippingProductId = validateNumberFormat("출고상품 ID", convertToLong(row[shippingProductIdIdx])),
+                    productName = row[productNameIdx],
+                    barcode = row[barcodeIdx],
+                    piecesPerBox = validateNumberFormat("박스입수", convertToInt(row[piecesPerBoxIdx])),
+                    piecesPerPalette = convertToInt(row[piecesPerPaletteIdx]),
+                    expirationDateInfoExcelModel = ExpirationDateInfoExcelModel(
+                        manufactureDateWriteYn = convertToYN(row[manufactureDateWriteYnIdx]),
+                        expirationDateWriteYn = convertToYN(row[expirationDateWriteYnIdx]),
+                        manufactureToExpirationDate = convertToLong(row[expirationDateIdx])
+                    ),
+                    activeYn = convertToYN(row[activeYnIdx])
                 )
             } catch (e: Exception) {
                 log.error("BasicProductExcelModel 생성 실패, row idx: ${i}, productCode: ${row[productCodeIdx]}", e)
@@ -86,14 +86,14 @@ class BasicProductExcelModelMapper {
     }
 
     private fun convertToYN(target: String?): String =
-            when (target?.trim()) {
-                "1" -> "Y"
-                "0", null -> "N"
-                else -> throw IllegalArgumentException("YN 형식이 아닌 값이 입력되었습니다. target: ${target}")
-            }
+        when (target?.trim()) {
+            "1" -> "Y"
+            "0", null -> "N"
+            else -> throw IllegalArgumentException("YN 형식이 아닌 값이 입력되었습니다. target: ${target}")
+        }
 
     private fun <T : Number> validateNumberFormat(name: String, target: T?): T =
-            target ?: throw IllegalArgumentException("${name}은 숫자만 입력해주세요.")
+        target ?: throw IllegalArgumentException("${name}은 숫자만 입력해주세요.")
 
     private fun convertToLong(target: String): Long? = target.toLongOrNull()
 

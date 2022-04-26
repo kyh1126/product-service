@@ -6,19 +6,7 @@ import com.smartfoodnet.fnproduct.claim.model.vo.ExchangeStatus
 import com.smartfoodnet.fnproduct.claim.model.vo.ReturnStatus
 import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
 import java.time.LocalDateTime
-import javax.persistence.CascadeType
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.EnumType
-import javax.persistence.Enumerated
-import javax.persistence.FetchType
-import javax.persistence.ForeignKey
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
-import javax.persistence.Id
-import javax.persistence.JoinColumn
-import javax.persistence.OneToOne
-import javax.persistence.Table
+import javax.persistence.*
 
 @Entity
 @Table(name = "claim")
@@ -60,10 +48,15 @@ class Claim(
 
     @OneToOne(cascade = [CascadeType.PERSIST], fetch = FetchType.LAZY)
     @JoinColumn(name = "release_info_id", foreignKey = ForeignKey(name = "FK_release_info__claim"), columnDefinition = "BIGINT UNSIGNED")
-    val releaseInfo: ReleaseInfo? = null
-): BaseEntity() {
+    var releaseInfo: ReleaseInfo? = null
+) : BaseEntity() {
     fun addReturnInfo(returnInfo: ReturnInfo) {
         this.returnInfo = returnInfo
         returnInfo.claim = this
+    }
+
+    fun addReleaseInfo(releaseInfo: ReleaseInfo) {
+        this.releaseInfo = releaseInfo
+        releaseInfo.claim = this
     }
 }

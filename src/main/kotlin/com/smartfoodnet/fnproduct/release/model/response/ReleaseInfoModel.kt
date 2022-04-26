@@ -26,7 +26,7 @@ data class ReleaseInfoModel(
     @ApiModelProperty(value = "출고번호")
     var orderCode: String,
 
-    @ApiModelProperty(value = "출고상태 (NEW:신규주문/ORDER_CONFIRM:주문접수완료/BEFORE_RELEASE_REQUEST:출고요청전/RELEASE_REQUESTED:출고요청/RELEASE_ORDERED:출고지시/RELEASE_IN_PROGRESS:출고작업중/IN_TRANSIT:배송중/COMPLETE:배송완료/RELEASE_PAUSED:출고정지/RELEASE_CANCELLED:출고취소/CANCEL:주문취소)")
+    @ApiModelProperty(value = "출고상태 (NEW:신규주문/ORDER_CONFIRM:주문접수완료/BEFORE_RELEASE_REQUEST:출고작업중(1/4)/RELEASE_REQUESTED:출고작업중(2/4)/RELEASE_ORDERED:출고작업중(3/4)/RELEASE_IN_PROGRESS:출고작업중(4/4)/IN_TRANSIT:배송중/COMPLETE:배송완료/RELEASE_PAUSED:출고정지/RELEASE_CANCELLED:출고취소/CANCEL:주문취소)")
     var orderStatus: OrderStatus,
 
     @ApiModelProperty(value = "NOSNOS 출고 id")
@@ -54,10 +54,10 @@ data class ReleaseInfoModel(
     var deliveryCompletedAt: LocalDateTime? = null,
 
     @ApiModelProperty(value = "반품상태 (UNREGISTERED:미등록/RETURN_REQUESTED:반품요청/RETURN_IN_PROGRESS:반품진행/RETURN_INBOUND_COMPLETED:반품입고완료/RETURN_CANCELLED:반품취소)")
-    var returnStatuses: List<ReturnStatus> = emptyList(),
+    var returnStatus: ReturnStatus,
 
     @ApiModelProperty(value = "교환출고상태 (UNREGISTERED:미등록/EXCHANGE_RELEASE_IN_PROGRESS:교환출고중/EXCHANGE_DELIVERY_COMPLETED:교환배송완료)")
-    var exchangeStatuses: List<ExchangeStatus> = emptyList(),
+    var exchangeStatus: ExchangeStatus,
 
     @ApiModelProperty(
         value = "배송방식 (PARCEL:택배/VEHICLE:차량/DAWN:새벽배송/SAME_DAY:당일배송)",
@@ -107,8 +107,8 @@ data class ReleaseInfoModel(
                     trackingNumberStatus = trackingNumberStatus,
                     trackingNumberCreatedAt = trackingNumberCreatedAt,
                     deliveryCompletedAt = deliveryCompletedAt,
-                    returnStatuses = collectedOrders.map { it.returnStatus },
-                    exchangeStatuses = collectedOrders.map { it.exchangeStatus },
+                    returnStatus = claim?.returnStatus ?: ReturnStatus.UNREGISTERED,
+                    exchangeStatus = claim?.exchangeStatus ?: ExchangeStatus.UNREGISTERED,
                     deliveryType = firstCollectedOrder.deliveryType,
                     receiverModel = firstCollectedOrder.receiver.run(ReceiverModel::from),
                     storeName = firstCollectedOrder.storeName,

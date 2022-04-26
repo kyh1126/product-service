@@ -12,7 +12,7 @@ class ExpirationDateInfo(
     var expirationDateWriteYn: String = "N",
 
     @Column(name = "manufacture_to_expiration_date")
-    var manufactureToExpirationDate: Int? = null,
+    var manufactureToExpirationDate: Long? = null,
 ) {
     companion object {
         val default = ExpirationDateInfo()

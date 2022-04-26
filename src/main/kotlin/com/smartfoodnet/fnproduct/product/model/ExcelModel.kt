@@ -13,7 +13,7 @@ interface ExcelModel
 data class ExpirationDateInfoExcelModel(
     val manufactureDateWriteYn: String,
     val expirationDateWriteYn: String,
-    val manufactureToExpirationDate: Int?,
+    val manufactureToExpirationDate: Long?,
 ) {
     fun toExpirationDateInfoCreateModel(): ExpirationDateInfoCreateModel {
         return ExpirationDateInfoCreateModel(

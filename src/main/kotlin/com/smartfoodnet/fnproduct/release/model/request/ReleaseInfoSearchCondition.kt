@@ -9,6 +9,15 @@ import io.swagger.annotations.ApiModelProperty
 
 class ReleaseInfoSearchCondition(
     // ---------------------------------------------------------------------------------------------
+    // -- Claim field
+    // ---------------------------------------------------------------------------------------------
+    @ApiModelProperty(value = "반품상태")
+    var returnStatus: ReturnStatus? = null,
+
+    @ApiModelProperty(value = "교환출고상태")
+    var exchangeStatus: ExchangeStatus? = null,
+
+    // ---------------------------------------------------------------------------------------------
     // -- CollectedOrder field
     // ---------------------------------------------------------------------------------------------
     @ApiModelProperty(value = "주문번호")
@@ -25,12 +34,6 @@ class ReleaseInfoSearchCondition(
 
     @ApiModelProperty(value = "업로드방식")
     var uploadType: OrderUploadType? = null,
-
-    @ApiModelProperty(value = "반품상태")
-    var returnStatus: ReturnStatus? = null,
-
-    @ApiModelProperty(value = "교환출고상태")
-    var exchangeStatus: ExchangeStatus? = null,
 
     // ---------------------------------------------------------------------------------------------
     // -- ReleaseInfo field

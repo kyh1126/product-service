@@ -11,7 +11,7 @@ data class ExpirationDateInfoCreateModel(
     val expirationDateWriteYn: String = "N",
 
     @ApiModelProperty(value = "유통기한(제조일+X일)")
-    val manufactureToExpirationDate: Int? = null,
+    val manufactureToExpirationDate: Long? = null,
 ) {
     fun toEntity(): ExpirationDateInfo {
         return ExpirationDateInfo(

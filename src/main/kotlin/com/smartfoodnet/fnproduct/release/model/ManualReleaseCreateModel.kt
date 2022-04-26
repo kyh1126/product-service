@@ -1,7 +1,5 @@
 package com.smartfoodnet.fnproduct.release.model
 
-import com.smartfoodnet.fnproduct.claim.model.vo.ExchangeStatus
-import com.smartfoodnet.fnproduct.claim.model.vo.ReturnStatus
 import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
 import com.smartfoodnet.fnproduct.order.entity.CollectedProductInfo
 import com.smartfoodnet.fnproduct.order.entity.ConfirmProduct
@@ -59,8 +57,6 @@ data class ManualReleaseCreateModel(
             orderNumber = orderUniqueKey,
             status = OrderStatus.NEW,
             storeSyncStatus = StoreSyncStatus.NONE,
-            returnStatus = ReturnStatus.UNREGISTERED,
-            exchangeStatus = ExchangeStatus.UNREGISTERED,
             deliveryType = deliveryType,
             expectedDeliveryDate = null,
             price = null,

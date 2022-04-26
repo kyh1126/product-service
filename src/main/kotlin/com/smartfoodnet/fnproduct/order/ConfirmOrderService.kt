@@ -3,6 +3,7 @@ package com.smartfoodnet.fnproduct.order
 import com.smartfoodnet.apiclient.WmsApiClient
 import com.smartfoodnet.apiclient.request.RequestOrderMapper
 import com.smartfoodnet.common.error.exception.BaseRuntimeException
+import com.smartfoodnet.common.error.exception.ErrorCode
 import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.fnproduct.order.dto.ConfirmProductModel
 import com.smartfoodnet.fnproduct.order.entity.*
@@ -126,6 +127,11 @@ class ConfirmOrderService(
         confirmProductAddModel.confirmProductList.forEach {
             replaceConfirmProduct(it)
         }
+    }
+
+    fun getConfirmOrderByOrderId(orderId: Long): ConfirmOrder {
+        return confirmOrderRepository.findByOrderId(orderId)
+            ?: throw BaseRuntimeException(errorCode = ErrorCode.NO_ELEMENT)
     }
 
     private fun validateConfirmProduct(

@@ -2,8 +2,6 @@ package com.smartfoodnet.fnproduct.order.model
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.smartfoodnet.common.Constants
-import com.smartfoodnet.fnproduct.claim.model.vo.ExchangeStatus
-import com.smartfoodnet.fnproduct.claim.model.vo.ReturnStatus
 import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
 import com.smartfoodnet.fnproduct.order.entity.CollectedProductInfo
 import com.smartfoodnet.fnproduct.order.vo.DeliveryType
@@ -45,12 +43,6 @@ data class CollectedOrderCreateModel(
 
     @ApiModelProperty(value = "주문 상태")
     val status: OrderStatus,
-
-    @ApiModelProperty(value = "교환 상태")
-    val returnStatus: ReturnStatus = ReturnStatus.UNREGISTERED,
-
-    @ApiModelProperty(value = "교환 상태")
-    val exchangeStatus: ExchangeStatus = ExchangeStatus.UNREGISTERED,
 
     @ApiModelProperty(value = "쇼핑몰 상품명")
     val storeProductName: String,
@@ -105,8 +97,6 @@ data class CollectedOrderCreateModel(
             orderNumber = orderNumber,
             status = status,
             storeSyncStatus = StoreSyncStatus.NEW,
-            returnStatus = returnStatus,
-            exchangeStatus = exchangeStatus,
             deliveryType = deliveryType,
             expectedDeliveryDate = expectedDeliveryDate,
             price = price,

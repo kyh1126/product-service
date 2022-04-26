@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 import com.smartfoodnet.apiclient.dto.AddBarcode
 import com.smartfoodnet.common.convertYnToInt
+import com.smartfoodnet.common.convertYnToLong
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import io.swagger.annotations.ApiModelProperty
 
@@ -33,10 +34,10 @@ data class PreShippingProductModel(
     val boxWeight: Int? = null,
     val singleEta: Int? = null,
     val paletCount: Int? = null,
-    val useExpireDate: Int? = null,
-    val expireDateByMakeDate: Int? = null,
+    val useExpireDate: Long? = null,
+    val expireDateByMakeDate: Long? = null,
     val restrictedExpireDate: Int? = null,
-    val useMakeDate: Int? = null,
+    val useMakeDate: Long? = null,
     val warningExpireDate: Int? = null,
     val editCode: String? = null,
     val maxQuantityPerBox: Int? = null,
@@ -84,21 +85,21 @@ data class PreShippingProductModel(
         private fun convertWithExpirationDateManagementYn(
             expirationDateManagementYn: String,
             yn: String?
-        ): Int {
+        ): Long {
             if (expirationDateManagementYn == "N") {
-                return 0
+                return 0L
             }
-            return convertYnToInt(yn)
+            return convertYnToLong(yn)
         }
 
         private fun convertWithExpirationDateManagementYn(
             expirationDateManagementYn: String,
-            yn: Int?
-        ): Int {
+            yn: Long?
+        ): Long {
             if (expirationDateManagementYn == "N") {
-                return 0
+                return 0L
             }
-            return yn ?: 0
+            return yn ?: 0L
         }
     }
 }

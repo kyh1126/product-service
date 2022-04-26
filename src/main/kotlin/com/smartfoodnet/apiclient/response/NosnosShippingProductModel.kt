@@ -36,7 +36,7 @@ class NosnosShippingProductModel(
     val paletCount: Int? = null,
     val useExpireDate: Int? = null,
     val useMakeDate: Int? = null,
-    val expireDateByMakeDate: Int? = null,
+    val expireDateByMakeDate: Long? = null,
     val warningExpireDate: Int? = null,
     val restrictedExpireDate: Int? = null,
     val editCode: String? = null,
