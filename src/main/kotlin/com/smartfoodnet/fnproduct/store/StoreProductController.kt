@@ -2,7 +2,6 @@ package com.smartfoodnet.fnproduct.store
 
 import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.fnproduct.store.model.request.StoreProductCreateModel
-import com.smartfoodnet.fnproduct.store.model.request.StoreProductMappingCreateModel
 import com.smartfoodnet.fnproduct.store.model.request.StoreProductUpdateModel
 import com.smartfoodnet.fnproduct.store.model.response.StoreProductModel
 import com.smartfoodnet.fnproduct.store.support.StoreProductSearchCondition
@@ -68,12 +67,6 @@ class StoreProductController(
     @DeleteMapping("{id}")
     fun deleteStoreProduct(@PathVariable id: Long) {
         storeProductService.deleteStoreProduct(id)
-    }
-
-    @Operation(summary = "쇼핑몰상품 기본상품 매핑")
-    @PostMapping("/map-basic-product")
-    fun mapBasicProduct(@Valid @RequestBody storeProductMappingCreateModels: StoreProductMappingCreateModel): StoreProductModel {
-        return storeProductService.mapBasicProducts(storeProductMappingCreateModels)
     }
 
     @Operation(summary = "쇼핑몰상품 excel 파일로 생성")
