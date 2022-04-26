@@ -275,6 +275,9 @@ class ReleaseInfoService(
     ): Map<Long, BasicProduct> {
         val shippingProductIdsFromModel = itemsByReleaseId.values.flatten()
             .mapNotNull { it.shippingProductId }.toSet()
+
+        if (shippingProductIdsFromModel.isEmpty()) return emptyMap()
+
         return basicProductService.getBasicProductsByShippingProductIds(shippingProductIdsFromModel)
             .associateBy { it.shippingProductId!! }
     }
