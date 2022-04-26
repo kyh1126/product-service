@@ -6,6 +6,7 @@ import com.smartfoodnet.common.entity.SimpleBaseEntity
 import com.smartfoodnet.fnproduct.claim.entity.Claim
 import com.smartfoodnet.fnproduct.order.entity.ConfirmOrder
 import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
+import com.smartfoodnet.fnproduct.release.model.vo.PausedBy
 import com.smartfoodnet.fnproduct.release.model.vo.ReleaseStatus
 import com.smartfoodnet.fnproduct.release.model.vo.TrackingNumberStatus
 import java.time.LocalDateTime
@@ -63,7 +64,11 @@ class ReleaseInfo(
 
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "releaseInfo")
     @JsonIgnore
-    var claim: Claim? = null
+    var claim: Claim? = null,
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "paused_by")
+    var pausedBy: PausedBy? = null,
 ) : SimpleBaseEntity() {
     fun addReleaseProducts(releaseProduct: ReleaseProduct) {
         releaseProducts.add(releaseProduct)
@@ -73,9 +78,14 @@ class ReleaseInfo(
     fun update(
         request: NosnosReleaseModel,
         releaseProductRequests: Set<ReleaseProduct>,
-        uploadType: OrderUploadType
+        uploadType: OrderUploadType,
+        pausedBy: PausedBy = PausedBy.NOSNOS
     ) {
         releaseStatus = ReleaseStatus.fromReleaseStatus(request.releaseStatus!!)
+        if (releaseStatus == ReleaseStatus.RELEASE_PAUSED) {
+            pause(pausedBy)
+        }
+
         deliveryAgencyId = request.deliveryAgencyId
         trackingNumber = request.trackingNumber
         if (trackingNumber != null) {
@@ -104,8 +114,9 @@ class ReleaseInfo(
         deliveryCompletedAt = procDateTime
     }
 
-    fun pause() {
-        releaseStatus = ReleaseStatus.RELEASE_PAUSED
+    fun pause(pausedBy: PausedBy) {
+        this.releaseStatus = ReleaseStatus.RELEASE_PAUSED
+        this.pausedBy = pausedBy
     }
 
     fun cancel() {

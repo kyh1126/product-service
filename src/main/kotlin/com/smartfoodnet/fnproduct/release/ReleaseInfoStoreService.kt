@@ -18,6 +18,7 @@ import com.smartfoodnet.fnproduct.release.entity.ReleaseProduct
 import com.smartfoodnet.fnproduct.release.model.dto.OrderReleaseInfoDto
 import com.smartfoodnet.fnproduct.release.model.dto.ReleaseModelDto
 import com.smartfoodnet.fnproduct.release.model.vo.DeliveryAgency
+import com.smartfoodnet.fnproduct.release.model.vo.PausedBy
 import com.smartfoodnet.fnproduct.release.model.vo.ReleaseStatus
 import com.smartfoodnet.fnproduct.release.model.vo.TrackingNumberStatus
 import feign.FeignException
@@ -147,7 +148,7 @@ class ReleaseInfoStoreService(
             log.error("[pauseReleaseInfo] ${getNosnosErrorMessage(e.message)}", e)
             throw e
         }
-        releaseInfo.pause()
+        releaseInfo.pause(PausedBy.PARTNER)
     }
 
     fun cancelReleaseInfo(id: Long) {

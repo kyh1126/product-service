@@ -61,6 +61,10 @@ data class NosnosReleaseModel(
         )
 
         return releaseInfo.apply {
+            if (releaseStatus == ReleaseStatus.RELEASE_PAUSED) {
+                this.pausedBy = pausedBy
+            }
+
             if (trackingNumber != null) {
                 trackingNumberStatus = TrackingNumberStatus.getInitialStatus(uploadType)
                 trackingNumberCreatedAt = LocalDateTime.now()
