@@ -249,6 +249,8 @@ class ReleaseInfoService(
         var page = NOSNOS_INITIAL_PAGE
         var totalPage = NOSNOS_INITIAL_PAGE
 
+        if (releaseIds.isEmpty()) return emptyList()
+
         while (page <= totalPage) {
             val model: CommonDataListModel<NosnosReleaseItemModel>?
             try {
