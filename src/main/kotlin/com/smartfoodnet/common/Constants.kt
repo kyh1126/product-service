@@ -19,4 +19,5 @@ object Constants {
     const val WORKSHEET_INDEX: Int = 0
     const val DATA_STARTING_ROW_INDEX: Int = 1
     const val NOSNOS_INITIAL_PAGE = 1
+    const val NOSNOS_NO_VALUE_MESSAGE = "검색된 데이터가 없습니다."
 }

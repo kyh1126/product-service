@@ -49,7 +49,7 @@ fun convertYnToInt(yn: String?) = if (yn == "Y") 1 else 0
  * ex>
  * [400 ] during [PATCH] to [http://localhost:4001/fresh-networks/fn-warehouse-service/release/cancel/193353] [WmsApiClient#cancelRelease(long)]: [{"serviceCode":"FN-NOSNOS-SERVICE","errorCode":"500","errorMessage":"4117-출고요청 상태인 경우만 출고취소가 가능합니다."}]
  *
- * @see com.smartfoodnet.common.error.handleFeignException
+ * @see com.smartfoodnet.common.error.ApiExceptionHandler.handleFeignException
  */
 fun getNosnosErrorMessage(message: String?): String? {
     if (message == null) return null

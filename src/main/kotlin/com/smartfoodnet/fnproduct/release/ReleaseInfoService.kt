@@ -8,7 +8,9 @@ import com.smartfoodnet.apiclient.response.CommonDataListModel
 import com.smartfoodnet.apiclient.response.NosnosReleaseItemModel
 import com.smartfoodnet.apiclient.response.NosnosReleaseModel
 import com.smartfoodnet.common.Constants.NOSNOS_INITIAL_PAGE
+import com.smartfoodnet.common.Constants.NOSNOS_NO_VALUE_MESSAGE
 import com.smartfoodnet.common.error.exception.BaseRuntimeException
+import com.smartfoodnet.common.getNosnosErrorMessage
 import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.fnproduct.order.ConfirmOrderService
@@ -212,7 +214,7 @@ class ReleaseInfoService(
         var totalPage = NOSNOS_INITIAL_PAGE
 
         while (page <= totalPage) {
-            val model: CommonDataListModel<NosnosReleaseModel>?
+            var model: CommonDataListModel<NosnosReleaseModel>? = null
             try {
                 model = wmsApiClient.getReleases(
                     partnerId = partnerId,
@@ -220,8 +222,12 @@ class ReleaseInfoService(
                     page = page
                 ).payload
             } catch (e: FeignException) {
-                log.error("[getReleases] orderIds: ${orderIds}, page: ${page}", e)
-                throw BaseRuntimeException(errorMessage = "출고 정보 조회 실패, orderIds: ${orderIds}, page: ${page}")
+                if (NOSNOS_NO_VALUE_MESSAGE == getNosnosErrorMessage(e.message)) {
+                    log.warn("[getReleases] ${NOSNOS_NO_VALUE_MESSAGE} orderIds: ${orderIds}, page: ${page}", e)
+                } else {
+                    log.error("[getReleases] orderIds: ${orderIds}, page: ${page}", e)
+                    throw BaseRuntimeException(errorMessage = "출고 정보 조회 실패, orderIds: ${orderIds}, page: ${page}")
+                }
             }
 
             if (totalPage == NOSNOS_INITIAL_PAGE) {
