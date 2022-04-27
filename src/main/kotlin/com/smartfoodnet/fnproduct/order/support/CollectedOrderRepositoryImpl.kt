@@ -11,6 +11,7 @@ import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
 import com.smartfoodnet.fnproduct.order.entity.QCollectedOrder.collectedOrder
 import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import com.smartfoodnet.fnproduct.product.entity.QBasicProduct.basicProduct
+import com.smartfoodnet.fnproduct.product.entity.QPackageProductMapping.packageProductMapping
 import com.smartfoodnet.fnproduct.store.entity.QStoreProduct.storeProduct
 import com.smartfoodnet.fnproduct.store.entity.QStoreProductMapping.storeProductMapping
 
@@ -96,6 +97,24 @@ class CollectedOrderRepositoryImpl : CollectedOrderRepositoryCustom, Querydsl4Re
             .leftJoin(storeProduct.storeProductMappings, storeProductMapping)
             .leftJoin(storeProductMapping.basicProduct, basicProduct)
             .where(condition.toPredicate())
+            .fetch()
+    }
+
+    override fun findMissingAffectedOrders(
+        partnerId: Long,
+        basicProductId: Long
+    ): List<CollectedOrder> {
+        return selectFrom(collectedOrder)
+            .innerJoin(collectedOrder.storeProduct, storeProduct)
+            .innerJoin(storeProduct.storeProductMappings, storeProductMapping)
+            .innerJoin(storeProductMapping.basicProduct, basicProduct)
+            .leftJoin(basicProduct.packageProductMappings, packageProductMapping)
+            .leftJoin(packageProductMapping.selectedBasicProduct)
+            .where(
+                collectedOrder.status.eq(OrderStatus.NEW),
+                packageProductMapping.selectedBasicProduct.id.eq(basicProductId)
+                    .or(storeProductMapping.basicProduct.id.eq(basicProductId))
+            )
             .fetch()
     }
 }
