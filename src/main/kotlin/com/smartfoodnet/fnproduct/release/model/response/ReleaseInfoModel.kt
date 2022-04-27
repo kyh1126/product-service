@@ -71,6 +71,9 @@ data class ReleaseInfoModel(
     @ApiModelProperty(value = "쇼핑몰 이름")
     var storeName: String,
 
+    @ApiModelProperty(value = "쇼핑몰 아이콘")
+    var storeIcon: String? = null,
+
     @ApiModelProperty(
         value = "업로드방식 (API:API/UPLOAD:엑셀/MANUAL:수동)",
         allowableValues = "API,UPLOAD,MANUAL"
@@ -112,6 +115,7 @@ data class ReleaseInfoModel(
                     deliveryType = firstCollectedOrder.deliveryType,
                     receiverModel = firstCollectedOrder.receiver.run(ReceiverModel::from),
                     storeName = firstCollectedOrder.storeName,
+                    storeIcon = firstCollectedOrder.storeIcon,
                     uploadType = firstCollectedOrder.uploadType,
                     bundleNumber = firstCollectedOrder.bundleNumber,
                     orderNumbers = collectedOrders.map { it.orderNumber },
