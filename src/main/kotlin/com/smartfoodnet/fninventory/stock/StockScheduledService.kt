@@ -189,6 +189,7 @@ class StockScheduledService(
 
             nosnosStocksByExpirationDate.forEach { nosnosStockByExpirationDate ->
                 val basicProduct = basicProductChunk.find {
+                    println("${nosnosStockByExpirationDate.shippingProductId} ::  ${nosnosStockByExpirationDate.expirationDate}")
                     it.shippingProductId?.equals(nosnosStockByExpirationDate.shippingProductId)?.or(nosnosStockByExpirationDate.expirationDate == null)
                         ?: false
                 }
