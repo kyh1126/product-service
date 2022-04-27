@@ -41,7 +41,7 @@ class ReleaseController(
     }
 
     @Operation(summary = "특정 화주(고객사) ID 의 중지된 출고 리스트 조회")
-    @GetMapping("partners/{partnerId}")
+    @GetMapping("partners/{partnerId}/paused")
     fun getPausedReleaseInfoList(
         @Parameter(description = "화주(고객사) ID", required = true)
         @PathVariable partnerId: Long,
