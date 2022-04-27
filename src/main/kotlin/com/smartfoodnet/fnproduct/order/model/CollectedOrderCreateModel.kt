@@ -24,6 +24,9 @@ data class CollectedOrderCreateModel(
     @ApiModelProperty(value = "쇼핑몰 코유 코드")
     val storeCode: String,
 
+    @ApiModelProperty(value = "쇼핑몰 아이콘")
+    val storeIcon: String? = null,
+
     @ApiModelProperty(value = "쇼핑몰 ID")
     val storeId: Long,
 
@@ -89,6 +92,7 @@ data class CollectedOrderCreateModel(
             storeName = storeName,
             storeCode = storeCode,
             storeId = storeId,
+            storeIcon = storeIcon,
             collectedProductInfo = CollectedProductInfo(storeProductCode, storeProductName, storeProductOptionName),
             userStoreId = userStoreId,
             orderedAt = orderedAt,
