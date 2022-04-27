@@ -3,6 +3,7 @@ package com.smartfoodnet.fnproduct.order.dto
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.querydsl.core.annotations.QueryProjection
+import com.smartfoodnet.common.Constants.DATE_FORMAT
 import com.smartfoodnet.common.Constants.TIMESTAMP_FORMAT
 import com.smartfoodnet.fnproduct.order.vo.DeliveryType
 import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
@@ -18,9 +19,12 @@ data class ConfirmProductModel @QueryProjection constructor(
     val uploadType: OrderUploadType,
     val status: OrderStatus,
     val orderNumber: String,
+    @JsonFormat(pattern = TIMESTAMP_FORMAT)
+    val orderedAt: LocalDateTime,
     val bundleNumber: String,
     val matchingType: MatchingType,
     val basicProductId: Long?,
+    val basicProductCode : String?,
     val basicProductType: BasicProductType,
     val basicProductSalesProductId: Long?,
     val basicProductSalesProductCode: String?,
@@ -43,6 +47,7 @@ data class ConfirmProductModel @QueryProjection constructor(
     val deliveryType: DeliveryType,
     val shippingPrice: Double?,
     val name: String? = null,
+    val zipCode: String? = null,
     val address: String? = null,
     val phoneNumber: String? = null,
     @JsonFormat(pattern = TIMESTAMP_FORMAT)
