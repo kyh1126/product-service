@@ -126,7 +126,7 @@ class OrderController(
     }
 
     @Operation(summary = "결품영향주문 조회")
-    @GetMapping("/partners/{partnerId}/missing/{basicProductId}")
+    @GetMapping("/partners/{partnerId}/missing-order/product/{basicProductId}")
     fun getMissingAffectedOrder(
         @ApiIgnore
         @RequestHeader(Constants.HEADER_KEY_SFN_META_USER)
