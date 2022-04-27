@@ -22,6 +22,7 @@ import com.smartfoodnet.fnproduct.release.model.dto.OrderReleaseInfoDto
 import com.smartfoodnet.fnproduct.release.model.request.ReleaseInfoSearchCondition
 import com.smartfoodnet.fnproduct.release.model.response.OrderConfirmProductModel
 import com.smartfoodnet.fnproduct.release.model.response.OrderProductModel
+import com.smartfoodnet.fnproduct.release.model.response.PausedReleaseInfoModel
 import com.smartfoodnet.fnproduct.release.model.response.ReleaseInfoModel
 import com.smartfoodnet.fnproduct.release.model.vo.DeliveryAgency
 import com.smartfoodnet.fnproduct.release.model.vo.DeliveryAgency.Companion.getDeliveryAgencyByName
@@ -57,6 +58,15 @@ class ReleaseInfoService(
         return releaseInfoPage.map {
             ReleaseInfoModel.fromEntity(it, deliveryAgencyModelsByDeliveryAgencyId)
         }.run { PageResponse.of(this) }
+    }
+
+    fun getPausedReleaseInfoList(
+        condition: ReleaseInfoSearchCondition,
+        page: Pageable
+    ): PageResponse<PausedReleaseInfoModel> {
+        val releaseInfoPage = releaseInfoRepository.findAllByCondition(condition, page)
+        return releaseInfoPage.map(PausedReleaseInfoModel.Companion::fromEntity)
+            .run { PageResponse.of(this) }
     }
 
     fun syncReleaseInfo(partnerId: Long?) {

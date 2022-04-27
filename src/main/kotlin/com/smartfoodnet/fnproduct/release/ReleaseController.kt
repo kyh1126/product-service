@@ -5,6 +5,7 @@ import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.fnproduct.release.model.request.ReleaseInfoSearchCondition
 import com.smartfoodnet.fnproduct.release.model.response.OrderConfirmProductModel
 import com.smartfoodnet.fnproduct.release.model.response.OrderProductModel
+import com.smartfoodnet.fnproduct.release.model.response.PausedReleaseInfoModel
 import com.smartfoodnet.fnproduct.release.model.response.ReleaseInfoModel
 import com.smartfoodnet.fnproduct.release.model.vo.DeliveryAgency
 import io.swagger.annotations.Api
@@ -32,8 +33,27 @@ class ReleaseController(
         @ModelAttribute condition: ReleaseInfoSearchCondition,
         @PageableDefault(size = 50, sort = ["id"], direction = Sort.Direction.DESC) page: Pageable,
     ): PageResponse<ReleaseInfoModel> {
-        condition.apply { this.partnerId = partnerId }
+        condition.apply {
+            this.partnerId = partnerId
+            removePausedOrderStatus()
+        }
         return releaseInfoService.getReleaseInfoList(condition, page)
+    }
+
+    @Operation(summary = "특정 화주(고객사) ID 의 중지된 출고 리스트 조회")
+    @GetMapping("partners/{partnerId}")
+    fun getPausedReleaseInfoList(
+        @Parameter(description = "화주(고객사) ID", required = true)
+        @PathVariable partnerId: Long,
+        @Parameter(description = "검색조건")
+        @ModelAttribute condition: ReleaseInfoSearchCondition,
+        @PageableDefault(size = 50, sort = ["id"], direction = Sort.Direction.DESC) page: Pageable,
+    ): PageResponse<PausedReleaseInfoModel> {
+        condition.apply {
+            this.partnerId = partnerId
+            setPausedOrderStatus()
+        }
+        return releaseInfoService.getPausedReleaseInfoList(condition, page)
     }
 
     @Operation(summary = "릴리즈 정보 동기화")

@@ -47,4 +47,14 @@ class ReleaseInfoSearchCondition(
 
     @ApiModelProperty(value = "송장번호")
     var trackingNumber: String? = null,
-)
+) {
+    fun removePausedOrderStatus() {
+        if (this.orderStatus == OrderStatus.RELEASE_PAUSED) {
+            orderStatus = null
+        }
+    }
+
+    fun setPausedOrderStatus() {
+        orderStatus = OrderStatus.RELEASE_PAUSED
+    }
+}

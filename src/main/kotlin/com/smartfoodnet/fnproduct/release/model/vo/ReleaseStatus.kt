@@ -24,5 +24,10 @@ enum class ReleaseStatus(val releaseStatus: Int?, val description: String, val o
             return values().firstOrNull { it.releaseStatus == releaseStatus }
                 ?: throw IllegalArgumentException("Format $releaseStatus is illegal")
         }
+
+        fun fromOrderStatus(orderStatus: OrderStatus?): ReleaseStatus? {
+            if (orderStatus == null) return null
+            return values().firstOrNull { it.orderStatus == orderStatus }
+        }
     }
 }
