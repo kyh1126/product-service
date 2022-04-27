@@ -8,6 +8,7 @@ import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import com.smartfoodnet.fninventory.shortage.model.ShortageOrderProjectionModel
 import com.smartfoodnet.fninventory.shortage.support.ProductShortageSearchCondition
 import com.smartfoodnet.fnproduct.order.dto.CollectedOrderModel
+import com.smartfoodnet.fnproduct.order.dto.MissingAffectedOrderModel
 import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
 import com.smartfoodnet.fnproduct.order.model.BasicProductAddModel
 import com.smartfoodnet.fnproduct.order.support.CollectedOrderRepository
@@ -152,6 +153,12 @@ class OrderService(
         }
 
         return storeProductService.createStoreProduct(storeProduct)
+    }
+
+    fun getMissingAffectedOrder(partnerId: Long, basicProductId: Long) : List<MissingAffectedOrderModel> {
+        val collectedOrderList : List<CollectedOrder> =
+            collectedOrderRepository.findMissingAffectedOrders(partnerId, basicProductId)
+        return collectedOrderList.map(MissingAffectedOrderModel::from)
     }
 
     companion object : Log
