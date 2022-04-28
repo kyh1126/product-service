@@ -319,12 +319,4 @@ internal class BasicProductServiceTest(
     private fun getSubsidiaryMaterialById(createModel: BasicProductDetailCreateModel) =
         basicProductService.getBasicProducts(createModel.subsidiaryMaterialMappingModels.map { it.subsidiaryMaterialId!! })
             .associateBy { it.id }
-
-    @Test
-    @DisplayName("check")
-    fun checkNull(){
-       val basic =  "1".equals("1").or(null != null)
-            ?: false
-        println("basic  ::  $basic")
-    }
 }

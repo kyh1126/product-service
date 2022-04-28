@@ -190,9 +190,10 @@ class StockScheduledService(
             nosnosStocksByExpirationDate.forEach { nosnosStockByExpirationDate ->
                 val basicProduct = basicProductChunk.find {
                     println("${nosnosStockByExpirationDate.shippingProductId} ::  ${nosnosStockByExpirationDate.expirationDate}")
-                    it.shippingProductId?.equals(nosnosStockByExpirationDate.shippingProductId)?.or(nosnosStockByExpirationDate.expirationDate == null)
+                    it.shippingProductId?.equals(nosnosStockByExpirationDate.shippingProductId)?.or(nosnosStockByExpirationDate.expirationDate != null)
                         ?: false
                 }
+                println("check basicProduct : $basicProduct")
 
                 if (basicProduct == null) {
                     log.error("error: shippingProductId = [${nosnosStockByExpirationDate.shippingProductId}] does not exist or expiration Date null.")
