@@ -41,6 +41,7 @@ class StockByBestBeforeSearchCondition(
 
     override fun assemblePredicate(predicate: BooleanBuilder): Predicate {
         return predicate.orAllOf(
+            notExistExpirationDate(),
             eqCollectDateToday(),
             eqPartnerId(partnerId),
             searchType?.let { toPredicate(it) },
@@ -55,6 +56,9 @@ class StockByBestBeforeSearchCondition(
             CODE -> containBasicProductCode(searchKeyword)
             BARCODE -> containBarcode(searchKeyword)
         }
+
+    private fun notExistExpirationDate() =
+        stockByBestBefore.bestBefore.ne(1f)
 
     private fun eqCollectDateToday()=
         stockByBestBefore.collectedDate.eq(LocalDate.now())
