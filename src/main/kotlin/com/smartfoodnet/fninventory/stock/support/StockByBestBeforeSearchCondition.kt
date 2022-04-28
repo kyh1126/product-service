@@ -58,7 +58,7 @@ class StockByBestBeforeSearchCondition(
         }
 
     private fun notExistExpirationDate() =
-        stockByBestBefore.bestBefore.ne(1f)
+        stockByBestBefore.bestBefore.ne(-1f)
 
     private fun eqCollectDateToday()=
         stockByBestBefore.collectedDate.eq(LocalDate.now())
