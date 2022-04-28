@@ -7,6 +7,9 @@ import com.querydsl.core.types.Predicate
 import com.smartfoodnet.common.Constants
 import com.smartfoodnet.common.model.request.PredicateSearchCondition
 import com.smartfoodnet.fnproduct.order.entity.QCollectedOrder.collectedOrder
+import com.smartfoodnet.fnproduct.order.entity.QConfirmProduct
+import com.smartfoodnet.fnproduct.order.entity.QConfirmProduct.*
+import com.smartfoodnet.fnproduct.order.vo.MatchingType
 import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import io.swagger.annotations.ApiModelProperty
 import java.time.LocalDate
@@ -50,7 +53,11 @@ class ConfirmProductSearchCondition(
     val basicProductName: String? = null,
 
     @ApiModelProperty(value = "기본/모음상품코드")
-    val basicProductCode: String? = null
+    val basicProductCode: String? = null,
+
+    @ApiModelProperty(value = "매칭상태")
+    val matchingType : MatchingType? = null
+
 ) : PredicateSearchCondition() {
     override fun assemblePredicate(predicate: BooleanBuilder): Predicate {
         return predicate.orAllOf(
@@ -65,7 +72,8 @@ class ConfirmProductSearchCondition(
             storeProductName?.let { collectedOrder.collectedProductInfo.collectedStoreProductName.contains(it) },
             storeProductCode?.let { collectedOrder.collectedProductInfo.collectedStoreProductCode.eq(it) },
             storeOptionName?.let { collectedOrder.collectedProductInfo.collectedStoreProductOptionName.contains(it) },
-            storeOptionCode?.let { collectedOrder.collectedProductInfo.collectedStoreProductOptionCode.eq(it) }
+            storeOptionCode?.let { collectedOrder.collectedProductInfo.collectedStoreProductOptionCode.eq(it) },
+            matchingType?.let { confirmProduct.matchingType.eq(it) }
         )
     }
 }
