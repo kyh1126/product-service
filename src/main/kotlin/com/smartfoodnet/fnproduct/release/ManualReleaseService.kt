@@ -8,16 +8,18 @@ import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.fnpartner.PartnerService
 import com.smartfoodnet.fnproduct.order.ConfirmOrderService
 import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
+import com.smartfoodnet.fnproduct.order.entity.ConfirmOrder
 import com.smartfoodnet.fnproduct.order.entity.ConfirmProduct
 import com.smartfoodnet.fnproduct.order.model.RequestOrderCreateModel
-import com.smartfoodnet.fnproduct.order.model.response.ManualReleaseResponseModel
+import com.smartfoodnet.fnproduct.order.model.response.ManualOrderResponseModel
 import com.smartfoodnet.fnproduct.order.support.CollectedOrderRepository
 import com.smartfoodnet.fnproduct.order.support.ConfirmProductRepository
+import com.smartfoodnet.fnproduct.order.vo.MatchingType
 import com.smartfoodnet.fnproduct.product.BasicProductRepository
-import com.smartfoodnet.fnproduct.release.model.ManualReleaseCreateModel
-import com.smartfoodnet.fnproduct.release.model.ManualReleaseProductInfo
-import com.smartfoodnet.fnproduct.release.validator.ManualReleaseCreateModelValidator
+import com.smartfoodnet.fnproduct.release.model.request.*
+import com.smartfoodnet.fnproduct.release.validator.ManualOrderModelValidator
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 
 /**
@@ -26,7 +28,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 @Transactional(readOnly = true)
 class ManualReleaseService(
-    private val manualReleaseCreateModelValidator: ManualReleaseCreateModelValidator,
+    private val manualOrderModelValidator: ManualOrderModelValidator,
     private val collectedOrderRepository: CollectedOrderRepository,
     private val basicProductRepository: BasicProductRepository,
     private val confirmProductRepository: ConfirmProductRepository,
@@ -36,7 +38,7 @@ class ManualReleaseService(
     /**
      * 주문외출고 등록(상품과 주문 정보 없이 주문수집 데이터를 생성한다)
      * - Collected Order생성(쇼핑몰 주문하고 쇼핑몰 상품 없이 등록
-     *   uploadType: [com.smartfoodnet.fnproduct.order.enums.OrderUploadType.MANUAL])
+     *   uploadType: [com.smartfoodnet.fnproduct.order.vo.OrderUploadType.MANUAL])
      *
      * - Collected Order생성 > Confirm Product생성 > Confirm Order생성(노스노스 발주 등록/SFN출고지시)
      */
@@ -45,40 +47,65 @@ class ManualReleaseService(
         sfnMetaUser: SfnMetaUser?,
         partnerId: Long,
         manualReleaseRequest: ManualReleaseCreateModel
-    ): ManualReleaseResponseModel {
+    ): ManualOrderResponseModel {
         // validation
         ValidatorUtils.validateAndThrow(
             SaveState.CREATE,
-            manualReleaseCreateModelValidator,
+            manualOrderModelValidator,
             manualReleaseRequest
         )
 
-         partnerService.checkUserPartnerMembership(sfnMetaUser, partnerId)
+        partnerService.checkUserPartnerMembership(sfnMetaUser, partnerId)
 
+        val (collectedOrder, confirmOrder) =
+            createManualOrder(partnerId, manualReleaseRequest)
+
+        return ManualOrderResponseModel.from(collectedOrder, confirmOrder)
+    }
+
+    /**
+     * 재출고 등록 - 주문외출고 등록과 동일 프로세스
+     *   uploadType: [com.smartfoodnet.fnproduct.order.vo.OrderUploadType.RE_ORDER]
+     *
+     *   @see com.smartfoodnet.fnproduct.release.ManualReleaseService.issueManualRelease
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    fun issueReOrder(partnerId: Long, createModel: ReOrderCreateModel): ManualOrderResponseModel {
+        ValidatorUtils.validateAndThrow(manualOrderModelValidator, createModel)
+
+        val (collectedOrder, confirmOrders) =
+            createManualOrder(partnerId, createModel)
+
+        return ManualOrderResponseModel.from(collectedOrder, confirmOrders)
+    }
+
+    private fun createManualOrder(
+        partnerId: Long,
+        request: ManualOrderModel
+    ): Pair<CollectedOrder, ConfirmOrder> {
         // 1. collected order생성하기
         val collectedOrder = createCollectedOrder(
             partnerId = partnerId,
-            manualReleaseRequest = manualReleaseRequest
+            manualOrderRequest = request
         )
 
         // 2. confirm product생성하기
         val confirmProducts =
-            createConfirmProducts(collectedOrder, manualReleaseRequest.products)
+            createConfirmProducts(collectedOrder, request.products)
         confirmProducts.forEach { collectedOrder.addConfirmProduct(it) }
         collectedOrder.nextStep()
 
         // 3. confirm order
-        val confirmOrders = confirmOrderService.requestOrders(
+        val confirmOrder = confirmOrderService.requestOrder(
             partnerId = partnerId,
             requestOrderCreateModel = RequestOrderCreateModel(
-                promotion = manualReleaseRequest.promotion,
-                reShipmentReason = manualReleaseRequest.reShipmentReason,
+                promotion = request.promotion,
+                reShipmentReason = request.reShipmentReason,
                 collectedOrderIds = listOf(collectedOrder.id!!),
-                deliveryType = manualReleaseRequest.deliveryType
+                deliveryType = request.deliveryType
             )
         )
-
-        return ManualReleaseResponseModel.from(collectedOrder, confirmOrders)
+        return Pair(collectedOrder, confirmOrder)
     }
 
     /**
@@ -86,14 +113,14 @@ class ManualReleaseService(
      */
     private fun createCollectedOrder(
         partnerId: Long,
-        manualReleaseRequest: ManualReleaseCreateModel
+        manualOrderRequest: ManualOrderModel
     ): CollectedOrder {
-        val orderUniqueKey = ManualReleaseCreateModel.generateOrderUniqueKey()
+        val orderUniqueKey = ManualOrderModel.generateOrderUniqueKey()
         if (collectedOrderRepository.existsByOrderUniqueKey(orderUniqueKey)) {
             throw BaseRuntimeException(errorMessage = "Duplicate OrderKey = $orderUniqueKey")
         }
 
-        val collectedOrder = manualReleaseRequest.toCollectOrderEntity(
+        val collectedOrder = manualOrderRequest.toCollectOrderEntity(
             partnerId = partnerId,
             orderUniqueKey = orderUniqueKey
         )
@@ -107,7 +134,7 @@ class ManualReleaseService(
      */
     private fun createConfirmProducts(
         collectedOrder: CollectedOrder,
-        manualReleaseProducts: List<ManualReleaseProductInfo>
+        manualReleaseProducts: List<ManualProductModel>
     ): List<ConfirmProduct> {
         val basicProductIds = manualReleaseProducts.map { it.productId }.toSet()
         val basicProductsMap = basicProductRepository
@@ -117,7 +144,11 @@ class ManualReleaseService(
         val confirmProducts = manualReleaseProducts.map {
             val basicProduct = basicProductsMap[it.productId]
                 ?: throw BaseRuntimeException(errorMessage = "기본상품을 찾지 못했습니다. productId = ${it.productId}")
-            it.toConfirmProduct(collectedOrder, basicProduct)
+
+            when (it) {
+                is ManualReleaseProductInfo -> it.toConfirmProduct(collectedOrder, basicProduct, MatchingType.MANUAL)
+                is ReOrderProductInfo -> it.toConfirmProduct(collectedOrder, basicProduct, MatchingType.RE_ORDER)
+            }
         }.toList()
 
         confirmProductRepository.saveAll(confirmProducts)

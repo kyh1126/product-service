@@ -1,4 +1,4 @@
-package com.smartfoodnet.fnproduct.release.model
+package com.smartfoodnet.fnproduct.release.model.request
 
 import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
 import com.smartfoodnet.fnproduct.order.entity.CollectedProductInfo
@@ -13,24 +13,30 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.math.absoluteValue
 
-data class ManualReleaseCreateModel(
-    @ApiModelProperty(value = "받는이 이름", example = "홍길동")
-    val receiverName: String,
-    @ApiModelProperty(value = "받는이 전화번호", example = "010-1234-5678")
-    val receiverPhoneNumber: String,
-    @ApiModelProperty(value = "받는이 주소", example = "서울 강남구 남부순환로 2753 3층 스마트푸드네트웍스")
-    val receiverAddress: String,
-    @ApiModelProperty(value = "우편번호", example = "")
-    val receiverZipCode: String? = null,
-    @ApiModelProperty(value = "배송 타입", example = "PARCEL(택배), VEHICLE(차량), DAWN(새벽배송), SAME_DAY(당일배송)")
-    val deliveryType: DeliveryType = DeliveryType.PARCEL,
-    @ApiModelProperty(value = "행사여부", example = "Y, N, 행사메모입력")
-    val promotion: String?,
-    @ApiModelProperty(value = "재출고사유", example = "배송 된 상품의 유통기간이 지났다")
-    val reShipmentReason: String?,
-    @ApiModelProperty(value = "출고상품", example = "[{productId, quantity}, ...]")
-    var products: List<ManualReleaseProductInfo>
-) {
+sealed class ManualOrderModel {
+    @get:ApiModelProperty(value = "받는이 이름", example = "홍길동")
+    abstract val receiverName: String
+
+    @get:ApiModelProperty(value = "받는이 전화번호", example = "010-1234-5678")
+    abstract val receiverPhoneNumber: String
+
+    @get:ApiModelProperty(value = "받는이 주소", example = "서울 강남구 남부순환로 2753 3층 스마트푸드네트웍스")
+    abstract val receiverAddress: String
+
+    @get:ApiModelProperty(value = "우편번호", example = "")
+    abstract val receiverZipCode: String?
+
+    @get:ApiModelProperty(value = "배송 타입", example = "PARCEL(택배), VEHICLE(차량), DAWN(새벽배송), SAME_DAY(당일배송)")
+    abstract val deliveryType: DeliveryType
+
+    @get:ApiModelProperty(value = "행사여부", example = "Y, N, 행사메모입력")
+    abstract val promotion: String?
+
+    @get:ApiModelProperty(value = "재출고사유", example = "배송 된 상품의 유통기간이 지났다")
+    abstract val reShipmentReason: String?
+
+    @get:ApiModelProperty(value = "출고상품", example = "[{productId, quantity}, ...]")
+    abstract var products: List<ManualProductModel>
 
     fun toCollectOrderEntity(
         partnerId: Long,
@@ -104,18 +110,19 @@ data class ManualReleaseCreateModel(
     }
 }
 
-data class ManualReleaseProductInfo(
-    var productId: Long,
-    var quantity: Int,
-) {
+sealed class ManualProductModel {
+    abstract val productId: Long
+    abstract val quantity: Int
+
     fun toConfirmProduct(
         collectedOrder: CollectedOrder,
-        basicProduct: BasicProduct
+        basicProduct: BasicProduct,
+        matchingType: MatchingType
     ): ConfirmProduct {
         return ConfirmProduct(
             collectedOrder = collectedOrder,
             type = basicProduct.type,
-            matchingType = MatchingType.MANUAL,
+            matchingType = matchingType,
             basicProduct = basicProduct,
             quantity = quantity,
             quantityPerUnit = quantity

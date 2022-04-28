@@ -160,6 +160,17 @@ class ReleaseInfoStoreService(
         releaseInfo.cancel()
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    fun processReOrderResult(id: Long, nextOrderCode: String) {
+        val releaseInfo = releaseInfoRepository.findById(id).get()
+
+        releaseInfo.processNextOrderCode(nextOrderCode)
+
+        releaseInfoRepository.findByOrderCode(nextOrderCode).forEach { nextReleaseInfo ->
+            nextReleaseInfo.linkPreviousCodes(releaseInfo.orderCode, releaseInfo.releaseCode)
+        }
+    }
+
     private fun isNeedToBeUpdatedReleaseId(releaseInfoByReleaseId: Map<Long?, ReleaseInfo>) =
         releaseInfoByReleaseId.containsKey(null)
 
