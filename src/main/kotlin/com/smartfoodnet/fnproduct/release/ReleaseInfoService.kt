@@ -210,13 +210,7 @@ class ReleaseInfoService(
 
     fun reOrder(id: Long, createModel: ReOrderCreateModel) {
         val releaseInfo = releaseInfoRepository.findById(id).get()
-
-        val reOrderResponseModel = manualReleaseService.issueReOrder(
-            releaseInfo.partnerId,
-            createModel
-        )
-        val nextOrderCode = reOrderResponseModel.confirmOrder?.nosnosOrderCode!!
-        releaseInfoStoreService.processReOrderResult(id, nextOrderCode)
+        manualReleaseService.reOrder(id, releaseInfo.partnerId, createModel)
     }
 
     private fun getSyncableReleaseInfoList(partnerId: Long?, page: PageRequest) =

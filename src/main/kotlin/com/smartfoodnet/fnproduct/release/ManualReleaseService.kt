@@ -34,6 +34,7 @@ class ManualReleaseService(
     private val confirmProductRepository: ConfirmProductRepository,
     private val confirmOrderService: ConfirmOrderService,
     private val partnerService: PartnerService,
+    private val releaseInfoStoreService: ReleaseInfoStoreService
 ) {
     /**
      * 주문외출고 등록(상품과 주문 정보 없이 주문수집 데이터를 생성한다)
@@ -60,13 +61,21 @@ class ManualReleaseService(
         return createManualOrder(partnerId, manualReleaseRequest, OrderUploadType.MANUAL)
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    fun reOrder(releaseInfoId: Long, partnerId: Long, createModel: ReOrderCreateModel) {
+        val reOrderResponseModel = issueReOrder(partnerId, createModel)
+        val nextOrderCode = reOrderResponseModel.confirmOrder?.nosnosOrderCode!!
+
+        releaseInfoStoreService.processReOrderResult(releaseInfoId, nextOrderCode)
+    }
+
     /**
      * 재출고 등록 - 주문외출고 등록과 동일 프로세스
      *   uploadType: [com.smartfoodnet.fnproduct.order.vo.OrderUploadType.RE_ORDER]
      *
      *   @see com.smartfoodnet.fnproduct.release.ManualReleaseService.issueManualRelease
      */
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     fun issueReOrder(partnerId: Long, createModel: ReOrderCreateModel): ManualOrderResponseModel {
         ValidatorUtils.validateAndThrow(manualOrderModelValidator, createModel)
 
