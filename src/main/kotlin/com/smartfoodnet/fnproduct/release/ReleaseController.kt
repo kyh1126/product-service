@@ -35,10 +35,8 @@ class ReleaseController(
         @ModelAttribute condition: ReleaseInfoSearchCondition,
         @PageableDefault(size = 50, sort = ["id"], direction = Sort.Direction.DESC) page: Pageable,
     ): PageResponse<ReleaseInfoModel> {
-        condition.apply {
-            this.partnerId = partnerId
-            removePausedOrderStatus()
-        }
+        condition.apply { this.partnerId = partnerId }
+
         return releaseInfoService.getReleaseInfoList(condition, page)
     }
 
