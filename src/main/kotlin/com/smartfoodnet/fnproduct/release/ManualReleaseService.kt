@@ -8,7 +8,6 @@ import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.fnpartner.PartnerService
 import com.smartfoodnet.fnproduct.order.ConfirmOrderService
 import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
-import com.smartfoodnet.fnproduct.order.entity.ConfirmOrder
 import com.smartfoodnet.fnproduct.order.entity.ConfirmProduct
 import com.smartfoodnet.fnproduct.order.model.RequestOrderCreateModel
 import com.smartfoodnet.fnproduct.order.model.response.ManualOrderResponseModel
@@ -58,10 +57,7 @@ class ManualReleaseService(
 
         partnerService.checkUserPartnerMembership(sfnMetaUser, partnerId)
 
-        val (collectedOrder, confirmOrder) =
-            createManualOrder(partnerId, manualReleaseRequest, OrderUploadType.MANUAL)
-
-        return ManualOrderResponseModel.from(collectedOrder, confirmOrder)
+        return createManualOrder(partnerId, manualReleaseRequest, OrderUploadType.MANUAL)
     }
 
     /**
@@ -74,17 +70,14 @@ class ManualReleaseService(
     fun issueReOrder(partnerId: Long, createModel: ReOrderCreateModel): ManualOrderResponseModel {
         ValidatorUtils.validateAndThrow(manualOrderModelValidator, createModel)
 
-        val (collectedOrder, confirmOrders) =
-            createManualOrder(partnerId, createModel, OrderUploadType.RE_ORDER)
-
-        return ManualOrderResponseModel.from(collectedOrder, confirmOrders)
+        return createManualOrder(partnerId, createModel, OrderUploadType.RE_ORDER)
     }
 
     private fun createManualOrder(
         partnerId: Long,
         request: ManualOrderModel,
         uploadType: OrderUploadType
-    ): Pair<CollectedOrder, ConfirmOrder> {
+    ): ManualOrderResponseModel {
         // 1. collected order생성하기
         val collectedOrder = createCollectedOrder(
             partnerId = partnerId,
@@ -108,7 +101,7 @@ class ManualReleaseService(
                 deliveryType = request.deliveryType
             )
         )
-        return Pair(collectedOrder, confirmOrder)
+        return ManualOrderResponseModel.from(collectedOrder, confirmOrder)
     }
 
     /**
