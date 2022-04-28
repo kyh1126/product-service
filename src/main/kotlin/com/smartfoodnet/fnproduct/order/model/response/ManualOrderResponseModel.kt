@@ -4,11 +4,11 @@ import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
 import com.smartfoodnet.fnproduct.order.entity.ConfirmOrder
 import io.swagger.annotations.ApiModelProperty
 
-data class ManualReleaseResponseModel(
+data class ManualOrderResponseModel(
     @ApiModelProperty(value = "collected order(주문외출고)")
     val collectedOrder: ManualReleaseCollectedOrder? = null,
     @ApiModelProperty(value = "confirm orders(발주등록)")
-    val confirmOrders: List<ManualReleaseConfirmOrder> = mutableListOf(),
+    val confirmOrder: ManualConfirmOrder? = null,
 ) {
 
     data class ManualReleaseCollectedOrder(
@@ -20,30 +20,25 @@ data class ManualReleaseResponseModel(
         val bundleNumber: String?
     )
 
-    data class ManualReleaseConfirmOrder(
+    data class ManualConfirmOrder(
         val id: Long?,
         val nosnosOrderId: Long? = null,
         val nosnosOrderCode: String? = null,
     )
 
     companion object {
-        fun from(
-            collectedOrder: CollectedOrder,
-            confirmOrders: List<ConfirmOrder>,
-        ): ManualReleaseResponseModel {
-            return ManualReleaseResponseModel(
+        fun from(collectedOrder: CollectedOrder, confirmOrder: ConfirmOrder): ManualOrderResponseModel {
+            return ManualOrderResponseModel(
                 collectedOrder = ManualReleaseCollectedOrder(
                     id = collectedOrder.id,
                     orderNumber = collectedOrder.orderNumber,
                     bundleNumber = collectedOrder.bundleNumber,
                 ),
-                confirmOrders = confirmOrders.map {
-                    ManualReleaseConfirmOrder(
-                        id = it.id,
-                        nosnosOrderId = it.orderId,
-                        nosnosOrderCode = it.orderCode,
-                    )
-                }
+                confirmOrder = ManualConfirmOrder(
+                    id = confirmOrder.id,
+                    nosnosOrderId = confirmOrder.orderId,
+                    nosnosOrderCode = confirmOrder.orderCode,
+                )
             )
         }
     }

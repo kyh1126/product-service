@@ -9,11 +9,11 @@ import com.smartfoodnet.fnproduct.order.model.BasicProductAddModel
 import com.smartfoodnet.fnproduct.order.model.CollectedOrderCreateModel
 import com.smartfoodnet.fnproduct.order.model.ConfirmProductAddModel
 import com.smartfoodnet.fnproduct.order.model.RequestOrderCreateModel
-import com.smartfoodnet.fnproduct.order.model.response.ManualReleaseResponseModel
+import com.smartfoodnet.fnproduct.order.model.response.ManualOrderResponseModel
 import com.smartfoodnet.fnproduct.order.support.condition.CollectingOrderSearchCondition
 import com.smartfoodnet.fnproduct.order.support.condition.ConfirmProductSearchCondition
 import com.smartfoodnet.fnproduct.release.ManualReleaseService
-import com.smartfoodnet.fnproduct.release.model.ManualReleaseCreateModel
+import com.smartfoodnet.fnproduct.release.model.request.ManualReleaseCreateModel
 import io.swagger.annotations.Api
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -117,7 +117,7 @@ class OrderController(
         @Parameter(description = "주문외출고 정보", required = true)
         @Valid
         @RequestBody manualReleaseRequest: ManualReleaseCreateModel
-    ): ManualReleaseResponseModel {
+    ): ManualOrderResponseModel {
         return manualReleaseService.issueManualRelease(
             sfnMetaUser,
             partnerId,
@@ -135,7 +135,7 @@ class OrderController(
         @PathVariable partnerId: Long,
         @Parameter(description = "기본상품 ID", required = true, example = "36")
         @PathVariable basicProductId: Long
-    ): List<MissingAffectedOrderModel>{
+    ): List<MissingAffectedOrderModel> {
         return orderService.getMissingAffectedOrder(partnerId, basicProductId)
     }
 }

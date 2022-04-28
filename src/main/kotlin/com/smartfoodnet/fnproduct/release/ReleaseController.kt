@@ -2,6 +2,7 @@ package com.smartfoodnet.fnproduct.release
 
 import com.smartfoodnet.common.model.response.CommonResponse
 import com.smartfoodnet.common.model.response.PageResponse
+import com.smartfoodnet.fnproduct.release.model.request.ReOrderCreateModel
 import com.smartfoodnet.fnproduct.release.model.request.ReleaseInfoSearchCondition
 import com.smartfoodnet.fnproduct.release.model.response.OrderConfirmProductModel
 import com.smartfoodnet.fnproduct.release.model.response.OrderProductModel
@@ -16,6 +17,7 @@ import org.springframework.data.domain.Sort
 import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
+import javax.validation.Valid
 
 @Api(description = "릴리즈 관련 API")
 @RestController
@@ -33,10 +35,8 @@ class ReleaseController(
         @ModelAttribute condition: ReleaseInfoSearchCondition,
         @PageableDefault(size = 50, sort = ["id"], direction = Sort.Direction.DESC) page: Pageable,
     ): PageResponse<ReleaseInfoModel> {
-        condition.apply {
-            this.partnerId = partnerId
-            removePausedOrderStatus()
-        }
+        condition.apply { this.partnerId = partnerId }
+
         return releaseInfoService.getReleaseInfoList(condition, page)
     }
 
@@ -106,6 +106,16 @@ class ReleaseController(
         @Parameter(description = "릴리즈 정보 ID", required = true) @PathVariable id: Long,
     ): CommonResponse<String> {
         releaseInfoStoreService.cancelReleaseInfo(id)
+        return CommonResponse(HttpStatus.OK.reasonPhrase)
+    }
+
+    @Operation(summary = "재출고")
+    @PostMapping("re-order/{id}")
+    fun reOrder(
+        @Parameter(description = "릴리즈 정보 ID", required = true) @PathVariable id: Long,
+        @Valid @RequestBody reOrderCreateModel: ReOrderCreateModel,
+    ): CommonResponse<String> {
+        releaseInfoService.reOrder(id, reOrderCreateModel)
         return CommonResponse(HttpStatus.OK.reasonPhrase)
     }
 

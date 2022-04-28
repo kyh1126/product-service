@@ -19,6 +19,7 @@ import com.smartfoodnet.fnproduct.product.BasicProductService
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
 import com.smartfoodnet.fnproduct.release.model.dto.OrderReleaseInfoDto
+import com.smartfoodnet.fnproduct.release.model.request.ReOrderCreateModel
 import com.smartfoodnet.fnproduct.release.model.request.ReleaseInfoSearchCondition
 import com.smartfoodnet.fnproduct.release.model.response.OrderConfirmProductModel
 import com.smartfoodnet.fnproduct.release.model.response.OrderProductModel
@@ -43,6 +44,7 @@ class ReleaseInfoService(
     private val releaseInfoStoreService: ReleaseInfoStoreService,
     private val basicProductService: BasicProductService,
     private val confirmOrderService: ConfirmOrderService,
+    private val manualReleaseService: ManualReleaseService,
     private val releaseInfoRepository: ReleaseInfoRepository,
     private val wmsApiClient: WmsApiClient,
     private val lotteDeliveryInfoApiClient: LotteDeliveryInfoApiClient,
@@ -204,6 +206,11 @@ class ReleaseInfoService(
 
             page = page.next()
         }
+    }
+
+    fun reOrder(id: Long, createModel: ReOrderCreateModel) {
+        val releaseInfo = releaseInfoRepository.findById(id).get()
+        manualReleaseService.reOrder(id, releaseInfo.partnerId, createModel)
     }
 
     private fun getSyncableReleaseInfoList(partnerId: Long?, page: PageRequest) =

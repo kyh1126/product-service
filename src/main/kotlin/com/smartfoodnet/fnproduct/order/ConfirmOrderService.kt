@@ -71,6 +71,14 @@ class ConfirmOrderService(
     }
 
     @Transactional
+    fun requestOrder(
+        partnerId: Long,
+        requestOrderCreateModel: RequestOrderCreateModel
+    ): ConfirmOrder {
+        return requestOrders(partnerId, requestOrderCreateModel).first()
+    }
+
+    @Transactional
     fun requestOrders(
         partnerId: Long,
         requestOrderCreateModel: RequestOrderCreateModel
