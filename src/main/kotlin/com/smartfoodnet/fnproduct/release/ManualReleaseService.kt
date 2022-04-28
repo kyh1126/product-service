@@ -15,6 +15,7 @@ import com.smartfoodnet.fnproduct.order.model.response.ManualOrderResponseModel
 import com.smartfoodnet.fnproduct.order.support.CollectedOrderRepository
 import com.smartfoodnet.fnproduct.order.support.ConfirmProductRepository
 import com.smartfoodnet.fnproduct.order.vo.MatchingType
+import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
 import com.smartfoodnet.fnproduct.product.BasicProductRepository
 import com.smartfoodnet.fnproduct.release.model.request.*
 import com.smartfoodnet.fnproduct.release.validator.ManualOrderModelValidator
@@ -58,7 +59,7 @@ class ManualReleaseService(
         partnerService.checkUserPartnerMembership(sfnMetaUser, partnerId)
 
         val (collectedOrder, confirmOrder) =
-            createManualOrder(partnerId, manualReleaseRequest)
+            createManualOrder(partnerId, manualReleaseRequest, OrderUploadType.MANUAL)
 
         return ManualOrderResponseModel.from(collectedOrder, confirmOrder)
     }
@@ -74,19 +75,21 @@ class ManualReleaseService(
         ValidatorUtils.validateAndThrow(manualOrderModelValidator, createModel)
 
         val (collectedOrder, confirmOrders) =
-            createManualOrder(partnerId, createModel)
+            createManualOrder(partnerId, createModel, OrderUploadType.RE_ORDER)
 
         return ManualOrderResponseModel.from(collectedOrder, confirmOrders)
     }
 
     private fun createManualOrder(
         partnerId: Long,
-        request: ManualOrderModel
+        request: ManualOrderModel,
+        uploadType: OrderUploadType
     ): Pair<CollectedOrder, ConfirmOrder> {
         // 1. collected order생성하기
         val collectedOrder = createCollectedOrder(
             partnerId = partnerId,
-            manualOrderRequest = request
+            manualOrderRequest = request,
+            uploadType = uploadType
         )
 
         // 2. confirm product생성하기
@@ -113,7 +116,8 @@ class ManualReleaseService(
      */
     private fun createCollectedOrder(
         partnerId: Long,
-        manualOrderRequest: ManualOrderModel
+        manualOrderRequest: ManualOrderModel,
+        uploadType: OrderUploadType
     ): CollectedOrder {
         val orderUniqueKey = ManualOrderModel.generateOrderUniqueKey()
         if (collectedOrderRepository.existsByOrderUniqueKey(orderUniqueKey)) {
@@ -122,7 +126,8 @@ class ManualReleaseService(
 
         val collectedOrder = manualOrderRequest.toCollectOrderEntity(
             partnerId = partnerId,
-            orderUniqueKey = orderUniqueKey
+            orderUniqueKey = orderUniqueKey,
+            uploadType = uploadType
         )
         collectedOrderRepository.save(collectedOrder)
 

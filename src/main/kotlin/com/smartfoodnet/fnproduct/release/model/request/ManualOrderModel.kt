@@ -40,7 +40,8 @@ sealed class ManualOrderModel {
 
     fun toCollectOrderEntity(
         partnerId: Long,
-        orderUniqueKey: String
+        orderUniqueKey: String,
+        uploadType: OrderUploadType
     ): CollectedOrder {
         val now = LocalDateTime.now()
 
@@ -74,7 +75,7 @@ sealed class ManualOrderModel {
                 address = receiverAddress,
                 zipCode = receiverZipCode
             ),
-            uploadType = OrderUploadType.MANUAL
+            uploadType = uploadType
         )
     }
 
