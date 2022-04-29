@@ -20,4 +20,5 @@ object Constants {
     const val DATA_STARTING_ROW_INDEX: Int = 1
     const val NOSNOS_INITIAL_PAGE = 1
     const val NOSNOS_NO_VALUE_MESSAGE = "검색된 데이터가 없습니다."
+    const val NOSNOS_CANCEL_REASON_NO = 6
 }

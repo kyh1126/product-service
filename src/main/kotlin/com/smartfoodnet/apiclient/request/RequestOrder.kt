@@ -123,7 +123,6 @@ object RequestOrderMapper {
         }
     }
 
-
 }
 
 class OutboundCreateModel(
@@ -264,3 +263,30 @@ class OutboundCreateBulkItemModel(
     @JsonProperty("order_item_list")
     var orderItemList: List<OrderItem>
 )
+
+class OutboundCancelModel(
+    @JsonProperty("partner_id")
+    val partnerId: Long? = null,
+
+    @JsonProperty("order_id")
+    val orderId: Long,
+
+    @JsonProperty("cancel_reason_no")
+    val cancelReasonNo: Int,
+
+    @JsonProperty("cancel_reason_content")
+    val cancelReasonContent: String? = null,
+) {
+    companion object {
+        fun fromEntity(releaseInfo: ReleaseInfo): OutboundCancelModel {
+            return releaseInfo.run {
+                OutboundCancelModel(
+                    partnerId = partnerId,
+                    orderId = orderId,
+                    cancelReasonNo = NOSNOS_CANCEL_REASON_NO,
+                    cancelReasonContent = "${PausedBy.PARTNER.description} 발주삭제 요청"
+                )
+            }
+        }
+    }
+}
