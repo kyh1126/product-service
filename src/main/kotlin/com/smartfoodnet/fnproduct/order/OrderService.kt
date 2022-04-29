@@ -50,7 +50,7 @@ class OrderService(
 
     @Transactional
     fun createCollectedOrder(collectedOrderCreateModel: List<CollectedOrderCreateModel>) {
-        collectedOrderCreateModel.map { convertCollectedOrderEntity(it) }
+        collectedOrderCreateModel.forEach { convertCollectedOrderEntity(it) }
     }
 
     fun getCollectedOrder(

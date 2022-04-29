@@ -42,6 +42,7 @@ class ConfirmProductRepositoryImpl : ConfirmProductRepositoryCustom, Querydsl4Re
                 collectedOrder.collectedProductInfo.collectedStoreProductCode,
                 collectedOrder.collectedProductInfo.collectedStoreProductName,
                 collectedOrder.collectedProductInfo.collectedStoreProductOptionName,
+                collectedOrder.collectedProductInfo.collectedStoreProductOptionCode,
                 collectedOrder.storeProduct.id,
                 collectedOrder.storeProduct.name,
                 collectedOrder.storeProduct.storeProductCode,

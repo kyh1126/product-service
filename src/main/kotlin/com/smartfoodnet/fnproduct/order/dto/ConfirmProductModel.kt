@@ -38,6 +38,7 @@ data class ConfirmProductModel @QueryProjection constructor(
     val collectedProductCode: String,
     val collectedProductName: String,
     val collectedProductOptionName: String?,
+    val collectedProductOptionCode: String?,
     val storeProductId: Long?,
     val storeProductName: String?,
     val storeProductCode: String?,

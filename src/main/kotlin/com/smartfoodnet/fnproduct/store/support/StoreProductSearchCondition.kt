@@ -71,7 +71,7 @@ class StoreProductSearchCondition(
                     storeIds = listOf(nonNullStoreId),
                     storeProductCode = collectedProductInfo.collectedStoreProductCode,
                     storeProductName = collectedProductInfo.collectedStoreProductName,
-                    storeProductOptionName = collectedProductInfo.collectedStoreProductOptionName
+                    storeProductOptionName = collectedProductInfo.collectedStoreProductOptionName,
                 )
             }
         }
