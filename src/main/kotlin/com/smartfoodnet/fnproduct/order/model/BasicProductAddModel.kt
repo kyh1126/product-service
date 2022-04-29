@@ -1,10 +1,12 @@
 package com.smartfoodnet.fnproduct.order.model
 
 import io.swagger.annotations.ApiModelProperty
+import springfox.documentation.annotations.ApiIgnore
 
 data class BasicProductAddModel(
     @ApiModelProperty(value = "화주(고객)사 ID", example = "11")
     var partnerId: Long,
+    @ApiModelProperty(hidden = true)
     var collectedOrderId: Long,
     val basicProducts: List<BasicProductMappedModel>
 )
