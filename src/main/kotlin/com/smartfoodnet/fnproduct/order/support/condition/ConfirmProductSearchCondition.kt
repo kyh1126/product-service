@@ -11,6 +11,7 @@ import com.smartfoodnet.fnproduct.order.entity.QConfirmProduct
 import com.smartfoodnet.fnproduct.order.entity.QConfirmProduct.*
 import com.smartfoodnet.fnproduct.order.vo.MatchingType
 import com.smartfoodnet.fnproduct.order.vo.OrderStatus
+import com.smartfoodnet.fnproduct.product.entity.QBasicProduct.basicProduct
 import io.swagger.annotations.ApiModelProperty
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -66,6 +67,8 @@ class ConfirmProductSearchCondition(
             if (collectedDateTo != null && collectedDateFrom != null) {
                 collectedOrder.collectedAt.between(collectedDateFrom, collectedDateTo)
             } else null,
+            basicProductName?.let { basicProduct.name.contains(it) },
+            basicProductCode?.let { basicProduct.code.eq(it) },
             bundleNumber?.let { collectedOrder.bundleNumber.eq(it) },
             orderNumber?.let { collectedOrder.orderNumber.eq(it) },
             storeId?.let { collectedOrder.storeId.`in`(it) },
