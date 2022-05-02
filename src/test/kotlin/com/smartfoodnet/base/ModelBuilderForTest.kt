@@ -1,9 +1,6 @@
 package com.smartfoodnet.base
 
-import com.smartfoodnet.fnproduct.product.model.request.BasicProductCreateModel
-import com.smartfoodnet.fnproduct.product.model.request.BasicProductDetailCreateModel
-import com.smartfoodnet.fnproduct.product.model.request.SubsidiaryMaterialMappingCreateModel
-import com.smartfoodnet.fnproduct.product.model.request.TestBasicProductCreateModel
+import com.smartfoodnet.fnproduct.product.model.request.*
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
 import com.smartfoodnet.fnproduct.product.model.vo.SeasonalOption
@@ -50,6 +47,8 @@ fun buildBasicProductCreateModel(
     handlingTemperature = handlingTemperature,
     warehouseId = warehouseId,
     expirationDateManagementYn = expirationDateManagementYn,
+    singleDimensionCreateModel = buildSingleDimensionCreateModel(),
+    boxDimensionCreateModel = buildBoxDimensionCreateModel(),
     piecesPerBox = piecesPerBox,
     piecesPerPalette = piecesPerPalette,
     activeYn = "Y"
@@ -73,5 +72,21 @@ fun buildBasicProductSubCreateModel(
     subsidiaryMaterialCategoryId = subsidiaryMaterialCategoryId,
     handlingTemperature = handlingTemperature,
     warehouseId = warehouseId,
+    singleDimensionCreateModel = buildSingleDimensionCreateModel(),
+    boxDimensionCreateModel = buildBoxDimensionCreateModel(),
     activeYn = "Y"
 ).toModel()
+
+fun buildSingleDimensionCreateModel() = SingleDimensionCreateModel().also {
+    it.singleWidth = 0
+    it.singleLength = 0
+    it.singleHeight = 0
+    it.singleWeight = null
+}
+
+fun buildBoxDimensionCreateModel() = BoxDimensionCreateModel().also {
+    it.boxWidth = 0
+    it.boxLength = 0
+    it.boxHeight = 0
+    it.boxWeight = null
+}

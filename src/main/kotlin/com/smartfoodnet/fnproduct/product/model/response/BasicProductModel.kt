@@ -65,6 +65,12 @@ data class BasicProductModel(
     @ApiModelProperty(value = "유통기한정보")
     var expirationDateInfoModel: ExpirationDateInfoModel? = null,
 
+    @JsonUnwrapped
+    var singleDimensionModel: SingleDimensionModel,
+
+    @JsonUnwrapped
+    var boxDimensionModel: BoxDimensionModel,
+
     @ApiModelProperty(value = "박스입수")
     var piecesPerBox: Int? = null,
 
@@ -105,7 +111,7 @@ data class BasicProductModel(
 
                 BasicProductModel(
                     id = id,
-                    type = type!!,
+                    type = type,
                     partnerId = partnerId,
                     name = if (type == BasicProductType.SUB) level2CategoryName else name,
                     code = code,
@@ -129,6 +135,8 @@ data class BasicProductModel(
                     expirationDateInfoModel = expirationDateInfo?.let {
                         ExpirationDateInfoModel.fromEntity(it)
                     },
+                    singleDimensionModel = SingleDimensionModel.fromEntity(singleDimension),
+                    boxDimensionModel = BoxDimensionModel.fromEntity(boxDimension),
                     piecesPerBox = piecesPerBox,
                     piecesPerPalette = piecesPerPalette,
                     imageUrl = imageUrl,
