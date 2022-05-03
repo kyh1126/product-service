@@ -1,10 +1,11 @@
 package com.smartfoodnet.fnproduct.product.model.request
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped
+import com.smartfoodnet.base.buildBoxDimensionCreateModel
+import com.smartfoodnet.base.buildSingleDimensionCreateModel
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
 import io.swagger.annotations.ApiModelProperty
-import javax.validation.Valid
 import javax.validation.constraints.NotNull
 
 class TestBasicProductCreateModel(
@@ -63,6 +64,12 @@ class TestBasicProductCreateModel(
     @JsonUnwrapped
     var expirationDateInfoModel: ExpirationDateInfoCreateModel? = null,
 
+    @JsonUnwrapped
+    var singleDimensionCreateModel: SingleDimensionCreateModel,
+
+    @JsonUnwrapped
+    var boxDimensionCreateModel: BoxDimensionCreateModel,
+
     @ApiModelProperty(value = "박스입수")
     val piecesPerBox: Int? = null,
 
@@ -75,16 +82,6 @@ class TestBasicProductCreateModel(
     @ApiModelProperty(value = "활성화여부 (default: Y)", allowableValues = "Y,N")
     val activeYn: String = "Y",
 ) {
-    @NotNull
-    @Valid
-    @JsonUnwrapped
-    lateinit var singleDimensionCreateModel: SingleDimensionCreateModel
-
-    @NotNull
-    @Valid
-    @JsonUnwrapped
-    lateinit var boxDimensionCreateModel: BoxDimensionCreateModel
-
     fun toModel(): BasicProductCreateModel {
         return BasicProductCreateModel().also {
             it.id = id
@@ -106,18 +103,8 @@ class TestBasicProductCreateModel(
             it.imageUrl = imageUrl
             it.activeYn = activeYn
             it.expirationDateInfoModel = expirationDateInfoModel
-            it.singleDimensionCreateModel = SingleDimensionCreateModel().also {
-                it.singleWidth = 0
-                it.singleLength = 0
-                it.singleHeight = 0
-                it.singleWeight = null
-            }
-            it.boxDimensionCreateModel = BoxDimensionCreateModel().also {
-                it.boxWidth = 0
-                it.boxLength = 0
-                it.boxHeight = 0
-                it.boxWeight = null
-            }
+            it.singleDimensionCreateModel = buildSingleDimensionCreateModel()
+            it.boxDimensionCreateModel = buildBoxDimensionCreateModel()
         }
     }
 }

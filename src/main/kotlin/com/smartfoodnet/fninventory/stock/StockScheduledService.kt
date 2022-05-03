@@ -194,7 +194,7 @@ class StockScheduledService(
                 }
 
                 if (basicProduct == null) {
-                    log.error("error: shippingProductId = [${nosnosStockByExpirationDate.shippingProductId}] does not exist.")
+                    log.error("error: shippingProductId = [${nosnosStockByExpirationDate.shippingProductId}] does not exist or expiration Date null.")
                     return
                 }
 

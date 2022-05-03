@@ -4,6 +4,7 @@ import com.smartfoodnet.common.Constants
 import com.smartfoodnet.common.model.header.SfnMetaUser
 import com.smartfoodnet.fnproduct.order.dto.CollectedOrderModel
 import com.smartfoodnet.fnproduct.order.dto.ConfirmProductModel
+import com.smartfoodnet.fnproduct.order.dto.MissingAffectedOrderModel
 import com.smartfoodnet.fnproduct.order.model.BasicProductAddModel
 import com.smartfoodnet.fnproduct.order.model.CollectedOrderCreateModel
 import com.smartfoodnet.fnproduct.order.model.ConfirmProductAddModel
@@ -122,5 +123,19 @@ class OrderController(
             partnerId,
             manualReleaseRequest
         )
+    }
+
+    @Operation(summary = "결품영향주문 조회")
+    @GetMapping("/partners/{partnerId}/missing-order/product/{basicProductId}")
+    fun getMissingAffectedOrder(
+        @ApiIgnore
+        @RequestHeader(Constants.HEADER_KEY_SFN_META_USER)
+        sfnMetaUser: SfnMetaUser?,
+        @Parameter(description = "화주(고객사) ID", required = true, example = "11")
+        @PathVariable partnerId: Long,
+        @Parameter(description = "기본상품 ID", required = true, example = "36")
+        @PathVariable basicProductId: Long
+    ): List<MissingAffectedOrderModel> {
+        return orderService.getMissingAffectedOrder(partnerId, basicProductId)
     }
 }

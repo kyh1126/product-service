@@ -3,9 +3,6 @@ server:
   servlet:
     context-path: /fresh-networks/fn-product
 logging:
-  slack:
-    webhook-uri: ${SLACK_WEBHOOK_URI}
-  config: classpath:logback-slack.xml
   level.io.swagger.models.parameters.AbstractSerializableParameter: ERROR
 spring:
   data:
