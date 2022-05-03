@@ -8,6 +8,7 @@ import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import com.smartfoodnet.fninventory.shortage.model.ShortageOrderProjectionModel
 import com.smartfoodnet.fninventory.shortage.support.ProductShortageSearchCondition
 import com.smartfoodnet.fnproduct.order.dto.CollectedOrderModel
+import com.smartfoodnet.fnproduct.order.dto.CollectedOrderSimpleModel
 import com.smartfoodnet.fnproduct.order.dto.MissingAffectedOrderModel
 import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
 import com.smartfoodnet.fnproduct.order.model.BasicProductAddModel
@@ -159,6 +160,12 @@ class OrderService(
         val collectedOrderList : List<CollectedOrder> =
             collectedOrderRepository.findMissingAffectedOrders(partnerId, basicProductId)
         return collectedOrderList.map(MissingAffectedOrderModel::from)
+    }
+
+    fun getCollectedOrderByOrderNumber(partnerId: Long, orderNumber: String) : CollectedOrderSimpleModel {
+        val collectedOrder = collectedOrderRepository.findByPartnerIdAndOrderNumber(partnerId, orderNumber)
+            ?: throw NoSuchElementException("주문번호 \"${orderNumber}\"를 찾을 수 없습니다")
+        return CollectedOrderSimpleModel.fromEntity(collectedOrder)
     }
 
     companion object : Log

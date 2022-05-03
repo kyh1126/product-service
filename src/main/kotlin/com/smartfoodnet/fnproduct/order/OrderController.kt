@@ -3,6 +3,7 @@ package com.smartfoodnet.fnproduct.order
 import com.smartfoodnet.common.Constants
 import com.smartfoodnet.common.model.header.SfnMetaUser
 import com.smartfoodnet.fnproduct.order.dto.CollectedOrderModel
+import com.smartfoodnet.fnproduct.order.dto.CollectedOrderSimpleModel
 import com.smartfoodnet.fnproduct.order.dto.ConfirmProductModel
 import com.smartfoodnet.fnproduct.order.dto.MissingAffectedOrderModel
 import com.smartfoodnet.fnproduct.order.model.BasicProductAddModel
@@ -63,6 +64,17 @@ class OrderController(
         @ModelAttribute condition: CollectingOrderSearchCondition,
     ): List<CollectedOrderModel> {
         return orderService.getCollectedOrder(condition.apply { this.partnerId = partnerId })
+    }
+
+    @Operation(summary = "주문정보 간단 조회")
+    @GetMapping("{orderNumber}/partners/{partnerId}")
+    fun getCollectedOrder(
+        @Parameter(description = "화주(고객사) ID", required = true)
+        @PathVariable partnerId: Long,
+        @Parameter(description = "주문번호", required = true)
+        @PathVariable orderNumber : String
+    ) : CollectedOrderSimpleModel {
+        return orderService.getCollectedOrderByOrderNumber(partnerId, orderNumber)
     }
 
     @Operation(summary = "출고지시 조회")
