@@ -12,6 +12,7 @@ import com.smartfoodnet.fnproduct.release.entity.QReleaseInfo.releaseInfo
 import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
 import com.smartfoodnet.fnproduct.release.model.request.ReleaseInfoSearchCondition
 import com.smartfoodnet.fnproduct.release.model.vo.ReleaseStatus
+import com.smartfoodnet.fnproduct.release.model.vo.TrackingNumberStatus
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 
@@ -34,6 +35,21 @@ class ReleaseInfoRepositoryImpl : Querydsl4RepositorySupport(ReleaseInfo::class.
                     eqPartnerId(condition.partnerId),
                     containsOrderCode(condition.orderCode),
                     containsTrackingNumber(condition.trackingNumber),
+                )
+                .groupBy(releaseInfo)
+        }
+    }
+
+    override fun findAllByTrackingNumberStatus(
+        trackingNumberStatus: TrackingNumberStatus,
+        checkTrackingNumber: Boolean,
+        page: Pageable
+    ): Page<ReleaseInfo> {
+        return applyPagination(page) {
+            it.selectFrom(releaseInfo)
+                .where(
+                    isNotNullTrackingNumber(checkTrackingNumber),
+                    eqTrackingNumberStatus(trackingNumberStatus),
                 )
                 .groupBy(releaseInfo)
         }
@@ -68,4 +84,10 @@ class ReleaseInfoRepositoryImpl : Querydsl4RepositorySupport(ReleaseInfo::class.
 
     private fun containsTrackingNumber(trackingNumber: String?) =
         trackingNumber?.let { releaseInfo.trackingNumber.contains(it) }
+
+    private fun isNotNullTrackingNumber(checkTrackingNumber: Boolean) =
+        if (checkTrackingNumber) releaseInfo.trackingNumber.isNotNull else null
+
+    private fun eqTrackingNumberStatus(trackingNumberStatus: TrackingNumberStatus?) =
+        trackingNumberStatus?.let { releaseInfo.trackingNumberStatus.eq(it) }
 }

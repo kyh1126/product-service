@@ -186,8 +186,9 @@ class ReleaseInfoService(
 
         while (true) {
             val targetList =
-                releaseInfoRepository.findByTrackingNumberStatusAndTrackingNumberIsNotNull(
+                releaseInfoRepository.findAllByTrackingNumberStatus(
                     TrackingNumberStatus.BEFORE_REGISTER,
+                    true,
                     page
                 )
             if (!targetList.hasContent()) break
