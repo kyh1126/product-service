@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @EnableFeignClients
 @SpringBootApplication
-class ProductApplication(){
+class ProductApplication{
 
     @RestController
     @RequestMapping("/health")

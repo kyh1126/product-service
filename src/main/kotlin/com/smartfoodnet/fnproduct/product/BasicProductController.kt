@@ -13,7 +13,15 @@ import io.swagger.v3.oas.annotations.Parameter
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.web.PageableDefault
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.ModelAttribute
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RestController
 import javax.validation.Valid
 
 @Api(description = "기본상품 관련 API")
@@ -51,6 +59,15 @@ class BasicProductController(private val basicProductService: BasicProductServic
         @PathVariable productId: Long,
     ): BasicProductDetailModel {
         return basicProductService.getBasicProduct(productId)
+    }
+
+    @Operation(summary = "기본상품 벌크 조회")
+    @GetMapping
+    fun getBasicProducts(
+        @Parameter(description = "상품 ID 리스트", required = true)
+        @RequestParam productIds: List<Long>,
+    ): List<BasicProductModel> {
+        return basicProductService.getBasicProducts(productIds).map(BasicProductModel::fromEntity)
     }
 
     @java.lang.Deprecated(forRemoval = true)

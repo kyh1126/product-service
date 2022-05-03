@@ -112,10 +112,6 @@ class StoreProductService(
             throw ValidateError("중복된 기본상품이 존재합니다.")
         }
 
-        val unMappedBasicProducts = storeProduct.storeProductMappings.filterNot { mapping ->
-            newBasicProductIds.contains(mapping.basicProduct.id)
-        }
-
         val newMappings = storeProductModel.storeProductBasicProductMappings.map { model ->
             val newMapping = storeProduct.storeProductMappings.firstOrNull { mapping ->
                 mapping.basicProduct.id == model.basicProductId
