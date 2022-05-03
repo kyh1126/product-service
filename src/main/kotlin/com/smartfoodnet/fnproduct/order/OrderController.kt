@@ -3,16 +3,18 @@ package com.smartfoodnet.fnproduct.order
 import com.smartfoodnet.common.Constants
 import com.smartfoodnet.common.model.header.SfnMetaUser
 import com.smartfoodnet.fnproduct.order.dto.CollectedOrderModel
+import com.smartfoodnet.fnproduct.order.dto.CollectedOrderSimpleModel
 import com.smartfoodnet.fnproduct.order.dto.ConfirmProductModel
+import com.smartfoodnet.fnproduct.order.dto.MissingAffectedOrderModel
 import com.smartfoodnet.fnproduct.order.model.BasicProductAddModel
 import com.smartfoodnet.fnproduct.order.model.CollectedOrderCreateModel
 import com.smartfoodnet.fnproduct.order.model.ConfirmProductAddModel
 import com.smartfoodnet.fnproduct.order.model.RequestOrderCreateModel
-import com.smartfoodnet.fnproduct.order.model.response.ManualReleaseResponseModel
+import com.smartfoodnet.fnproduct.order.model.response.ManualOrderResponseModel
 import com.smartfoodnet.fnproduct.order.support.condition.CollectingOrderSearchCondition
 import com.smartfoodnet.fnproduct.order.support.condition.ConfirmProductSearchCondition
 import com.smartfoodnet.fnproduct.release.ManualReleaseService
-import com.smartfoodnet.fnproduct.release.model.ManualReleaseCreateModel
+import com.smartfoodnet.fnproduct.release.model.request.ManualReleaseCreateModel
 import io.swagger.annotations.Api
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -62,6 +64,17 @@ class OrderController(
         @ModelAttribute condition: CollectingOrderSearchCondition,
     ): List<CollectedOrderModel> {
         return orderService.getCollectedOrder(condition.apply { this.partnerId = partnerId })
+    }
+
+    @Operation(summary = "주문정보 간단 조회")
+    @GetMapping("{orderNumber}/partners/{partnerId}")
+    fun getCollectedOrder(
+        @Parameter(description = "화주(고객사) ID", required = true)
+        @PathVariable partnerId: Long,
+        @Parameter(description = "주문번호", required = true)
+        @PathVariable orderNumber : String
+    ) : CollectedOrderSimpleModel {
+        return orderService.getCollectedOrderByOrderNumber(partnerId, orderNumber)
     }
 
     @Operation(summary = "출고지시 조회")
@@ -116,11 +129,25 @@ class OrderController(
         @Parameter(description = "주문외출고 정보", required = true)
         @Valid
         @RequestBody manualReleaseRequest: ManualReleaseCreateModel
-    ): ManualReleaseResponseModel {
+    ): ManualOrderResponseModel {
         return manualReleaseService.issueManualRelease(
             sfnMetaUser,
             partnerId,
             manualReleaseRequest
         )
+    }
+
+    @Operation(summary = "결품영향주문 조회")
+    @GetMapping("/partners/{partnerId}/missing-order/product/{basicProductId}")
+    fun getMissingAffectedOrder(
+        @ApiIgnore
+        @RequestHeader(Constants.HEADER_KEY_SFN_META_USER)
+        sfnMetaUser: SfnMetaUser?,
+        @Parameter(description = "화주(고객사) ID", required = true, example = "11")
+        @PathVariable partnerId: Long,
+        @Parameter(description = "기본상품 ID", required = true, example = "36")
+        @PathVariable basicProductId: Long
+    ): List<MissingAffectedOrderModel> {
+        return orderService.getMissingAffectedOrder(partnerId, basicProductId)
     }
 }

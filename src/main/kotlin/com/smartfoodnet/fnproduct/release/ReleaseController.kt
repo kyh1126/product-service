@@ -2,9 +2,11 @@ package com.smartfoodnet.fnproduct.release
 
 import com.smartfoodnet.common.model.response.CommonResponse
 import com.smartfoodnet.common.model.response.PageResponse
+import com.smartfoodnet.fnproduct.release.model.request.ReOrderCreateModel
 import com.smartfoodnet.fnproduct.release.model.request.ReleaseInfoSearchCondition
 import com.smartfoodnet.fnproduct.release.model.response.OrderConfirmProductModel
 import com.smartfoodnet.fnproduct.release.model.response.OrderProductModel
+import com.smartfoodnet.fnproduct.release.model.response.PausedReleaseInfoModel
 import com.smartfoodnet.fnproduct.release.model.response.ReleaseInfoModel
 import com.smartfoodnet.fnproduct.release.model.vo.DeliveryAgency
 import io.swagger.annotations.Api
@@ -15,6 +17,7 @@ import org.springframework.data.domain.Sort
 import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
+import javax.validation.Valid
 
 @Api(description = "릴리즈 관련 API")
 @RestController
@@ -33,7 +36,24 @@ class ReleaseController(
         @PageableDefault(size = 50, sort = ["id"], direction = Sort.Direction.DESC) page: Pageable,
     ): PageResponse<ReleaseInfoModel> {
         condition.apply { this.partnerId = partnerId }
+
         return releaseInfoService.getReleaseInfoList(condition, page)
+    }
+
+    @Operation(summary = "특정 화주(고객사) ID 의 중지된 출고 리스트 조회")
+    @GetMapping("partners/{partnerId}/paused")
+    fun getPausedReleaseInfoList(
+        @Parameter(description = "화주(고객사) ID", required = true)
+        @PathVariable partnerId: Long,
+        @Parameter(description = "검색조건")
+        @ModelAttribute condition: ReleaseInfoSearchCondition,
+        @PageableDefault(size = 50, sort = ["id"], direction = Sort.Direction.DESC) page: Pageable,
+    ): PageResponse<PausedReleaseInfoModel> {
+        condition.apply {
+            this.partnerId = partnerId
+            setPausedOrderStatus()
+        }
+        return releaseInfoService.getPausedReleaseInfoList(condition, page)
     }
 
     @Operation(summary = "릴리즈 정보 동기화")
@@ -86,6 +106,16 @@ class ReleaseController(
         @Parameter(description = "릴리즈 정보 ID", required = true) @PathVariable id: Long,
     ): CommonResponse<String> {
         releaseInfoStoreService.cancelReleaseInfo(id)
+        return CommonResponse(HttpStatus.OK.reasonPhrase)
+    }
+
+    @Operation(summary = "재출고")
+    @PostMapping("re-order/{id}")
+    fun reOrder(
+        @Parameter(description = "릴리즈 정보 ID", required = true) @PathVariable id: Long,
+        @Valid @RequestBody reOrderCreateModel: ReOrderCreateModel,
+    ): CommonResponse<String> {
+        releaseInfoService.reOrder(id, reOrderCreateModel)
         return CommonResponse(HttpStatus.OK.reasonPhrase)
     }
 

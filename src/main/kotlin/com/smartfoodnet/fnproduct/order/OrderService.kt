@@ -8,6 +8,8 @@ import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import com.smartfoodnet.fninventory.shortage.model.ShortageOrderProjectionModel
 import com.smartfoodnet.fninventory.shortage.support.ProductShortageSearchCondition
 import com.smartfoodnet.fnproduct.order.dto.CollectedOrderModel
+import com.smartfoodnet.fnproduct.order.dto.CollectedOrderSimpleModel
+import com.smartfoodnet.fnproduct.order.dto.MissingAffectedOrderModel
 import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
 import com.smartfoodnet.fnproduct.order.model.BasicProductAddModel
 import com.smartfoodnet.fnproduct.order.support.CollectedOrderRepository
@@ -49,7 +51,7 @@ class OrderService(
 
     @Transactional
     fun createCollectedOrder(collectedOrderCreateModel: List<CollectedOrderCreateModel>) {
-        collectedOrderCreateModel.map { convertCollectedOrderEntity(it) }
+        collectedOrderCreateModel.forEach { convertCollectedOrderEntity(it) }
     }
 
     fun getCollectedOrder(
@@ -152,6 +154,20 @@ class OrderService(
         }
 
         return storeProductService.createStoreProduct(storeProduct)
+    }
+
+    fun getMissingAffectedOrder(partnerId: Long, basicProductId: Long) : List<MissingAffectedOrderModel> {
+        val collectedOrderList : List<CollectedOrder> =
+            collectedOrderRepository.findMissingAffectedOrders(partnerId, basicProductId)
+        return collectedOrderList.map(MissingAffectedOrderModel::from)
+    }
+
+    fun getCollectedOrderByOrderNumber(partnerId: Long, orderNumber: String) : CollectedOrderSimpleModel {
+        val collectedOrder = collectedOrderRepository.findByPartnerIdAndOrderNumber(partnerId, orderNumber)
+
+        if (collectedOrder.isEmpty()) throw NoSuchElementException("주문번호 \"${orderNumber}\"를 찾을 수 없습니다")
+
+        return CollectedOrderSimpleModel.fromEntity(collectedOrder)
     }
 
     companion object : Log

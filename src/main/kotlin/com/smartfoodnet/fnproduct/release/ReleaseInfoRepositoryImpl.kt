@@ -7,11 +7,11 @@ import com.smartfoodnet.fnproduct.claim.model.vo.ReturnStatus
 import com.smartfoodnet.fnproduct.order.entity.QCollectedOrder.collectedOrder
 import com.smartfoodnet.fnproduct.order.entity.QConfirmOrder.confirmOrder
 import com.smartfoodnet.fnproduct.order.entity.QConfirmRequestOrder.confirmRequestOrder
-import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
 import com.smartfoodnet.fnproduct.release.entity.QReleaseInfo.releaseInfo
 import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
 import com.smartfoodnet.fnproduct.release.model.request.ReleaseInfoSearchCondition
+import com.smartfoodnet.fnproduct.release.model.vo.ReleaseStatus
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 
@@ -26,7 +26,7 @@ class ReleaseInfoRepositoryImpl : Querydsl4RepositorySupport(ReleaseInfo::class.
                 .where(
                     containsOrderNumber(condition.orderNumber),
                     containsStoreName(condition.storeName),
-                    eqOrderStatus(condition.orderStatus),
+                    eqReleaseStatus(ReleaseStatus.fromOrderStatus(condition.orderStatus)),
                     eqReceiverName(condition.receiverName),
                     eqUploadType(condition.uploadType),
                     eqReturnStatus(condition.returnStatus),
@@ -51,9 +51,6 @@ class ReleaseInfoRepositoryImpl : Querydsl4RepositorySupport(ReleaseInfo::class.
     private fun containsStoreName(storeName: String?) =
         storeName?.let { collectedOrder.storeName.contains(it) }
 
-    private fun eqOrderStatus(orderStatus: OrderStatus?) =
-        orderStatus?.let { collectedOrder.status.eq(it) }
-
     private fun eqReceiverName(receiverName: String?) =
         receiverName?.let { collectedOrder.receiver.name.eq(it) }
 
@@ -62,6 +59,9 @@ class ReleaseInfoRepositoryImpl : Querydsl4RepositorySupport(ReleaseInfo::class.
 
     private fun eqPartnerId(partnerId: Long?) =
         partnerId?.let { releaseInfo.partnerId.eq(partnerId) }
+
+    private fun eqReleaseStatus(releaseStatus: ReleaseStatus?) =
+        releaseStatus?.let { releaseInfo.releaseStatus.eq(it) }
 
     private fun containsOrderCode(orderCode: String?) =
         orderCode?.let { releaseInfo.orderCode.contains(it) }

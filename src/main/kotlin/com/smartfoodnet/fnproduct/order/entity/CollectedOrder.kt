@@ -42,6 +42,8 @@ class CollectedOrder(
 
     val storeId: Long?,
 
+    val storeIcon: String? = null,
+
     val userStoreId: String? = null,
 
     val orderedAt: LocalDateTime? = null,

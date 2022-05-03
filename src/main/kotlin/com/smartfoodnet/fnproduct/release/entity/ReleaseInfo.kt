@@ -69,6 +69,15 @@ class ReleaseInfo(
     @Enumerated(EnumType.STRING)
     @Column(name = "paused_by")
     var pausedBy: PausedBy? = null,
+
+    @Column(name = "previous_order_code")
+    var previousOrderCode: String? = null,
+
+    @Column(name = "previous_release_code")
+    var previousReleaseCode: String? = null,
+
+    @Column(name = "next_order_code")
+    var nextOrderCode: String? = null,
 ) : SimpleBaseEntity() {
     fun addReleaseProducts(releaseProduct: ReleaseProduct) {
         releaseProducts.add(releaseProduct)
@@ -112,6 +121,16 @@ class ReleaseInfo(
     fun updateDeliveryCompletedAt(procDateTime: LocalDateTime?) {
         releaseStatus = ReleaseStatus.DELIVERY_COMPLETED
         deliveryCompletedAt = procDateTime
+    }
+
+    fun processNextOrderCode(nextOrderCode: String) {
+        this.nextOrderCode = nextOrderCode
+        cancel()
+    }
+
+    fun linkPreviousCodes(previousOrderCode: String? = null, previousReleaseCode: String? = null) {
+        this.previousOrderCode = previousOrderCode
+        this.previousReleaseCode = previousReleaseCode
     }
 
     fun pause(pausedBy: PausedBy) {
