@@ -40,6 +40,23 @@ class ReleaseInfoRepositoryImpl : Querydsl4RepositorySupport(ReleaseInfo::class.
         }
     }
 
+    override fun findAllByReleaseStatuses(
+        partnerId: Long?,
+        deliveryAgencyId: Long?,
+        releaseStatuses: Collection<ReleaseStatus>,
+        page: Pageable
+    ): Page<ReleaseInfo> {
+        return applyPagination(page) {
+            it.selectFrom(releaseInfo)
+                .where(
+                    inReleaseStatus(releaseStatuses),
+                    eqPartnerId(partnerId),
+                    eqDeliveryAgencyId(deliveryAgencyId)
+                )
+                .groupBy(releaseInfo)
+        }
+    }
+
     override fun findAllByTrackingNumberStatus(
         trackingNumberStatus: TrackingNumberStatus,
         checkTrackingNumber: Boolean,
@@ -79,8 +96,14 @@ class ReleaseInfoRepositoryImpl : Querydsl4RepositorySupport(ReleaseInfo::class.
     private fun eqReleaseStatus(releaseStatus: ReleaseStatus?) =
         releaseStatus?.let { releaseInfo.releaseStatus.eq(it) }
 
+    private fun inReleaseStatus(statuses: Collection<ReleaseStatus>) =
+        releaseInfo.releaseStatus.`in`(statuses)
+
     private fun containsOrderCode(orderCode: String?) =
         orderCode?.let { releaseInfo.orderCode.contains(it) }
+
+    private fun eqDeliveryAgencyId(deliveryAgencyId: Long?) =
+        deliveryAgencyId?.let { releaseInfo.deliveryAgencyId.eq(it) }
 
     private fun containsTrackingNumber(trackingNumber: String?) =
         trackingNumber?.let { releaseInfo.trackingNumber.contains(it) }

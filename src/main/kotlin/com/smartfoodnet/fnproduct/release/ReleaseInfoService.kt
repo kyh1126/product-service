@@ -78,7 +78,11 @@ class ReleaseInfoService(
         val doneOrderIds = mutableSetOf<Long>()
 
         while (true) {
-            val targetList = getSyncableReleaseInfoList(partnerId, page)
+            val targetList = releaseInfoRepository.findAllByReleaseStatuses(
+                partnerId = partnerId,
+                releaseStatuses = ReleaseStatus.SYNCABLE_STATUSES,
+                page = page
+            )
 
             if (!targetList.hasContent()) break
 
@@ -214,19 +218,6 @@ class ReleaseInfoService(
         manualReleaseService.reOrder(id, releaseInfo.partnerId, createModel)
     }
 
-    private fun getSyncableReleaseInfoList(partnerId: Long?, page: PageRequest) =
-        when (partnerId) {
-            null -> releaseInfoRepository.findAllByReleaseStatusIn(
-                ReleaseStatus.SYNCABLE_STATUSES,
-                page
-            )
-            else -> releaseInfoRepository.findAllByReleaseStatusInAndPartnerId(
-                ReleaseStatus.SYNCABLE_STATUSES,
-                partnerId,
-                page
-            )
-        }
-
     private fun getReleases(partnerId: Long?, orderIds: Set<Long>): List<NosnosReleaseModel> {
         val releases = mutableListOf<NosnosReleaseModel>()
         var page = NOSNOS_INITIAL_PAGE
@@ -330,14 +321,14 @@ class ReleaseInfoService(
         page: PageRequest,
         idByDeliveryAgency: Map<DeliveryAgency?, Long>
     ) = when (deliveryAgency) {
-        null -> releaseInfoRepository.findAllByReleaseStatusIn(
-            ReleaseStatus.DELIVERY_SYNCABLE_STATUSES,
-            page
+        null -> releaseInfoRepository.findAllByReleaseStatuses(
+            releaseStatuses = ReleaseStatus.DELIVERY_SYNCABLE_STATUSES,
+            page = page
         )
-        else -> releaseInfoRepository.findAllByReleaseStatusInAndDeliveryAgencyId(
-            ReleaseStatus.DELIVERY_SYNCABLE_STATUSES,
-            idByDeliveryAgency[deliveryAgency]!!,
-            page
+        else -> releaseInfoRepository.findAllByReleaseStatuses(
+            deliveryAgencyId = idByDeliveryAgency[deliveryAgency],
+            releaseStatuses = ReleaseStatus.DELIVERY_SYNCABLE_STATUSES,
+            page = page
         )
     }
 
