@@ -14,6 +14,8 @@ class CollectedOrderSimpleModel(
     val orderNumber: String,
     @JsonFormat(pattern = Constants.TIMESTAMP_FORMAT)
     val collectedAt : LocalDateTime?,
+    @JsonFormat(pattern = Constants.TIMESTAMP_FORMAT)
+    val orderedAt : LocalDateTime?,
     val bundleNumber : String,
     val store : StoreSimpleModel?,
     val status: OrderStatus,
@@ -33,6 +35,7 @@ class CollectedOrderSimpleModel(
                     id = id!!,
                     orderNumber = orderNumber,
                     collectedAt = collectedAt,
+                    orderedAt = orderedAt,
                     bundleNumber = bundleNumber,
                     store = StoreSimpleModel(storeId, storeName, storeIcon),
                     status = status,
