@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 interface CollectedOrderRepository : JpaRepository<CollectedOrder, Long>, CollectedOrderRepositoryCustom{
     fun findAllByPartnerIdAndStatus(partnerId: Long, status: OrderStatus): List<CollectedOrder>?
     fun existsByOrderUniqueKey(uniqueKey: String) : Boolean
-    fun findByPartnerIdAndOrderNumber(partnerId: Long, orderNumber: String) : CollectedOrder?
+    fun findByPartnerIdAndOrderNumber(partnerId: Long, orderNumber: String) : List<CollectedOrder>
 }

@@ -164,7 +164,9 @@ class OrderService(
 
     fun getCollectedOrderByOrderNumber(partnerId: Long, orderNumber: String) : CollectedOrderSimpleModel {
         val collectedOrder = collectedOrderRepository.findByPartnerIdAndOrderNumber(partnerId, orderNumber)
-            ?: throw NoSuchElementException("주문번호 \"${orderNumber}\"를 찾을 수 없습니다")
+
+        if (collectedOrder.isEmpty()) throw NoSuchElementException("주문번호 \"${orderNumber}\"를 찾을 수 없습니다")
+
         return CollectedOrderSimpleModel.fromEntity(collectedOrder)
     }
 

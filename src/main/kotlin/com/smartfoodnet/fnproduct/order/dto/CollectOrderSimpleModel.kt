@@ -24,8 +24,11 @@ class CollectedOrderSimpleModel(
     val shippingPrice : Double?
 ){
     companion object{
-        fun fromEntity(collectedOrder : CollectedOrder): CollectedOrderSimpleModel{
-            return collectedOrder.run {
+        fun fromEntity(collectedOrders : List<CollectedOrder>): CollectedOrderSimpleModel{
+
+            val firstData = collectedOrders.first()
+
+            return firstData.run {
                 CollectedOrderSimpleModel(
                     id = id!!,
                     orderNumber = orderNumber,
@@ -34,7 +37,7 @@ class CollectedOrderSimpleModel(
                     store = StoreSimpleModel(storeId, storeName, storeIcon),
                     status = status,
                     uploadType = uploadType,
-                    price = price,
+                    price = collectedOrders.sumOf { it.price?:0.0 },
                     receiver = receiver,
                     deliveryType = deliveryType,
                     shippingPrice = shippingPrice
