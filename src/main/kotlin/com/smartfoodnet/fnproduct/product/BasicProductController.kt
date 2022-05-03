@@ -61,13 +61,13 @@ class BasicProductController(private val basicProductService: BasicProductServic
         return basicProductService.getBasicProduct(productId)
     }
 
-    @Operation(summary = "기본상품 벌크 조회")
+    @Operation(summary = "기본상품 출고상품 ID 기준 조회")
     @GetMapping
-    fun getBasicProducts(
-        @Parameter(description = "상품 ID 리스트", required = true)
-        @RequestParam productIds: List<Long>,
+    fun getBasicProductsByShippingProductIds(
+        @Parameter(description = "출고상품 ID 리스트", required = true)
+        @RequestParam shippingProductIds: List<Long>,
     ): List<BasicProductModel> {
-        return basicProductService.getBasicProducts(productIds).map(BasicProductModel::fromEntity)
+        return basicProductService.getBasicProductsByShippingProductIds(shippingProductIds).map(BasicProductModel::fromEntity)
     }
 
     @java.lang.Deprecated(forRemoval = true)
