@@ -21,6 +21,9 @@ data class OrderProductModel(
     @ApiModelProperty(value = "릴리즈코드")
     var releaseCode: String? = null,
 
+    @ApiModelProperty(value = "송장번호")
+    var trackingNumber: String? = null,
+
     @ApiModelProperty(value = "출고상품명")
     var basicProductName: String? = null,
 
@@ -44,6 +47,7 @@ data class OrderProductModel(
                     orderNumbers = collectedOrders.map { it.orderNumber },
                     releaseId = releaseId,
                     releaseCode = releaseCode,
+                    trackingNumber = trackingNumber,
                     basicProductName = releaseProduct.basicProduct.name,
                     basicProductCode = releaseProduct.basicProduct.code,
                     quantity = releaseProduct.quantity
@@ -64,6 +68,7 @@ data class OrderProductModel(
                     orderNumbers = collectedOrders.map { it.orderNumber },
                     releaseId = releaseId,
                     releaseCode = releaseCode,
+                    trackingNumber = trackingNumber,
                     basicProductName = confirmProduct.basicProduct.name,
                     basicProductCode = confirmProduct.basicProduct.code,
                     quantity = confirmProduct.quantity
