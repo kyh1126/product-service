@@ -79,7 +79,7 @@ class ReleaseController(
         }
     }
 
-    @Operation(summary = "중지된 출고상품 정보 리스트 조회")
+    @Operation(summary = "중지된 출고상품 정보 리스트 조회", description = "출고중지, 출고취소 상태의 출고상품만 조회 가능")
     @GetMapping("order-products/paused")
     fun getPausedOrderProducts(
         @Parameter(description = "출고번호") @RequestParam(required = false) orderCode: String? = null,
