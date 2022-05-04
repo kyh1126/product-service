@@ -134,7 +134,7 @@ class ReleaseInfoService(
         val releaseInfoList = releaseInfoRepository.findAllByReleaseStatuses(
             ReleaseStatusSearchCondition(
                 orderCode = orderCode,
-                releaseStatuses = setOf(ReleaseStatus.RELEASE_PAUSED)
+                releaseStatuses = ReleaseStatus.NOSNOS_CANCELLED_STATUSES
             ),
         )
         return releaseInfoList.flatMap(::getPausedOrderProducts)
@@ -144,7 +144,7 @@ class ReleaseInfoService(
         val releaseInfo = releaseInfoRepository.findAllByReleaseStatuses(
             ReleaseStatusSearchCondition(
                 releaseCode = releaseCode,
-                releaseStatuses = setOf(ReleaseStatus.RELEASE_PAUSED)
+                releaseStatuses = ReleaseStatus.NOSNOS_CANCELLED_STATUSES
             ),
         ).first()
         return getPausedOrderProducts(releaseInfo)
