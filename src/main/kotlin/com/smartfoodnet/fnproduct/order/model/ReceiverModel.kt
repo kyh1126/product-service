@@ -2,9 +2,6 @@ package com.smartfoodnet.fnproduct.order.model
 
 import com.smartfoodnet.fnproduct.order.entity.Receiver
 import io.swagger.annotations.ApiModelProperty
-import javax.persistence.Access
-import javax.persistence.AccessType
-import javax.persistence.Embeddable
 
 class ReceiverModel(
     @ApiModelProperty(value = "받는 분 이름")

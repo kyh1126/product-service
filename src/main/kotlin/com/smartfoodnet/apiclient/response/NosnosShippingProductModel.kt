@@ -11,7 +11,7 @@ import com.smartfoodnet.fnproduct.product.model.vo.SeasonalOption
 
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy::class)
 class NosnosShippingProductModel(
-    val shipping_product_id: Long,
+    val shippingProductId: Long,
     val productCode: String,
     val supplyCompanyId: Int? = null,
     val supplierId: Int? = null,
@@ -65,7 +65,7 @@ class NosnosShippingProductModel(
             it.type = BasicProductType.BASIC
             it.partnerId = partnerModel.partnerId
             it.partnerCode = partnerModel.partnerCode
-            it.shippingProductId = shipping_product_id
+            it.shippingProductId = shippingProductId
             it.name = productName
             it.barcodeYn = if (upc.isNullOrEmpty()) "N" else "Y"
             it.barcode = upc
