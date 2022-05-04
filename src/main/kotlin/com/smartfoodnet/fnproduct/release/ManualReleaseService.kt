@@ -14,7 +14,6 @@ import com.smartfoodnet.fnproduct.order.model.response.ManualOrderResponseModel
 import com.smartfoodnet.fnproduct.order.support.CollectedOrderRepository
 import com.smartfoodnet.fnproduct.order.support.ConfirmProductRepository
 import com.smartfoodnet.fnproduct.order.vo.MatchingType
-import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
 import com.smartfoodnet.fnproduct.product.BasicProductRepository
 import com.smartfoodnet.fnproduct.release.model.request.*
 import com.smartfoodnet.fnproduct.release.validator.ManualOrderModelValidator
@@ -58,7 +57,7 @@ class ManualReleaseService(
 
         partnerService.checkUserPartnerMembership(sfnMetaUser, partnerId)
 
-        return createManualOrder(partnerId, manualReleaseRequest, OrderUploadType.MANUAL)
+        return createManualOrder(partnerId, manualReleaseRequest)
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -71,7 +70,7 @@ class ManualReleaseService(
 
     /**
      * 재출고 등록 - 주문외출고 등록과 동일 프로세스
-     *   uploadType: [com.smartfoodnet.fnproduct.order.vo.OrderUploadType.RE_ORDER]
+     * - uploadType: [com.smartfoodnet.fnproduct.order.vo.OrderUploadType.RE_ORDER]
      *
      *   @see com.smartfoodnet.fnproduct.release.ManualReleaseService.issueManualRelease
      */
@@ -79,20 +78,15 @@ class ManualReleaseService(
     fun issueReOrder(partnerId: Long, createModel: ReOrderCreateModel): ManualOrderResponseModel {
         ValidatorUtils.validateAndThrow(manualOrderModelValidator, createModel)
 
-        return createManualOrder(partnerId, createModel, OrderUploadType.RE_ORDER)
+        return createManualOrder(partnerId, createModel)
     }
 
     private fun createManualOrder(
         partnerId: Long,
-        request: ManualOrderModel,
-        uploadType: OrderUploadType
+        request: ManualOrderModel
     ): ManualOrderResponseModel {
         // 1. collected order생성하기
-        val collectedOrder = createCollectedOrder(
-            partnerId = partnerId,
-            manualOrderRequest = request,
-            uploadType = uploadType
-        )
+        val collectedOrder = createCollectedOrder(partnerId, request)
 
         // 2. confirm product생성하기
         val confirmProducts =
@@ -118,8 +112,7 @@ class ManualReleaseService(
      */
     private fun createCollectedOrder(
         partnerId: Long,
-        manualOrderRequest: ManualOrderModel,
-        uploadType: OrderUploadType
+        manualOrderRequest: ManualOrderModel
     ): CollectedOrder {
         val orderUniqueKey = ManualOrderModel.generateOrderUniqueKey()
         if (collectedOrderRepository.existsByOrderUniqueKey(orderUniqueKey)) {
@@ -129,7 +122,7 @@ class ManualReleaseService(
         val collectedOrder = manualOrderRequest.toCollectOrderEntity(
             partnerId = partnerId,
             orderUniqueKey = orderUniqueKey,
-            uploadType = uploadType
+            uploadType = manualOrderRequest.uploadType
         )
         collectedOrderRepository.save(collectedOrder)
 

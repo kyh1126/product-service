@@ -2,6 +2,7 @@ package com.smartfoodnet.fnproduct.release
 
 import com.smartfoodnet.apiclient.OrderManagementServiceApiClient
 import com.smartfoodnet.apiclient.WmsApiClient
+import com.smartfoodnet.apiclient.request.OutboundCancelModel
 import com.smartfoodnet.apiclient.request.TrackingDataModel
 import com.smartfoodnet.apiclient.request.TrackingNumberRegisterModel
 import com.smartfoodnet.apiclient.request.TrackingOptionModel
@@ -142,8 +143,12 @@ class ReleaseInfoStoreService(
 
     fun pauseReleaseInfo(id: Long) {
         val releaseInfo = releaseInfoRepository.findById(id).get()
+        if (releaseInfo.releaseStatus != ReleaseStatus.BEFORE_RELEASE_REQUEST) {
+            throw BaseRuntimeException(errorMessage = "출고요청전 상태인 경우만 출고중지가 가능합니다.")
+        }
+
         try {
-            wmsApiClient.cancelRelease(releaseInfo.releaseId!!)
+            wmsApiClient.cancelOutbound(OutboundCancelModel.fromEntity(releaseInfo))
         } catch (e: FeignException) {
             log.error("[pauseReleaseInfo] ${getNosnosErrorMessage(e.message)}", e)
             throw e

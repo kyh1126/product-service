@@ -144,6 +144,11 @@ interface WmsApiClient {
         @RequestBody outboundCreateBulkModel: OutboundCreateBulkModel
     ): CommonResponse<CommonProcessBulkModel<PostOutboundModel>>
 
+    @PostMapping("inventory/outbound/cancel")
+    fun cancelOutbound(
+        @RequestBody outboundCancelModel: OutboundCancelModel
+    )
+
     // ---------------------------------------------------------------------------------------------
     // -- 반품
     // ---------------------------------------------------------------------------------------------

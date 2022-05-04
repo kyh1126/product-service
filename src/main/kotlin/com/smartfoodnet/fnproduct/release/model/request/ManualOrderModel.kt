@@ -1,5 +1,6 @@
 package com.smartfoodnet.fnproduct.release.model.request
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
 import com.smartfoodnet.fnproduct.order.entity.CollectedProductInfo
 import com.smartfoodnet.fnproduct.order.entity.ConfirmProduct
@@ -37,6 +38,9 @@ sealed class ManualOrderModel {
 
     @get:ApiModelProperty(value = "출고상품", example = "[{productId, quantity}, ...]")
     abstract var products: List<ManualProductModel>
+
+    @get:JsonIgnore
+    abstract val uploadType: OrderUploadType
 
     fun toCollectOrderEntity(
         partnerId: Long,
