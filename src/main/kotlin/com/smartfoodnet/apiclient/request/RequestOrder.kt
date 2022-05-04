@@ -2,17 +2,20 @@ package com.smartfoodnet.apiclient.request
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.smartfoodnet.common.Constants.NOSNOS_CANCEL_REASON_NO
 import com.smartfoodnet.common.Constants.NOSNOS_DATE_FORMAT
 import com.smartfoodnet.common.error.exception.BaseRuntimeException
 import com.smartfoodnet.fnproduct.order.entity.ConfirmOrder
 import com.smartfoodnet.fnproduct.order.entity.ConfirmProduct
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
+import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
+import com.smartfoodnet.fnproduct.release.model.vo.PausedBy
 import java.time.format.DateTimeFormatter
 
 object RequestOrderMapper {
 
-    fun toOutboundCreateBulkModel(confirmOrders: List<ConfirmOrder>): OutboundCreateBulkModel{
+    fun toOutboundCreateBulkModel(confirmOrders: List<ConfirmOrder>): OutboundCreateBulkModel {
         val outboundBulkItemList = createOutboundBulkItem(confirmOrders)
         /**
          * 각 주문별로 중복되는 상품이 있는지 확인
@@ -57,7 +60,7 @@ object RequestOrderMapper {
                         ?: throw BaseRuntimeException(errorMessage = "${it.basicProduct.name}의 salesProductId가 없습니다"),
                     quantity = it.quantity,
                     itemCd1 = bundleNumber,
-                    piecesPerBox = it.basicProduct.piecesPerBox?:-1
+                    piecesPerBox = it.basicProduct.piecesPerBox ?: -1
                 )
             }
 
@@ -73,7 +76,7 @@ object RequestOrderMapper {
     /**
      * 그룹핑 처리하여 1개 이상의 중복되는 상품은 합쳐서 보낸다
      */
-    private fun searchDuplicateProduct(outboundBulkItem: OutboundCreateBulkItemModel){
+    private fun searchDuplicateProduct(outboundBulkItem: OutboundCreateBulkItemModel) {
         val duplicateSalesIds = outboundBulkItem.orderItemList
             .groupBy { it.salesProductId }
             .map { sumDuplicateProduct(it.value) }
@@ -81,20 +84,20 @@ object RequestOrderMapper {
         outboundBulkItem.orderItemList = duplicateSalesIds
     }
 
-    private fun sumDuplicateProduct(duplicateOrderItemList : List<OrderItem>): OrderItem {
+    private fun sumDuplicateProduct(duplicateOrderItemList: List<OrderItem>): OrderItem {
         if (duplicateOrderItemList.count() == 1) {
             return duplicateOrderItemList.first()
         }
 
         val commonOrderItem = duplicateOrderItemList.first()
-        var quantity : Int = 0
+        var quantity: Int = 0
         duplicateOrderItemList.forEach {
-           quantity += it.quantity
+            quantity += it.quantity
         }
         return OrderItem(commonOrderItem.salesProductId, quantity, commonOrderItem.itemCd1, null, commonOrderItem.piecesPerBox)
     }
 
-    private fun createOutboundBulkItem(confirmOrders: List<ConfirmOrder>) : List<OutboundCreateBulkItemModel>{
+    private fun createOutboundBulkItem(confirmOrders: List<ConfirmOrder>): List<OutboundCreateBulkItemModel> {
         return confirmOrders.map { confirmOrder ->
             confirmOrder.run {
                 OutboundCreateBulkItemModel(
@@ -115,8 +118,7 @@ object RequestOrderMapper {
                     orderItemList = toOrderItemList(
                         requestOrderList
                             .map { it.collectedOrder.confirmProductList }
-                            .flatten()
-                        ,bundleNumber
+                            .flatten(), bundleNumber
                     )
                 )
             }
@@ -195,7 +197,7 @@ class OrderItem(
     val itemCd2: String? = null,
     @JsonIgnore
     val piecesPerBox: Int = -1
-){
+) {
     @JsonProperty("item_cd3")
     val itemCd3: String? = if ((quantity / piecesPerBox) == 1) "단수" else null
 }
@@ -205,7 +207,7 @@ class OutboundCreateBulkModel(
     val partnerId: Long? = null,
 
     @JsonProperty("request_data_list")
-    val requestDataList : List<OutboundCreateBulkItemModel>
+    val requestDataList: List<OutboundCreateBulkItemModel>
 )
 
 class OutboundCreateBulkItemModel(

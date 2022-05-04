@@ -1,6 +1,7 @@
 package com.smartfoodnet.fnproduct.release.model.request
 
 import com.smartfoodnet.fnproduct.order.vo.DeliveryType
+import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
 
 data class ReOrderCreateModel(
     override val receiverName: String,
@@ -10,7 +11,8 @@ data class ReOrderCreateModel(
     override val deliveryType: DeliveryType = DeliveryType.PARCEL,
     override val promotion: String?,
     override val reShipmentReason: String?,
-    override var products: List<ManualProductModel>
+    override var products: List<ManualProductModel>,
+    override val uploadType: OrderUploadType = OrderUploadType.RE_ORDER
 ) : ManualOrderModel()
 
 data class ReOrderProductInfo(
