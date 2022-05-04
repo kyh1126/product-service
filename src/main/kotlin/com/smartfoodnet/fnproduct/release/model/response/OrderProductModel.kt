@@ -35,8 +35,7 @@ data class OrderProductModel(
             releaseProduct: ReleaseProduct,
             releaseInfo: ReleaseInfo,
         ): OrderProductModel {
-            val collectedOrders = releaseInfo.confirmOrder?.requestOrderList
-                ?.map { it.collectedOrder } ?: emptyList()
+            val collectedOrders = getCollectedOrders(releaseInfo)
 
             return OrderProductModel(
                 orderId = releaseInfo.orderId,
