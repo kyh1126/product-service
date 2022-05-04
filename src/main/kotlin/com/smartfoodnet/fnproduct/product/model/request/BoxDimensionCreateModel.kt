@@ -1,5 +1,6 @@
 package com.smartfoodnet.fnproduct.product.model.request
 
+import com.smartfoodnet.apiclient.response.NosnosShippingProductModel
 import com.smartfoodnet.fnproduct.product.entity.BoxDimension
 import io.swagger.annotations.ApiModelProperty
 import javax.validation.constraints.NotNull
@@ -22,5 +23,16 @@ class BoxDimensionCreateModel {
 
     fun toEntity(): BoxDimension {
         return BoxDimension(width = boxWidth!!, length = boxLength!!, height = boxHeight!!, weight = boxWeight)
+    }
+
+    companion object {
+        fun fromModel(model: NosnosShippingProductModel): BoxDimensionCreateModel {
+            return BoxDimensionCreateModel().also {
+                it.boxWidth = model.boxWidth
+                it.boxLength = model.boxLength
+                it.boxHeight = model.boxHeight
+                it.boxWeight = model.boxWeight
+            }
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.smartfoodnet.fnproduct.product.model.request
 
+import com.smartfoodnet.apiclient.response.NosnosShippingProductModel
 import com.smartfoodnet.fnproduct.product.entity.SingleDimension
 import io.swagger.annotations.ApiModelProperty
 import javax.validation.constraints.NotNull
@@ -22,5 +23,16 @@ class SingleDimensionCreateModel {
 
     fun toEntity(): SingleDimension {
         return SingleDimension(width = singleWidth!!, length = singleLength!!, height = singleHeight!!, weight = singleWeight)
+    }
+
+    companion object {
+        fun fromModel(model: NosnosShippingProductModel): SingleDimensionCreateModel {
+            return SingleDimensionCreateModel().also {
+                it.singleWidth = model.singleWidth
+                it.singleLength = model.singleLength
+                it.singleHeight = model.singleHeight
+                it.singleWeight = model.singleWeight
+            }
+        }
     }
 }

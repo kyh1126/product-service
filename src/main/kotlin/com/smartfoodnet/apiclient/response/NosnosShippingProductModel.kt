@@ -4,9 +4,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 import com.smartfoodnet.apiclient.dto.AddBarcode
 import com.smartfoodnet.fnproduct.product.model.ExpirationDateInfoExcelModel
-import com.smartfoodnet.fnproduct.product.model.request.BasicProductCreateModel
-import com.smartfoodnet.fnproduct.product.model.request.BasicProductDetailCreateModel
-import com.smartfoodnet.fnproduct.product.model.request.SubsidiaryMaterialMappingCreateModel
+import com.smartfoodnet.fnproduct.product.model.request.*
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import com.smartfoodnet.fnproduct.product.model.vo.SeasonalOption
 
@@ -70,10 +68,12 @@ class NosnosShippingProductModel(
             it.name = productName
             it.barcodeYn = if (upc.isNullOrEmpty()) "N" else "Y"
             it.barcode = upc
-            it.piecesPerBox = singleEta
-            it.piecesPerPalette = paletCount
             it.expirationDateManagementYn = isExpirationDateManagement(expirationDateInfoExcelModel)
             it.expirationDateInfoModel = expirationDateInfoExcelModel.toExpirationDateInfoCreateModel()
+            it.singleDimensionCreateModel = SingleDimensionCreateModel.fromModel(this)
+            it.boxDimensionCreateModel = BoxDimensionCreateModel.fromModel(this)
+            it.piecesPerBox = singleEta
+            it.piecesPerPalette = paletCount
             it.activeYn = convertToYN(status)
         }
 
