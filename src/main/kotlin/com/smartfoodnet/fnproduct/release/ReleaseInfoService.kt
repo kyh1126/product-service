@@ -150,13 +150,24 @@ class ReleaseInfoService(
         return getPausedOrderProducts(releaseInfo)
     }
 
-    fun getOrderProducts(releaseInfo: ReleaseInfo): List<OrderProductModel> {
+    @java.lang.Deprecated(forRemoval = true)
+    fun getOrderProductsOld(releaseInfo: ReleaseInfo): List<OrderProductModel> {
         return releaseInfo.releaseProducts
             .map { OrderProductModel.fromEntity(it, releaseInfo) }
             .ifEmpty {
                 val confirmProducts = getConfirmProducts(releaseInfo)
                 confirmProducts.map { OrderProductModel.fromEntity(it, releaseInfo) }
             }
+    }
+
+    fun getOrderProducts(releaseInfo: ReleaseInfo): List<OrderProductModel> {
+        return when (releaseInfo.trackingNumber) {
+            null -> {
+                val confirmProducts = getConfirmProducts(releaseInfo)
+                confirmProducts.map { OrderProductModel.fromEntity(it, releaseInfo) }
+            }
+            else -> releaseInfo.releaseProducts.map { OrderProductModel.fromEntity(it, releaseInfo) }
+        }
     }
 
     fun getPausedOrderProducts(releaseInfo: ReleaseInfo): List<PausedOrderProductModel> {
