@@ -266,7 +266,18 @@ class OutboundCreateBulkItemModel(
     var orderItemList: List<OrderItem>
 )
 
-class OutboundCancelModel(
+class OutboundCancelReadModel(
+    @JsonProperty("partner_id")
+    var partnerId: Long,
+
+    @JsonProperty("order_id")
+    val orderId: Long? = null,
+
+    @JsonProperty("release_ids")
+    val releaseIds: List<Long>? = null,
+)
+
+class OutboundCancelCreateModel(
     @JsonProperty("partner_id")
     val partnerId: Long? = null,
 
@@ -280,9 +291,9 @@ class OutboundCancelModel(
     val cancelReasonContent: String? = null,
 ) {
     companion object {
-        fun fromEntity(releaseInfo: ReleaseInfo): OutboundCancelModel {
+        fun fromEntity(releaseInfo: ReleaseInfo): OutboundCancelCreateModel {
             return releaseInfo.run {
-                OutboundCancelModel(
+                OutboundCancelCreateModel(
                     partnerId = partnerId,
                     orderId = orderId,
                     cancelReasonNo = NOSNOS_CANCEL_REASON_NO,

@@ -14,6 +14,7 @@ import com.smartfoodnet.common.getNosnosErrorMessage
 import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.fnproduct.order.ConfirmOrderService
+import com.smartfoodnet.fnproduct.order.entity.ConfirmProduct
 import com.smartfoodnet.fnproduct.order.support.condition.ConfirmProductSearchCondition
 import com.smartfoodnet.fnproduct.product.BasicProductService
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
@@ -21,10 +22,8 @@ import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
 import com.smartfoodnet.fnproduct.release.model.dto.OrderReleaseInfoDto
 import com.smartfoodnet.fnproduct.release.model.request.ReOrderCreateModel
 import com.smartfoodnet.fnproduct.release.model.request.ReleaseInfoSearchCondition
-import com.smartfoodnet.fnproduct.release.model.response.OrderConfirmProductModel
-import com.smartfoodnet.fnproduct.release.model.response.OrderProductModel
-import com.smartfoodnet.fnproduct.release.model.response.PausedReleaseInfoModel
-import com.smartfoodnet.fnproduct.release.model.response.ReleaseInfoModel
+import com.smartfoodnet.fnproduct.release.model.request.ReleaseStatusSearchCondition
+import com.smartfoodnet.fnproduct.release.model.response.*
 import com.smartfoodnet.fnproduct.release.model.vo.DeliveryAgency
 import com.smartfoodnet.fnproduct.release.model.vo.DeliveryAgency.Companion.getDeliveryAgencyByName
 import com.smartfoodnet.fnproduct.release.model.vo.DeliveryStatus
@@ -79,8 +78,10 @@ class ReleaseInfoService(
 
         while (true) {
             val targetList = releaseInfoRepository.findAllByReleaseStatuses(
-                partnerId = partnerId,
-                releaseStatuses = ReleaseStatus.SYNCABLE_STATUSES,
+                condition = ReleaseStatusSearchCondition(
+                    partnerId = partnerId,
+                    releaseStatuses = ReleaseStatus.SYNCABLE_STATUSES,
+                ),
                 page = page
             )
 
@@ -129,15 +130,41 @@ class ReleaseInfoService(
         return getOrderProducts(releaseInfo)
     }
 
-    fun getOrderProducts(releaseInfo: ReleaseInfo): List<OrderProductModel> {
-        return releaseInfo.releaseProducts.map { OrderProductModel.fromEntity(it, releaseInfo) }
-            .ifEmpty {
-                val confirmProducts = releaseInfo.confirmOrder?.requestOrderList
-                    ?.flatMap { it.collectedOrder.confirmProductList } ?: emptyList()
+    fun getPausedOrderProductsByOrderCode(orderCode: String): List<PausedOrderProductModel> {
+        val releaseInfoList = releaseInfoRepository.findAllByReleaseStatuses(
+            ReleaseStatusSearchCondition(
+                orderCode = orderCode,
+                releaseStatuses = setOf(ReleaseStatus.RELEASE_PAUSED)
+            ),
+        )
+        return releaseInfoList.flatMap(::getPausedOrderProducts)
+    }
 
-                confirmProducts.map { it ->
-                    OrderProductModel.fromEntity(it, releaseInfo)
-                }
+    fun getPausedOrderProductsByReleaseCode(releaseCode: String): List<PausedOrderProductModel> {
+        val releaseInfo = releaseInfoRepository.findAllByReleaseStatuses(
+            ReleaseStatusSearchCondition(
+                releaseCode = releaseCode,
+                releaseStatuses = setOf(ReleaseStatus.RELEASE_PAUSED)
+            ),
+        ).first()
+        return getPausedOrderProducts(releaseInfo)
+    }
+
+    fun getOrderProducts(releaseInfo: ReleaseInfo): List<OrderProductModel> {
+        return releaseInfo.releaseProducts
+            .map { OrderProductModel.fromEntity(it, releaseInfo) }
+            .ifEmpty {
+                val confirmProducts = getConfirmProducts(releaseInfo)
+                confirmProducts.map { OrderProductModel.fromEntity(it, releaseInfo) }
+            }
+    }
+
+    fun getPausedOrderProducts(releaseInfo: ReleaseInfo): List<PausedOrderProductModel> {
+        return releaseInfo.releaseProducts
+            .map { PausedOrderProductModel.fromEntity(it, releaseInfo) }
+            .ifEmpty {
+                val confirmProducts = getConfirmProducts(releaseInfo)
+                confirmProducts.map { PausedOrderProductModel.fromEntity(it, releaseInfo) }
             }
     }
 
@@ -291,6 +318,11 @@ class ReleaseInfoService(
             .associateBy { it.shippingProductId!! }
     }
 
+    private fun getConfirmProducts(releaseInfo: ReleaseInfo): List<ConfirmProduct> {
+        return releaseInfo.confirmOrder?.requestOrderList
+            ?.flatMap { it.collectedOrder.confirmProductList } ?: emptyList()
+    }
+
     private fun updateReleaseInfo(
         orderId: Long,
         releaseModels: List<NosnosReleaseModel>,
@@ -322,12 +354,16 @@ class ReleaseInfoService(
         idByDeliveryAgency: Map<DeliveryAgency?, Long>
     ) = when (deliveryAgency) {
         null -> releaseInfoRepository.findAllByReleaseStatuses(
-            releaseStatuses = ReleaseStatus.DELIVERY_SYNCABLE_STATUSES,
+            condition = ReleaseStatusSearchCondition(
+                releaseStatuses = ReleaseStatus.DELIVERY_SYNCABLE_STATUSES
+            ),
             page = page
         )
         else -> releaseInfoRepository.findAllByReleaseStatuses(
-            deliveryAgencyId = idByDeliveryAgency[deliveryAgency],
-            releaseStatuses = ReleaseStatus.DELIVERY_SYNCABLE_STATUSES,
+            condition = ReleaseStatusSearchCondition(
+                deliveryAgencyId = idByDeliveryAgency[deliveryAgency],
+                releaseStatuses = ReleaseStatus.DELIVERY_SYNCABLE_STATUSES
+            ),
             page = page
         )
     }

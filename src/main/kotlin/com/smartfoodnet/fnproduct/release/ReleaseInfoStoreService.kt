@@ -2,11 +2,9 @@ package com.smartfoodnet.fnproduct.release
 
 import com.smartfoodnet.apiclient.OrderManagementServiceApiClient
 import com.smartfoodnet.apiclient.WmsApiClient
-import com.smartfoodnet.apiclient.request.OutboundCancelModel
-import com.smartfoodnet.apiclient.request.TrackingDataModel
-import com.smartfoodnet.apiclient.request.TrackingNumberRegisterModel
-import com.smartfoodnet.apiclient.request.TrackingOptionModel
+import com.smartfoodnet.apiclient.request.*
 import com.smartfoodnet.apiclient.response.*
+import com.smartfoodnet.apiclient.response.GetOutboundCancelModel.CancelledOutboundModel
 import com.smartfoodnet.common.error.exception.BaseRuntimeException
 import com.smartfoodnet.common.error.exception.ErrorCode
 import com.smartfoodnet.common.getNosnosErrorMessage
@@ -55,7 +53,7 @@ class ReleaseInfoStoreService(
     ) {
         val (confirmOrder, targetReleaseInfoList) = orderReleaseInfoDto
 
-        releaseModels.map { model ->
+        val processedReleaseInfoList: List<ReleaseInfo> = releaseModels.map { model ->
             val releaseInfoByReleaseId = targetReleaseInfoList.associateBy { it.releaseId }
             val releaseId = model.releaseId!!
             val releaseItemModels = itemModelsByReleaseId[releaseId] ?: emptyList()
@@ -72,12 +70,12 @@ class ReleaseInfoStoreService(
                 // Case2: releaseId 가 null 인 releaseInfo 업데이트
                 isNeedToBeUpdatedReleaseId(releaseInfoByReleaseId) -> {
                     val targetReleaseInfo = releaseInfoByReleaseId[null]!!
+                    targetReleaseInfo.releaseId = releaseId
                     updateReleaseId(
                         targetReleaseInfo.id!!,
                         releaseModelDto,
                         basicProductByShippingProductId
                     )
-                    targetReleaseInfo.releaseId = releaseId
                 }
                 // Case3: releaseInfo 엔티티 생성
                 else -> {
@@ -90,7 +88,9 @@ class ReleaseInfoStoreService(
                     )
                 }
             }
-        }
+        }.filterNotNull()
+
+        processPausedReleaseInfo(processedReleaseInfoList)
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -148,12 +148,12 @@ class ReleaseInfoStoreService(
         }
 
         try {
-            wmsApiClient.cancelOutbound(OutboundCancelModel.fromEntity(releaseInfo))
+            wmsApiClient.cancelOutbound(OutboundCancelCreateModel.fromEntity(releaseInfo))
         } catch (e: FeignException) {
             log.error("[pauseReleaseInfo] ${getNosnosErrorMessage(e.message)}", e)
             throw e
         }
-        releaseInfo.pause(PausedBy.PARTNER)
+        releaseInfo.pause(pausedBy = PausedBy.PARTNER)
     }
 
     fun cancelReleaseInfo(id: Long) {
@@ -192,11 +192,11 @@ class ReleaseInfoStoreService(
         releaseInfoId: Long,
         releaseModelDto: ReleaseModelDto,
         basicProductByShippingProductId: Map<Long, BasicProduct>
-    ) {
+    ): ReleaseInfo? {
         val targetReleaseInfo = releaseInfoRepository.findById(releaseInfoId).get()
         targetReleaseInfo.updateReleaseId(releaseModelDto.releaseModel)
 
-        updateExistingReleaseId(
+        return updateExistingReleaseId(
             targetReleaseInfo.releaseId!!,
             targetReleaseInfo,
             releaseModelDto,
@@ -209,11 +209,11 @@ class ReleaseInfoStoreService(
         releaseInfoEntity: ReleaseInfo? = null,
         releaseModelDto: ReleaseModelDto,
         basicProductByShippingProductId: Map<Long, BasicProduct>
-    ) {
+    ): ReleaseInfo? {
         val (releaseModel, releaseItemModels) = releaseModelDto
 
         val targetReleaseInfo = releaseInfoEntity
-            ?: (releaseInfoRepository.findByReleaseId(releaseId) ?: return)
+            ?: (releaseInfoRepository.findByReleaseId(releaseId) ?: return null)
 
         // 릴리즈상품 저장
         val entityByReleaseItemId =
@@ -225,6 +225,7 @@ class ReleaseInfoStoreService(
         )
 
         targetReleaseInfo.update(releaseModel, releaseProducts, getUploadType(targetReleaseInfo))
+        return targetReleaseInfo
     }
 
     private fun createReleaseInfo(
@@ -232,7 +233,7 @@ class ReleaseInfoStoreService(
         basicProductByShippingProductId: Map<Long, BasicProduct>,
         firstTargetReleaseInfo: ReleaseInfo,
         confirmOrder: ConfirmOrder,
-    ) {
+    ): ReleaseInfo {
         val (releaseModel, releaseItemModels) = releaseModelDto
 
         // 릴리즈상품 저장
@@ -244,7 +245,7 @@ class ReleaseInfoStoreService(
         val uploadType = getUploadType(firstTargetReleaseInfo)
 
         val releaseInfo = releaseModel.toEntity(releaseProducts, uploadType, confirmOrder)
-        releaseInfoRepository.save(releaseInfo)
+        return releaseInfoRepository.save(releaseInfo)
     }
 
     private fun createOrUpdateReleaseProducts(
@@ -269,6 +270,38 @@ class ReleaseInfoStoreService(
             .forEach(ReleaseProduct::delete)
 
         return releaseProducts
+    }
+
+    /**
+     * OrderId 별 ReleaseInfo 중 출고중지 상태인 경우 후처리
+     */
+    private fun processPausedReleaseInfo(processedList: List<ReleaseInfo>) {
+        val targetList = processedList
+            .filter { it.releaseStatus == ReleaseStatus.RELEASE_PAUSED }
+        val firstTarget = targetList.firstOrNull() ?: return
+
+        val cancelOutboundMap = getCancelOutboundMap(firstTarget)
+
+        targetList.forEach { pausedReleaseInfo ->
+            val searchCondition = Pair(pausedReleaseInfo.orderId, pausedReleaseInfo.releaseId)
+            pausedReleaseInfo.processNosnosPause(cancelOutboundMap[searchCondition])
+        }
+    }
+
+    private fun getCancelOutboundMap(firstTarget: ReleaseInfo): Map<Pair<Long, Long?>, CancelledOutboundModel> {
+        var cancelOutboundsBy: Map<Pair<Long, Long?>, CancelledOutboundModel> = mapOf()
+        try {
+            val cancelOutbounds = wmsApiClient.getCancelOutbounds(
+                OutboundCancelReadModel(partnerId = firstTarget.partnerId, orderId = firstTarget.orderId)
+            ).payload?.dataList ?: emptyList()
+
+            cancelOutboundsBy = cancelOutbounds.map(GetOutboundCancelModel::toCancelledOutboundModel)
+                .associateBy { Pair(it.orderId, it.releaseId) }
+        } catch (e: FeignException) {
+            // nosnos 출고 메뉴에서 바로 출고취소 클릭시 발주 취소요청은 생성되지 않는다. (known issue)
+            log.warn("[processPausedReleaseInfo] ${getNosnosErrorMessage(e.message)}", e)
+        }
+        return cancelOutboundsBy
     }
 
     companion object : Log

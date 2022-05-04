@@ -5,6 +5,7 @@ import com.smartfoodnet.fnproduct.claim.model.vo.ExchangeStatus
 import com.smartfoodnet.fnproduct.claim.model.vo.ReturnStatus
 import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
+import com.smartfoodnet.fnproduct.release.model.vo.ReleaseStatus
 import io.swagger.annotations.ApiModelProperty
 
 class ReleaseInfoSearchCondition(
@@ -52,3 +53,11 @@ class ReleaseInfoSearchCondition(
         orderStatus = OrderStatus.RELEASE_PAUSED
     }
 }
+
+class ReleaseStatusSearchCondition(
+    var partnerId: Long? = null,
+    var deliveryAgencyId: Long? = null,
+    var orderCode: String? = null,
+    var releaseCode: String? = null,
+    var releaseStatuses: Collection<ReleaseStatus>,
+)

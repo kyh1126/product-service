@@ -144,9 +144,14 @@ interface WmsApiClient {
         @RequestBody outboundCreateBulkModel: OutboundCreateBulkModel
     ): CommonResponse<CommonProcessBulkModel<PostOutboundModel>>
 
-    @PostMapping("inventory/outbound/cancel")
+    @GetMapping("inventory/outbound/cancels/bulk")
+    fun getCancelOutbounds(
+        @SpringQueryMap outboundCancelReadModel: OutboundCancelReadModel
+    ): CommonResponse<CommonDataListModel<GetOutboundCancelModel>>
+
+    @PostMapping("inventory/outbound/cancels")
     fun cancelOutbound(
-        @RequestBody outboundCancelModel: OutboundCancelModel
+        @RequestBody outboundCancelCreateModel: OutboundCancelCreateModel
     )
 
     // ---------------------------------------------------------------------------------------------

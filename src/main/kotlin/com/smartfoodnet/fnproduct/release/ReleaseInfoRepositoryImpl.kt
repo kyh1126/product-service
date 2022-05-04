@@ -11,6 +11,7 @@ import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
 import com.smartfoodnet.fnproduct.release.entity.QReleaseInfo.releaseInfo
 import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
 import com.smartfoodnet.fnproduct.release.model.request.ReleaseInfoSearchCondition
+import com.smartfoodnet.fnproduct.release.model.request.ReleaseStatusSearchCondition
 import com.smartfoodnet.fnproduct.release.model.vo.ReleaseStatus
 import com.smartfoodnet.fnproduct.release.model.vo.TrackingNumberStatus
 import org.springframework.data.domain.Page
@@ -40,18 +41,31 @@ class ReleaseInfoRepositoryImpl : Querydsl4RepositorySupport(ReleaseInfo::class.
         }
     }
 
+    override fun findAllByReleaseStatuses(condition: ReleaseStatusSearchCondition): List<ReleaseInfo> {
+        return selectFrom(releaseInfo)
+            .where(
+                inReleaseStatus(condition.releaseStatuses),
+                eqPartnerId(condition.partnerId),
+                eqDeliveryAgencyId(condition.deliveryAgencyId),
+                eqOrderCode(condition.orderCode),
+                eqReleaseCode(condition.releaseCode)
+            )
+            .groupBy(releaseInfo)
+            .fetch()
+    }
+
     override fun findAllByReleaseStatuses(
-        partnerId: Long?,
-        deliveryAgencyId: Long?,
-        releaseStatuses: Collection<ReleaseStatus>,
+        condition: ReleaseStatusSearchCondition,
         page: Pageable
     ): Page<ReleaseInfo> {
         return applyPagination(page) {
             it.selectFrom(releaseInfo)
                 .where(
-                    inReleaseStatus(releaseStatuses),
-                    eqPartnerId(partnerId),
-                    eqDeliveryAgencyId(deliveryAgencyId)
+                    inReleaseStatus(condition.releaseStatuses),
+                    eqPartnerId(condition.partnerId),
+                    eqDeliveryAgencyId(condition.deliveryAgencyId),
+                    eqOrderCode(condition.orderCode),
+                    eqReleaseCode(condition.releaseCode)
                 )
                 .groupBy(releaseInfo)
         }
@@ -99,11 +113,17 @@ class ReleaseInfoRepositoryImpl : Querydsl4RepositorySupport(ReleaseInfo::class.
     private fun inReleaseStatus(statuses: Collection<ReleaseStatus>) =
         releaseInfo.releaseStatus.`in`(statuses)
 
+    private fun eqDeliveryAgencyId(deliveryAgencyId: Long?) =
+        deliveryAgencyId?.let { releaseInfo.deliveryAgencyId.eq(it) }
+
+    private fun eqOrderCode(orderCode: String?) =
+        orderCode?.let { releaseInfo.orderCode.eq(it) }
+
     private fun containsOrderCode(orderCode: String?) =
         orderCode?.let { releaseInfo.orderCode.contains(it) }
 
-    private fun eqDeliveryAgencyId(deliveryAgencyId: Long?) =
-        deliveryAgencyId?.let { releaseInfo.deliveryAgencyId.eq(it) }
+    private fun eqReleaseCode(releaseCode: String?) =
+        releaseCode?.let { releaseInfo.releaseCode.eq(it) }
 
     private fun containsTrackingNumber(trackingNumber: String?) =
         trackingNumber?.let { releaseInfo.trackingNumber.contains(it) }

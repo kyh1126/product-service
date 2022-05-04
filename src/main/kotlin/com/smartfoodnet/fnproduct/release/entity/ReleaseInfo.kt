@@ -1,6 +1,7 @@
 package com.smartfoodnet.fnproduct.release.entity
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.smartfoodnet.apiclient.response.GetOutboundCancelModel.CancelledOutboundModel
 import com.smartfoodnet.apiclient.response.NosnosReleaseModel
 import com.smartfoodnet.common.entity.SimpleBaseEntity
 import com.smartfoodnet.fnproduct.claim.entity.Claim
@@ -55,6 +56,9 @@ class ReleaseInfo(
     @Column(name = "delivery_completed_at")
     var deliveryCompletedAt: LocalDateTime? = null,
 
+    @Column(name = "paused_at")
+    var pausedAt: LocalDateTime? = null,
+
     @OneToMany(mappedBy = "releaseInfo", cascade = [CascadeType.PERSIST])
     var releaseProducts: MutableSet<ReleaseProduct> = LinkedHashSet(),
 
@@ -69,6 +73,9 @@ class ReleaseInfo(
     @Enumerated(EnumType.STRING)
     @Column(name = "paused_by")
     var pausedBy: PausedBy? = null,
+
+    @Column(name = "paused_reason")
+    var pausedReason: String? = null,
 
     @Column(name = "previous_order_code")
     var previousOrderCode: String? = null,
@@ -91,10 +98,6 @@ class ReleaseInfo(
         pausedBy: PausedBy = PausedBy.NOSNOS
     ) {
         releaseStatus = ReleaseStatus.fromReleaseStatus(request.releaseStatus!!)
-        if (releaseStatus == ReleaseStatus.RELEASE_PAUSED) {
-            pause(pausedBy)
-        }
-
         deliveryAgencyId = request.deliveryAgencyId
         trackingNumber = request.trackingNumber
         if (trackingNumber != null) {
@@ -133,8 +136,14 @@ class ReleaseInfo(
         this.previousReleaseCode = previousReleaseCode
     }
 
-    fun pause(pausedBy: PausedBy) {
+    fun processNosnosPause(cancelledOutbound: CancelledOutboundModel?) {
+        pause(cancelledOutbound?.pausedAt, PausedBy.NOSNOS)
+        pausedReason = cancelledOutbound?.cancelReason
+    }
+
+    fun pause(pausedAt: LocalDateTime? = null, pausedBy: PausedBy) {
         this.releaseStatus = ReleaseStatus.RELEASE_PAUSED
+        this.pausedAt = pausedAt ?: LocalDateTime.now()
         this.pausedBy = pausedBy
     }
 

@@ -21,4 +21,5 @@ object Constants {
     const val NOSNOS_INITIAL_PAGE = 1
     const val NOSNOS_NO_VALUE_MESSAGE = "검색된 데이터가 없습니다."
     const val NOSNOS_CANCEL_REASON_NO = 6
+    const val NOSNOS_CANCEL_STATUS = 2
 }

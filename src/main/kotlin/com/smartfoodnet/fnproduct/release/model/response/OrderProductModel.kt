@@ -35,19 +35,20 @@ data class OrderProductModel(
             releaseProduct: ReleaseProduct,
             releaseInfo: ReleaseInfo,
         ): OrderProductModel {
-            val collectedOrders = releaseInfo.confirmOrder?.requestOrderList
-                ?.map { it.collectedOrder } ?: emptyList()
+            val collectedOrders = getCollectedOrders(releaseInfo)
 
-            return OrderProductModel(
-                orderId = releaseInfo.orderId,
-                orderCode = releaseInfo.orderCode,
-                orderNumbers = collectedOrders.map { it.orderNumber },
-                releaseId = releaseInfo.releaseId,
-                releaseCode = releaseInfo.releaseCode,
-                basicProductName = releaseProduct.basicProduct.name,
-                basicProductCode = releaseProduct.basicProduct.code,
-                quantity = releaseProduct.quantity
-            )
+            return releaseInfo.run {
+                OrderProductModel(
+                    orderId = orderId,
+                    orderCode = orderCode,
+                    orderNumbers = collectedOrders.map { it.orderNumber },
+                    releaseId = releaseId,
+                    releaseCode = releaseCode,
+                    basicProductName = releaseProduct.basicProduct.name,
+                    basicProductCode = releaseProduct.basicProduct.code,
+                    quantity = releaseProduct.quantity
+                )
+            }
         }
 
         fun fromEntity(
@@ -56,16 +57,18 @@ data class OrderProductModel(
         ): OrderProductModel {
             val collectedOrders = getCollectedOrders(releaseInfo)
 
-            return OrderProductModel(
-                orderId = releaseInfo.orderId,
-                orderCode = releaseInfo.orderCode,
-                orderNumbers = collectedOrders.map { it.orderNumber },
-                releaseId = releaseInfo.releaseId,
-                releaseCode = releaseInfo.releaseCode,
-                basicProductName = confirmProduct.basicProduct.name,
-                basicProductCode = confirmProduct.basicProduct.code,
-                quantity = confirmProduct.quantity
-            )
+            return releaseInfo.run {
+                OrderProductModel(
+                    orderId = orderId,
+                    orderCode = orderCode,
+                    orderNumbers = collectedOrders.map { it.orderNumber },
+                    releaseId = releaseId,
+                    releaseCode = releaseCode,
+                    basicProductName = confirmProduct.basicProduct.name,
+                    basicProductCode = confirmProduct.basicProduct.code,
+                    quantity = confirmProduct.quantity
+                )
+            }
         }
 
         private fun getCollectedOrders(releaseInfo: ReleaseInfo) =

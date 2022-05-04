@@ -4,10 +4,7 @@ import com.smartfoodnet.common.model.response.CommonResponse
 import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.fnproduct.release.model.request.ReOrderCreateModel
 import com.smartfoodnet.fnproduct.release.model.request.ReleaseInfoSearchCondition
-import com.smartfoodnet.fnproduct.release.model.response.OrderConfirmProductModel
-import com.smartfoodnet.fnproduct.release.model.response.OrderProductModel
-import com.smartfoodnet.fnproduct.release.model.response.PausedReleaseInfoModel
-import com.smartfoodnet.fnproduct.release.model.response.ReleaseInfoModel
+import com.smartfoodnet.fnproduct.release.model.response.*
 import com.smartfoodnet.fnproduct.release.model.vo.DeliveryAgency
 import io.swagger.annotations.Api
 import io.swagger.v3.oas.annotations.Operation
@@ -77,6 +74,22 @@ class ReleaseController(
                 releaseInfoService.getOrderProductsByOrderCode(orderCode)
             releaseCode != null ->
                 releaseInfoService.getOrderProductsByReleaseCode(releaseCode)
+            else ->
+                throw IllegalArgumentException("출고번호, 릴리즈코드 중 하나는 필수 값입니다.")
+        }
+    }
+
+    @Operation(summary = "중지된 출고상품 정보 리스트 조회")
+    @GetMapping("order-products/paused")
+    fun getPausedOrderProducts(
+        @Parameter(description = "출고번호") @RequestParam(required = false) orderCode: String? = null,
+        @Parameter(description = "릴리즈코드") @RequestParam(required = false) releaseCode: String? = null,
+    ): List<PausedOrderProductModel> {
+        return when {
+            orderCode != null ->
+                releaseInfoService.getPausedOrderProductsByOrderCode(orderCode)
+            releaseCode != null ->
+                releaseInfoService.getPausedOrderProductsByReleaseCode(releaseCode)
             else ->
                 throw IllegalArgumentException("출고번호, 릴리즈코드 중 하나는 필수 값입니다.")
         }
