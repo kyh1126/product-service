@@ -127,16 +127,6 @@ class BasicProductDetailCreateModelValidator(
     ) {
         with(expirationDateInfoModel) {
             when (expirationDateWriteYn) {
-                "Y" -> {
-                    if (manufactureDateWriteYn == "N") {
-                        validateNull(
-                            errors,
-                            "basicProductModel.expirationDateInfoModel.manufactureToExpirationDate",
-                            "유통기한(제조일+X일)",
-                            manufactureToExpirationDate
-                        )
-                    }
-                }
                 "N" -> {
                     if (manufactureDateWriteYn == "N" || manufactureToExpirationDate == null) {
                         errors.reject(
