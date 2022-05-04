@@ -66,7 +66,7 @@ class ReleaseInfoService(
         page: Pageable
     ): PageResponse<PausedReleaseInfoModel> {
         val releaseInfoPage = releaseInfoRepository.findAllByCondition(condition, page)
-        return releaseInfoPage.map(PausedReleaseInfoModel.Companion::fromEntity)
+        return releaseInfoPage.map(PausedReleaseInfoModel::fromEntity)
             .run { PageResponse.of(this) }
     }
 

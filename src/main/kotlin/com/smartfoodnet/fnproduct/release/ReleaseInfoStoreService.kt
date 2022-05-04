@@ -36,7 +36,6 @@ class ReleaseInfoStoreService(
     /**
      * 노스노스에서 응답 받은 데이터로 ReleaseInfo 엔티티를 생성하는 함수
      */
-    @Transactional
     fun createFromOrderInfo(partnerId: Long, orderInfo: PostOutboundModel) {
         releaseInfoRepository.save(orderInfo.toReleaseInfo(partnerId))
     }
@@ -53,7 +52,7 @@ class ReleaseInfoStoreService(
     ) {
         val (confirmOrder, targetReleaseInfoList) = orderReleaseInfoDto
 
-        val processedReleaseInfoList: List<ReleaseInfo> = releaseModels.map { model ->
+        val processedReleaseInfoList = releaseModels.mapNotNull { model ->
             val releaseInfoByReleaseId = targetReleaseInfoList.associateBy { it.releaseId }
             val releaseId = model.releaseId!!
             val releaseItemModels = itemModelsByReleaseId[releaseId] ?: emptyList()
@@ -88,7 +87,7 @@ class ReleaseInfoStoreService(
                     )
                 }
             }
-        }.filterNotNull()
+        }
 
         processPausedReleaseInfo(processedReleaseInfoList)
     }
@@ -126,13 +125,10 @@ class ReleaseInfoStoreService(
 
         targetMap.entries.forEach { (key, models) ->
             val (partnerId, storeCode) = key
-            val trackingOptionModel =
-                TrackingOptionModel(dataModelList = models.map(TrackingDataModel::fromModel))
-
             orderManagementServiceApiClient.sendTrackingNumber(
                 partnerId,
                 storeCode,
-                trackingOptionModel
+                TrackingOptionModel(models.map(TrackingDataModel::fromModel))
             )
         }
 
@@ -141,8 +137,19 @@ class ReleaseInfoStoreService(
         }
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    fun processReOrderResult(id: Long, nextOrderCode: String) {
+        val releaseInfo = getReleaseInfo(id)
+
+        releaseInfo.processNextOrderCode(nextOrderCode)
+
+        releaseInfoRepository.findByOrderCode(nextOrderCode).forEach { nextReleaseInfo ->
+            nextReleaseInfo.linkPreviousCodes(releaseInfo.orderCode, releaseInfo.releaseCode)
+        }
+    }
+
     fun pauseReleaseInfo(id: Long) {
-        val releaseInfo = releaseInfoRepository.findById(id).get()
+        val releaseInfo = getReleaseInfo(id)
         if (releaseInfo.releaseStatus != ReleaseStatus.BEFORE_RELEASE_REQUEST) {
             throw BaseRuntimeException(errorMessage = "출고요청전 상태인 경우만 출고중지가 가능합니다.")
         }
@@ -157,23 +164,12 @@ class ReleaseInfoStoreService(
     }
 
     fun cancelReleaseInfo(id: Long) {
-        val releaseInfo = releaseInfoRepository.findById(id).get()
+        val releaseInfo = getReleaseInfo(id)
         if (releaseInfo.releaseStatus != ReleaseStatus.RELEASE_PAUSED) {
             throw BaseRuntimeException(errorMessage = "출고중지 상태인 경우만 출고 철회가 가능합니다. id: ${id}")
         }
 
         releaseInfo.cancel()
-    }
-
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    fun processReOrderResult(id: Long, nextOrderCode: String) {
-        val releaseInfo = releaseInfoRepository.findById(id).get()
-
-        releaseInfo.processNextOrderCode(nextOrderCode)
-
-        releaseInfoRepository.findByOrderCode(nextOrderCode).forEach { nextReleaseInfo ->
-            nextReleaseInfo.linkPreviousCodes(releaseInfo.orderCode, releaseInfo.releaseCode)
-        }
     }
 
     private fun isNeedToBeUpdatedReleaseId(releaseInfoByReleaseId: Map<Long?, ReleaseInfo>) =
@@ -193,7 +189,7 @@ class ReleaseInfoStoreService(
         releaseModelDto: ReleaseModelDto,
         basicProductByShippingProductId: Map<Long, BasicProduct>
     ): ReleaseInfo? {
-        val targetReleaseInfo = releaseInfoRepository.findById(releaseInfoId).get()
+        val targetReleaseInfo = getReleaseInfo(releaseInfoId)
         targetReleaseInfo.updateReleaseId(releaseModelDto.releaseModel)
 
         return updateExistingReleaseId(
@@ -303,6 +299,8 @@ class ReleaseInfoStoreService(
         }
         return cancelOutboundsBy
     }
+
+    private fun getReleaseInfo(id: Long) = releaseInfoRepository.findById(id).get()
 
     companion object : Log
 }
