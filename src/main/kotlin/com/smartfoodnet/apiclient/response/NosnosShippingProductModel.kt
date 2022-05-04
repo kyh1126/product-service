@@ -6,6 +6,7 @@ import com.smartfoodnet.apiclient.dto.AddBarcode
 import com.smartfoodnet.fnproduct.product.model.ExpirationDateInfoExcelModel
 import com.smartfoodnet.fnproduct.product.model.request.*
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
+import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
 import com.smartfoodnet.fnproduct.product.model.vo.SeasonalOption
 
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy::class)
@@ -68,6 +69,7 @@ class NosnosShippingProductModel(
             it.name = productName
             it.barcodeYn = if (upc.isNullOrEmpty()) "N" else "Y"
             it.barcode = upc
+            it.handlingTemperature = HandlingTemperatureType.fromDesc(manageCode3)
             it.expirationDateManagementYn = isExpirationDateManagement(expirationDateInfoExcelModel)
             it.expirationDateInfoModel = expirationDateInfoExcelModel.toExpirationDateInfoCreateModel()
             it.singleDimensionCreateModel = SingleDimensionCreateModel.fromModel(this)

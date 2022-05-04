@@ -54,6 +54,7 @@ data class PreShippingProductModel(
                     productCode = code,
                     productName = name!!,
                     upc = barcode,
+                    manageCode3 = handlingTemperature?.desc,
                     singleWidth = singleDimension.width,
                     singleLength = singleDimension.length,
                     singleHeight = singleDimension.height,
