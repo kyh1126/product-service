@@ -8,4 +8,6 @@ interface CollectedOrderRepository : JpaRepository<CollectedOrder, Long>, Collec
     fun findAllByPartnerIdAndStatus(partnerId: Long, status: OrderStatus): List<CollectedOrder>?
     fun existsByOrderUniqueKey(uniqueKey: String) : Boolean
     fun findByPartnerIdAndOrderNumber(partnerId: Long, orderNumber: String) : List<CollectedOrder>
+    fun countByPartnerIdAndStatusAndUnprocessedIsFalse(partnerId: Long, status: OrderStatus) : Long
+    fun countByPartnerIdAndUnprocessedIsTrue(partnerId: Long) : Long
 }
