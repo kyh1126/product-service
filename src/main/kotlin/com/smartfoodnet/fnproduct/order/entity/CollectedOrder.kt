@@ -10,6 +10,7 @@ import java.time.LocalDateTime
 import javax.persistence.*
 
 @Entity
+@Table(indexes = [Index(name="idx_partnerid_status", columnList = "partnerId, status")])
 @DynamicUpdate
 class CollectedOrder(
     @Id
