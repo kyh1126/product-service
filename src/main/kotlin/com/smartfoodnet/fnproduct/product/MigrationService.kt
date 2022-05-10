@@ -27,6 +27,7 @@ class MigrationService(
     private val maxPageSize: Int,
     private val excelMapper: BasicProductExcelModelMapper,
     private val basicProductService: BasicProductService,
+    private val shippingProductArchiveRepository: ShippingProductArchiveRepository,
     private val partnerApiClient: PartnerApiClient,
     private val wmsApiClient: WmsApiClient
 ) {
@@ -162,6 +163,33 @@ class MigrationService(
 
                 start = end
             }
+        }
+    }
+
+    @Transactional
+    fun archiveShippingProducts(memberId: Long, startPage: Int, endPage: Int) {
+        val partnerModel = partnerApiClient.getPartner(memberId).payload!!
+
+        var page = startPage
+        var totalPage = endPage
+
+        while (page <= totalPage) {
+            val model: CommonDataListModel<NosnosShippingProductModel>
+            try {
+                model = wmsApiClient.getShippingProducts(BasicProductReadModel(memberId = memberId, page = page)).payload!!
+            } catch (e: Exception) {
+                log.error("[archiveShippingProducts] page: $page", e)
+                throw BaseRuntimeException(errorMessage = "출고상품 조회 실패, memberId: ${memberId}, page: ${page}")
+            }
+
+            if (totalPage == NOSNOS_INITIAL_PAGE) {
+                totalPage = model.totalPage.toInt()
+            }
+            val dataList = model.dataList
+
+            shippingProductArchiveRepository.saveAll(dataList.map { it.toShippingProductArchive(partnerModel.partnerId) })
+
+            page++
         }
     }
 

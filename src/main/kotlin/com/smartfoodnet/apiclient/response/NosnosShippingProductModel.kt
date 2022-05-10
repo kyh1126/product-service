@@ -3,6 +3,7 @@ package com.smartfoodnet.apiclient.response
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 import com.smartfoodnet.apiclient.dto.AddBarcode
+import com.smartfoodnet.fnproduct.product.entity.ShippingProductArchive
 import com.smartfoodnet.fnproduct.product.model.ExpirationDateInfoExcelModel
 import com.smartfoodnet.fnproduct.product.model.request.*
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
@@ -45,6 +46,16 @@ class NosnosShippingProductModel(
     val status: Int? = null,
     val addSalesProduct: Int? = null
 ) {
+    fun toShippingProductArchive(partnerId: Long): ShippingProductArchive {
+        return ShippingProductArchive(
+            partnerId = partnerId,
+            shippingProductId = shippingProductId,
+            productCode = productCode,
+            supplyCompanyId = supplyCompanyId,
+            categoryId = categoryId,
+        )
+    }
+
     fun toBasicProductDetailCreateModel(
         defaultBasicProductSubId: Long,
         partnerModel: PartnerIdPairModel

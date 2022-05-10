@@ -81,6 +81,20 @@ class MigrationController(private val migrationService: MigrationService) {
     // ---------------------------------------------------------------------------------------------
     // -- API
     // ---------------------------------------------------------------------------------------------
+    @Operation(summary = "[Step 0] API 로 출고상품 정보 아카이빙 작업")
+    @PostMapping("{memberId}/basic-products/archive")
+    fun archiveShippingProducts(
+        @Parameter(description = "member ID")
+        @PathVariable memberId: Long,
+        @Parameter(description = "시작 Page")
+        @RequestParam(required = false, defaultValue = "${NOSNOS_INITIAL_PAGE}") startPage: Int,
+        @Parameter(description = "끝 Page")
+        @RequestParam(required = false, defaultValue = "${NOSNOS_INITIAL_PAGE}") endPage: Int
+    ): CommonResponse<String> {
+        migrationService.archiveShippingProducts(memberId, startPage, endPage)
+        return CommonResponse(HttpStatus.OK.reasonPhrase)
+    }
+
     @Operation(summary = "[Step 1] API 로 기본상품 생성 작업")
     @PostMapping("{memberId}/basic-products")
     fun nosnosToBasicProducts(
