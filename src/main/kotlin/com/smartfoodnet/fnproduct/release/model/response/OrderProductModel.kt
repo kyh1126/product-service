@@ -37,13 +37,13 @@ data class OrderProductModel(
     var trackingNumberCreatedAt: LocalDateTime? = null,
 
     @ApiModelProperty(value = "기본상품 ID")
-    var basicProductId: Long? = null,
+    var basicProductId: Long,
 
     @ApiModelProperty(value = "출고상품명")
-    var basicProductName: String? = null,
+    var basicProductName: String,
 
     @ApiModelProperty(value = "출고상품코드")
-    var basicProductCode: String? = null,
+    var basicProductCode: String,
 
     @ApiModelProperty(value = "출고상품수량")
     var quantity: Int
@@ -67,9 +67,9 @@ data class OrderProductModel(
                     orderStatus = releaseStatus.orderStatus,
                     trackingNumber = trackingNumber,
                     trackingNumberCreatedAt = trackingNumberCreatedAt,
-                    basicProductId = releaseProduct.basicProduct.id,
-                    basicProductName = releaseProduct.basicProduct.name,
-                    basicProductCode = releaseProduct.basicProduct.code,
+                    basicProductId = releaseProduct.basicProduct.id!!,
+                    basicProductName = releaseProduct.basicProduct.name!!,
+                    basicProductCode = releaseProduct.basicProduct.code!!,
                     quantity = releaseProduct.quantity
                 )
             }
@@ -93,9 +93,9 @@ data class OrderProductModel(
                     orderStatus = releaseStatus.orderStatus,
                     trackingNumber = trackingNumber,
                     trackingNumberCreatedAt = trackingNumberCreatedAt,
-                    basicProductId = confirmProduct.basicProduct.id,
-                    basicProductName = confirmProduct.basicProduct.name,
-                    basicProductCode = confirmProduct.basicProduct.code,
+                    basicProductId = confirmProduct.basicProduct.id!!,
+                    basicProductName = confirmProduct.basicProduct.name!!,
+                    basicProductCode = confirmProduct.basicProduct.code!!,
                     quantity = confirmProduct.quantity
                 )
             }
