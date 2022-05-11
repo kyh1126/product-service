@@ -105,7 +105,7 @@ class ConfirmOrderService(
         for ((index, confirmOrder) in sendOrderList.withIndex()) {
             val orderInfo = response[index]
             confirmOrder.setOrderInfo(orderInfo.orderId, orderInfo.orderCode)
-            releaseInfoStoreService.createFromOrderInfo(partnerId, orderInfo)
+            releaseInfoStoreService.createFromOrderInfo(partnerId, orderInfo, confirmOrder)
         }
 
         return sendOrderList
