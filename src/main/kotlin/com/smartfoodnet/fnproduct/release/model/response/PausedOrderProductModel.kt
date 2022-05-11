@@ -1,9 +1,11 @@
 package com.smartfoodnet.fnproduct.release.model.response
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped
+import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
 import com.smartfoodnet.fnproduct.order.entity.ConfirmProduct
 import com.smartfoodnet.fnproduct.order.model.ReceiverModel
 import com.smartfoodnet.fnproduct.order.vo.OrderStatus
+import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
 import com.smartfoodnet.fnproduct.release.entity.ReleaseProduct
 import com.smartfoodnet.fnproduct.release.model.vo.PausedBy
@@ -60,7 +62,10 @@ data class PausedOrderProductModel(
     var basicProductCode: String,
 
     @ApiModelProperty(value = "출고상품수량")
-    var quantity: Int
+    var quantity: Int,
+
+    @ApiModelProperty(value = "상품별 주문수량")
+    var orderQuantity: Int
 ) {
     companion object {
         fun fromEntity(
@@ -88,7 +93,8 @@ data class PausedOrderProductModel(
                     basicProductId = releaseProduct.basicProduct.id!!,
                     basicProductName = releaseProduct.basicProduct.name!!,
                     basicProductCode = releaseProduct.basicProduct.code!!,
-                    quantity = releaseProduct.quantity
+                    quantity = releaseProduct.quantity,
+                    orderQuantity = getOrderQuantity(releaseProduct.basicProduct, collectedOrders)
                 )
             }
         }
@@ -118,7 +124,8 @@ data class PausedOrderProductModel(
                     basicProductId = confirmProduct.basicProduct.id!!,
                     basicProductName = confirmProduct.basicProduct.name!!,
                     basicProductCode = confirmProduct.basicProduct.code!!,
-                    quantity = confirmProduct.quantity
+                    quantity = confirmProduct.quantity,
+                    orderQuantity = getOrderQuantity(confirmProduct.basicProduct, collectedOrders)
                 )
             }
         }
@@ -126,5 +133,15 @@ data class PausedOrderProductModel(
         private fun getCollectedOrders(releaseInfo: ReleaseInfo) =
             releaseInfo.confirmOrder?.requestOrderList
                 ?.map { it.collectedOrder } ?: emptyList()
+
+        private fun getOrderQuantity(basicProduct: BasicProduct, collectedOrders: List<CollectedOrder>): Int {
+            var count = 0
+            collectedOrders.forEach {
+                if (it.confirmProductList.any { basicProduct.id == basicProduct.id }) {
+                    count += 1
+                }
+            }
+            return count
+        }
     }
 }

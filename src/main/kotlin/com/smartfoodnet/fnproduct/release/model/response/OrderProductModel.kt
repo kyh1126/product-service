@@ -1,5 +1,6 @@
 package com.smartfoodnet.fnproduct.release.model.response
 
+import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
 import com.smartfoodnet.fnproduct.order.entity.ConfirmProduct
 import com.smartfoodnet.fnproduct.order.vo.DeliveryType
 import com.smartfoodnet.fnproduct.order.vo.OrderStatus
@@ -46,7 +47,10 @@ data class OrderProductModel(
     var basicProductCode: String,
 
     @ApiModelProperty(value = "출고상품수량")
-    var quantity: Int
+    var quantity: Int,
+
+    @ApiModelProperty(value = "상품별 주문수량")
+    var orderQuantity: Int
 ) {
     companion object {
         fun fromEntity(
@@ -70,7 +74,8 @@ data class OrderProductModel(
                     basicProductId = releaseProduct.basicProduct.id!!,
                     basicProductName = releaseProduct.basicProduct.name!!,
                     basicProductCode = releaseProduct.basicProduct.code!!,
-                    quantity = releaseProduct.quantity
+                    quantity = releaseProduct.quantity,
+                    orderQuantity = getOrderQuantity(releaseProduct.basicProduct.id!!, collectedOrders)
                 )
             }
         }
@@ -96,7 +101,8 @@ data class OrderProductModel(
                     basicProductId = confirmProduct.basicProduct.id!!,
                     basicProductName = confirmProduct.basicProduct.name!!,
                     basicProductCode = confirmProduct.basicProduct.code!!,
-                    quantity = confirmProduct.quantity
+                    quantity = confirmProduct.quantity,
+                    orderQuantity = getOrderQuantity(confirmProduct.basicProduct.id!!, collectedOrders)
                 )
             }
         }
@@ -104,5 +110,18 @@ data class OrderProductModel(
         private fun getCollectedOrders(releaseInfo: ReleaseInfo) =
             releaseInfo.confirmOrder?.requestOrderList
                 ?.map { it.collectedOrder } ?: emptyList()
+
+        private fun getOrderQuantity(basicProductId: Long, collectedOrders: List<CollectedOrder>): Int {
+            var count = 0
+            collectedOrders.forEach {
+                if (containsBasicProduct(it, basicProductId)) {
+                    count += 1
+                }
+            }
+            return count
+        }
+
+        private fun containsBasicProduct(collectedOrder: CollectedOrder, basicProductId: Long) =
+            collectedOrder.confirmProductList.any { it.basicProduct.id == basicProductId }
     }
 }
