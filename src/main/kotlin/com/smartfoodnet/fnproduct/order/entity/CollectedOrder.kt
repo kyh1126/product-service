@@ -108,4 +108,7 @@ class CollectedOrder(
     fun clearConfirmProduct() {
         confirmProductList.clear()
     }
+
+    fun containsBasicProduct(basicProductId: Long) =
+        confirmProductList.any { it.basicProduct.id == basicProductId }
 }

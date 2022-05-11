@@ -114,14 +114,11 @@ data class OrderProductModel(
         private fun getOrderQuantity(basicProductId: Long, collectedOrders: List<CollectedOrder>): Int {
             var count = 0
             collectedOrders.forEach {
-                if (containsBasicProduct(it, basicProductId)) {
+                if (it.containsBasicProduct(basicProductId)) {
                     count += 1
                 }
             }
             return count
         }
-
-        private fun containsBasicProduct(collectedOrder: CollectedOrder, basicProductId: Long) =
-            collectedOrder.confirmProductList.any { it.basicProduct.id == basicProductId }
     }
 }

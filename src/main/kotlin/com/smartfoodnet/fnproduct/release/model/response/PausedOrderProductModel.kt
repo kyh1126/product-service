@@ -5,7 +5,6 @@ import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
 import com.smartfoodnet.fnproduct.order.entity.ConfirmProduct
 import com.smartfoodnet.fnproduct.order.model.ReceiverModel
 import com.smartfoodnet.fnproduct.order.vo.OrderStatus
-import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
 import com.smartfoodnet.fnproduct.release.entity.ReleaseProduct
 import com.smartfoodnet.fnproduct.release.model.vo.PausedBy
@@ -94,7 +93,7 @@ data class PausedOrderProductModel(
                     basicProductName = releaseProduct.basicProduct.name!!,
                     basicProductCode = releaseProduct.basicProduct.code!!,
                     quantity = releaseProduct.quantity,
-                    orderQuantity = getOrderQuantity(releaseProduct.basicProduct, collectedOrders)
+                    orderQuantity = getOrderQuantity(releaseProduct.basicProduct.id!!, collectedOrders)
                 )
             }
         }
@@ -125,7 +124,7 @@ data class PausedOrderProductModel(
                     basicProductName = confirmProduct.basicProduct.name!!,
                     basicProductCode = confirmProduct.basicProduct.code!!,
                     quantity = confirmProduct.quantity,
-                    orderQuantity = getOrderQuantity(confirmProduct.basicProduct, collectedOrders)
+                    orderQuantity = getOrderQuantity(confirmProduct.basicProduct.id!!, collectedOrders)
                 )
             }
         }
@@ -134,10 +133,10 @@ data class PausedOrderProductModel(
             releaseInfo.confirmOrder?.requestOrderList
                 ?.map { it.collectedOrder } ?: emptyList()
 
-        private fun getOrderQuantity(basicProduct: BasicProduct, collectedOrders: List<CollectedOrder>): Int {
+        private fun getOrderQuantity(basicProductId: Long, collectedOrders: List<CollectedOrder>): Int {
             var count = 0
             collectedOrders.forEach {
-                if (it.confirmProductList.any { basicProduct.id == basicProduct.id }) {
+                if (it.containsBasicProduct(basicProductId)) {
                     count += 1
                 }
             }
