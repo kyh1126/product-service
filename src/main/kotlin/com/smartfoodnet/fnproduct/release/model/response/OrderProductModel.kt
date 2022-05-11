@@ -36,6 +36,9 @@ data class OrderProductModel(
     @ApiModelProperty(value = "송장번호부여일시")
     var trackingNumberCreatedAt: LocalDateTime? = null,
 
+    @ApiModelProperty(value = "기본상품 ID")
+    var basicProductId: Long? = null,
+
     @ApiModelProperty(value = "출고상품명")
     var basicProductName: String? = null,
 
@@ -64,6 +67,7 @@ data class OrderProductModel(
                     orderStatus = releaseStatus.orderStatus,
                     trackingNumber = trackingNumber,
                     trackingNumberCreatedAt = trackingNumberCreatedAt,
+                    basicProductId = releaseProduct.basicProduct.id,
                     basicProductName = releaseProduct.basicProduct.name,
                     basicProductCode = releaseProduct.basicProduct.code,
                     quantity = releaseProduct.quantity
@@ -89,6 +93,7 @@ data class OrderProductModel(
                     orderStatus = releaseStatus.orderStatus,
                     trackingNumber = trackingNumber,
                     trackingNumberCreatedAt = trackingNumberCreatedAt,
+                    basicProductId = confirmProduct.basicProduct.id,
                     basicProductName = confirmProduct.basicProduct.name,
                     basicProductCode = confirmProduct.basicProduct.code,
                     quantity = confirmProduct.quantity

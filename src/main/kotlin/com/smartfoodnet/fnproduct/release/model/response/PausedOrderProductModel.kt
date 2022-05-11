@@ -50,6 +50,9 @@ data class PausedOrderProductModel(
     @ApiModelProperty(value = "재출고 출고번호")
     var nextOrderCode: String? = null,
 
+    @ApiModelProperty(value = "기본상품 ID")
+    var basicProductId: Long? = null,
+
     @ApiModelProperty(value = "출고상품명")
     var basicProductName: String? = null,
 
@@ -82,6 +85,7 @@ data class PausedOrderProductModel(
                     pausedBy = pausedBy,
                     previousOrderCode = previousOrderCode,
                     nextOrderCode = nextOrderCode,
+                    basicProductId = releaseProduct.basicProduct.id,
                     basicProductName = releaseProduct.basicProduct.name,
                     basicProductCode = releaseProduct.basicProduct.code,
                     quantity = releaseProduct.quantity
@@ -111,6 +115,7 @@ data class PausedOrderProductModel(
                     pausedBy = pausedBy,
                     previousOrderCode = previousOrderCode,
                     nextOrderCode = nextOrderCode,
+                    basicProductId = confirmProduct.basicProduct.id,
                     basicProductName = confirmProduct.basicProduct.name,
                     basicProductCode = confirmProduct.basicProduct.code,
                     quantity = confirmProduct.quantity
