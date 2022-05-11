@@ -36,8 +36,8 @@ class ReleaseInfoStoreService(
     /**
      * 노스노스에서 응답 받은 데이터로 ReleaseInfo 엔티티를 생성하는 함수
      */
-    fun createFromOrderInfo(partnerId: Long, orderInfo: PostOutboundModel) {
-        releaseInfoRepository.save(orderInfo.toReleaseInfo(partnerId))
+    fun createFromOrderInfo(partnerId: Long, orderInfo: PostOutboundModel, confirmOrder: ConfirmOrder) {
+        releaseInfoRepository.save(orderInfo.toReleaseInfo(partnerId, confirmOrder))
     }
 
     /**
