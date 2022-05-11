@@ -73,7 +73,7 @@ class BasicProductService(
         val basicProduct = getBasicProducts(listOf(productId)).first()
         // 기본상품-부자재 매핑을 위한 부자재(BasicProduct) 조회
         val subsidiaryMaterialById =
-            getBasicProducts(basicProduct.subsidiaryMaterialMappings.map { it.subsidiaryMaterial.id!! })
+            getBasicProducts(basicProduct.subsidiaryMaterialMappings.map { it.subsidiaryMaterial.id })
                 .associateBy { it.id }
 
         return toBasicProductDetailModel(basicProduct, subsidiaryMaterialById)
@@ -321,7 +321,7 @@ class BasicProductService(
     private fun createOrUpdateSubsidiaryMaterialMappings(
         subsidiaryMaterialMappingModels: List<SubsidiaryMaterialMappingCreateModel>,
         entityById: Map<Long?, SubsidiaryMaterialMapping> = emptyMap(),
-        subsidiaryMaterialById: Map<Long?, BasicProduct>,
+        subsidiaryMaterialById: Map<Long, BasicProduct>,
     ): Set<SubsidiaryMaterialMapping> {
         val subsidiaryMaterialMappings = subsidiaryMaterialMappingModels.map {
             val basicProductSub = subsidiaryMaterialById[it.subsidiaryMaterialId]
@@ -347,7 +347,7 @@ class BasicProductService(
     ) {
         if (request.activeYn == "Y") return
 
-        packageProductFinder.getPackageProductByBasicProduct(basicProduct.id!!)?.let {
+        packageProductFinder.getPackageProductByBasicProduct(basicProduct.id)?.let {
             if (it.activeYn == "N") return
             it.inactivate()
             log.info("기본상품(${basicProduct.id})에 의한 모음상품(${it.id}) 비활성화")
@@ -356,7 +356,7 @@ class BasicProductService(
 
     private fun toBasicProductDetailModel(
         basicProduct: BasicProduct,
-        subsidiaryMaterialById: Map<Long?, BasicProduct>,
+        subsidiaryMaterialById: Map<Long, BasicProduct>,
     ): BasicProductDetailModel {
         return BasicProductDetailModel.fromEntity(basicProduct, subsidiaryMaterialById)
     }

@@ -15,7 +15,7 @@ data class BasicProductDetailModel(
     companion object {
         fun fromEntity(
             basicProduct: BasicProduct,
-            subsidiaryMaterialById: Map<Long?, BasicProduct>,
+            subsidiaryMaterialById: Map<Long, BasicProduct>,
         ): BasicProductDetailModel {
             return basicProduct.run {
                 BasicProductDetailModel(

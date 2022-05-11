@@ -24,22 +24,23 @@ class BasicProductPackageCreateModel {
 
     @field:NotEmpty
     @ApiModelProperty(value = "상품명")
-    val name: String? = null
+    lateinit var name: String
 
     @ApiModelProperty(value = "활성화여부 (default: Y)", allowableValues = "Y,N")
     val activeYn: String = "Y"
 
     fun toEntity(code: String): BasicProduct {
         return BasicProduct(
-            type = BasicProductType.PACKAGE,
             partnerId = partnerId,
-            name = name,
             code = code,
             handlingTemperature = HandlingTemperatureType.MIX,
             expirationDateInfo = ExpirationDateInfo.default,
             activeYn = activeYn,
             singleDimension = SingleDimension.default,
             boxDimension = BoxDimension.default
-        )
+        ).also {
+            it.type = BasicProductType.PACKAGE
+            it.name = name
+        }
     }
 }

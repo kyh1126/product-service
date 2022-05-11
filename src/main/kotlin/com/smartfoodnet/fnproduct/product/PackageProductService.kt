@@ -42,7 +42,7 @@ class PackageProductService(
 
         // 모음상품-기본상품 매핑을 위한 기본상품(BasicProduct) 조회
         val basicProductById =
-            basicProductService.getBasicProducts(packageProduct.packageProductMappings.map { it.selectedBasicProduct.id!! })
+            basicProductService.getBasicProducts(packageProduct.packageProductMappings.map { it.selectedBasicProduct.id })
                 .associateBy { it.id }
 
         return toPackageProductDetailModel(packageProduct, basicProductById)
@@ -96,7 +96,7 @@ class PackageProductService(
 
         val packageProduct = getPackageProductByProductId(productId)
         with(updateModel.packageProductModel) {
-            packageProduct.update(name!!, activeYn)
+            packageProduct.update(name, activeYn)
         }
 
         val basicProductById =
@@ -111,7 +111,7 @@ class PackageProductService(
 
     private fun createPackageProductMappings(
         packageProductMappingModels: List<PackageProductMappingCreateModel>,
-        basicProductById: Map<Long?, BasicProduct>,
+        basicProductById: Map<Long, BasicProduct>,
     ): Set<PackageProductMapping> {
         return packageProductMappingModels.map {
             val selectedBasicProduct = basicProductById[it.basicProductId]
@@ -122,7 +122,7 @@ class PackageProductService(
 
     private fun toPackageProductDetailModel(
         packageProduct: BasicProduct,
-        basicProductById: Map<Long?, BasicProduct>,
+        basicProductById: Map<Long, BasicProduct>,
     ) = PackageProductDetailModel.fromEntity(packageProduct, basicProductById)
 
 }

@@ -59,9 +59,9 @@ class BasicProductDetailCreateModelValidator(
         errors: Errors
     ) {
         with(target) {
-            if (name == null || partnerId == null) return
+            if (partnerId == null) return
 
-            basicProductRepository.findByPartnerIdAndName(partnerId!!, name!!)?.let {
+            basicProductRepository.findByPartnerIdAndName(partnerId!!, name)?.let {
                 if (saveState == SaveState.UPDATE && it.id == id) return
 
                 errors.rejectValue(
