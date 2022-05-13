@@ -2,10 +2,11 @@ package com.smartfoodnet.fnproduct.claim.model
 
 import com.smartfoodnet.fnproduct.claim.entity.ReturnProduct
 import com.smartfoodnet.fnproduct.product.model.response.BasicProductModel
+import com.smartfoodnet.fnproduct.product.model.response.BasicProductSimpleModel
 
 data class ReturnProductModel(
     var id: Long? = null,
-    var basicProduct: BasicProductModel,
+    var basicProduct: BasicProductSimpleModel,
     var requestQuantity: Int,
     var inboundQuantity: Int? = null,
     var discardedQuantity: Int? = null,
@@ -15,7 +16,7 @@ data class ReturnProductModel(
             return returnProduct.run {
                 ReturnProductModel(
                     id = id,
-                    basicProduct = BasicProductModel.fromEntity(basicProduct),
+                    basicProduct = BasicProductSimpleModel.fromEntity(basicProduct),
                     requestQuantity = requestQuantity,
                     inboundQuantity = inboundQuantity,
                     discardedQuantity = discardedQuantity
