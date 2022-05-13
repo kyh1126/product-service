@@ -89,7 +89,7 @@ class ClaimService(
             try {
                 wmsApiClient.cancelReleaseReturn(it)
             } catch (e: FeignException) {
-                throw UserRequestError(errorMessage = "반품이 취소가 불가능 합니다. \n ${e.message}")
+                throw UserRequestError(errorMessage = "반품이 취소가 불가능 합니다. ${e.message}")
             }
         } ?: throw NoSuchElementError("반품정보가 존재하지 않습니다.")
 
