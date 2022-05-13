@@ -2,6 +2,7 @@ package com.smartfoodnet.fninventory.stock
 
 import com.smartfoodnet.common.model.response.CommonResponse
 import com.smartfoodnet.common.model.response.PageResponse
+import com.smartfoodnet.fninventory.stock.model.AvailableStockModel
 import com.smartfoodnet.fninventory.stock.model.BasicProductStockModel
 import com.smartfoodnet.fninventory.stock.model.DailyStockSummaryModel
 import com.smartfoodnet.fninventory.stock.model.StockByBestBeforeModel
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 
@@ -86,5 +88,14 @@ class StockController(
     ): CommonResponse<Unit> {
         stockScheduledService.syncStocksByBestBefore()
         return CommonResponse()
+    }
+
+    @Operation(summary = "기본상품 가용재고 조회")
+    @GetMapping("basic-product/available/partner/{partnerId}")
+    fun getBasicProductAvailableStock(
+        @PathVariable partnerId: Long,
+        @RequestParam("ids") ids : HashSet<Long>
+    ) : List<AvailableStockModel>{
+        return stockService.getBasicProductStocks(partnerId, ids)
     }
 }

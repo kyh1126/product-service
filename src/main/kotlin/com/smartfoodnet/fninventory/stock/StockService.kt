@@ -1,9 +1,11 @@
 package com.smartfoodnet.fninventory.stock
 
 import com.smartfoodnet.apiclient.WmsApiClient
+import com.smartfoodnet.common.Constants
 import com.smartfoodnet.common.model.request.PredicateSearchCondition
 import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.common.utils.Log
+import com.smartfoodnet.fninventory.stock.model.AvailableStockModel
 import com.smartfoodnet.fninventory.stock.model.BasicProductStockModel
 import com.smartfoodnet.fninventory.stock.model.DailyStockSummaryModel
 import com.smartfoodnet.fninventory.stock.model.StockByBestBeforeModel
@@ -13,6 +15,8 @@ import com.smartfoodnet.fninventory.stock.support.StockByBestBeforeSearchConditi
 import com.smartfoodnet.fnproduct.order.OrderService
 import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import com.smartfoodnet.fnproduct.product.BasicProductRepository
+import com.smartfoodnet.fnproduct.product.BasicProductUtils
+import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -54,6 +58,27 @@ class StockService(
         }
 
         return PageResponse.of(basicProductStockModels)
+    }
+
+    fun getBasicProductStocks(
+        partnerId: Long,
+        ids: Collection<Long>
+    ) : List<AvailableStockModel>{
+        val basicProductList : Map<Long, BasicProduct> = basicProductRepository.findAllById(ids).associateBy { it.id!! }
+        val stocks : List<AvailableStockModel> = basicProductList.map {
+            val availableStockModel = AvailableStockModel(it.key)
+            val expandedBasicProducts = BasicProductUtils.expandPackageProducts(it.value)
+            availableStockModel.stock = getMinStocks(partnerId, expandedBasicProducts)
+            availableStockModel
+        }
+
+        return stocks
+    }
+
+    private fun getMinStocks(partnerId: Long, basicProductList : List<BasicProduct>) : Int {
+        val shippingProductIds = basicProductList.mapNotNull{ it.shippingProductId }
+        val stocks = wmsApiClient.getStocks(partnerId, shippingProductIds).payload?.dataList ?: listOf()
+        return if (stocks.isEmpty()) 0 else stocks.minOf { it.normalStock ?: 0 }
     }
 
     fun getStocksByBestBefore(
