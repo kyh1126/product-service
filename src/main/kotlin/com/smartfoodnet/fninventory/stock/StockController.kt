@@ -94,7 +94,7 @@ class StockController(
     @GetMapping("basic-product/available/partner/{partnerId}")
     fun getBasicProductAvailableStock(
         @PathVariable partnerId: Long,
-        @RequestParam("ids") ids : HashSet<Long>
+        @RequestParam("ids") ids : List<Long>
     ) : List<AvailableStockModel>{
         return stockService.getBasicProductStocks(partnerId, ids)
     }
