@@ -8,32 +8,24 @@ import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 class BasicProductAvailableStock(
     val baseBasicProduct: BasicProduct
 ) {
-    var stock: Long = 0
+    var stock: Int = 0
 
     val isPackage: Boolean = baseBasicProduct.type == BasicProductType.PACKAGE
 
-    val subBasicProduct: List<BasicProduct>
-        get() = expandPackageProducts()
-
-    private val packageProductMappings: List<PackageProductMapping>
-        get() = baseBasicProduct.packageProductMappings.toList()
-
-    val nosnosStockModel: MutableList<NosnosStockModel> = mutableListOf()
-
-    private fun expandPackageProducts(): List<BasicProduct> {
+    fun getSubBasicProduct(): List<BasicProduct> {
         return when (baseBasicProduct.type) {
-            BasicProductType.PACKAGE -> getBasicProduct(baseBasicProduct.packageProductMappings)
+            BasicProductType.PACKAGE -> getBasicProductFromPackage(baseBasicProduct.packageProductMappings)
             else -> listOf()
         }
     }
 
-    private fun getBasicProduct(packageProductList: Collection<PackageProductMapping>): List<BasicProduct> {
+    fun getBasicProductFromPackage(packageProductList: Collection<PackageProductMapping>): List<BasicProduct> {
         return packageProductList.map { it.selectedBasicProduct }
     }
 
-    private fun getMinStocks(): Int {
-        return if (isPackage) {
-            packageProductMappings.map {
+    fun calcMinStocks(nosnosStockModel : List<NosnosStockModel>) {
+        stock = if (isPackage) {
+            baseBasicProduct.packageProductMappings.toList().map {
                 val orderQuantity: Int = nosnosStockModel
                     .find { stock -> stock.shippingProductId == it.selectedBasicProduct.shippingProductId }?.normalStock
                     ?: 0
@@ -45,6 +37,6 @@ class BasicProductAvailableStock(
     }
 
     fun toDto() : AvailableStockModel{
-        return AvailableStockModel(baseBasicProduct.id!!, getMinStocks())
+        return AvailableStockModel(baseBasicProduct.id!!, stock)
     }
 }
