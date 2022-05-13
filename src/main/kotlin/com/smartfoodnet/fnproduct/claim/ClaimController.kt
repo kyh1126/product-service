@@ -2,6 +2,7 @@ package com.smartfoodnet.fnproduct.claim
 
 import com.smartfoodnet.common.model.response.CommonResponse
 import com.smartfoodnet.common.model.response.PageResponse
+import com.smartfoodnet.fnproduct.claim.model.ClaimCancelModel
 import com.smartfoodnet.fnproduct.claim.model.ClaimCreateModel
 import com.smartfoodnet.fnproduct.claim.model.ClaimModel
 import com.smartfoodnet.fnproduct.claim.model.ExchangeReleaseCreateModel
@@ -28,7 +29,7 @@ class ClaimController(
         @Parameter(description = "검색조건")
         @ModelAttribute condition: ClaimSearchCondition,
         @PageableDefault(size = 50, sort = ["id"], direction = Sort.Direction.DESC) page: Pageable,
-    ): PageResponse<ClaimModel>{
+    ): PageResponse<ClaimModel> {
         return PageResponse.of(claimService.findClaims(condition, page))
     }
 
@@ -46,23 +47,24 @@ class ClaimController(
     @PostMapping("claim")
     fun createClaim(
         @RequestBody claimCreateModel: ClaimCreateModel
-    ){
-        claimService.createClaim(claimCreateModel)
+    ): ClaimModel {
+        return claimService.createClaim(claimCreateModel)
     }
 
     @Operation(summary = "클레임 취소")
     @PostMapping("claim:cancel")
     fun cancelClaim(
-        @RequestBody claimId: Long
-    ){
-        claimService.cancelClaim(claimId)
+        @RequestBody claimCancelModel: ClaimCancelModel
+    ): CommonResponse<String> {
+        claimService.cancelClaim(claimCancelModel)
+        return CommonResponse(HttpStatus.OK.reasonPhrase)
     }
 
     @Operation(summary = "교환출고 등록")
     @PostMapping("exchangeRelease")
     fun createExchangeRelease(
         @RequestBody exchangeReleaseCreateModel: ExchangeReleaseCreateModel
-    ){
+    ) {
         claimService.createExchangeRelease(exchangeReleaseCreateModel)
     }
 }

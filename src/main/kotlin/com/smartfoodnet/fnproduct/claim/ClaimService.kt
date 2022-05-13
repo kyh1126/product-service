@@ -12,6 +12,7 @@ import com.smartfoodnet.common.error.exception.UserRequestError
 import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.fnproduct.claim.entity.*
 import com.smartfoodnet.fnproduct.claim.entity.QClaim.claim
+import com.smartfoodnet.fnproduct.claim.model.ClaimCancelModel
 import com.smartfoodnet.fnproduct.claim.model.ClaimCreateModel
 import com.smartfoodnet.fnproduct.claim.model.ClaimModel
 import com.smartfoodnet.fnproduct.claim.model.ExchangeReleaseCreateModel
@@ -54,12 +55,12 @@ class ClaimService(
     }
 
     @Transactional
-    fun createClaim(claimCreateModel: ClaimCreateModel) {
+    fun createClaim(claimCreateModel: ClaimCreateModel): ClaimModel {
         val claim = buildClaim(claimCreateModel)
 
         sendReleaseReturn(claim)
 
-        claimRepository.save(claim)
+        return ClaimModel.from(claimRepository.save(claim))
     }
 
     @Transactional
@@ -81,8 +82,8 @@ class ClaimService(
     }
 
     @Transactional
-    fun cancelClaim(claimId: Long) {
-        val claim = claimRepository.findByIdOrNull(claimId) ?: throw NoSuchElementError("Claim이 존재하지 않습니다: [claimId:$claimId]")
+    fun cancelClaim(claimCancelModel: ClaimCancelModel) {
+        val claim = claimRepository.findByIdAndPartnerId(claimCancelModel.claimId, claimCancelModel.partnerId) ?: throw NoSuchElementError("Claim이 존재하지 않습니다: [claimId:${claimCancelModel.claimId}]")
 
         claim.returnInfo?.nosnosReleaseReturnInfoId?.let {
             try {
