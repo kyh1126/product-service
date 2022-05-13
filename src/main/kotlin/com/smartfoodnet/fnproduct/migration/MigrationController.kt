@@ -1,4 +1,4 @@
-package com.smartfoodnet.fnproduct.product
+package com.smartfoodnet.fnproduct.migration
 
 import com.smartfoodnet.common.Constants.NOSNOS_INITIAL_PAGE
 import com.smartfoodnet.common.model.response.CommonResponse
@@ -18,6 +18,7 @@ class MigrationController(private val migrationService: MigrationService) {
     // ---------------------------------------------------------------------------------------------
     // -- 출고상품 엑셀
     // ---------------------------------------------------------------------------------------------
+    @java.lang.Deprecated(forRemoval = true)
     @Operation(summary = "[Step 1] 출고상품 엑셀로 기본상품 생성 작업")
     @PostMapping(value = ["excel/basic-products"], consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     fun excelToBasicProducts(
@@ -30,6 +31,7 @@ class MigrationController(private val migrationService: MigrationService) {
         return CommonResponse(HttpStatus.OK.reasonPhrase)
     }
 
+    @java.lang.Deprecated(forRemoval = true)
     @Operation(summary = "[Step 2] 출고상품 엑셀로 출고상품 product-code 업데이트 작업")
     @PostMapping(value = ["excel/product-codes"], consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     fun updateProductCodes(
@@ -46,6 +48,7 @@ class MigrationController(private val migrationService: MigrationService) {
         return CommonResponse(HttpStatus.OK.reasonPhrase)
     }
 
+    @java.lang.Deprecated(forRemoval = true)
     @Operation(summary = "[Step 3] 출고상품 엑셀로 판매상품 생성 작업")
     @PostMapping(value = ["excel/sales-products"], consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     fun createNosnosSalesProducts(
@@ -62,6 +65,7 @@ class MigrationController(private val migrationService: MigrationService) {
         return CommonResponse(HttpStatus.OK.reasonPhrase)
     }
 
+    @java.lang.Deprecated(forRemoval = true)
     @Operation(summary = "[Step 4] 출고상품 엑셀로 기존 출고상품-판매상품 연결 작업")
     @PostMapping(value = ["excel/mappings"], consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     fun createProductMappings(
@@ -103,9 +107,10 @@ class MigrationController(private val migrationService: MigrationService) {
         @Parameter(description = "시작 Page")
         @RequestParam(required = false, defaultValue = "${NOSNOS_INITIAL_PAGE}") startPage: Int,
         @Parameter(description = "끝 Page")
-        @RequestParam(required = false, defaultValue = "${NOSNOS_INITIAL_PAGE}") endPage: Int
+        @RequestParam(required = false, defaultValue = "${NOSNOS_INITIAL_PAGE}") endPage: Int,
+        @Parameter(description = "테스트 여부") @RequestParam(required = false) isTest: Boolean = false
     ): CommonResponse<String> {
-        migrationService.nosnosToBasicProducts(memberId, startPage, endPage)
+        migrationService.nosnosToBasicProducts(memberId, startPage, endPage, isTest)
         return CommonResponse(HttpStatus.OK.reasonPhrase)
     }
 

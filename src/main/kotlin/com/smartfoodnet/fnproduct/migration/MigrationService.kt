@@ -1,4 +1,4 @@
-package com.smartfoodnet.fnproduct.product
+package com.smartfoodnet.fnproduct.migration
 
 import com.smartfoodnet.apiclient.PartnerApiClient
 import com.smartfoodnet.apiclient.WmsApiClient
@@ -8,6 +8,9 @@ import com.smartfoodnet.apiclient.response.NosnosShippingProductModel
 import com.smartfoodnet.common.Constants.NOSNOS_INITIAL_PAGE
 import com.smartfoodnet.common.error.exception.BaseRuntimeException
 import com.smartfoodnet.common.utils.Log
+import com.smartfoodnet.fnproduct.migration.dto.NosnosShippingProductTestModel
+import com.smartfoodnet.fnproduct.product.BasicProductService
+import com.smartfoodnet.fnproduct.product.ShippingProductArchiveRepository
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.product.mapper.BasicProductExcelModelMapper
 import com.smartfoodnet.fnproduct.product.model.BasicProductExcelModel
@@ -21,7 +24,7 @@ import sfn.excel.module.workbook.read.ExcelReadUtils
 import kotlin.math.min
 
 @Service
-@Transactional(readOnly = true)
+@Transactional
 class MigrationService(
     @Value("\${spring.data.web.pageable.max-page-size:50}")
     private val maxPageSize: Int,
@@ -34,7 +37,6 @@ class MigrationService(
     private val defaultSubsidiaryMaterialName = "없음"
     private val nosnosMaxRequestSize = 100
 
-    @Transactional
     fun excelToBasicProducts(fileName: String?, file: MultipartFile?) {
         val defaultSubsidiaryMaterialId = getDefaultSubsidiaryMaterialId()
         val partnerModelMap =
@@ -50,7 +52,6 @@ class MigrationService(
         }
     }
 
-    @Transactional
     fun updateProductCodes(fileName: String?, file: MultipartFile?, startIdx: Int?, endIdx: Int?) {
         val basicProductExcelModels = getBasicProductExcelModel(fileName, file, startIdx, endIdx)
         val rowIdxList = basicProductExcelModels.associate { it.shippingProductId to it.rowIdx }
@@ -82,7 +83,6 @@ class MigrationService(
         }
     }
 
-    @Transactional
     fun createNosnosSalesProducts(
         fileName: String?,
         file: MultipartFile?,
@@ -128,7 +128,6 @@ class MigrationService(
         }
     }
 
-    @Transactional
     fun createProductMappings(
         fileName: String?,
         file: MultipartFile?,
@@ -166,7 +165,9 @@ class MigrationService(
         }
     }
 
-    @Transactional
+    /**
+     * Step 0
+     */
     fun archiveShippingProducts(memberId: Long, startPage: Int, endPage: Int) {
         val partnerModel = partnerApiClient.getPartner(memberId).payload!!
 
@@ -176,7 +177,9 @@ class MigrationService(
         while (page <= totalPage) {
             val model: CommonDataListModel<NosnosShippingProductModel>
             try {
-                model = wmsApiClient.getShippingProducts(BasicProductReadModel(memberId = memberId, page = page)).payload!!
+                model = wmsApiClient.getShippingProducts(
+                    BasicProductReadModel(memberId = memberId, status = 1, page = page)
+                ).payload!!
             } catch (e: Exception) {
                 log.error("[archiveShippingProducts] page: $page", e)
                 throw BaseRuntimeException(errorMessage = "출고상품 조회 실패, memberId: ${memberId}, page: ${page}")
@@ -187,14 +190,18 @@ class MigrationService(
             }
             val dataList = model.dataList
 
-            shippingProductArchiveRepository.saveAll(dataList.map { it.toShippingProductArchive(partnerModel.partnerId) })
+            shippingProductArchiveRepository.saveAll(
+                dataList.map { it.toShippingProductArchive(partnerModel.partnerId) }
+            )
 
             page++
         }
     }
 
-    @Transactional
-    fun nosnosToBasicProducts(memberId: Long, startPage: Int, endPage: Int) {
+    /**
+     * Step 1
+     */
+    fun nosnosToBasicProducts(memberId: Long, startPage: Int, endPage: Int, isTest: Boolean) {
         val defaultSubsidiaryMaterialId = getDefaultSubsidiaryMaterialId()
         val partnerModel = partnerApiClient.getPartner(memberId).payload!!
 
@@ -204,7 +211,9 @@ class MigrationService(
         while (page <= totalPage) {
             val model: CommonDataListModel<NosnosShippingProductModel>
             try {
-                model = wmsApiClient.getShippingProducts(BasicProductReadModel(memberId = memberId, page = page)).payload!!
+                model = wmsApiClient.getShippingProducts(
+                    BasicProductReadModel(memberId = memberId, status = 1, page = page)
+                ).payload!!
             } catch (e: Exception) {
                 log.error("[nosnosToBasicProducts] page: $page", e)
                 throw BaseRuntimeException(errorMessage = "출고상품 생성 실패, memberId: ${memberId}, page: ${page}")
@@ -217,35 +226,54 @@ class MigrationService(
 
             dataList.forEach {
                 basicProductService.createBasicProductWithNosnosMigration(
-                    it.toBasicProductDetailCreateModel(defaultSubsidiaryMaterialId, partnerModel)
+                    when (isTest) {
+                        true -> NosnosShippingProductTestModel().toBasicProductDetailCreateModel(
+                            it,
+                            defaultSubsidiaryMaterialId,
+                            partnerModel
+                        )
+                        false -> it.toBasicProductDetailCreateModel(
+                            it,
+                            defaultSubsidiaryMaterialId,
+                            partnerModel
+                        )
+                    }
                 )
             }
             page++
         }
     }
 
-    @Transactional
+    /**
+     * Step 2
+     */
     fun updateProductCodes(memberId: Long, shippingProductIds: List<Long>?) {
         val basicProducts: List<BasicProduct>
         val partnerId = partnerApiClient.getPartner(memberId).payload!!.partnerId
 
         basicProducts =
-            if (shippingProductIds.isNullOrEmpty()) basicProductService.updateProductCodeByPartnerId(partnerId)
-            else shippingProductIds.map { basicProductService.updateProductCode(it) }
+            if (shippingProductIds.isNullOrEmpty()) basicProductService.getBasicProductsByPartnerId(partnerId)
+            else basicProductService.getBasicProductsByShippingProductIds(shippingProductIds)
 
         // nosnos 쪽 출고상품 productCode 업데이트
-        log.info("[updateProductCodes] basicProductIds: ${basicProducts.map { it.id!! }}, shippingProductIds: ${basicProducts.map { it.shippingProductId!! }}")
-        wmsApiClient.updateShippingProducts(
-            CommonCreateBulkModel(
-                partnerId = partnerId,
-                requestDataList = basicProducts.map {
-                    PreShippingProductSimpleModel.fromEntity(it)
-                }
-            )
-        )
+        basicProducts.chunked(100).forEach { targetBasicProducts ->
+            try {
+                wmsApiClient.updateShippingProducts(
+                    CommonCreateBulkModel(
+                        partnerId = partnerId,
+                        requestDataList = targetBasicProducts.map(PreShippingProductSimpleModel::fromEntity)
+                    )
+                )
+                targetBasicProducts.forEach { it.updateProductCode(it.code!!) }
+            } catch (e: Exception) {
+                log.error("[updateProductCodes] shippingProductIds: ${targetBasicProducts.map { it.shippingProductId }}", e)
+            }
+        }
     }
 
-    @Transactional
+    /**
+     * Step 3
+     */
     fun createNosnosSalesProducts(memberId: Long, shippingProductIds: List<Long>?) {
         val basicProducts: List<BasicProduct>
         val partnerId = partnerApiClient.getPartner(memberId).payload!!.partnerId
@@ -254,24 +282,32 @@ class MigrationService(
             if (shippingProductIds.isNullOrEmpty()) basicProductService.getBasicProductsByPartnerId(partnerId)
             else basicProductService.getBasicProductsByShippingProductIds(shippingProductIds)
 
-        // nosnos 쪽 판매상품 일괄 등록
-        log.info("[createNosnosSalesProducts] basicProductIds: ${basicProducts.map { it.id!! }}, shippingProductIds: ${basicProducts.map { it.shippingProductId!! }}")
-        val postSalesProductModels = wmsApiClient.createSalesProducts(
-            CommonCreateBulkModel(
-                partnerId = partnerId,
-                requestDataList = basicProducts.map { PreSalesProductModel.fromEntity(it) }
-            )
-        ).payload?.processedDataList
-
-        // 판매상품 id 업데이트
         val basicProductBySalesProductCode = basicProducts.associateBy { it.salesProductCode }
-        postSalesProductModels?.forEach {
-            val basicProduct = basicProductBySalesProductCode[it.salesProductCode]
-            basicProduct?.updateSalesProductId(it.salesProductId)
+
+        // nosnos 쪽 판매상품 일괄 등록
+        basicProducts.chunked(100).forEach { targetBasicProducts ->
+            try {
+                val postSalesProductModels = wmsApiClient.createSalesProducts(
+                    CommonCreateBulkModel(
+                        partnerId = partnerId,
+                        requestDataList = targetBasicProducts.map(PreSalesProductModel::fromEntity)
+                    )
+                ).payload?.processedDataList
+
+                // 판매상품 id 업데이트
+                postSalesProductModels?.forEach {
+                    val basicProduct = basicProductBySalesProductCode[it.salesProductCode]
+                    basicProduct?.updateSalesProductId(it.salesProductId)
+                }
+            } catch (e: Exception) {
+                log.error("[createNosnosSalesProducts] shippingProductIds: ${targetBasicProducts.map { it.shippingProductId }}", e)
+            }
         }
     }
 
-    @Transactional
+    /**
+     * Step 4
+     */
     fun createProductMappings(memberId: Long, shippingProductIds: List<Long>?) {
         val basicProducts: List<BasicProduct>
         val partnerId = partnerApiClient.getPartner(memberId).payload!!.partnerId
@@ -281,13 +317,18 @@ class MigrationService(
             else basicProductService.getBasicProductsByShippingProductIds(shippingProductIds)
 
         // nosnos 쪽 상품연결 정보 일괄 등록
-        log.info("[createProductMappings] basicProductIds: ${basicProducts.map { it.id!! }}")
-        wmsApiClient.createProductMappings(
-            CommonCreateBulkModel(
-                partnerId = partnerId,
-                requestDataList = basicProducts.map { PreProductMappingModel.fromEntity(it) }
-            )
-        )
+        basicProducts.chunked(100).forEach { targetBasicProducts ->
+            try {
+                wmsApiClient.createProductMappings(
+                    CommonCreateBulkModel(
+                        partnerId = partnerId,
+                        requestDataList = targetBasicProducts.map(PreProductMappingModel::fromEntity)
+                    )
+                )
+            } catch (e: Exception) {
+                log.error("[createNosnosSalesProducts] shippingProductIds: ${targetBasicProducts.map { it.shippingProductId }}", e)
+            }
+        }
     }
 
     private fun getBasicProductExcelModel(

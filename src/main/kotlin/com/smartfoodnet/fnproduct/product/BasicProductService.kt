@@ -231,13 +231,6 @@ class BasicProductService(
         }
     }
 
-    @Transactional
-    fun updateProductCodeByPartnerId(partnerId: Long): List<BasicProduct> {
-        val basicProducts = getBasicProductsByPartnerId(partnerId)
-        basicProducts.forEach { it.updateProductCode(it.code!!) }
-        return basicProducts
-    }
-
     private fun getBasicProductByShippingProductId(shippingProductId: Long): BasicProduct {
         return basicProductRepository.findByShippingProductId(shippingProductId)
             ?: throw NoSuchElementException("기본상품(shippingProductId:${shippingProductId}) 값이 없습니다.")
