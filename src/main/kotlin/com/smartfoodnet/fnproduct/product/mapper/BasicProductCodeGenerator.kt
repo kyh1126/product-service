@@ -5,7 +5,6 @@ import com.smartfoodnet.fnproduct.product.BasicProductCodeSeqRepository
 import com.smartfoodnet.fnproduct.product.entity.BasicProductCodeSeq
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
@@ -22,6 +21,9 @@ class BasicProductCodeGenerator(
     private val basicProductCodeTypes =
         setOf(BasicProductType.BASIC, BasicProductType.PACKAGE, BasicProductType.CUSTOM_SUB)
 
+    private val defaultCount = 1
+    private val partnerCodeLength = 4
+
     fun getBasicProductCode(
         partnerId: Long,
         partnerCode: String,
@@ -32,18 +34,21 @@ class BasicProductCodeGenerator(
             || validateNotAvailableTemperatureType(type, handlingTemperature)
         ) return null
 
-        val temperatureCode = handlingTemperature.code
         // 00001 부터 시작
-        val basicProductCodeSeq = basicProductCodeSeqRepository.findByIdOrNull(partnerId)
-            ?.apply { updateSeq(partnerId) }
-            ?: run { basicProductCodeSeqRepository.save(BasicProductCodeSeq.initial(partnerId)) }
+        val basicProductCodeSeq =
+            when (updateSucceeded(partnerId)) {
+                true -> basicProductCodeSeqRepository.findById(partnerId).get()
+                false -> basicProductCodeSeqRepository.save(BasicProductCodeSeq.initial(partnerId))
+            }
         val totalProductCount = String.format("%05d", basicProductCodeSeq.seq)
-
-        return getCustomerNumber(partnerCode) + type.code + temperatureCode + totalProductCount
+        return getCustomerNumber(partnerCode) + type.code + handlingTemperature.code + totalProductCount
     }
 
+    private fun updateSucceeded(partnerId: Long) =
+        basicProductCodeSeqRepository.updateSeq(partnerId, defaultCount) == 1
+
     private fun getCustomerNumber(partnerCode: String): String {
-        if (partnerCode.length != 4) {
+        if (partnerCode.length != partnerCodeLength) {
             log.error("[BasicProductCodeGenerator] 상품코드 채번 에러, partnerCode = $partnerCode")
             throw IllegalArgumentException("partnerCode 는 4자리여야 합니다.")
         }

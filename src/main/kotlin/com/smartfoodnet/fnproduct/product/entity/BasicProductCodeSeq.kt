@@ -15,10 +15,6 @@ class BasicProductCodeSeq(
     @Column(name = "seq", nullable = false)
     var seq: Int = 1
 ) {
-    fun updateSeq(partnerId: Long) {
-        seq += 1
-    }
-
     companion object {
         fun initial(partnerId: Long): BasicProductCodeSeq = BasicProductCodeSeq(partnerId)
     }

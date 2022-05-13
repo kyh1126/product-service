@@ -240,15 +240,7 @@ class BasicProductService(
         ValidatorUtils.validateAndThrow(basicProductDetailCreateModelValidator, createModel)
 
         val basicProductCreateModel = createModel.basicProductModel
-        // 상품코드 채번
-        val basicProductCode = with(basicProductCreateModel) {
-            basicProductCodeGenerator.getBasicProductCode(
-                partnerId!!,
-                partnerCode!!,
-                type,
-                handlingTemperature!!
-            )
-        }
+
         // 기본상품 카테고리 조회
         val basicProductCategory = getBasicProductCategory(basicProductCreateModel)
         // (공통)부자재 카테고리 조회
@@ -264,6 +256,15 @@ class BasicProductService(
             subsidiaryMaterialById = subsidiaryMaterialById
         )
 
+        // 상품코드 채번
+        val basicProductCode = with(basicProductCreateModel) {
+            basicProductCodeGenerator.getBasicProductCode(
+                partnerId!!,
+                partnerCode!!,
+                type,
+                handlingTemperature!!
+            )
+        }
         val basicProduct = createModel.toEntity(
             code = basicProductCode,
             basicProductCategory = basicProductCategory,
