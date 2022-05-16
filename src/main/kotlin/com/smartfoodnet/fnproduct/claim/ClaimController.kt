@@ -53,6 +53,7 @@ class ClaimController(
     @Operation(summary = "클레임 취소")
     @PostMapping("claim:cancel/{claimId}")
     fun cancelClaim(
+        @Parameter(description = "클레임 ID", required = true)
         @PathVariable claimId: Long
     ): CommonResponse<String> {
         claimService.cancelClaim(claimId)
