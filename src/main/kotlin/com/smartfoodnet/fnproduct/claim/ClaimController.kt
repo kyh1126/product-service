@@ -2,7 +2,6 @@ package com.smartfoodnet.fnproduct.claim
 
 import com.smartfoodnet.common.model.response.CommonResponse
 import com.smartfoodnet.common.model.response.PageResponse
-import com.smartfoodnet.fnproduct.claim.model.ClaimCancelModel
 import com.smartfoodnet.fnproduct.claim.model.ClaimCreateModel
 import com.smartfoodnet.fnproduct.claim.model.ClaimModel
 import com.smartfoodnet.fnproduct.claim.model.ExchangeReleaseCreateModel

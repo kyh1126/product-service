@@ -12,7 +12,6 @@ import com.smartfoodnet.common.error.exception.UserRequestError
 import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.fnproduct.claim.entity.*
 import com.smartfoodnet.fnproduct.claim.entity.QClaim.claim
-import com.smartfoodnet.fnproduct.claim.model.ClaimCancelModel
 import com.smartfoodnet.fnproduct.claim.model.ClaimCreateModel
 import com.smartfoodnet.fnproduct.claim.model.ClaimModel
 import com.smartfoodnet.fnproduct.claim.model.ExchangeReleaseCreateModel
