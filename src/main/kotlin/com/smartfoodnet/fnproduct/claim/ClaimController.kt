@@ -30,15 +30,15 @@ class ClaimController(
         @ModelAttribute condition: ClaimSearchCondition,
         @PageableDefault(size = 50, sort = ["id"], direction = Sort.Direction.DESC) page: Pageable,
     ): PageResponse<ClaimModel> {
+        condition.apply {
+            this.partnerId = partnerId
+        }
         return PageResponse.of(claimService.findClaims(condition, page))
     }
 
     @Operation(summary = "반품정보 동기화")
     @PostMapping("claim:sync")
-    fun syncClaims(
-        @Parameter(description = "화주(고객사) ID", required = true)
-        @RequestBody partnerId: Long
-    ): CommonResponse<String> {
+    fun syncClaims(): CommonResponse<String> {
         claimService.syncReturnInfos()
         return CommonResponse(HttpStatus.OK.reasonPhrase)
     }
@@ -52,11 +52,11 @@ class ClaimController(
     }
 
     @Operation(summary = "클레임 취소")
-    @PostMapping("claim:cancel")
+    @PostMapping("claim:cancel/{claimId}")
     fun cancelClaim(
-        @RequestBody claimCancelModel: ClaimCancelModel
+        @PathVariable claimId: Long
     ): CommonResponse<String> {
-        claimService.cancelClaim(claimCancelModel)
+        claimService.cancelClaim(claimId)
         return CommonResponse(HttpStatus.OK.reasonPhrase)
     }
 

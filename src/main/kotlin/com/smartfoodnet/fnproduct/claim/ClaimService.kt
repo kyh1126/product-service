@@ -82,8 +82,8 @@ class ClaimService(
     }
 
     @Transactional
-    fun cancelClaim(claimCancelModel: ClaimCancelModel) {
-        val claim = claimRepository.findByIdAndPartnerId(claimCancelModel.claimId, claimCancelModel.partnerId) ?: throw NoSuchElementError("Claim이 존재하지 않습니다: [claimId:${claimCancelModel.claimId}]")
+    fun cancelClaim(claimId: Long) {
+        val claim = claimRepository.findByIdOrNull(claimId) ?: throw NoSuchElementError("Claim이 존재하지 않습니다: [claimId:${claimId}]")
 
         claim.returnInfo?.nosnosReleaseReturnInfoId?.let {
             try {
