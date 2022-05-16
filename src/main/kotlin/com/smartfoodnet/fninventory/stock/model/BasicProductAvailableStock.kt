@@ -19,7 +19,7 @@ class BasicProductAvailableStock(
         }
     }
 
-    fun getBasicProductFromPackage(packageProductList: Collection<PackageProductMapping>): List<BasicProduct> {
+    fun getBasicProductFromPackage(packageProductList: MutableSet<PackageProductMapping>): List<BasicProduct> {
         return packageProductList.map { it.selectedBasicProduct }
     }
 

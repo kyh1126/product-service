@@ -60,7 +60,7 @@ class StockService(
         partnerId: Long,
         ids: List<Long>
     ) : List<AvailableStockModel>{
-        val basicProductAvailableStocks : List<BasicProductAvailableStock> = basicProductRepository.findAllById(ids.toSet()).map {
+        val basicProductAvailableStocks : List<BasicProductAvailableStock> = basicProductRepository.findAllById(ids.distinct()).map {
             BasicProductAvailableStock(it)
         }
         val shippingProductIds : List<Long> = basicProductAvailableStocks.flatMap { basicProductAvailableStock ->
