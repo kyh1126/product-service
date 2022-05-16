@@ -10,7 +10,8 @@ class BasicProductAvailableStock(
 ) {
     var stock: Int = 0
 
-    val isPackage: Boolean = baseBasicProduct.type == BasicProductType.PACKAGE
+    val isPackage: Boolean
+        get() = baseBasicProduct.type == BasicProductType.PACKAGE
 
     fun getSubBasicProduct(): List<BasicProduct> {
         return when (baseBasicProduct.type) {
