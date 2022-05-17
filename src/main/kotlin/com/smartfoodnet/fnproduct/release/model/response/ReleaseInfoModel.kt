@@ -75,7 +75,7 @@ data class ReleaseInfoModel(
     var storeIcon: String? = null,
 
     @ApiModelProperty(
-        value = "업로드방식 (API:API/UPLOAD:엑셀/MANUAL:수동)",
+        value = "수집방식 (API:API/UPLOAD:엑셀/MANUAL:수동)",
         allowableValues = "API,UPLOAD,MANUAL"
     )
     var uploadType: OrderUploadType,
