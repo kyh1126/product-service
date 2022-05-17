@@ -11,7 +11,6 @@ import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.fnproduct.migration.dto.NosnosShippingProductTestModel
 import com.smartfoodnet.fnproduct.product.BasicProductService
 import com.smartfoodnet.fnproduct.product.ShippingProductArchiveRepository
-import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.product.mapper.BasicProductExcelModelMapper
 import com.smartfoodnet.fnproduct.product.model.BasicProductExcelModel
 import com.smartfoodnet.fnproduct.product.model.request.SubsidiaryMaterialSearchCondition
@@ -168,9 +167,7 @@ class MigrationService(
     /**
      * Step 0
      */
-    fun archiveShippingProducts(memberId: Long, startPage: Int, endPage: Int) {
-        val partnerModel = partnerApiClient.getPartner(memberId).payload!!
-
+    fun archiveShippingProducts(partnerId: Long, startPage: Int, endPage: Int) {
         var page = startPage
         var totalPage = endPage
 
@@ -178,11 +175,11 @@ class MigrationService(
             val model: CommonDataListModel<NosnosShippingProductModel>
             try {
                 model = wmsApiClient.getShippingProducts(
-                    BasicProductReadModel(memberId = memberId, status = 1, page = page)
+                    BasicProductReadModel(partnerId = partnerId, status = 1, page = page)
                 ).payload!!
             } catch (e: Exception) {
                 log.error("[archiveShippingProducts] page: $page", e)
-                throw BaseRuntimeException(errorMessage = "출고상품 조회 실패, memberId: ${memberId}, page: ${page}")
+                throw BaseRuntimeException(errorMessage = "출고상품 조회 실패, partnerId: ${partnerId}, page: ${page}")
             }
 
             if (totalPage == NOSNOS_INITIAL_PAGE) {
@@ -191,7 +188,7 @@ class MigrationService(
             val dataList = model.dataList
 
             shippingProductArchiveRepository.saveAll(
-                dataList.map { it.toShippingProductArchive(partnerModel.partnerId) }
+                dataList.map { it.toShippingProductArchive(partnerId) }
             )
 
             page++
@@ -201,9 +198,9 @@ class MigrationService(
     /**
      * Step 1
      */
-    fun nosnosToBasicProducts(memberId: Long, startPage: Int, endPage: Int, isTest: Boolean) {
+    fun nosnosToBasicProducts(partnerId: Long, startPage: Int, endPage: Int, isTest: Boolean) {
         val defaultSubsidiaryMaterialId = getDefaultSubsidiaryMaterialId()
-        val partnerModel = partnerApiClient.getPartner(memberId).payload!!
+        val partnerModel = partnerApiClient.getPartner(partnerId).payload!!
 
         var page = startPage
         var totalPage = endPage
@@ -212,11 +209,11 @@ class MigrationService(
             val model: CommonDataListModel<NosnosShippingProductModel>
             try {
                 model = wmsApiClient.getShippingProducts(
-                    BasicProductReadModel(memberId = memberId, status = 1, page = page)
+                    BasicProductReadModel(partnerId = partnerId, status = 1, page = page)
                 ).payload!!
             } catch (e: Exception) {
                 log.error("[nosnosToBasicProducts] page: $page", e)
-                throw BaseRuntimeException(errorMessage = "출고상품 생성 실패, memberId: ${memberId}, page: ${page}")
+                throw BaseRuntimeException(errorMessage = "출고상품 생성 실패, memberId: ${partnerId}, page: ${page}")
             }
 
             if (totalPage == NOSNOS_INITIAL_PAGE) {
@@ -247,11 +244,8 @@ class MigrationService(
     /**
      * Step 2
      */
-    fun updateProductCodes(memberId: Long, shippingProductIds: List<Long>?) {
-        val basicProducts: List<BasicProduct>
-        val partnerId = partnerApiClient.getPartner(memberId).payload!!.partnerId
-
-        basicProducts =
+    fun updateProductCodes(partnerId: Long, shippingProductIds: List<Long>?) {
+        val basicProducts =
             if (shippingProductIds.isNullOrEmpty()) basicProductService.getBasicProductsByPartnerId(partnerId)
             else basicProductService.getBasicProductsByShippingProductIds(shippingProductIds)
 
@@ -274,11 +268,8 @@ class MigrationService(
     /**
      * Step 3
      */
-    fun createNosnosSalesProducts(memberId: Long, shippingProductIds: List<Long>?) {
-        val basicProducts: List<BasicProduct>
-        val partnerId = partnerApiClient.getPartner(memberId).payload!!.partnerId
-
-        basicProducts =
+    fun createNosnosSalesProducts(partnerId: Long, shippingProductIds: List<Long>?) {
+        val basicProducts =
             if (shippingProductIds.isNullOrEmpty()) basicProductService.getBasicProductsByPartnerId(partnerId)
             else basicProductService.getBasicProductsByShippingProductIds(shippingProductIds)
 
@@ -308,11 +299,8 @@ class MigrationService(
     /**
      * Step 4
      */
-    fun createProductMappings(memberId: Long, shippingProductIds: List<Long>?) {
-        val basicProducts: List<BasicProduct>
-        val partnerId = partnerApiClient.getPartner(memberId).payload!!.partnerId
-
-        basicProducts =
+    fun createProductMappings(partnerId: Long, shippingProductIds: List<Long>?) {
+        val basicProducts =
             if (shippingProductIds.isNullOrEmpty()) basicProductService.getBasicProductsByPartnerId(partnerId)
             else basicProductService.getBasicProductsByShippingProductIds(shippingProductIds)
 

@@ -86,67 +86,67 @@ class MigrationController(private val migrationService: MigrationService) {
     // -- API
     // ---------------------------------------------------------------------------------------------
     @Operation(summary = "[Step 0] API 로 출고상품 정보 아카이빙 작업")
-    @PostMapping("{memberId}/basic-products/archive")
+    @PostMapping("{partnerId}/basic-products/archive")
     fun archiveShippingProducts(
-        @Parameter(description = "member ID")
-        @PathVariable memberId: Long,
+        @Parameter(description = "화주(고객사) ID")
+        @PathVariable partnerId: Long,
         @Parameter(description = "시작 Page")
         @RequestParam(required = false, defaultValue = "${NOSNOS_INITIAL_PAGE}") startPage: Int,
         @Parameter(description = "끝 Page")
         @RequestParam(required = false, defaultValue = "${NOSNOS_INITIAL_PAGE}") endPage: Int
     ): CommonResponse<String> {
-        migrationService.archiveShippingProducts(memberId, startPage, endPage)
+        migrationService.archiveShippingProducts(partnerId, startPage, endPage)
         return CommonResponse(HttpStatus.OK.reasonPhrase)
     }
 
     @Operation(summary = "[Step 1] API 로 기본상품 생성 작업")
-    @PostMapping("{memberId}/basic-products")
+    @PostMapping("{partnerId}/basic-products")
     fun nosnosToBasicProducts(
-        @Parameter(description = "member ID")
-        @PathVariable memberId: Long,
+        @Parameter(description = "화주(고객사) ID")
+        @PathVariable partnerId: Long,
         @Parameter(description = "시작 Page")
         @RequestParam(required = false, defaultValue = "${NOSNOS_INITIAL_PAGE}") startPage: Int,
         @Parameter(description = "끝 Page")
         @RequestParam(required = false, defaultValue = "${NOSNOS_INITIAL_PAGE}") endPage: Int,
         @Parameter(description = "테스트 여부") @RequestParam(required = false) isTest: Boolean = false
     ): CommonResponse<String> {
-        migrationService.nosnosToBasicProducts(memberId, startPage, endPage, isTest)
+        migrationService.nosnosToBasicProducts(partnerId, startPage, endPage, isTest)
         return CommonResponse(HttpStatus.OK.reasonPhrase)
     }
 
     @Operation(summary = "[Step 2] API 로 출고상품 product-code 업데이트 작업")
-    @PostMapping("{memberId}/product-codes")
+    @PostMapping("{partnerId}/product-codes")
     fun updateProductCodes(
-        @Parameter(description = "member ID")
-        @PathVariable memberId: Long,
+        @Parameter(description = "화주(고객사) ID")
+        @PathVariable partnerId: Long,
         @Parameter(description = "출고상품 ID")
         @RequestParam(required = false) shippingProductIds: List<Long>?
     ): CommonResponse<String> {
-        migrationService.updateProductCodes(memberId, shippingProductIds)
+        migrationService.updateProductCodes(partnerId, shippingProductIds)
         return CommonResponse(HttpStatus.OK.reasonPhrase)
     }
 
     @Operation(summary = "[Step 3] API 로 판매상품 생성 작업")
-    @PostMapping("{memberId}/sales-products")
+    @PostMapping("{partnerId}/sales-products")
     fun createNosnosSalesProducts(
-        @Parameter(description = "member ID")
-        @PathVariable memberId: Long,
+        @Parameter(description = "화주(고객사) ID")
+        @PathVariable partnerId: Long,
         @Parameter(description = "출고상품 ID")
         @RequestParam(required = false) shippingProductIds: List<Long>?
     ): CommonResponse<String> {
-        migrationService.createNosnosSalesProducts(memberId, shippingProductIds)
+        migrationService.createNosnosSalesProducts(partnerId, shippingProductIds)
         return CommonResponse(HttpStatus.OK.reasonPhrase)
     }
 
     @Operation(summary = "[Step 4] API 로 기존 출고상품-판매상품 연결 작업")
-    @PostMapping("{memberId}/mappings")
+    @PostMapping("{partnerId}/mappings")
     fun createProductMappings(
-        @Parameter(description = "member ID")
-        @PathVariable memberId: Long,
+        @Parameter(description = "화주(고객사) ID")
+        @PathVariable partnerId: Long,
         @Parameter(description = "출고상품 ID")
         @RequestParam(required = false) shippingProductIds: List<Long>?
     ): CommonResponse<String> {
-        migrationService.createProductMappings(memberId, shippingProductIds)
+        migrationService.createProductMappings(partnerId, shippingProductIds)
         return CommonResponse(HttpStatus.OK.reasonPhrase)
     }
 }
