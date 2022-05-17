@@ -112,13 +112,7 @@ data class OrderProductModel(
                 ?.map { it.collectedOrder } ?: emptyList()
 
         private fun getOrderQuantity(basicProductId: Long, collectedOrders: List<CollectedOrder>): Int {
-            var count = 0
-            collectedOrders.forEach {
-                if (it.containsBasicProduct(basicProductId)) {
-                    count += 1
-                }
-            }
-            return count
+            return collectedOrders.count { it.containsBasicProduct(basicProductId) }
         }
     }
 }
