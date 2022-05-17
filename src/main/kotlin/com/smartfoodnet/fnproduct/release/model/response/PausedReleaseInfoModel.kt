@@ -38,6 +38,18 @@ data class PausedReleaseInfoModel(
     @ApiModelProperty(value = "주문수집일시")
     var collectedAt: LocalDateTime? = null,
 
+    @ApiModelProperty(value = "송장번호")
+    var trackingNumber: String? = null,
+
+    @ApiModelProperty(value = "송장번호부여일시")
+    var trackingNumberCreatedAt: LocalDateTime? = null,
+
+    @ApiModelProperty(value = "출고중지일시")
+    var pausedAt: LocalDateTime,
+
+    @ApiModelProperty(value = "출고중지사유")
+    var pausedReason: String? = null,
+
     @ApiModelProperty(value = "출고중지당사자")
     var pausedBy: PausedBy? = null
 ) {
@@ -60,6 +72,10 @@ data class PausedReleaseInfoModel(
                     orderNumbers = collectedOrders.map { it.orderNumber },
                     orderedAt = firstCollectedOrder.orderedAt,
                     collectedAt = firstCollectedOrder.collectedAt,
+                    trackingNumber = trackingNumber,
+                    trackingNumberCreatedAt = trackingNumberCreatedAt,
+                    pausedAt = pausedAt!!,
+                    pausedReason = pausedReason,
                     pausedBy = pausedBy
                 )
             }
