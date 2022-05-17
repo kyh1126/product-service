@@ -301,12 +301,13 @@ class ConfirmOrderService(
         basicProducts.forEach {
             collectedOrder.addConfirmProduct(
                 it.run {
+                    val quantity = quantityPerBasicProduct[this.id]!!
                     ConfirmProduct(
                         type = type,
                         basicProduct = this,
                         matchingType = MatchingType.TEMP,
-                        quantity = quantityPerBasicProduct[this.id]!!,
-                        quantityPerUnit = 0
+                        quantity = quantity,
+                        quantityPerUnit = quantity
                     )
                 }
             )
