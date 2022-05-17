@@ -13,55 +13,58 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.ModelAttribute
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @Api(description = "클레임 관련 API")
 @RestController
-@RequestMapping("/claim")
 class ClaimController(
     private val claimService: ClaimService
 ) {
     @Operation(summary = "반품 현황 조회")
-    @GetMapping("partner/{partnerId}")
+    @GetMapping("claim/partner/{partnerId}")
     fun findClaims(
         @Parameter(description = "화주(고객사) ID", required = true)
         @PathVariable partnerId: Long,
         @Parameter(description = "검색조건")
         @ModelAttribute condition: ClaimSearchCondition,
         @PageableDefault(size = 50, sort = ["id"], direction = Sort.Direction.DESC) page: Pageable,
-    ): PageResponse<ClaimModel>{
+    ): PageResponse<ClaimModel> {
+        condition.apply {
+            this.partnerId = partnerId
+        }
         return PageResponse.of(claimService.findClaims(condition, page))
     }
 
     @Operation(summary = "반품정보 동기화")
-    @PostMapping("partner/{partnerId}")
-    fun syncClaims(
-        @Parameter(description = "화주(고객사) ID", required = true)
-        @PathVariable partnerId: Long
-    ): CommonResponse<String> {
+    @PostMapping("claim:sync")
+    fun syncClaims(): CommonResponse<String> {
         claimService.syncReturnInfos()
         return CommonResponse(HttpStatus.OK.reasonPhrase)
     }
 
     @Operation(summary = "클레임 등록")
-    @PostMapping
+    @PostMapping("claim")
     fun createClaim(
         @RequestBody claimCreateModel: ClaimCreateModel
-    ){
-        claimService.createClaim(claimCreateModel)
+    ): ClaimModel {
+        return claimService.createClaim(claimCreateModel)
+    }
+
+    @Operation(summary = "클레임 취소")
+    @PostMapping("claim:cancel/{claimId}")
+    fun cancelClaim(
+        @Parameter(description = "클레임 ID", required = true)
+        @PathVariable claimId: Long
+    ): CommonResponse<String> {
+        claimService.cancelClaim(claimId)
+        return CommonResponse(HttpStatus.OK.reasonPhrase)
     }
 
     @Operation(summary = "교환출고 등록")
     @PostMapping("exchangeRelease")
     fun createExchangeRelease(
         @RequestBody exchangeReleaseCreateModel: ExchangeReleaseCreateModel
-    ){
+    ) {
         claimService.createExchangeRelease(exchangeReleaseCreateModel)
     }
 }

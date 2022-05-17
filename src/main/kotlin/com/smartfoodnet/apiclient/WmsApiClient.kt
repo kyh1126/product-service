@@ -167,6 +167,11 @@ interface WmsApiClient {
         @PathVariable releaseReturnInfoId: Long
     ): CommonResponse<GetReturnModel>
 
+    @PatchMapping("return/{releaseReturnInfoId}")
+    fun cancelReleaseReturn(
+        @PathVariable releaseReturnInfoId: Long
+    )
+
     // ---------------------------------------------------------------------------------------------
     // -- 로케이션,택배
     // ---------------------------------------------------------------------------------------------
