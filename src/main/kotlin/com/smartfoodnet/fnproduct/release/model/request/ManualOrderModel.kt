@@ -3,10 +3,11 @@ package com.smartfoodnet.fnproduct.release.model.request
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
 import com.smartfoodnet.fnproduct.order.entity.CollectedProductInfo
-import com.smartfoodnet.fnproduct.order.entity.ConfirmProduct
 import com.smartfoodnet.fnproduct.order.entity.Receiver
-import com.smartfoodnet.fnproduct.order.vo.*
-import com.smartfoodnet.fnproduct.product.entity.BasicProduct
+import com.smartfoodnet.fnproduct.order.vo.DeliveryType
+import com.smartfoodnet.fnproduct.order.vo.OrderStatus
+import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
+import com.smartfoodnet.fnproduct.order.vo.StoreSyncStatus
 import com.smartfoodnet.fnproduct.store.enums.ReservedStoreCode
 import io.swagger.annotations.ApiModelProperty
 import java.time.LocalDateTime
@@ -115,22 +116,26 @@ sealed class ManualOrderModel {
     }
 }
 
-sealed class ManualProductModel {
-    abstract val productId: Long
-    abstract val quantity: Int
+data class ReOrderCreateModel(
+    override val receiverName: String,
+    override val receiverPhoneNumber: String,
+    override val receiverAddress: String,
+    override val receiverZipCode: String?,
+    override val deliveryType: DeliveryType = DeliveryType.PARCEL,
+    override val promotion: String?,
+    override val reShipmentReason: String?,
+    override var products: List<ManualProductModel>,
+    override val uploadType: OrderUploadType = OrderUploadType.RE_ORDER
+) : ManualOrderModel()
 
-    fun toConfirmProduct(
-        collectedOrder: CollectedOrder,
-        basicProduct: BasicProduct,
-        matchingType: MatchingType
-    ): ConfirmProduct {
-        return ConfirmProduct(
-            collectedOrder = collectedOrder,
-            type = basicProduct.type,
-            matchingType = matchingType,
-            basicProduct = basicProduct,
-            quantity = quantity,
-            quantityPerUnit = quantity
-        )
-    }
-}
+data class ManualReleaseCreateModel(
+    override val receiverName: String,
+    override val receiverPhoneNumber: String,
+    override val receiverAddress: String,
+    override val receiverZipCode: String?,
+    override val deliveryType: DeliveryType = DeliveryType.PARCEL,
+    override val promotion: String?,
+    override val reShipmentReason: String?,
+    override var products: List<ManualProductModel>,
+    override val uploadType: OrderUploadType = OrderUploadType.MANUAL
+) : ManualOrderModel()

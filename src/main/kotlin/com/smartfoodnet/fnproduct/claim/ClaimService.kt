@@ -10,8 +10,12 @@ import com.smartfoodnet.common.error.exception.ExternalApiError
 import com.smartfoodnet.common.error.exception.NoSuchElementError
 import com.smartfoodnet.common.error.exception.UserRequestError
 import com.smartfoodnet.common.utils.Log
-import com.smartfoodnet.fnproduct.claim.entity.*
+import com.smartfoodnet.fnproduct.claim.entity.Claim
+import com.smartfoodnet.fnproduct.claim.entity.ExchangeProduct
+import com.smartfoodnet.fnproduct.claim.entity.ExchangeRelease
 import com.smartfoodnet.fnproduct.claim.entity.QClaim.claim
+import com.smartfoodnet.fnproduct.claim.entity.ReturnInfo
+import com.smartfoodnet.fnproduct.claim.entity.ReturnProduct
 import com.smartfoodnet.fnproduct.claim.model.ClaimCreateModel
 import com.smartfoodnet.fnproduct.claim.model.ClaimModel
 import com.smartfoodnet.fnproduct.claim.model.ExchangeReleaseCreateModel
@@ -50,7 +54,24 @@ class ClaimService(
         val claims = claimRepository.findAllByCondition(condition, page)
         syncReturnInfosByCoroutine(claims.content)
 
-        return claims.map { ClaimModel.from(it) }
+        return buildClaimModels(claims)
+    }
+
+    private fun buildClaimModels(claims: Page<Claim>): Page<ClaimModel> {
+        return claims.map { claim ->
+            val claimModel = ClaimModel.from(claim)
+
+            val releaseProducts = claim.releaseInfo?.releaseProducts
+                ?: throw NoSuchElementError("출고상품 (releaseProducts)가 존재하지 않습니다. claimId: ${claim.id}")
+
+            claimModel.returnInfo.returnProducts.forEach { returnProductModel ->
+                returnProductModel.originalReleaseQuantity =
+                    releaseProducts.firstOrNull { it.basicProduct.id == returnProductModel.basicProduct.id }?.quantity
+                        ?: throw NoSuchElementError("출고상품과 매칭되는 반품상품이 없습니다. returnProductId: ${returnProductModel.id}")
+            }
+
+            claimModel
+        }
     }
 
     @Transactional
@@ -82,7 +103,8 @@ class ClaimService(
 
     @Transactional
     fun cancelClaim(claimId: Long) {
-        val claim = claimRepository.findByIdOrNull(claimId) ?: throw NoSuchElementError("Claim이 존재하지 않습니다: [claimId:${claimId}]")
+        val claim = claimRepository.findByIdOrNull(claimId)
+            ?: throw NoSuchElementError("Claim이 존재하지 않습니다: [claimId:${claimId}]")
 
         claim.returnInfo?.nosnosReleaseReturnInfoId?.let {
             try {
@@ -258,7 +280,7 @@ class ClaimService(
             val basicProduct = basicProductRepository.findByIdOrNull(it.basicProductId)
                 ?: throw NoSuchElementError("기본상품이 존재하지 않습니다. [basicProductId: ${it.basicProductId}]")
             ReturnProduct(
-                requestQuantity = it.quantity,
+                requestQuantity = it.requestQuantity,
                 basicProduct = basicProduct,
                 returnInfo = returnInfo
             )

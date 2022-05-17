@@ -1,15 +1,15 @@
 package com.smartfoodnet.fnproduct.claim.model
 
 import com.smartfoodnet.fnproduct.claim.entity.ReturnProduct
-import com.smartfoodnet.fnproduct.product.model.response.BasicProductModel
 import com.smartfoodnet.fnproduct.product.model.response.BasicProductSimpleModel
 
 data class ReturnProductModel(
-    var id: Long? = null,
-    var basicProduct: BasicProductSimpleModel,
-    var requestQuantity: Int,
-    var inboundQuantity: Int? = null,
-    var discardedQuantity: Int? = null,
+    val id: Long? = null,
+    val basicProduct: BasicProductSimpleModel,
+    val requestQuantity: Int,
+    var originalReleaseQuantity: Int? = null,
+    val inboundQuantity: Int? = null,
+    val discardedQuantity: Int? = null,
 ){
     companion object {
         fun from(returnProduct: ReturnProduct): ReturnProductModel {
