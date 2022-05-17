@@ -307,7 +307,7 @@ class ConfirmOrderService(
                         basicProduct = this,
                         matchingType = MatchingType.TEMP,
                         quantity = quantity,
-                        quantityPerUnit = quantity
+                        quantityPerUnit = 1
                     )
                 }
             )
