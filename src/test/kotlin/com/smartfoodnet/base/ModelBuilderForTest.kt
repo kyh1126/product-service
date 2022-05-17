@@ -27,7 +27,7 @@ fun buildBasicProductCreateModel(
     type: BasicProductType = BasicProductType.BASIC,
     partnerId: Long? = 1,
     partnerCode: String? = "0001",
-    name: String? = "테스트 기본상품",
+    name: String = "테스트 기본상품",
     barcodeYn: String = "N",
     basicProductCategoryId: Long? = 1,
     subsidiaryMaterialCategoryId: Long? = 1,
@@ -40,7 +40,6 @@ fun buildBasicProductCreateModel(
     type = type,
     partnerId = partnerId,
     partnerCode = partnerCode,
-    name = name,
     barcodeYn = barcodeYn,
     basicProductCategoryId = basicProductCategoryId,
     subsidiaryMaterialCategoryId = subsidiaryMaterialCategoryId,
@@ -52,13 +51,15 @@ fun buildBasicProductCreateModel(
     piecesPerBox = piecesPerBox,
     piecesPerPalette = piecesPerPalette,
     activeYn = "Y"
-).toModel()
+).also {
+    it.name = name
+}.toModel()
 
 fun buildBasicProductSubCreateModel(
     id: Long? = 2,
     type: BasicProductType = BasicProductType.SUB,
     partnerId: Long? = 1,
-    name: String? = "종이박스",
+    name: String = "종이박스",
     basicProductCategoryId: Long? = null,
     subsidiaryMaterialCategoryId: Long? = 1,
     handlingTemperature: HandlingTemperatureType? = null,
@@ -67,7 +68,6 @@ fun buildBasicProductSubCreateModel(
     id = id,
     type = type,
     partnerId = partnerId,
-    name = name,
     basicProductCategoryId = basicProductCategoryId,
     subsidiaryMaterialCategoryId = subsidiaryMaterialCategoryId,
     handlingTemperature = handlingTemperature,
@@ -75,7 +75,9 @@ fun buildBasicProductSubCreateModel(
     singleDimensionCreateModel = buildSingleDimensionCreateModel(),
     boxDimensionCreateModel = buildBoxDimensionCreateModel(),
     activeYn = "Y"
-).toModel()
+).also {
+    it.name = name
+}.toModel()
 
 fun buildSingleDimensionCreateModel() = SingleDimensionCreateModel().also {
     it.singleWidth = 0

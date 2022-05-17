@@ -115,7 +115,7 @@ internal class BasicProductDetailCreateModelValidatorTest {
     private fun getInput(basicProductModel: BasicProductCreateModel): BasicProductDetailCreateModel {
         val firstBasicProductSub = basicproductsSub.first()
         val buildSubsidiaryMaterialMappingCreateModel =
-            buildSubsidiaryMaterialMappingCreateModel(subsidiaryMaterialId = firstBasicProductSub.id!!)
+            buildSubsidiaryMaterialMappingCreateModel(subsidiaryMaterialId = firstBasicProductSub.id)
 
         return buildBasicProductDetailCreateModel(basicProductModel = basicProductModel)
             .apply { subsidiaryMaterialMappingModels.add(buildSubsidiaryMaterialMappingCreateModel) }

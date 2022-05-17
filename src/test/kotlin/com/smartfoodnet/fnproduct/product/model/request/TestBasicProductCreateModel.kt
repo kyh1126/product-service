@@ -28,9 +28,6 @@ class TestBasicProductCreateModel(
     @ApiModelProperty(value = "출고상품 ID (nosnos)")
     val shippingProductId: Long? = null,
 
-    @ApiModelProperty(value = "상품명")
-    val name: String? = null,
-
     @ApiModelProperty(value = "상품코드")
     val code: String? = null,
 
@@ -82,6 +79,9 @@ class TestBasicProductCreateModel(
     @ApiModelProperty(value = "활성화여부 (default: Y)", allowableValues = "Y,N")
     val activeYn: String = "Y",
 ) {
+    @ApiModelProperty(value = "상품명")
+    lateinit var name: String
+
     fun toModel(): BasicProductCreateModel {
         return BasicProductCreateModel().also {
             it.id = id
