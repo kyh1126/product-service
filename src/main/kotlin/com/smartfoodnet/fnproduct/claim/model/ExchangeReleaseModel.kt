@@ -10,7 +10,9 @@ data class ExchangeReleaseModel(
     val trackingNumber: String? = null,
     val trackingNumberRegisteredAt: LocalDateTime? = null,
     val shippingCompletedAt: LocalDateTime? = null,
-    val exchangeProducts: List<ExchangeProductModel>
+    val exchangeProducts: List<ExchangeProductModel>,
+    val nosnosOrderId: Long? = null,
+    val nosnosOrderCode: String? = null
 ) {
     companion object {
         fun from(exchangeRelease: ExchangeRelease): ExchangeReleaseModel {
@@ -21,7 +23,9 @@ data class ExchangeReleaseModel(
                     trackingNumber = trackingNumber,
                     trackingNumberRegisteredAt = trackingNumberRegisteredAt,
                     shippingCompletedAt = shippingCompletedAt,
-                    exchangeProducts = exchangeProducts.map { ExchangeProductModel.from(it) }
+                    exchangeProducts = exchangeProducts.map { ExchangeProductModel.from(it) },
+                    nosnosOrderId = nosnosOrderId,
+                    nosnosOrderCode = nosnosOrderCode
                 )
             }
         }
