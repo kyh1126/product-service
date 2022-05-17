@@ -33,7 +33,6 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.test.context.TestConstructor
 import org.springframework.test.util.ReflectionTestUtils
 import java.util.*
-import kotlin.random.Random
 
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -112,7 +111,7 @@ internal class BasicProductServiceTest(
             )
         ).willReturn(listOf(subsidiaryMaterialCategories.first()))
         basicproductsSub.forEach {
-            given(basicProductRepository.findById(it.id!!))
+            given(basicProductRepository.findById(it.id))
                 .willReturn(Optional.of(it))
         }
     }
@@ -120,8 +119,8 @@ internal class BasicProductServiceTest(
     @Nested
     @DisplayName("기본상품(type=BASIC)")
     inner class BasicProductBasicType {
-        private var productId = Random.nextLong(0, Long.MAX_VALUE)
         private var basicProductCode: String? = null
+        private var basicProductId: Long = 0
 
         @Test
         @DisplayName("추가 성공한다")
@@ -132,7 +131,7 @@ internal class BasicProductServiceTest(
                 .willReturn(listOf(firstBasicProductSub))
 
             val buildSubsidiaryMaterialMappingCreateModel =
-                buildSubsidiaryMaterialMappingCreateModel(subsidiaryMaterialId = firstBasicProductSub.id!!)
+                buildSubsidiaryMaterialMappingCreateModel(subsidiaryMaterialId = firstBasicProductSub.id)
 
             val mockCreateModel = buildBasicProductDetailCreateModel(
                 basicProductModel = buildBasicProductCreateModel(
@@ -179,7 +178,8 @@ internal class BasicProductServiceTest(
                 subsidiaryMaterialCategory,
                 subsidiaryMaterialMappings,
                 warehouse
-            ).apply { id = productId }
+            )
+            basicProductId = mockBasicProduct.id
 
             val postShippingProductModel = PostShippingProductModel(
                 shippingProductId = 1L,
@@ -193,9 +193,9 @@ internal class BasicProductServiceTest(
                 )
             ).willReturn(CommonResponse(postShippingProductModel))
             given(basicProductRepository.save(any())).willReturn(mockBasicProduct)
-            given(basicProductRepository.findById(productId))
+            given(basicProductRepository.findById(basicProductId))
                 .willReturn(Optional.of(mockBasicProduct))
-            given(basicProductRepository.findAllById(listOf(productId)))
+            given(basicProductRepository.findAllById(listOf(basicProductId)))
                 .willReturn(listOf(mockBasicProduct))
 
             // when
@@ -203,11 +203,13 @@ internal class BasicProductServiceTest(
                 basicProductService.createBasicProductWithNosnos(mockCreateModel)
 
             // then
+            val expected = BasicProductDetailModel.fromEntity(mockBasicProduct, subsidiaryMaterialById)
+
             assertNotNull(BasicProductDetailModel)
             verify(basicProductRepository, times(1)).save(any())
             assertEquals(
-                BasicProductDetailModel.fromEntity(mockBasicProduct, subsidiaryMaterialById),
-                actualBasicProductDetailModel
+                expected.basicProductModel,
+                actualBasicProductDetailModel.basicProductModel
             )
         }
 
@@ -215,17 +217,17 @@ internal class BasicProductServiceTest(
         @DisplayName("수정 성공한다")
         fun updateBasicProduct_ValidInput_ThenSuccess() {
             // given
-            if (basicProductCode == null) {
-                createBasicProduct_ValidInput_ThenSuccess()
-            }
-
             // 부자재 수정
             val secondBasicProductSub = basicproductsSub[1]
             given(basicProductRepository.findAllById(listOf(secondBasicProductSub.id)))
                 .willReturn(listOf(secondBasicProductSub))
 
+            if (basicProductCode == null) {
+                createBasicProduct_ValidInput_ThenSuccess()
+            }
+
             val buildSubsidiaryMaterialMappingCreateModel =
-                buildSubsidiaryMaterialMappingCreateModel(subsidiaryMaterialId = secondBasicProductSub.id!!)
+                buildSubsidiaryMaterialMappingCreateModel(subsidiaryMaterialId = secondBasicProductSub.id)
 
             val mockUpdateModel = buildBasicProductDetailCreateModel(
                 basicProductModel = buildBasicProductCreateModel(
@@ -244,7 +246,7 @@ internal class BasicProductServiceTest(
             val warehouse = getWarehouse(basicProductCreateModel)
             val subsidiaryMaterialById = getSubsidiaryMaterialById(mockUpdateModel)
 
-            val basicProduct = basicProductService.getBasicProducts(listOf(productId)).first()
+            val basicProduct = basicProductService.getBasicProducts(listOf(basicProductId)).first()
 
             // 기본상품-부자재 매핑 저장
             val entityById = basicProduct.subsidiaryMaterialMappings.associateBy { it.id }
@@ -264,17 +266,19 @@ internal class BasicProductServiceTest(
                 subsidiaryMaterialCategory,
                 subsidiaryMaterialMappings,
                 warehouse
-            ).apply { id = productId }
+            )
 
             // when
             val actualBasicProductDetailModel =
-                basicProductService.updateBasicProduct(productId, mockUpdateModel)
+                basicProductService.updateBasicProduct(mockBasicProduct.id, mockUpdateModel)
 
             // then
+            val expected = BasicProductDetailModel.fromEntity(mockBasicProduct, subsidiaryMaterialById)
+
             assertNotNull(BasicProductDetailModel)
             assertEquals(
-                BasicProductDetailModel.fromEntity(mockBasicProduct, subsidiaryMaterialById),
-                actualBasicProductDetailModel
+                expected.basicProductModel,
+                actualBasicProductDetailModel.basicProductModel
             )
         }
     }

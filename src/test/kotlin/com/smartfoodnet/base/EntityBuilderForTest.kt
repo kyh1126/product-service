@@ -127,15 +127,17 @@ fun buildBasicProduct_SUB(
     subsidiaryMaterialCategory: SubsidiaryMaterialCategory,
 ): BasicProduct {
     return BasicProduct(
-        id = Random.nextLong(0, Long.MAX_VALUE),
-        type = BasicProductType.SUB,
         partnerId = partnerId,
-        name = name,
         subsidiaryMaterialCategory = subsidiaryMaterialCategory,
         warehouse = buildWarehouse(partnerId),
         supplyPrice = 120,
         activeYn = "Y",
         singleDimension = SingleDimension.default,
         boxDimension = BoxDimension.default
-    )
+    ).also {
+        it.type = BasicProductType.SUB
+        it.barcodeYn = "N"
+        it.name = name
+        it.expirationDateManagementYn = "N"
+    }
 }
