@@ -1,12 +1,12 @@
 package com.smartfoodnet.fninventory.stock
 
 import com.smartfoodnet.apiclient.WmsApiClient
+import com.smartfoodnet.apiclient.response.NosnosStockModel
+import com.smartfoodnet.common.Constants
 import com.smartfoodnet.common.model.request.PredicateSearchCondition
 import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.common.utils.Log
-import com.smartfoodnet.fninventory.stock.model.BasicProductStockModel
-import com.smartfoodnet.fninventory.stock.model.DailyStockSummaryModel
-import com.smartfoodnet.fninventory.stock.model.StockByBestBeforeModel
+import com.smartfoodnet.fninventory.stock.model.*
 import com.smartfoodnet.fninventory.stock.support.DailyStockSummaryRepository
 import com.smartfoodnet.fninventory.stock.support.StockByBestBeforeRepository
 import com.smartfoodnet.fninventory.stock.support.StockByBestBeforeSearchCondition
@@ -54,6 +54,32 @@ class StockService(
         }
 
         return PageResponse.of(basicProductStockModels)
+    }
+
+    fun getBasicProductStocks(
+        partnerId: Long,
+        ids: List<Long>
+    ) : List<AvailableStockModel>{
+        val basicProductAvailableStocks : List<BasicProductAvailableStock> = basicProductRepository.findAllById(ids.distinct()).map {
+            BasicProductAvailableStock(it)
+        }
+        val shippingProductIds : List<Long> = basicProductAvailableStocks.flatMap { basicProductAvailableStock ->
+            if (basicProductAvailableStock.isPackage)
+                basicProductAvailableStock.getSubBasicProduct().mapNotNull { basicProduct -> basicProduct.shippingProductId  }
+            else
+                listOf(basicProductAvailableStock.baseBasicProduct.shippingProductId!!)
+        }.distinct()
+
+        val stocks : List<NosnosStockModel> = getNosnosStocks(partnerId, shippingProductIds)
+
+        return basicProductAvailableStocks.map {
+            it.calcMinStocks(stocks)
+            it.toDto()
+        }
+    }
+
+    private fun getNosnosStocks(partnerId: Long, shippingProductIds : List<Long>) : List<NosnosStockModel> {
+        return wmsApiClient.getStocks(partnerId, shippingProductIds).payload?.dataList ?: listOf()
     }
 
     fun getStocksByBestBefore(
