@@ -199,7 +199,7 @@ class StockScheduledService(
                 }
 
                 val orderCount = orderService.getOrderCountByProductIdAndStatus(
-                    basicProduct.id!!,
+                    basicProduct.id,
                     OrderStatus.NEW
                 ) ?: 0
 

@@ -3,11 +3,9 @@ package com.smartfoodnet.apiclient.response
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 import com.smartfoodnet.apiclient.dto.AddBarcode
-import com.smartfoodnet.fnproduct.product.model.ExpirationDateInfoExcelModel
-import com.smartfoodnet.fnproduct.product.model.request.*
-import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
-import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
-import com.smartfoodnet.fnproduct.product.model.vo.SeasonalOption
+import com.smartfoodnet.fnproduct.migration.mapper.NosnosModelMapperImpl
+import com.smartfoodnet.fnproduct.migration.mapper.NosnosShippingProductModelMapper
+import com.smartfoodnet.fnproduct.product.entity.ShippingProductArchive
 
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy::class)
 class NosnosShippingProductModel(
@@ -43,61 +41,16 @@ class NosnosShippingProductModel(
     val locationId: Int? = null,
     val locationQuantity: Int? = null,
     val status: Int? = null,
-    val addSalesProduct: Int? = null
-) {
-    fun toBasicProductDetailCreateModel(
-        defaultBasicProductSubId: Long,
-        partnerModel: PartnerIdPairModel
-    ): BasicProductDetailCreateModel {
-        val subsidiaryMaterialMappingCreateModel = SubsidiaryMaterialMappingCreateModel(
-            subsidiaryMaterialId = defaultBasicProductSubId,
-            seasonalOption = SeasonalOption.ALL,
-            quantity = 1
+    val addSalesProduct: Int? = null,
+    private val modelMapperImpl: NosnosModelMapperImpl = NosnosModelMapperImpl()
+) : NosnosShippingProductModelMapper by modelMapperImpl {
+    fun toShippingProductArchive(partnerId: Long): ShippingProductArchive {
+        return ShippingProductArchive(
+            partnerId = partnerId,
+            shippingProductId = shippingProductId,
+            productCode = productCode,
+            supplyCompanyId = supplyCompanyId,
+            categoryId = categoryId,
         )
-
-        val basicProductModel = BasicProductCreateModel().also {
-            val expirationDateInfoExcelModel = ExpirationDateInfoExcelModel(
-                manufactureDateWriteYn = convertToYN(useMakeDate),
-                expirationDateWriteYn = convertToYN(useExpireDate),
-                manufactureToExpirationDate = expireDateByMakeDate
-            )
-
-            it.type = BasicProductType.BASIC
-            it.partnerId = partnerModel.partnerId
-            it.partnerCode = partnerModel.partnerCode
-            it.shippingProductId = shippingProductId
-            it.name = productName
-            it.barcodeYn = if (upc.isNullOrEmpty()) "N" else "Y"
-            it.barcode = upc
-            it.handlingTemperature = HandlingTemperatureType.fromDesc(manageCode3)
-            it.expirationDateManagementYn = isExpirationDateManagement(expirationDateInfoExcelModel)
-            it.expirationDateInfoModel = expirationDateInfoExcelModel.toExpirationDateInfoCreateModel()
-            it.singleDimensionCreateModel = SingleDimensionCreateModel.fromModel(this)
-            it.boxDimensionCreateModel = BoxDimensionCreateModel.fromModel(this)
-            it.piecesPerBox = singleEta
-            it.piecesPerPalette = paletCount
-            it.activeYn = convertToYN(status)
-        }
-
-        return BasicProductDetailCreateModel(
-            subsidiaryMaterialMappingModels = mutableListOf(subsidiaryMaterialMappingCreateModel)
-        ).also {
-            it.basicProductModel = basicProductModel
-        }
-    }
-
-    private fun convertToYN(target: Int?): String =
-        when (target) {
-            1 -> "Y"
-            0, null -> "N"
-            else -> throw IllegalArgumentException("YN 형식이 아닌 값이 입력되었습니다. target: ${target}")
-        }
-
-    private fun isExpirationDateManagement(expirationDateInfo: ExpirationDateInfoExcelModel): String {
-        val (manufactureDateWriteYn, expirationDateWriteYn, _) = expirationDateInfo
-        if (manufactureDateWriteYn.isEmpty() || expirationDateWriteYn.isEmpty()) {
-            return "N"
-        }
-        return "Y"
     }
 }

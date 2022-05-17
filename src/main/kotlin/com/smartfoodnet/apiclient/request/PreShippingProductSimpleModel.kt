@@ -21,7 +21,7 @@ data class PreShippingProductSimpleModel(
                 PreShippingProductSimpleModel(
                     shippingProductId = shippingProductId!!,
                     productCode = code!!,
-                    productName = name!!,
+                    productName = name,
                     upc = barcode,
                 )
             }

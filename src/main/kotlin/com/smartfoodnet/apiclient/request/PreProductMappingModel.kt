@@ -23,6 +23,7 @@ data class PreProductMappingModel(
     }
 }
 
+@JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy::class)
 class ProductMappingInfo(
     val shippingProductId: Long,
     val quantity: Int = 1

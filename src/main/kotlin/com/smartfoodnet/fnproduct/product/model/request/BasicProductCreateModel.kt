@@ -32,7 +32,7 @@ class BasicProductCreateModel {
     var shippingProductId: Long? = null
 
     @ApiModelProperty(value = "상품명")
-    var name: String? = null
+    lateinit var name: String
 
     @ApiModelProperty(value = "상품코드")
     var code: String? = null
@@ -96,18 +96,14 @@ class BasicProductCreateModel {
         inWarehouse: InWarehouse?,
     ): BasicProduct {
         return BasicProduct(
-            type = type,
             partnerId = partnerId,
-            name = name,
             code = code,
-            barcodeYn = barcodeYn,
             barcode = barcode,
             basicProductCategory = basicProductCategory,
             subsidiaryMaterialCategory = subsidiaryMaterialCategory,
             handlingTemperature = handlingTemperature,
             warehouse = inWarehouse,
             supplyPrice = supplyPrice,
-            expirationDateManagementYn = expirationDateManagementYn,
             expirationDateInfo = expirationDateInfoModel?.toEntity(),
             singleDimension = singleDimensionCreateModel.toEntity(),
             boxDimension = boxDimensionCreateModel.toEntity(),
@@ -115,6 +111,11 @@ class BasicProductCreateModel {
             piecesPerPalette = piecesPerPalette,
             imageUrl = imageUrl,
             activeYn = activeYn
-        )
+        ).also {
+            it.type = type
+            it.barcodeYn = barcodeYn
+            it.name = name
+            it.expirationDateManagementYn = expirationDateManagementYn
+        }
     }
 }

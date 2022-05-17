@@ -59,9 +59,9 @@ class BasicProductDetailCreateModelValidator(
         errors: Errors
     ) {
         with(target) {
-            if (name == null || partnerId == null) return
+            if (partnerId == null) return
 
-            basicProductRepository.findByPartnerIdAndName(partnerId!!, name!!)?.let {
+            basicProductRepository.findByPartnerIdAndName(partnerId!!, name)?.let {
                 if (saveState == SaveState.UPDATE && it.id == id) return
 
                 errors.rejectValue(
@@ -83,17 +83,6 @@ class BasicProductDetailCreateModelValidator(
         with(target) {
             if (barcodeYn.isNotEmpty() && barcodeYn == "Y") {
                 validateEmpty(errors, "basicProductModel.barcode", "상품바코드", barcode)
-                validateNull(errors, "basicProductModel.partnerId", "화주(고객사) ID", partnerId)
-
-                if (barcode == null || partnerId == null) return
-
-                if (barcode!!.toLongOrNull() == null) {
-                    errors.rejectValue(
-                        "basicProductModel.barcode",
-                        "barcode.invalid",
-                        "바코드 값은 숫자 입력만 가능합니다."
-                    )
-                }
             }
         }
     }

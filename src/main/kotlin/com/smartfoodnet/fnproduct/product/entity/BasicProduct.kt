@@ -3,7 +3,6 @@ package com.smartfoodnet.fnproduct.product.entity
 import com.smartfoodnet.common.entity.BaseEntity
 import com.smartfoodnet.fnproduct.product.model.request.BasicProductCreateModel
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
-import com.smartfoodnet.fnproduct.product.model.vo.BasicProductTypeConverter
 import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
 import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureTypeConverter
 import com.smartfoodnet.fnproduct.warehouse.entity.InWarehouse
@@ -12,36 +11,21 @@ import javax.persistence.*
 @Entity
 @Table(name = "basic_product")
 class BasicProduct(
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", columnDefinition = "BIGINT UNSIGNED")
-    var id: Long? = null,
-
-    @Column(name = "type")
-    @Convert(converter = BasicProductTypeConverter::class)
-    var type: BasicProductType,
-
-    @Column(name = "partner_id", columnDefinition = "BIGINT UNSIGNED")
+    @Column(name = "partner_id")
     var partnerId: Long? = null,
-
-    @Column(name = "name")
-    var name: String? = null,
 
     @Column(name = "code")
     var code: String? = null,
-
-    @Column(name = "barcode_yn")
-    var barcodeYn: String = "N",
 
     @Column(name = "barcode")
     var barcode: String? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "basic_product_category_id", columnDefinition = "BIGINT UNSIGNED")
+    @JoinColumn(name = "basic_product_category_id")
     var basicProductCategory: BasicProductCategory? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "subsidiary_material_category_id", columnDefinition = "BIGINT UNSIGNED")
+    @JoinColumn(name = "subsidiary_material_category_id")
     var subsidiaryMaterialCategory: SubsidiaryMaterialCategory? = null,
 
     @Column(name = "handling_temperature")
@@ -49,14 +33,11 @@ class BasicProduct(
     var handlingTemperature: HandlingTemperatureType? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "warehouse_id", columnDefinition = "BIGINT UNSIGNED")
+    @JoinColumn(name = "warehouse_id")
     var warehouse: InWarehouse? = null,
 
     @Column(name = "supply_price")
     var supplyPrice: Int? = null,
-
-    @Column(name = "expiration_date_management_yn")
-    var expirationDateManagementYn: String = "N",
 
     @Embedded
     var expirationDateInfo: ExpirationDateInfo? = null,
@@ -85,18 +66,36 @@ class BasicProduct(
     @Column(name = "active_yn")
     var activeYn: String = "N",
 
-    @Column(name = "shipping_product_id", columnDefinition = "BIGINT UNSIGNED")
+    @Column(name = "shipping_product_id")
     var shippingProductId: Long? = null,
 
     @Column(name = "product_code")
     var productCode: String? = null,
 
-    @Column(name = "sales_product_id", columnDefinition = "BIGINT UNSIGNED")
+    @Column(name = "sales_product_id")
     var salesProductId: Long? = null,
 
     @Column(name = "sales_product_code")
     var salesProductCode: String? = null,
 ) : BaseEntity() {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
+    val id: Long = 0
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false)
+    lateinit var type: BasicProductType
+
+    @Column(name = "barcode_yn", nullable = false)
+    lateinit var barcodeYn: String
+
+    @Column(name = "name", nullable = false)
+    lateinit var name: String
+
+    @Column(name = "expiration_date_management_yn", nullable = false)
+    lateinit var expirationDateManagementYn: String
+
     fun addSubsidiaryMaterialMappings(subsidiaryMaterialMapping: SubsidiaryMaterialMapping) {
         subsidiaryMaterialMappings.add(subsidiaryMaterialMapping)
         subsidiaryMaterialMapping.basicProduct = this

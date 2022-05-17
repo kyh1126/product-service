@@ -13,7 +13,7 @@ interface ExcelModel
 data class ExpirationDateInfoExcelModel(
     val manufactureDateWriteYn: String,
     val expirationDateWriteYn: String,
-    val manufactureToExpirationDate: Long?,
+    var manufactureToExpirationDate: Long? = 0,
 ) {
     fun toExpirationDateInfoCreateModel(): ExpirationDateInfoCreateModel {
         return ExpirationDateInfoCreateModel(
@@ -22,6 +22,10 @@ data class ExpirationDateInfoExcelModel(
             manufactureToExpirationDate = manufactureToExpirationDate
         )
     }
+
+    fun isExpirationDateManagement(manufactureDateWriteYn: String, expirationDateWriteYn: String) =
+        !((manufactureDateWriteYn.isEmpty() || expirationDateWriteYn.isEmpty())
+            || (manufactureDateWriteYn == "N" && expirationDateWriteYn == "N"))
 }
 
 data class BasicProductExcelModel(
