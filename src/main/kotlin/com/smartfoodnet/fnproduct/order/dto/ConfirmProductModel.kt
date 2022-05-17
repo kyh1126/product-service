@@ -24,7 +24,7 @@ data class ConfirmProductModel @QueryProjection constructor(
     val bundleNumber: String,
     val matchingType: MatchingType,
     val basicProductId: Long?,
-    val basicProductCode : String?,
+    val basicProductCode: String?,
     val basicProductType: BasicProductType,
     val basicProductSalesProductId: Long?,
     val basicProductSalesProductCode: String?,
@@ -32,7 +32,9 @@ data class ConfirmProductModel @QueryProjection constructor(
     val basicProductShippingProductCode: String?,
     val basicProductName: String?,
     @JsonIgnore
-    val mappedQuantity: Int?,
+    val confirmQuantity: Int?,
+    @JsonIgnore
+    val confirmQuantityPerUnit: Int?,
     val storeId: Long?,
     val storeName: String?,
     val collectedProductCode: String,
@@ -56,5 +58,9 @@ data class ConfirmProductModel @QueryProjection constructor(
 ) {
     val mappedFlag: Boolean = basicProductId != null
     var availableQuantity: Int = -1
-    val mappedQuantityCalc: Int = (mappedQuantity ?: 0) * (quantity ?: 0)
+    val mappedQuantityCalc: Int
+        get() = when (matchingType) {
+            MatchingType.TEMP -> (confirmQuantity ?: 0)
+            else -> (confirmQuantityPerUnit ?: 0) * (quantity ?: 0)
+        }
 }
