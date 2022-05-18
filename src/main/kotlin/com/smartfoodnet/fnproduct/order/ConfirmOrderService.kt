@@ -279,7 +279,7 @@ class ConfirmOrderService(
             availableStocks
         )
 
-        val mappedQuantity = confirmProductModel.mappedQuantityCalc
+        val mappedQuantity = confirmProductModel.quantity
         val minQuantity = basicProductAndQuantity.map {
             var quantity = it.value * mappedQuantity
             val availableStock = availableStocks[it.key.shippingProductId] ?: 0

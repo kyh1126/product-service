@@ -38,7 +38,6 @@ class ConfirmProductRepositoryImpl : ConfirmProductRepositoryCustom, Querydsl4Re
                 basicProduct.productCode,
                 basicProduct.name,
                 confirmProduct.quantity,
-                confirmProduct.quantityPerUnit,
                 collectedOrder.storeId,
                 collectedOrder.storeName,
                 collectedOrder.collectedProductInfo.collectedStoreProductCode,

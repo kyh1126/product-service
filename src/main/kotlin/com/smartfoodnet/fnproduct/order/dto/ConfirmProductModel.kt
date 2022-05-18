@@ -3,7 +3,6 @@ package com.smartfoodnet.fnproduct.order.dto
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.querydsl.core.annotations.QueryProjection
-import com.smartfoodnet.common.Constants.DATE_FORMAT
 import com.smartfoodnet.common.Constants.TIMESTAMP_FORMAT
 import com.smartfoodnet.fnproduct.order.vo.DeliveryType
 import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
@@ -31,10 +30,7 @@ data class ConfirmProductModel @QueryProjection constructor(
     val basicProductShippingProductId: Long?,
     val basicProductShippingProductCode: String?,
     val basicProductName: String?,
-    @JsonIgnore
-    val confirmQuantity: Int?,
-    @JsonIgnore
-    val confirmQuantityPerUnit: Int?,
+    val releaseQuantity: Int,
     val storeId: Long?,
     val storeName: String?,
     val collectedProductCode: String,
@@ -46,7 +42,7 @@ data class ConfirmProductModel @QueryProjection constructor(
     val storeProductCode: String?,
     val storeProductOptionName: String?,
     val storeProductOptionCode: String?,
-    val quantity: Int?,
+    val quantity: Int,
     val deliveryType: DeliveryType,
     val shippingPrice: Double?,
     val name: String? = null,
@@ -58,9 +54,4 @@ data class ConfirmProductModel @QueryProjection constructor(
 ) {
     val mappedFlag: Boolean = basicProductId != null
     var availableQuantity: Int = -1
-    val mappedQuantityCalc: Int
-        get() = when (matchingType) {
-            MatchingType.TEMP -> (confirmQuantity ?: 0)
-            else -> (confirmQuantityPerUnit ?: 0) * (quantity ?: 0)
-        }
 }
