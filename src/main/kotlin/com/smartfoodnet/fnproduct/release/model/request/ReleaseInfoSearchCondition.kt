@@ -33,7 +33,7 @@ class ReleaseInfoSearchCondition(
     @ApiModelProperty(value = "받는분이름")
     var receiverName: String? = null,
 
-    @ApiModelProperty(value = "업로드방식")
+    @ApiModelProperty(value = "수집방식")
     var uploadType: OrderUploadType? = null,
 
     // ---------------------------------------------------------------------------------------------
