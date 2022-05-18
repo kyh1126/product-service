@@ -49,8 +49,8 @@ data class OrderProductModel(
     @ApiModelProperty(value = "출고상품수량")
     var quantity: Int,
 
-    @ApiModelProperty(value = "상품별 주문수량")
-    var orderQuantity: Int
+    @ApiModelProperty(value = "상품별주문수")
+    var orderCount: Int
 ) {
     companion object {
         fun fromEntity(
@@ -75,7 +75,7 @@ data class OrderProductModel(
                     basicProductName = releaseProduct.basicProduct.name!!,
                     basicProductCode = releaseProduct.basicProduct.code!!,
                     quantity = releaseProduct.quantity,
-                    orderQuantity = getOrderQuantity(releaseProduct.basicProduct.id!!, collectedOrders)
+                    orderCount = getOrderCount(releaseProduct.basicProduct.id!!, collectedOrders)
                 )
             }
         }
@@ -102,7 +102,7 @@ data class OrderProductModel(
                     basicProductName = confirmProduct.basicProduct.name!!,
                     basicProductCode = confirmProduct.basicProduct.code!!,
                     quantity = confirmProduct.quantity,
-                    orderQuantity = getOrderQuantity(confirmProduct.basicProduct.id!!, collectedOrders)
+                    orderCount = getOrderCount(confirmProduct.basicProduct.id!!, collectedOrders)
                 )
             }
         }
@@ -111,7 +111,7 @@ data class OrderProductModel(
             releaseInfo.confirmOrder?.requestOrderList
                 ?.map { it.collectedOrder } ?: emptyList()
 
-        private fun getOrderQuantity(basicProductId: Long, collectedOrders: List<CollectedOrder>): Int {
+        private fun getOrderCount(basicProductId: Long, collectedOrders: List<CollectedOrder>): Int {
             return collectedOrders.count { it.containsBasicProduct(basicProductId) }
         }
     }
