@@ -2,24 +2,26 @@ package com.smartfoodnet.fnproduct.order
 
 import com.smartfoodnet.apiclient.WmsApiClient
 import com.smartfoodnet.common.error.exception.BaseRuntimeException
+import com.smartfoodnet.common.model.request.PredicateSearchCondition
 import com.smartfoodnet.common.utils.Log
-import com.smartfoodnet.fnproduct.order.model.CollectedOrderCreateModel
-import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import com.smartfoodnet.fninventory.shortage.model.ShortageOrderProjectionModel
 import com.smartfoodnet.fninventory.shortage.support.ProductShortageSearchCondition
-import com.smartfoodnet.fnproduct.order.dto.CollectedOrderModel
+import com.smartfoodnet.fnproduct.order.dto.CollectedOrderFlatModel
 import com.smartfoodnet.fnproduct.order.dto.CollectedOrderSimpleModel
 import com.smartfoodnet.fnproduct.order.dto.MissingAffectedOrderModel
 import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
 import com.smartfoodnet.fnproduct.order.model.BasicProductAddModel
+import com.smartfoodnet.fnproduct.order.model.CollectedOrderCreateModel
 import com.smartfoodnet.fnproduct.order.support.CollectedOrderRepository
-import com.smartfoodnet.fnproduct.order.support.condition.CollectingOrderSearchCondition
+import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import com.smartfoodnet.fnproduct.product.BasicProductService
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.store.StoreProductService
 import com.smartfoodnet.fnproduct.store.entity.StoreProduct
 import com.smartfoodnet.fnproduct.store.entity.StoreProductMapping
 import com.smartfoodnet.fnproduct.store.support.StoreProductSearchCondition
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -54,10 +56,11 @@ class OrderService(
         collectedOrderCreateModel.forEach { convertCollectedOrderEntity(it) }
     }
 
-    fun getCollectedOrder(
-        condition: CollectingOrderSearchCondition
-    ): List<CollectedOrderModel> {
-        return collectedOrderRepository.findAllCollectedOrders(condition)
+    fun findCollectedOrders(
+        condition: PredicateSearchCondition,
+        page: Pageable
+    ): Page<CollectedOrderFlatModel> {
+        return collectedOrderRepository.findCollectedOrders(condition, page)
     }
 
     fun getCollectedOrder(collectedOrderId: Long) =
