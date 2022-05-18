@@ -3,14 +3,35 @@ package com.smartfoodnet.fnproduct.order.entity
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.smartfoodnet.common.entity.BaseEntity
 import com.smartfoodnet.fnproduct.claim.model.vo.ExchangeStatus
-import com.smartfoodnet.fnproduct.order.vo.*
+import com.smartfoodnet.fnproduct.claim.model.vo.ReturnStatus
+import com.smartfoodnet.fnproduct.order.vo.DeliveryType
+import com.smartfoodnet.fnproduct.order.vo.DeliveryTypeConverter
+import com.smartfoodnet.fnproduct.order.vo.OrderStatus
+import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
+import com.smartfoodnet.fnproduct.order.vo.StoreSyncStatus
 import com.smartfoodnet.fnproduct.store.entity.StoreProduct
 import org.hibernate.annotations.DynamicUpdate
 import java.time.LocalDateTime
-import javax.persistence.*
+import javax.persistence.CascadeType
+import javax.persistence.Column
+import javax.persistence.Convert
+import javax.persistence.Embedded
+import javax.persistence.Entity
+import javax.persistence.EnumType
+import javax.persistence.Enumerated
+import javax.persistence.FetchType
+import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType
+import javax.persistence.Id
+import javax.persistence.Index
+import javax.persistence.JoinColumn
+import javax.persistence.OneToMany
+import javax.persistence.OneToOne
+import javax.persistence.Table
+import javax.persistence.Transient
 
 @Entity
-@Table(indexes = [Index(name="idx_partnerid_status", columnList = "partnerId, status")])
+@Table(indexes = [Index(name = "idx_partnerid_status", columnList = "partnerId, status")])
 @DynamicUpdate
 class CollectedOrder(
     @Id
@@ -68,7 +89,12 @@ class CollectedOrder(
     @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
     var storeProduct: StoreProduct? = null,
 
-    @OneToMany(mappedBy = "collectedOrder", fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST], orphanRemoval = true)
+    @OneToMany(
+        mappedBy = "collectedOrder",
+        fetch = FetchType.LAZY,
+        cascade = [CascadeType.PERSIST],
+        orphanRemoval = true
+    )
     val confirmProductList: MutableList<ConfirmProduct> = mutableListOf(),
 
     @Embedded
@@ -90,7 +116,15 @@ class CollectedOrder(
     @Enumerated(EnumType.STRING)
     val uploadType: OrderUploadType = OrderUploadType.API,
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "return_status")
+    var returnStatus: ReturnStatus = ReturnStatus.UNREGISTERED,
+
+    @OneToOne(mappedBy = "collectedOrder", fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
+    val confirmRequestOrder: ConfirmRequestOrder? = null,
+
     val unprocessed: Boolean = false
+
 ) : BaseEntity() {
     val isConnectedStoreProduct
         @JsonIgnore @Transient

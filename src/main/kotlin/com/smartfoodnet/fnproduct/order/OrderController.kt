@@ -2,7 +2,8 @@ package com.smartfoodnet.fnproduct.order
 
 import com.smartfoodnet.common.Constants
 import com.smartfoodnet.common.model.header.SfnMetaUser
-import com.smartfoodnet.fnproduct.order.dto.CollectedOrderModel
+import com.smartfoodnet.common.model.response.PageResponse
+import com.smartfoodnet.fnproduct.order.dto.CollectedOrderFlatModel
 import com.smartfoodnet.fnproduct.order.dto.CollectedOrderSimpleModel
 import com.smartfoodnet.fnproduct.order.dto.ConfirmProductModel
 import com.smartfoodnet.fnproduct.order.dto.MissingAffectedOrderModel
@@ -11,14 +12,25 @@ import com.smartfoodnet.fnproduct.order.model.CollectedOrderCreateModel
 import com.smartfoodnet.fnproduct.order.model.ConfirmProductAddModel
 import com.smartfoodnet.fnproduct.order.model.RequestOrderCreateModel
 import com.smartfoodnet.fnproduct.order.model.response.ManualOrderResponseModel
-import com.smartfoodnet.fnproduct.order.support.condition.CollectingOrderSearchCondition
+import com.smartfoodnet.fnproduct.order.support.condition.CollectedOrderSearchCondition
 import com.smartfoodnet.fnproduct.order.support.condition.ConfirmProductSearchCondition
 import com.smartfoodnet.fnproduct.release.ManualReleaseService
 import com.smartfoodnet.fnproduct.release.model.request.ManualReleaseCreateModel
 import io.swagger.annotations.Api
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
-import org.springframework.web.bind.annotation.*
+import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
+import org.springframework.data.web.PageableDefault
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.ModelAttribute
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestHeader
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 import springfox.documentation.annotations.ApiIgnore
 import javax.validation.Valid
 
@@ -34,6 +46,17 @@ class OrderController(
     @PostMapping
     fun createCollectedOrder(@Valid @RequestBody collectedOrderCreateModels: List<CollectedOrderCreateModel>) {
         orderService.createCollectedOrder(collectedOrderCreateModels)
+    }
+
+    @Operation(summary = "특정 화주(고객사) ID 의 주문수집 조회")
+    @GetMapping
+    fun findCollectedOrders(
+        @Parameter(description = "검색조건")
+        @ModelAttribute condition: CollectedOrderSearchCondition,
+        @PageableDefault(size = 50, sort = ["id"], direction = Sort.Direction.DESC)
+        page: Pageable,
+    ): PageResponse<CollectedOrderFlatModel> {
+        return PageResponse.of(orderService.findCollectedOrders(condition, page))
     }
 
     @Operation(summary = "주문수집 미매칭 쇼핑몰상품 연결")
@@ -55,25 +78,14 @@ class OrderController(
         confirmOrderService.createConfirmProduct(partnerId, collectedIds)
     }
 
-    @Operation(summary = "특정 화주(고객사) ID 의 주문수집 조회")
-    @GetMapping("partners/{partnerId}")
-    fun getCollectedOrders(
-        @Parameter(description = "화주(고객사) ID", required = true)
-        @PathVariable partnerId: Long,
-        @Parameter(description = "검색조건")
-        @ModelAttribute condition: CollectingOrderSearchCondition,
-    ): List<CollectedOrderModel> {
-        return orderService.getCollectedOrder(condition.apply { this.partnerId = partnerId })
-    }
-
     @Operation(summary = "주문정보 간단 조회")
     @GetMapping("{orderNumber}/partners/{partnerId}")
     fun getCollectedOrder(
         @Parameter(description = "화주(고객사) ID", required = true)
         @PathVariable partnerId: Long,
         @Parameter(description = "주문번호", required = true)
-        @PathVariable orderNumber : String
-    ) : CollectedOrderSimpleModel {
+        @PathVariable orderNumber: String
+    ): CollectedOrderSimpleModel {
         return orderService.getCollectedOrderByOrderNumber(partnerId, orderNumber)
     }
 
