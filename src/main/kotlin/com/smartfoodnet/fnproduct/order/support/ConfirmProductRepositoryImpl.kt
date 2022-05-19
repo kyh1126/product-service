@@ -2,18 +2,13 @@ package com.smartfoodnet.fnproduct.order.support
 
 import com.smartfoodnet.common.model.request.PredicateSearchCondition
 import com.smartfoodnet.config.Querydsl4RepositorySupport
-import com.smartfoodnet.fnproduct.order.dto.CollectedOrderModel
 import com.smartfoodnet.fnproduct.order.dto.ConfirmProductModel
-import com.smartfoodnet.fnproduct.order.dto.QCollectedOrderModel
 import com.smartfoodnet.fnproduct.order.dto.QConfirmProductModel
 import com.smartfoodnet.fnproduct.order.entity.ConfirmProduct
-import com.smartfoodnet.fnproduct.order.entity.QCollectedOrder
-import com.smartfoodnet.fnproduct.order.entity.QCollectedOrder.*
-import com.smartfoodnet.fnproduct.order.entity.QConfirmProduct
-import com.smartfoodnet.fnproduct.order.entity.QConfirmProduct.*
-import com.smartfoodnet.fnproduct.product.entity.QBasicProduct
-import com.smartfoodnet.fnproduct.product.entity.QBasicProduct.*
 import com.smartfoodnet.fnproduct.store.entity.QStoreProduct.storeProduct
+import com.smartfoodnet.fnproduct.order.entity.QCollectedOrder.collectedOrder
+import com.smartfoodnet.fnproduct.order.entity.QConfirmProduct.confirmProduct
+import com.smartfoodnet.fnproduct.product.entity.QBasicProduct.basicProduct
 
 class ConfirmProductRepositoryImpl : ConfirmProductRepositoryCustom, Querydsl4RepositorySupport(
     ConfirmProduct::class.java){

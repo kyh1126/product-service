@@ -1,5 +1,6 @@
 package com.smartfoodnet.fnproduct.release.model.response
 
+import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
 import com.smartfoodnet.fnproduct.order.entity.ConfirmProduct
 import com.smartfoodnet.fnproduct.order.vo.DeliveryType
 import com.smartfoodnet.fnproduct.order.vo.OrderStatus
@@ -36,14 +37,20 @@ data class OrderProductModel(
     @ApiModelProperty(value = "송장번호부여일시")
     var trackingNumberCreatedAt: LocalDateTime? = null,
 
+    @ApiModelProperty(value = "기본상품 ID")
+    var basicProductId: Long,
+
     @ApiModelProperty(value = "출고상품명")
-    var basicProductName: String? = null,
+    var basicProductName: String,
 
     @ApiModelProperty(value = "출고상품코드")
-    var basicProductCode: String? = null,
+    var basicProductCode: String,
 
     @ApiModelProperty(value = "출고상품수량")
-    var quantity: Int
+    var quantity: Int,
+
+    @ApiModelProperty(value = "상품별주문수")
+    var orderCount: Int
 ) {
     companion object {
         fun fromEntity(
@@ -64,9 +71,11 @@ data class OrderProductModel(
                     orderStatus = releaseStatus.orderStatus,
                     trackingNumber = trackingNumber,
                     trackingNumberCreatedAt = trackingNumberCreatedAt,
-                    basicProductName = releaseProduct.basicProduct.name,
-                    basicProductCode = releaseProduct.basicProduct.code,
-                    quantity = releaseProduct.quantity
+                    basicProductId = releaseProduct.basicProduct.id!!,
+                    basicProductName = releaseProduct.basicProduct.name!!,
+                    basicProductCode = releaseProduct.basicProduct.code!!,
+                    quantity = releaseProduct.quantity,
+                    orderCount = getOrderCount(releaseProduct.basicProduct.id!!, collectedOrders)
                 )
             }
         }
@@ -89,9 +98,11 @@ data class OrderProductModel(
                     orderStatus = releaseStatus.orderStatus,
                     trackingNumber = trackingNumber,
                     trackingNumberCreatedAt = trackingNumberCreatedAt,
-                    basicProductName = confirmProduct.basicProduct.name,
-                    basicProductCode = confirmProduct.basicProduct.code,
-                    quantity = confirmProduct.quantity
+                    basicProductId = confirmProduct.basicProduct.id!!,
+                    basicProductName = confirmProduct.basicProduct.name!!,
+                    basicProductCode = confirmProduct.basicProduct.code!!,
+                    quantity = confirmProduct.quantity,
+                    orderCount = getOrderCount(confirmProduct.basicProduct.id!!, collectedOrders)
                 )
             }
         }
@@ -99,5 +110,9 @@ data class OrderProductModel(
         private fun getCollectedOrders(releaseInfo: ReleaseInfo) =
             releaseInfo.confirmOrder?.requestOrderList
                 ?.map { it.collectedOrder } ?: emptyList()
+
+        private fun getOrderCount(basicProductId: Long, collectedOrders: List<CollectedOrder>): Int {
+            return collectedOrders.count { it.containsBasicProduct(basicProductId) }
+        }
     }
 }

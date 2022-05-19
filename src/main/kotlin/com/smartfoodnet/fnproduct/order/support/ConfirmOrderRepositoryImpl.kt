@@ -3,9 +3,7 @@ package com.smartfoodnet.fnproduct.order.support
 import com.querydsl.jpa.impl.JPAQuery
 import com.smartfoodnet.common.model.request.PredicateSearchCondition
 import com.smartfoodnet.config.Querydsl4RepositorySupport
-import com.smartfoodnet.fnproduct.order.dto.CollectedOrderModel
 import com.smartfoodnet.fnproduct.order.dto.ConfirmOrderModel
-import com.smartfoodnet.fnproduct.order.dto.QCollectedOrderModel
 import com.smartfoodnet.fnproduct.order.dto.QConfirmOrderModel
 import com.smartfoodnet.fnproduct.order.entity.ConfirmOrder
 import com.smartfoodnet.fnproduct.order.entity.QCollectedOrder.collectedOrder

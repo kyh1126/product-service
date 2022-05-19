@@ -32,7 +32,6 @@ class SpringFoxConfig(
         )
 
         return Docket(DocumentationType.SWAGGER_2)
-//            .host(host)
             .alternateTypeRules(newRule)
             .select()
             .apis(RequestHandlerSelectors.basePackage("com.smartfoodnet"))
