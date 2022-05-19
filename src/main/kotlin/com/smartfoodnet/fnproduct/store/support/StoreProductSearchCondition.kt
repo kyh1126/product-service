@@ -1,6 +1,5 @@
 package com.smartfoodnet.fnproduct.store.support
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import com.querydsl.core.BooleanBuilder
 import com.querydsl.core.types.Predicate
 import com.querydsl.core.types.dsl.BooleanExpression
@@ -13,8 +12,7 @@ import com.smartfoodnet.fnproduct.store.entity.QStoreProduct.storeProduct
 import io.swagger.annotations.ApiModelProperty
 
 class StoreProductSearchCondition(
-    @JsonIgnore
-    @ApiModelProperty(hidden = true)
+    @ApiModelProperty(value = "화주사 (고객) ID", required = true)
     var partnerId: Long? = null,
     @ApiModelProperty(value = "쇼핑몰 ID")
     val storeIds: List<Long>? = null,

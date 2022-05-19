@@ -29,6 +29,10 @@ class StoreProductService(
         return storeProductRepository.findStoreProducts(condition, page).map { StoreProductModel.from(it) }
     }
 
+    fun findFlattenedStoreProducts(condition: PredicateSearchCondition, page: Pageable): Page<StoreProductModel> {
+        return storeProductRepository.findFlattenedStoreProducts(condition, page).map { StoreProductModel.from(it) }
+    }
+
     fun getStoreProduct(storeProductId: Long): StoreProductModel? {
         return storeProductRepository.findByIdOrNull(storeProductId)?.let { StoreProductModel.from(it) }
     }

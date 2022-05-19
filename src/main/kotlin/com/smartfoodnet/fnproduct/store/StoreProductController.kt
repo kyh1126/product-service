@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
@@ -25,21 +24,28 @@ import org.springframework.web.multipart.MultipartFile
 import javax.validation.Valid
 
 @RestController
-@RequestMapping("store-product")
 class StoreProductController(
     private val storeProductService: StoreProductService,
     private val storeProductExcelService: StoreProductExcelService
 ) {
-    @Operation(summary = "특정 화주(고객사) ID 의 쇼핑몰상품 리스트 조회")
-    @GetMapping("partner/{partnerId}")
+    @Operation(summary = "쇼핑몰상품 리스트 조회")
+    @GetMapping("store-product")
     fun findStoreProducts(
-        @Parameter(description = "화주(고객사) ID", required = true)
-        @PathVariable partnerId: Long,
         @Parameter(description = "검색조건")
         @ModelAttribute condition: StoreProductSearchCondition,
         @PageableDefault(size = 50, sort = ["id"], direction = Sort.Direction.DESC) page: Pageable,
     ): PageResponse<StoreProductModel> {
         return PageResponse.of(storeProductService.findStoreProducts(condition.apply { this.partnerId = partnerId }, page))
+    }
+
+    @Operation(summary = "쇼핑몰상품 기본상품 기준 리스트 조회")
+    @GetMapping("store-product/flat")
+    fun findFlattenedStoreProducts(
+        @Parameter(description = "검색조건")
+        @ModelAttribute condition: StoreProductSearchCondition,
+        @PageableDefault(size = 50, sort = ["id"], direction = Sort.Direction.DESC) page: Pageable,
+    ): PageResponse<StoreProductModel> {
+        return PageResponse.of(storeProductService.findStoreProducts(condition, page))
     }
 
     @Operation(summary = "쇼핑몰상품 상세 조회")
