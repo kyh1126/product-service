@@ -5,6 +5,7 @@ import com.smartfoodnet.config.Querydsl4RepositorySupport
 import com.smartfoodnet.fnproduct.order.dto.ConfirmProductModel
 import com.smartfoodnet.fnproduct.order.dto.QConfirmProductModel
 import com.smartfoodnet.fnproduct.order.entity.ConfirmProduct
+import com.smartfoodnet.fnproduct.store.entity.QStoreProduct.storeProduct
 import com.smartfoodnet.fnproduct.order.entity.QCollectedOrder.collectedOrder
 import com.smartfoodnet.fnproduct.order.entity.QConfirmProduct.confirmProduct
 import com.smartfoodnet.fnproduct.product.entity.QBasicProduct.basicProduct
@@ -31,18 +32,18 @@ class ConfirmProductRepositoryImpl : ConfirmProductRepositoryCustom, Querydsl4Re
                 basicProduct.shippingProductId,
                 basicProduct.productCode,
                 basicProduct.name,
-                confirmProduct.quantityPerUnit,
+                confirmProduct.quantity,
                 collectedOrder.storeId,
                 collectedOrder.storeName,
                 collectedOrder.collectedProductInfo.collectedStoreProductCode,
                 collectedOrder.collectedProductInfo.collectedStoreProductName,
                 collectedOrder.collectedProductInfo.collectedStoreProductOptionName,
                 collectedOrder.collectedProductInfo.collectedStoreProductOptionCode,
-                collectedOrder.storeProduct.id,
-                collectedOrder.storeProduct.name,
-                collectedOrder.storeProduct.storeProductCode,
-                collectedOrder.storeProduct.optionName,
-                collectedOrder.storeProduct.optionCode,
+                storeProduct.id,
+                storeProduct.name,
+                storeProduct.storeProductCode,
+                storeProduct.optionName,
+                storeProduct.optionCode,
                 collectedOrder.quantity,
                 collectedOrder.deliveryType,
                 collectedOrder.shippingPrice,
@@ -54,10 +55,8 @@ class ConfirmProductRepositoryImpl : ConfirmProductRepositoryCustom, Querydsl4Re
             )
         )
             .from(collectedOrder)
-            .leftJoin(
-                collectedOrder.confirmProductList,
-                confirmProduct
-            )
+            .leftJoin(collectedOrder.confirmProductList, confirmProduct)
+            .leftJoin(collectedOrder.storeProduct, storeProduct)
             .leftJoin(confirmProduct.basicProduct, basicProduct)
             .where(condition.toPredicate())
             .fetch()
