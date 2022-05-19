@@ -279,7 +279,7 @@ class ConfirmOrderService(
             availableStocks
         )
 
-        val mappedQuantity = confirmProductModel.mappedQuantityCalc
+        val mappedQuantity = confirmProductModel.releaseQuantity
         val minQuantity = basicProductAndQuantity.map {
             var quantity = it.value * mappedQuantity
             val availableStock = availableStocks[it.key.shippingProductId] ?: 0
@@ -301,12 +301,13 @@ class ConfirmOrderService(
         basicProducts.forEach {
             collectedOrder.addConfirmProduct(
                 it.run {
+                    val quantity = quantityPerBasicProduct[this.id]!!
                     ConfirmProduct(
                         type = type,
                         basicProduct = this,
                         matchingType = MatchingType.TEMP,
-                        quantity = quantityPerBasicProduct[this.id]!!,
-                        quantityPerUnit = 0
+                        quantity = quantity,
+                        quantityPerUnit = 1
                     )
                 }
             )

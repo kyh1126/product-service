@@ -3,7 +3,6 @@ package com.smartfoodnet.fnproduct.order.dto
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.querydsl.core.annotations.QueryProjection
-import com.smartfoodnet.common.Constants.DATE_FORMAT
 import com.smartfoodnet.common.Constants.TIMESTAMP_FORMAT
 import com.smartfoodnet.fnproduct.order.vo.DeliveryType
 import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
@@ -24,15 +23,14 @@ data class ConfirmProductModel @QueryProjection constructor(
     val bundleNumber: String,
     val matchingType: MatchingType,
     val basicProductId: Long?,
-    val basicProductCode : String?,
+    val basicProductCode: String?,
     val basicProductType: BasicProductType,
     val basicProductSalesProductId: Long?,
     val basicProductSalesProductCode: String?,
     val basicProductShippingProductId: Long?,
     val basicProductShippingProductCode: String?,
     val basicProductName: String?,
-    @JsonIgnore
-    val mappedQuantity: Int?,
+    val releaseQuantity: Int,
     val storeId: Long?,
     val storeName: String?,
     val collectedProductCode: String,
@@ -44,7 +42,7 @@ data class ConfirmProductModel @QueryProjection constructor(
     val storeProductCode: String?,
     val storeProductOptionName: String?,
     val storeProductOptionCode: String?,
-    val quantity: Int?,
+    val quantity: Int,
     val deliveryType: DeliveryType,
     val shippingPrice: Double?,
     val name: String? = null,
@@ -56,5 +54,4 @@ data class ConfirmProductModel @QueryProjection constructor(
 ) {
     val mappedFlag: Boolean = basicProductId != null
     var availableQuantity: Int = -1
-    val mappedQuantityCalc: Int = (mappedQuantity ?: 0) * (quantity ?: 0)
 }

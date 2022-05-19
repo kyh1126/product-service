@@ -27,7 +27,7 @@ data class OrderConfirmProductModel(
                     orderNumber = orderNumber,
                     basicProductName = basicProductName,
                     basicProductCode = basicProductShippingProductCode,
-                    mappedQuantity = mappedQuantityCalc
+                    mappedQuantity = releaseQuantity
                 )
             }
         }
