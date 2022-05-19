@@ -19,8 +19,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2
 @Configuration
 @EnableSwagger2
 class SpringFoxConfig(
-    @Value("\${sfn.swagger.host}")
-    private val host: String,
     private val typeResolver: TypeResolver,
 ) {
 
