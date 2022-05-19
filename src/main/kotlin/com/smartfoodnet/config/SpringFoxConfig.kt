@@ -20,7 +20,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2
 class SpringFoxConfig(
     private val typeResolver: TypeResolver,
 ) {
-
     @Bean
     fun api(): Docket {
         val newRule = AlternateTypeRules.newRule(

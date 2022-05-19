@@ -30,7 +30,7 @@ data class CollectedOrderFlatModel @QueryProjection constructor(
     val address: String? = null,
     val phoneNumber: String? = null,
     @JsonFormat(pattern = TIMESTAMP_FORMAT)
-    val collectedAt: LocalDateTime?,
+    val collectedAt: LocalDateTime?
 )
 
 data class BasicProductFlatModel @QueryProjection constructor(
