@@ -44,7 +44,7 @@ class StockController(
         return stockService.getBasicProductStocks(partnerId, condition, page)
     }
 
-    @Operation(summary = "특정 화주(고객사) ID 의 상미기한별 재고 리스트 조회")
+    @Operation(summary = "특정 화주(고객사) ID 의 유통기한별 재고 리스트 조회")
     @GetMapping("best-before/{partnerId}")
     fun getStocksByBestBefore(
         @Parameter(description = "화주(고객사) ID", required = true)
@@ -53,8 +53,8 @@ class StockController(
         @ModelAttribute condition: StockByBestBeforeSearchCondition,
         @PageableDefault(
             size = 50,
-            sort = ["bestBefore"],
-            direction = Sort.Direction.DESC
+            sort = ["expirationDate"],
+            direction = Sort.Direction.ASC
         ) page: Pageable,
     ): PageResponse<StockByBestBeforeModel> {
         condition.apply { this.partnerId = partnerId }

@@ -119,9 +119,7 @@ class StockScheduledService(
             }
         }
 
-        val dailyStockSummaries = mutableListOf<DailyStockSummary>()
-
-        dailyCloseStockModels?.forEach { closeStock ->
+        val dailyStockSummaries = dailyCloseStockModels?.map { closeStock ->
             val summary =
                 stockSummaryModels?.firstOrNull { it.shippingProductId == closeStock.shippingProductId }
             val basicProduct =
@@ -145,10 +143,10 @@ class StockScheduledService(
             )
 
             dailyStockSummary.calculateTotalStockChange()
-            dailyStockSummaries.add(dailyStockSummary)
+            dailyStockSummary
         }
 
-        dailyStockSummaryRepository.saveAll(dailyStockSummaries)
+        dailyStockSummaries?.let { dailyStockSummaryRepository.saveAll(it)}
     }
 
     @Transactional
@@ -185,9 +183,7 @@ class StockScheduledService(
                 basicProductChunk.map { it.shippingProductId }
             ).payload?.dataList ?: listOf()
 
-            val stocksByBestBefore = mutableListOf<StockByBestBefore>()
-
-            nosnosStocksByExpirationDate.forEach { nosnosStockByExpirationDate ->
+            val stocksByBestBefore = nosnosStocksByExpirationDate.map { nosnosStockByExpirationDate ->
                 val basicProduct = basicProductChunk.find {
                     it.shippingProductId?.equals(nosnosStockByExpirationDate.shippingProductId)
                         ?: false
@@ -203,15 +199,12 @@ class StockScheduledService(
                     OrderStatus.NEW
                 ) ?: 0
 
-                val stockByBestBefore = buildStockByBestBefore(
+                buildStockByBestBefore(
                     basicProduct,
                     nosnosStockByExpirationDate,
                     orderCount
                 )
-
-                stocksByBestBefore.add(stockByBestBefore)
             }
-
             stockByBestBeforeRepository.saveAll(stocksByBestBefore)
         }
     }
