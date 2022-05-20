@@ -58,9 +58,12 @@ class StoreProductController(
     }
 
     @Operation(summary = "쇼핑몰상품 수정")
-    @PatchMapping("")
-    fun updateStoreProduct(@Valid @RequestBody storeProductUpdateModel: StoreProductUpdateModel): StoreProductModel {
-        return storeProductService.updateStoreProduct(storeProductUpdateModel)
+    @PatchMapping("{storeProductId}")
+    fun updateStoreProduct(
+        @Parameter(description = "쇼핑몰 상품 ID", required = true)
+        @PathVariable storeProductId: Long,
+        @Valid @RequestBody storeProductUpdateModel: StoreProductUpdateModel): StoreProductModel {
+        return storeProductService.updateStoreProduct(storeProductId, storeProductUpdateModel)
     }
 
     @Operation(summary = "쇼핑몰상품 삭제")

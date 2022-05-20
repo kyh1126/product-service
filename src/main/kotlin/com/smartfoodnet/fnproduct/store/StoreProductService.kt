@@ -77,9 +77,9 @@ class StoreProductService(
     }
 
     @Transactional
-    fun updateStoreProduct(storeProductModel: StoreProductUpdateModel): StoreProductModel {
-        val storeProduct = storeProductRepository.findByIdOrNull(storeProductModel.id)
-            ?: throw NoSuchElementError(errorMessage = "존재하지 않는 상품입니다. [storeProductId = ${storeProductModel.id}]")
+    fun updateStoreProduct(storeProductId: Long, storeProductModel: StoreProductUpdateModel): StoreProductModel {
+        val storeProduct = storeProductRepository.findByIdOrNull(storeProductId)
+            ?: throw NoSuchElementError(errorMessage = "존재하지 않는 상품입니다. [storeProductId = ${storeProductId}]")
 
         storeProduct.update(storeProductModel)
 
