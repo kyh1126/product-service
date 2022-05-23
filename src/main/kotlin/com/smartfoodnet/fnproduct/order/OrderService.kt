@@ -44,7 +44,7 @@ class OrderService(
         val storeProduct = storeProductService
             .getStoreProductForOrderDetail(
                 StoreProductSearchCondition.toSearchConditionModel(collectedOrder)
-            )
+            ) ?: createStoreProduct(collectedOrder)
 
         collectedOrder.storeProduct = storeProduct
 
