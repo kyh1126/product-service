@@ -59,13 +59,18 @@ Docker를 실행해주세여...TestContainer 올릴 시 필요합니당
    1. 발주처리->출고요청->출고지시->출고완료 일 경우 차감
    
 # 상미기한별 재고 -> 유통기한별 재고 변경
-1. 유통기간 날짜별 상태
+1. 유통기간 날짜별 상태(2022-05-24기준 유통기간이 10일 부터 임박인 경우)
+   - expirationDateFrom <= expiration_date < expirationDateTo   
    1. 유통기간 초과
-      1. expirationDateFrom - null
-      2. expirationDateTo - today
+      1. expirationDateFrom - null          
+      2. expirationDateTo - 2022-05-23(23일부터 이전 유효기간 조회)
+         1. sql : expiration_date < 2022-05-24 00:00:00(day+1)
    2. 유통기간 임박
-      1. expirationDateFrom - today
-      2. expirationDateTo - day(기준일)+1
+      1. expirationDateFrom - 2022-05-24(오늘날짜)
+         1. sql : 2022-05-24 00:00:00 <= expiration_date
+      2. expirationDateTo - 2022-06-02(기준일 10일)
+         1. sql : expiration_date < 2022-06-03 00:00:00(day+1)
    3. 유통기간 안정
-      1. expirationDateFrom - day(기준일)+1
+      1. expirationDateFrom - 2022-06-03(03일 부터 이후 유효기간 조회)
+         1. sql : 2022-06-23 00:00:00 <= expiration_date
       2. expirationDateTo - null
