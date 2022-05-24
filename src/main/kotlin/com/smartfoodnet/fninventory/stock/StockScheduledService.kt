@@ -145,7 +145,12 @@ class StockScheduledService(
             dailyStockSummary.calculateTotalStockChange()
             dailyStockSummary
         }
-        if(!dailyStockSummaries.isNullOrEmpty())dailyStockSummaryRepository.saveAll(dailyStockSummaries)
+
+        dailyStockSummaries.takeIf {
+            !it.isNullOrEmpty()
+        }?.let {
+            dailyStockSummaryRepository.saveAll(it)
+        }
     }
 
     @Transactional
@@ -204,7 +209,14 @@ class StockScheduledService(
                     orderCount
                 )
             }
-            if(!stocksByBestBefore.isNullOrEmpty())stockByBestBeforeRepository.saveAll(stocksByBestBefore)
+
+            stocksByBestBefore.takeIf {
+                it.isNotEmpty()
+            }?.let {
+                stockByBestBeforeRepository.saveAll(it)
+            }
+
+
         }
     }
 
