@@ -146,8 +146,8 @@ class StockScheduledService(
             dailyStockSummary
         }
 
-        dailyStockSummaries.takeIf {
-            !it.isNullOrEmpty()
+        dailyStockSummaries?.takeIf {
+            it.isNotEmpty()
         }?.let {
             dailyStockSummaryRepository.saveAll(it)
         }
