@@ -18,9 +18,7 @@ import com.smartfoodnet.fnproduct.product.BasicProductRepository
 import com.smartfoodnet.fnproduct.release.model.request.ManualOrderModel
 import com.smartfoodnet.fnproduct.release.model.request.ManualProductModel
 import com.smartfoodnet.fnproduct.release.model.request.ManualReleaseCreateModel
-import com.smartfoodnet.fnproduct.release.model.request.ManualReleaseProductInfo
 import com.smartfoodnet.fnproduct.release.model.request.ReOrderCreateModel
-import com.smartfoodnet.fnproduct.release.model.request.ReOrderProductInfo
 import com.smartfoodnet.fnproduct.release.validator.ManualOrderModelValidator
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
@@ -61,7 +59,6 @@ class ManualReleaseService(
         )
 
         partnerService.checkUserPartnerMembership(sfnMetaUser, partnerId)
-
         return createManualOrder(partnerId, manualReleaseRequest)
     }
 
@@ -82,7 +79,6 @@ class ManualReleaseService(
     @Transactional
     fun issueReOrder(partnerId: Long, createModel: ReOrderCreateModel): ManualOrderResponseModel {
         ValidatorUtils.validateAndThrow(manualOrderModelValidator, createModel)
-
         return createManualOrder(partnerId, createModel)
     }
 
@@ -150,10 +146,7 @@ class ManualReleaseService(
             val basicProduct = basicProductsMap[it.productId]
                 ?: throw BaseRuntimeException(errorMessage = "기본상품을 찾지 못했습니다. productId = ${it.productId}")
 
-            when (it) {
-                is ManualReleaseProductInfo -> it.toConfirmProduct(collectedOrder, basicProduct, MatchingType.MANUAL)
-                is ReOrderProductInfo -> it.toConfirmProduct(collectedOrder, basicProduct, MatchingType.RE_ORDER)
-            }
+            it.toConfirmProduct(collectedOrder, basicProduct, MatchingType.AUTO)
         }.toList()
 
         confirmProductRepository.saveAll(confirmProducts)
