@@ -70,6 +70,7 @@ class StoreProductSearchCondition(
                     storeProductCode = collectedProductInfo.collectedStoreProductCode,
                     storeProductName = collectedProductInfo.collectedStoreProductName,
                     storeProductOptionName = collectedProductInfo.collectedStoreProductOptionName,
+                    storeProductOptionCode = collectedProductInfo.collectedStoreProductOptionCode
                 )
             }
         }
