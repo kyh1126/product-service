@@ -35,9 +35,10 @@ class StoreProductService(
     fun findFlattenedStoreProducts(condition: PredicateSearchCondition, page: Pageable): Page<StoreProductFlatModel> {
         val storeProducts = storeProductRepository.findFlattenedStoreProducts(condition, page)
         val pageable = storeProducts.pageable
-        val storeProductMappings = storeProducts.content.flatMap { it.storeProductMappings }
 
-        val storeProductFlatModels = storeProductMappings.map { buildStoreProductFlatModel(it) }
+        val storeProductFlatModels =
+            storeProducts.content.flatMap { it.storeProductMappings }
+                .map { buildStoreProductFlatModel(it) }
 
         return PageImpl(storeProductFlatModels, pageable, storeProducts.totalElements)
     }
@@ -98,7 +99,7 @@ class StoreProductService(
 
         val newMappings = buildStoreProductMappings(storeProductModel, storeProduct)
         newMappings?.let {
-            if(it.isNotEmpty()){
+            if (it.isNotEmpty()) {
                 storeProduct.updateStoreProductMappings(it)
             }
         }
@@ -141,7 +142,8 @@ class StoreProductService(
         storeProductModel: StoreProductUpdateModel,
         storeProduct: StoreProduct
     ): Set<StoreProductMapping>? {
-        val newBasicProductIds = storeProductModel.storeProductBasicProductMappings?.map { it.basicProductId } ?: return null
+        val newBasicProductIds =
+            storeProductModel.storeProductBasicProductMappings?.map { it.basicProductId } ?: return null
 
         if (newBasicProductIds.size != newBasicProductIds.toSet().size) {
             throw ValidateError("중복된 기본상품이 존재합니다.")
