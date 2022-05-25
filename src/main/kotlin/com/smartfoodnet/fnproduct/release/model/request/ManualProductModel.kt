@@ -5,10 +5,10 @@ import com.smartfoodnet.fnproduct.order.entity.ConfirmProduct
 import com.smartfoodnet.fnproduct.order.vo.MatchingType
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 
-sealed class ManualProductModel {
-    abstract val productId: Long
-    abstract val quantity: Int
-
+data class ManualProductModel(
+    val productId: Long,
+    val quantity: Int
+) {
     fun toConfirmProduct(
         collectedOrder: CollectedOrder,
         basicProduct: BasicProduct,
@@ -24,13 +24,3 @@ sealed class ManualProductModel {
         )
     }
 }
-
-data class ReOrderProductInfo(
-    override var productId: Long,
-    override var quantity: Int,
-) : ManualProductModel()
-
-data class ManualReleaseProductInfo(
-    override var productId: Long,
-    override var quantity: Int,
-) : ManualProductModel()
