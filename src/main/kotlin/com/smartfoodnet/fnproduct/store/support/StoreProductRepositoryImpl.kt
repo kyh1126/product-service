@@ -1,6 +1,5 @@
 package com.smartfoodnet.fnproduct.store.support
 
-import com.querydsl.jpa.impl.JPAQueryFactory
 import com.smartfoodnet.common.model.request.PredicateSearchCondition
 import com.smartfoodnet.config.Querydsl4RepositorySupport
 import com.smartfoodnet.fnproduct.product.entity.QBasicProduct.basicProduct
@@ -18,29 +17,20 @@ class StoreProductRepositoryImpl : StoreProductRepositoryCustom, Querydsl4Reposi
     }
 
     override fun findStoreProducts(condition: PredicateSearchCondition, page: Pageable): Page<StoreProduct> {
-        val contentQuery = { _: JPAQueryFactory ->
+        return applyPagination(page) {
             selectFrom(storeProduct)
-                .leftJoin(storeProduct.storeProductMappings, storeProductMapping)
-                .leftJoin(storeProductMapping.basicProduct, basicProduct)
+                .leftJoin(storeProduct.storeProductMappings, storeProductMapping).fetchJoin()
+                .leftJoin(storeProductMapping.basicProduct, basicProduct).fetchJoin()
                 .where( condition.toPredicate() )
+                .distinct()
         }
-
-        val countQuery = { _: JPAQueryFactory ->
-            selectFrom(storeProduct)
-                .leftJoin(storeProduct.storeProductMappings, storeProductMapping)
-                .leftJoin(storeProductMapping.basicProduct, basicProduct)
-                .where( condition.toPredicate() )
-                .groupBy(storeProduct)
-        }
-
-        return applyPagination(page, contentQuery, countQuery)
     }
 
     override fun findFlattenedStoreProducts(condition: PredicateSearchCondition, page: Pageable): Page<StoreProduct> {
         return applyPagination(page) {
             it.selectFrom(storeProduct)
-                .leftJoin(storeProduct.storeProductMappings, storeProductMapping)
-                .leftJoin(storeProductMapping.basicProduct, basicProduct)
+                .leftJoin(storeProduct.storeProductMappings, storeProductMapping).fetchJoin()
+                .leftJoin(storeProductMapping.basicProduct, basicProduct).fetchJoin()
                 .where( condition.toPredicate() )
         }
     }

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
@@ -25,12 +26,13 @@ import org.springframework.web.multipart.MultipartFile
 import javax.validation.Valid
 
 @RestController
+@RequestMapping("store-product")
 class StoreProductController(
     private val storeProductService: StoreProductService,
     private val storeProductExcelService: StoreProductExcelService
 ) {
     @Operation(summary = "쇼핑몰상품 리스트 조회")
-    @GetMapping("store-product")
+    @GetMapping
     fun findStoreProducts(
         @Parameter(description = "검색조건")
         @ModelAttribute condition: StoreProductSearchCondition,
@@ -40,7 +42,7 @@ class StoreProductController(
     }
 
     @Operation(summary = "쇼핑몰상품 기본상품 기준 리스트 조회")
-    @GetMapping("store-product/flat")
+    @GetMapping("flat")
     fun findFlattenedStoreProducts(
         @Parameter(description = "검색조건")
         @ModelAttribute condition: StoreProductSearchCondition,
@@ -59,7 +61,7 @@ class StoreProductController(
     }
 
     @Operation(summary = "쇼핑몰상품 생성")
-    @PostMapping("")
+    @PostMapping
     fun createStoreProducts(@Valid @RequestBody storeProductCreateModel: StoreProductCreateModel): List<StoreProductModel> {
         return storeProductService.createStoreProducts(storeProductCreateModel)
     }
