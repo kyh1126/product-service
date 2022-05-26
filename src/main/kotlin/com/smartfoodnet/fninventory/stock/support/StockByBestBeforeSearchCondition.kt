@@ -11,8 +11,6 @@ import org.springframework.format.annotation.DateTimeFormat
 import java.time.LocalDate
 
 class StockByBestBeforeSearchCondition(
-    @ApiModelProperty(hidden = true)
-    var partnerId: Long? = null,
 
     /*--상미기한별 조회 임시 주석
     @ApiModelProperty(value = "상미기한 from")
@@ -40,6 +38,9 @@ class StockByBestBeforeSearchCondition(
     val searchKeyword: String? = null
 
     ) : PredicateSearchCondition() {
+
+    @ApiModelProperty(hidden = true)
+    var partnerId: Long? = null
 
     enum class SearchType {
         NAME, CODE, BARCODE
