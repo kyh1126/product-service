@@ -30,16 +30,16 @@ class StockByBestBeforeSearchCondition(
     @ApiModelProperty(value = "유통기한 to", example = "2021-12-04")
     val expirationDateTo: LocalDate? = null,
 
-    ) : PredicateSearchCondition() {
-
     @ApiModelProperty(
         value = "상품별검색 (NAME:기본상품명/CODE:기본상품코드/BARCODE:상품바코드)",
         allowableValues = "NAME,CODE,BARCODE"
     )
-    val searchType: SearchType? = null
+    val searchType: SearchType? = null,
 
     @ApiModelProperty(value = "검색 키워드")
     val searchKeyword: String? = null
+
+    ) : PredicateSearchCondition() {
 
     enum class SearchType {
         NAME, CODE, BARCODE
