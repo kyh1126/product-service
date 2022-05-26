@@ -16,10 +16,6 @@ import javax.persistence.ManyToOne
 
 @Entity
 class ConfirmProduct(
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "confirm_product_id", columnDefinition = "BIGINT UNSIGNED")
-    val id: Long? = null,
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "collected_order_id")
     var collectedOrder: CollectedOrder? = null,
@@ -37,4 +33,8 @@ class ConfirmProduct(
     val quantity: Int,
 
     val quantityPerUnit: Int
-)
+){
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "confirm_product_id", columnDefinition = "BIGINT UNSIGNED")
+    val id: Long? = null
+}

@@ -2,9 +2,12 @@ package com.smartfoodnet.fnproduct.order
 
 import com.smartfoodnet.apiclient.WmsApiClient
 import com.smartfoodnet.apiclient.request.RequestOrderMapper
+import com.smartfoodnet.common.Constants.API_CALL_LIST_SIZE
 import com.smartfoodnet.common.error.exception.BaseRuntimeException
 import com.smartfoodnet.common.error.exception.ErrorCode
 import com.smartfoodnet.common.utils.Log
+import com.smartfoodnet.fninventory.stock.dto.BasicProductAvailableStock
+import com.smartfoodnet.fninventory.stock.model.AvailableStockModel
 import com.smartfoodnet.fnproduct.order.dto.ConfirmProductModel
 import com.smartfoodnet.fnproduct.order.entity.*
 import com.smartfoodnet.fnproduct.order.model.ConfirmProductAddModel
@@ -69,15 +72,63 @@ class ConfirmOrderService(
     }
 
     @Transactional
+    fun requestOrders(
+        partnerId: Long,
+        requestOrderCreateModel: RequestOrderCreateModel
+    ) : List<ConfirmOrder> {
+        // TODO : 전송 보내기전 출고수량보다 가용재고가 적다면 진행 안되게 변경
+        validateStockPerAvailableStock(partnerId, requestOrderCreateModel)
+        return listOf()
+//        return sendNosnosOrders(partnerId, requestOrderCreateModel)
+    }
+
+    private fun validateStockPerAvailableStock(
+        partnerId: Long,
+        requestOrderCreateModel: RequestOrderCreateModel
+    ) {
+        val collectedOrderList =
+            orderService.getCollectedOrders(requestOrderCreateModel.collectedOrderIds)
+        val basicProductList : List<BasicProduct> =
+            basicProductService.getAllProductFromCollectedOrders(collectedOrderList)
+
+        val shippingProductIds = basicProductList.mapNotNull { it.shippingProductId }.distinct()
+
+        val availableStocks : MutableMap<Long, Int> = mutableMapOf()
+        shippingProductIds.chunked(API_CALL_LIST_SIZE).forEach { ids : List<Long> ->
+            availableStocks += getAvailableStocks(partnerId, ids)
+        }
+
+        val calculatedBasicProduct  = collectedOrderList
+            .flatMap { it.confirmProductList }
+            .flatMap {
+                val basicProductAvailableStock = BasicProductAvailableStock(it.basicProduct)
+                basicProductAvailableStock.calcQuantityPerBasicProduct(it.quantity)
+            }
+            .groupBy({it.basicProduct.shippingProductId!!},{it.quantity})
+            .mapValues { it.value.sum() }
+
+
+        log.info("calculatedBasicProduct -> {}", calculatedBasicProduct)
+        log.info("availableStocks -> {}", availableStocks)
+        
+        val lackShippingProductIds= calculatedBasicProduct
+            .filter { it.value.compareTo(availableStocks[it.key] ?: 0) == 1 }
+            .map { it.key }
+
+        if (lackShippingProductIds.isNotEmpty())
+            throw IllegalStateException("가용재고가 부족한 출고건이 존재합니다 : shippingProduct = $lackShippingProductIds")
+
+    }
+
+    @Transactional
     fun requestOrder(
         partnerId: Long,
         requestOrderCreateModel: RequestOrderCreateModel
     ): ConfirmOrder {
-        return requestOrders(partnerId, requestOrderCreateModel).first()
+        return sendNosnosOrders(partnerId, requestOrderCreateModel).first()
     }
 
-    @Transactional
-    fun requestOrders(
+    private fun sendNosnosOrders(
         partnerId: Long,
         requestOrderCreateModel: RequestOrderCreateModel
     ): List<ConfirmOrder> {
