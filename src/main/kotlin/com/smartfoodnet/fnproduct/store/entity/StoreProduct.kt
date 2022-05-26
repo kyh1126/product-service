@@ -7,6 +7,7 @@ import java.time.LocalDateTime
 import javax.persistence.CascadeType
 import javax.persistence.Column
 import javax.persistence.Entity
+import javax.persistence.FetchType
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
@@ -53,7 +54,7 @@ class StoreProduct(
     @Column(name = "option_code")
     var optionCode: String? = null,
 
-    @OneToMany(mappedBy = "storeProduct", cascade = [CascadeType.PERSIST], orphanRemoval = true)
+    @OneToMany(mappedBy = "storeProduct", cascade = [CascadeType.PERSIST], orphanRemoval = true, fetch = FetchType.LAZY)
     var storeProductMappings: MutableSet<StoreProductMapping> = mutableSetOf()
 
 ) : BaseEntity() {

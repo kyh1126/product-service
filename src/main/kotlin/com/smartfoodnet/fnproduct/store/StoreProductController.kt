@@ -3,6 +3,7 @@ package com.smartfoodnet.fnproduct.store
 import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.fnproduct.store.model.request.StoreProductCreateModel
 import com.smartfoodnet.fnproduct.store.model.request.StoreProductUpdateModel
+import com.smartfoodnet.fnproduct.store.model.response.StoreProductFlatModel
 import com.smartfoodnet.fnproduct.store.model.response.StoreProductModel
 import com.smartfoodnet.fnproduct.store.support.StoreProductSearchCondition
 import io.swagger.v3.oas.annotations.Operation
@@ -30,16 +31,24 @@ class StoreProductController(
     private val storeProductService: StoreProductService,
     private val storeProductExcelService: StoreProductExcelService
 ) {
-    @Operation(summary = "특정 화주(고객사) ID 의 쇼핑몰상품 리스트 조회")
-    @GetMapping("partner/{partnerId}")
+    @Operation(summary = "쇼핑몰상품 리스트 조회")
+    @GetMapping
     fun findStoreProducts(
-        @Parameter(description = "화주(고객사) ID", required = true)
-        @PathVariable partnerId: Long,
         @Parameter(description = "검색조건")
         @ModelAttribute condition: StoreProductSearchCondition,
         @PageableDefault(size = 50, sort = ["id"], direction = Sort.Direction.DESC) page: Pageable,
     ): PageResponse<StoreProductModel> {
         return PageResponse.of(storeProductService.findStoreProducts(condition.apply { this.partnerId = partnerId }, page))
+    }
+
+    @Operation(summary = "쇼핑몰상품 기본상품 기준 리스트 조회")
+    @GetMapping("flat")
+    fun findFlattenedStoreProducts(
+        @Parameter(description = "검색조건")
+        @ModelAttribute condition: StoreProductSearchCondition,
+        @PageableDefault(size = 50, sort = ["id"], direction = Sort.Direction.DESC) page: Pageable,
+    ): PageResponse<StoreProductFlatModel> {
+        return PageResponse.of(storeProductService.findFlattenedStoreProducts(condition, page))
     }
 
     @Operation(summary = "쇼핑몰상품 상세 조회")
@@ -52,7 +61,7 @@ class StoreProductController(
     }
 
     @Operation(summary = "쇼핑몰상품 생성")
-    @PostMapping("")
+    @PostMapping
     fun createStoreProducts(@Valid @RequestBody storeProductCreateModel: StoreProductCreateModel): List<StoreProductModel> {
         return storeProductService.createStoreProducts(storeProductCreateModel)
     }
