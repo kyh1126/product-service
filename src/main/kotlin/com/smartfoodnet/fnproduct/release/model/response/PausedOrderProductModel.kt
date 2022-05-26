@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
 import com.smartfoodnet.fnproduct.order.entity.ConfirmProduct
 import com.smartfoodnet.fnproduct.order.model.ReceiverModel
+import com.smartfoodnet.fnproduct.order.vo.DeliveryType
 import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
 import com.smartfoodnet.fnproduct.release.entity.ReleaseProduct
@@ -30,8 +31,17 @@ data class PausedOrderProductModel(
     @ApiModelProperty(value = "주문번호")
     var orderNumbers: List<String>,
 
+    @ApiModelProperty(value = "배송방식")
+    val deliveryType: DeliveryType,
+
     @ApiModelProperty(value = "출고상태")
     var orderStatus: OrderStatus,
+
+    @ApiModelProperty(value = "송장번호")
+    var trackingNumber: String? = null,
+
+    @ApiModelProperty(value = "송장번호부여일시")
+    var trackingNumberCreatedAt: LocalDateTime? = null,
 
     @ApiModelProperty(value = "주문수집일시")
     var collectedAt: LocalDateTime? = null,
@@ -82,7 +92,10 @@ data class PausedOrderProductModel(
                     releaseCode = releaseCode,
                     receiverModel = firstCollectedOrder.receiver.run(ReceiverModel::from),
                     orderNumbers = collectedOrders.map { it.orderNumber },
+                    deliveryType = firstCollectedOrder.deliveryType,
                     orderStatus = releaseStatus.orderStatus,
+                    trackingNumber = trackingNumber,
+                    trackingNumberCreatedAt = trackingNumberCreatedAt,
                     collectedAt = firstCollectedOrder.collectedAt,
                     pausedAt = pausedAt!!,
                     pausedReason = pausedReason,
@@ -113,7 +126,10 @@ data class PausedOrderProductModel(
                     releaseCode = releaseCode,
                     receiverModel = firstCollectedOrder.receiver.run(ReceiverModel::from),
                     orderNumbers = collectedOrders.map { it.orderNumber },
+                    deliveryType = firstCollectedOrder.deliveryType,
                     orderStatus = releaseStatus.orderStatus,
+                    trackingNumber = trackingNumber,
+                    trackingNumberCreatedAt = trackingNumberCreatedAt,
                     collectedAt = firstCollectedOrder.collectedAt,
                     pausedAt = pausedAt!!,
                     pausedReason = pausedReason,
