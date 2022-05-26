@@ -17,17 +17,17 @@ class PackageProductMapping(
     var id: Long? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "package_product_id", columnDefinition = "BIGINT UNSIGNED")
-    @JsonIgnore
-    var packageProduct: BasicProduct? = null,
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "basic_product_id", columnDefinition = "BIGINT UNSIGNED")
     var selectedBasicProduct: BasicProduct,
 
     @Column(name = "quantity")
     var quantity: Int,
 ) : BaseEntity() {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "package_product_id", columnDefinition = "BIGINT UNSIGNED")
+    @JsonIgnore
+    lateinit var packageProduct: BasicProduct
+
     fun update(request: PackageProductMappingCreateModel, basicProduct: BasicProduct) {
         selectedBasicProduct = basicProduct
         quantity = request.quantity
