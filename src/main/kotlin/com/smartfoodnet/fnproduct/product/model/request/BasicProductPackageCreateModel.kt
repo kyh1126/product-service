@@ -4,7 +4,6 @@ import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.product.entity.BoxDimension
 import com.smartfoodnet.fnproduct.product.entity.ExpirationDateInfo
 import com.smartfoodnet.fnproduct.product.entity.SingleDimension
-import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
 import io.swagger.annotations.ApiModelProperty
 import javax.validation.constraints.NotEmpty
@@ -39,10 +38,7 @@ class BasicProductPackageCreateModel {
             singleDimension = SingleDimension.default,
             boxDimension = BoxDimension.default
         ).also {
-            it.type = BasicProductType.PACKAGE
-            it.barcodeYn = "N"
-            it.name = name
-            it.expirationDateManagementYn = "N"
+            it.setPackageProductDefault(this)
         }
     }
 }

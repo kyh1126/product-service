@@ -2,6 +2,7 @@ package com.smartfoodnet.fnproduct.product.entity
 
 import com.smartfoodnet.common.entity.BaseEntity
 import com.smartfoodnet.fnproduct.product.model.request.BasicProductCreateModel
+import com.smartfoodnet.fnproduct.product.model.request.BasicProductPackageCreateModel
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
 import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureTypeConverter
@@ -164,6 +165,13 @@ class BasicProduct(
 
     fun manufactureToExpirationDate(): Long {
         return expirationDateInfo?.manufactureToExpirationDate ?: 0
+    }
+
+    fun setPackageProductDefault(request: BasicProductPackageCreateModel) {
+        type = BasicProductType.PACKAGE
+        barcodeYn = "N"
+        name = request.name
+        expirationDateManagementYn = "N"
     }
 
     fun singleCbm(): Long {
