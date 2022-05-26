@@ -40,7 +40,9 @@ class BasicProductPackageCreateModel {
             boxDimension = BoxDimension.default
         ).also {
             it.type = BasicProductType.PACKAGE
+            it.barcodeYn = "N"
             it.name = name
+            it.expirationDateManagementYn = "N"
         }
     }
 }
