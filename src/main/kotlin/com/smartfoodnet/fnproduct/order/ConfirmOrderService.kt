@@ -13,7 +13,6 @@ import com.smartfoodnet.fnproduct.order.model.RequestOrderCreateModel
 import com.smartfoodnet.fnproduct.order.support.ConfirmOrderRepository
 import com.smartfoodnet.fnproduct.order.support.ConfirmProductRepository
 import com.smartfoodnet.fnproduct.order.support.condition.ConfirmProductSearchCondition
-import com.smartfoodnet.fnproduct.order.vo.BoxType
 import com.smartfoodnet.fnproduct.order.vo.DeliveryType
 import com.smartfoodnet.fnproduct.order.vo.MatchingType
 import com.smartfoodnet.fnproduct.order.vo.OrderStatus
@@ -21,7 +20,6 @@ import com.smartfoodnet.fnproduct.product.BasicProductService
 import com.smartfoodnet.fnproduct.product.PackageProductMappingRepository
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
-import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
 import com.smartfoodnet.fnproduct.release.ReleaseInfoStoreService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -33,7 +31,7 @@ class ConfirmOrderService(
     val orderService: OrderService,
     val basicProductService: BasicProductService,
     val releaseInfoStoreService: ReleaseInfoStoreService,
-    val cubicMeterService: CubicMeterService,
+    val boxService: BoxService,
 
     val confirmOrderRepository: ConfirmOrderRepository,
     val confirmProductRepository: ConfirmProductRepository,
@@ -205,8 +203,10 @@ class ConfirmOrderService(
                 memo5 = requestOrderCreateModel.reShipmentReason,
             )
         )
-        // 추천 박스 처리
-        confirmOrder.memo!!.memo3 = getRecommendBox(orderGroup.value).description
+
+        val collectedOrders : List<CollectedOrder> = orderGroup.value
+        val basicProductList : List<BasicProduct> = basicProductService.getAllProductFromCollectedOrders(collectedOrders)
+        confirmOrder.memo.memo3 = boxService.getRecommendBox(basicProductList).description
 
         orderGroup.value.forEach {
             val confirmRequestOrder = ConfirmRequestOrder(
@@ -281,7 +281,7 @@ class ConfirmOrderService(
 
         val mappedQuantity = confirmProductModel.releaseQuantity
         val minQuantity = basicProductAndQuantity.map {
-            var quantity = it.value * mappedQuantity
+            val quantity = it.value * mappedQuantity
             val availableStock = availableStocks[it.key.shippingProductId] ?: 0
             availableStock.toDouble().div(quantity.toDouble())
         }.minOf { it.toInt() }
@@ -318,57 +318,5 @@ class ConfirmOrderService(
     private fun getBasicProductsAndRequestQuantityMapping(mappedModel: ConfirmProductMappedModel): Map<Long, Int> {
         return mappedModel.basicProducts.associateBy({ it.basicProductId }, { it.quantity })
     }
-
-    /**
-     * 추천 박스를 계산하여 가져온다. null인 경우 검토필요로 가져온다
-     * @param collectedOrderList 주문 수집된 리스트
-     * @return BoxType
-     */
-    private fun getRecommendBox(collectedOrderList: List<CollectedOrder>): BoxType {
-        val totalCbm = sumProductCbm(collectedOrderList)
-        val handleTemperature = getProductHandleTemperature(collectedOrderList)
-        log.info("totalCbm -> {}", totalCbm)
-        return cubicMeterService.getByCBM(totalCbm, handleTemperature)?.box ?: BoxType.CHECK
-    }
-
-    private fun sumProductCbm(collectedOrderList: List<CollectedOrder>): Long =
-        getAllProduct(collectedOrderList).sumOf(BasicProduct::singleCbm)
-
-    /**
-     * 상온, 저온을 반환한다
-     * 만약 상온/저온 복합일 경우 저온으로 반환한다
-     * @param collectedOrderList 주문 수집된 리스트
-     * @return HandlingTemperatureType
-     */
-    private fun getProductHandleTemperature(collectedOrderList: List<CollectedOrder>): HandlingTemperatureType {
-        return if (getAllProduct(collectedOrderList).all { b -> b.handlingTemperature == HandlingTemperatureType.ROOM })
-            HandlingTemperatureType.ROOM
-        else
-            HandlingTemperatureType.REFRIGERATE
-    }
-
-    /**
-     * BASIC, PACKAGE을 전부 BASIC으로 변환한 리스트를 반환한다
-     * 건수가 많지 않아 asSequence()는 사용하지 않음
-     */
-    private fun getAllProduct(collectedOrderList: List<CollectedOrder>): List<BasicProduct> {
-        return collectedOrderList
-            .map { it.confirmProductList }
-            .flatten()
-            .map { it.basicProduct }
-            .map { b ->
-                when (b.type) {
-                    BasicProductType.PACKAGE -> expandPackageProduct(b)
-                    else -> listOf(b)
-                }
-            }.flatten()
-            .toList()
-    }
-
-    /**
-     * 이하 함수는 BasicProductType = PACKAGE 일 경우다
-     */
-    private fun expandPackageProduct(basicProduct: BasicProduct): List<BasicProduct> =
-        basicProduct.packageProductMappings.map { it.selectedBasicProduct }
 
 }
