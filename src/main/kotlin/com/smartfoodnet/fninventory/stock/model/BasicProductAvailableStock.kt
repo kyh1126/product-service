@@ -37,7 +37,7 @@ class BasicProductAvailableStock(
         }
     }
 
-    fun toDto() : AvailableStockModel{
-        return AvailableStockModel(baseBasicProduct.id!!, stock)
+    fun toDto(): AvailableStockModel {
+        return AvailableStockModel(baseBasicProduct.id, stock)
     }
 }

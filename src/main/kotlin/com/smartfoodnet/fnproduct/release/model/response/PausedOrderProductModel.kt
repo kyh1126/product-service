@@ -89,11 +89,11 @@ data class PausedOrderProductModel(
                     pausedBy = pausedBy,
                     previousOrderCode = previousOrderCode,
                     nextOrderCode = nextOrderCode,
-                    basicProductId = releaseProduct.basicProduct.id!!,
-                    basicProductName = releaseProduct.basicProduct.name!!,
+                    basicProductId = releaseProduct.basicProduct.id,
+                    basicProductName = releaseProduct.basicProduct.name,
                     basicProductCode = releaseProduct.basicProduct.code!!,
                     quantity = releaseProduct.quantity,
-                    orderCount = getOrderCount(releaseProduct.basicProduct.id!!, collectedOrders)
+                    orderCount = getOrderCount(releaseProduct.basicProduct.id, collectedOrders)
                 )
             }
         }
@@ -120,11 +120,11 @@ data class PausedOrderProductModel(
                     pausedBy = pausedBy,
                     previousOrderCode = previousOrderCode,
                     nextOrderCode = nextOrderCode,
-                    basicProductId = confirmProduct.basicProduct.id!!,
-                    basicProductName = confirmProduct.basicProduct.name!!,
+                    basicProductId = confirmProduct.basicProduct.id,
+                    basicProductName = confirmProduct.basicProduct.name,
                     basicProductCode = confirmProduct.basicProduct.code!!,
                     quantity = confirmProduct.quantity,
-                    orderCount = getOrderCount(confirmProduct.basicProduct.id!!, collectedOrders)
+                    orderCount = getOrderCount(confirmProduct.basicProduct.id, collectedOrders)
                 )
             }
         }
