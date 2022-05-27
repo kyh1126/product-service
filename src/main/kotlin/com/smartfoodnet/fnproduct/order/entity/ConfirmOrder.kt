@@ -20,7 +20,7 @@ class ConfirmOrder(
     @Embedded
     val receiver: Receiver,
     @Embedded
-    val memo: Memo? = null,
+    val memo: Memo,
     @OneToMany(mappedBy = "confirmOrder", cascade = [CascadeType.PERSIST], orphanRemoval = true)
     val requestOrderList: MutableList<ConfirmRequestOrder> = mutableListOf()
 ) : BaseEntity(), Serializable {

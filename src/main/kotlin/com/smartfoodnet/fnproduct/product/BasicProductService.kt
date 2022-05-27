@@ -11,6 +11,7 @@ import com.smartfoodnet.common.model.request.PredicateSearchCondition
 import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.common.utils.Log
 import com.smartfoodnet.fnproduct.code.entity.Code
+import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.product.entity.BasicProductCategory
 import com.smartfoodnet.fnproduct.product.entity.SubsidiaryMaterialCategory
@@ -357,6 +358,25 @@ class BasicProductService(
 
     private fun toCategoriesByLevelModel(categoriesByLevel1: Map<Code, List<CategoryDto?>>) =
         categoriesByLevel1.map { CategoryByLevelModel.fromEntity(it.key, it.value) }
+
+    /**
+     * TYPE이 PACKAGE을 전부 BASIC으로 변환한 리스트를 반환한다
+     * 건수가 많지 않아 asSequence()는 사용하지 않음
+     */
+    fun getAllProductFromCollectedOrders(collectedOrderList: List<CollectedOrder>): List<BasicProduct> {
+        return collectedOrderList
+            .flatMap { it.confirmProductList }
+            .map { it.basicProduct }
+            .flatMap { b ->
+                when (b.type) {
+                    BasicProductType.PACKAGE -> expandPackageProduct(b)
+                    else -> listOf(b)
+                }
+            }.toList()
+    }
+
+    private fun expandPackageProduct(basicProduct: BasicProduct): List<BasicProduct> =
+        basicProduct.packageProductMappings.map { it.selectedBasicProduct }
 
     companion object : Log
 }
