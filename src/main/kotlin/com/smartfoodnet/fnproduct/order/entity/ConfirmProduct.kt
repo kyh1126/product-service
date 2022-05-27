@@ -36,5 +36,5 @@ class ConfirmProduct(
 ){
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "confirm_product_id", columnDefinition = "BIGINT UNSIGNED")
-    val id: Long? = null
+    val id: Long = 0
 }
