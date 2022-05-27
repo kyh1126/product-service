@@ -4,10 +4,7 @@ import com.smartfoodnet.common.model.response.CommonResponse
 import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.fnproduct.release.model.request.ReOrderCreateModel
 import com.smartfoodnet.fnproduct.release.model.request.ReleaseInfoSearchCondition
-import com.smartfoodnet.fnproduct.release.model.response.OrderConfirmProductModel
-import com.smartfoodnet.fnproduct.release.model.response.OrderProductModel
-import com.smartfoodnet.fnproduct.release.model.response.PausedReleaseInfoModel
-import com.smartfoodnet.fnproduct.release.model.response.ReleaseInfoModel
+import com.smartfoodnet.fnproduct.release.model.response.*
 import com.smartfoodnet.fnproduct.release.model.vo.DeliveryAgency
 import io.swagger.annotations.Api
 import io.swagger.v3.oas.annotations.Operation
@@ -54,6 +51,14 @@ class ReleaseController(
             setPausedOrderStatus()
         }
         return releaseInfoService.getPausedReleaseInfoList(condition, page)
+    }
+
+    @Operation(summary = "출고정보 상세 조회")
+    @GetMapping("order/{orderCode}")
+    fun getOrderDetail(
+        @Parameter(description = "출고번호") @PathVariable orderCode: String,
+    ): OrderReleaseInfoModel {
+        return releaseInfoService.getOrderDetail(orderCode)
     }
 
     @Operation(summary = "릴리즈 정보 동기화")

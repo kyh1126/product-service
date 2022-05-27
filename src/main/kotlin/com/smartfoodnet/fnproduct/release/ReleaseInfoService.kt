@@ -23,10 +23,7 @@ import com.smartfoodnet.fnproduct.release.model.dto.OrderReleaseInfoDto
 import com.smartfoodnet.fnproduct.release.model.request.ReOrderCreateModel
 import com.smartfoodnet.fnproduct.release.model.request.ReleaseInfoSearchCondition
 import com.smartfoodnet.fnproduct.release.model.request.ReleaseStatusSearchCondition
-import com.smartfoodnet.fnproduct.release.model.response.OrderConfirmProductModel
-import com.smartfoodnet.fnproduct.release.model.response.OrderProductModel
-import com.smartfoodnet.fnproduct.release.model.response.PausedReleaseInfoModel
-import com.smartfoodnet.fnproduct.release.model.response.ReleaseInfoModel
+import com.smartfoodnet.fnproduct.release.model.response.*
 import com.smartfoodnet.fnproduct.release.model.vo.DeliveryAgency
 import com.smartfoodnet.fnproduct.release.model.vo.DeliveryAgency.Companion.getDeliveryAgencyByName
 import com.smartfoodnet.fnproduct.release.model.vo.DeliveryStatus
@@ -121,6 +118,11 @@ class ReleaseInfoService(
             page = page.next()
             doneOrderIds.addAll(orderIds)
         }
+    }
+
+    fun getOrderDetail(orderCode: String): OrderReleaseInfoModel {
+        val orderProducts = getOrderProductsByOrderCode(orderCode)
+        return OrderReleaseInfoModel.fromModel(orderProducts)
     }
 
     fun getOrderProductsByOrderCode(orderCode: String): List<OrderProductModel> {
