@@ -4,15 +4,18 @@ import com.smartfoodnet.common.error.exception.NoSuchElementError
 import com.smartfoodnet.common.error.exception.ValidateError
 import com.smartfoodnet.common.model.request.PredicateSearchCondition
 import com.smartfoodnet.fnproduct.product.BasicProductRepository
+import com.smartfoodnet.fnproduct.product.model.response.BasicProductSimpleModel
 import com.smartfoodnet.fnproduct.store.entity.StoreProduct
 import com.smartfoodnet.fnproduct.store.entity.StoreProductMapping
 import com.smartfoodnet.fnproduct.store.model.request.StoreProductCreateModel
 import com.smartfoodnet.fnproduct.store.model.request.StoreProductUpdateModel
+import com.smartfoodnet.fnproduct.store.model.response.StoreProductFlatModel
 import com.smartfoodnet.fnproduct.store.model.response.StoreProductModel
 import com.smartfoodnet.fnproduct.store.support.StoreProductMappingRepository
 import com.smartfoodnet.fnproduct.store.support.StoreProductRepository
 import com.smartfoodnet.fnproduct.store.support.StoreProductSearchCondition
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -27,6 +30,17 @@ class StoreProductService(
 ) {
     fun findStoreProducts(condition: PredicateSearchCondition, page: Pageable): Page<StoreProductModel> {
         return storeProductRepository.findStoreProducts(condition, page).map { StoreProductModel.from(it) }
+    }
+
+    fun findFlattenedStoreProducts(condition: PredicateSearchCondition, page: Pageable): Page<StoreProductFlatModel> {
+        val storeProducts = storeProductRepository.findFlattenedStoreProducts(condition, page)
+        val pageable = storeProducts.pageable
+
+        val storeProductFlatModels =
+            storeProducts.content.flatMap { it.storeProductMappings }
+                .map { buildStoreProductFlatModel(it) }
+
+        return PageImpl(storeProductFlatModels, pageable, storeProducts.totalElements)
     }
 
     fun getStoreProduct(storeProductId: Long): StoreProductModel? {
@@ -85,7 +99,7 @@ class StoreProductService(
 
         val newMappings = buildStoreProductMappings(storeProductModel, storeProduct)
         newMappings?.let {
-            if(it.isNotEmpty()){
+            if (it.isNotEmpty()) {
                 storeProduct.updateStoreProductMappings(it)
             }
         }
@@ -102,11 +116,34 @@ class StoreProductService(
         storeProductRepository.save(storeProduct)
     }
 
-    fun buildStoreProductMappings(
+    private fun buildStoreProductFlatModel(storeProductMapping: StoreProductMapping): StoreProductFlatModel {
+        val storeProduct = storeProductMapping.storeProduct
+        val basicProduct = storeProductMapping.basicProduct
+        return storeProductMapping.run {
+            StoreProductFlatModel(
+                id = storeProduct.id,
+                storeId = storeProduct.storeId,
+                storeName = storeProduct.storeName,
+                storeIcon = storeProduct.storeIcon,
+                partnerId = storeProduct.partnerId,
+                name = storeProduct.name,
+                storeProductCode = storeProduct.storeProductCode,
+                optionName = storeProduct.optionName,
+                optionCode = storeProduct.optionCode,
+                basicProduct = BasicProductSimpleModel.fromEntity(basicProduct),
+                quantity = quantity,
+                createdAt = storeProduct.createdAt,
+                updatedAt = storeProduct.updatedAt
+            )
+        }
+    }
+
+    private fun buildStoreProductMappings(
         storeProductModel: StoreProductUpdateModel,
         storeProduct: StoreProduct
     ): Set<StoreProductMapping>? {
-        val newBasicProductIds = storeProductModel.storeProductBasicProductMappings?.map { it.basicProductId } ?: return null
+        val newBasicProductIds =
+            storeProductModel.storeProductBasicProductMappings?.map { it.basicProductId } ?: return null
 
         if (newBasicProductIds.size != newBasicProductIds.toSet().size) {
             throw ValidateError("중복된 기본상품이 존재합니다.")

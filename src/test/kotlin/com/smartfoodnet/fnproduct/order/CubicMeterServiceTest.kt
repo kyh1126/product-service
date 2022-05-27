@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired
 internal class CubicMeterServiceTest : AbstractTest() {
 
     @Autowired
-    private lateinit var cubicMeterService: CubicMeterService
+    private lateinit var boxService: BoxService
 
     @Autowired
     private lateinit var cubicMeterRepository: CubicMeterRepository
@@ -35,7 +35,7 @@ internal class CubicMeterServiceTest : AbstractTest() {
     @DisplayName("CBM에 따른 박스추천")
     fun getCBM() {
         val cbm1 = CubicMeterValues(300, 200, 150)
-        val cubicMeter = cubicMeterService.getByCBM(cbm1.cbm, HandlingTemperatureType.ROOM)
+        val cubicMeter = boxService.getByCBM(cbm1.cbm, HandlingTemperatureType.ROOM)
         assertEquals(BoxType.ROOM2, cubicMeter?.box)
     }
 
@@ -43,7 +43,7 @@ internal class CubicMeterServiceTest : AbstractTest() {
     @DisplayName("추천박스 없음")
     fun getCBM_noResult() {
         val cbm1 = CubicMeterValues(3000, 2000, 1500)
-        val cubicMeter = cubicMeterService.getByCBM(cbm1.cbm, HandlingTemperatureType.ROOM)
+        val cubicMeter = boxService.getByCBM(cbm1.cbm, HandlingTemperatureType.ROOM)
         assertEquals(null, cubicMeter?.box)
     }
 

@@ -8,4 +8,5 @@ import org.springframework.data.domain.Pageable
 interface StoreProductRepositoryCustom {
     fun findStoreProduct(condition: PredicateSearchCondition) : StoreProduct?
     fun findStoreProducts(condition: PredicateSearchCondition, page: Pageable) : Page<StoreProduct>
+    fun findFlattenedStoreProducts(condition: PredicateSearchCondition, page: Pageable): Page<StoreProduct>
 }
