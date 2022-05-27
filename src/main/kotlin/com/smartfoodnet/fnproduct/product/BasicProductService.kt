@@ -365,16 +365,14 @@ class BasicProductService(
      */
     fun getAllProductFromCollectedOrders(collectedOrderList: List<CollectedOrder>): List<BasicProduct> {
         return collectedOrderList
-            .map { it.confirmProductList }
-            .flatten()
+            .flatMap { it.confirmProductList }
             .map { it.basicProduct }
-            .map { b ->
+            .flatMap { b ->
                 when (b.type) {
                     BasicProductType.PACKAGE -> expandPackageProduct(b)
                     else -> listOf(b)
                 }
-            }.flatten()
-            .toList()
+            }.toList()
     }
 
     private fun expandPackageProduct(basicProduct: BasicProduct): List<BasicProduct> =
