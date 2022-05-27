@@ -76,7 +76,6 @@ class ConfirmOrderService(
         partnerId: Long,
         requestOrderCreateModel: RequestOrderCreateModel
     ) : List<ConfirmOrder> {
-        // TODO : 전송 보내기전 출고수량보다 가용재고가 적다면 진행 안되게 변경
         validateStockPerAvailableStock(partnerId, requestOrderCreateModel)
         return sendNosnosOrders(partnerId, requestOrderCreateModel)
     }
