@@ -3,8 +3,8 @@ package com.smartfoodnet.fnproduct.release.model.response
 import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.smartfoodnet.fnproduct.claim.model.vo.ExchangeStatus
 import com.smartfoodnet.fnproduct.claim.model.vo.ReturnStatus
-import com.smartfoodnet.fnproduct.order.model.ReceiverModel
 import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
+import com.smartfoodnet.fnproduct.release.model.dto.SimpleOrderInfoDto
 import com.smartfoodnet.fnproduct.release.model.vo.PausedBy
 import com.smartfoodnet.fnproduct.release.model.vo.TrackingNumberStatus
 import io.swagger.annotations.ApiModelProperty
@@ -17,23 +17,14 @@ data class PausedReleaseInfoModel(
     @ApiModelProperty(value = "화주(고객)사 ID", example = "11")
     var partnerId: Long,
 
-    @ApiModelProperty(value = "NOSNOS 발주 id")
-    var orderId: Long,
-
-    @ApiModelProperty(value = "출고번호")
-    var orderCode: String,
+    @JsonUnwrapped
+    var simpleOrderInfo: SimpleOrderInfoDto,
 
     @ApiModelProperty(value = "NOSNOS 출고 id")
     var releaseId: Long? = null,
 
     @ApiModelProperty(value = "릴리즈코드")
     var releaseCode: String? = null,
-
-    @JsonUnwrapped
-    var receiverModel: ReceiverModel,
-
-    @ApiModelProperty(value = "주문번호")
-    var orderNumbers: List<String> = emptyList(),
 
     @ApiModelProperty(value = "주문일시")
     var orderedAt: LocalDateTime? = null,
@@ -91,12 +82,9 @@ data class PausedReleaseInfoModel(
                 PausedReleaseInfoModel(
                     id = id!!,
                     partnerId = partnerId,
-                    orderId = orderId,
-                    orderCode = orderCode,
+                    simpleOrderInfo = SimpleOrderInfoDto.from(orderId, orderCode, collectedOrders),
                     releaseId = releaseId,
                     releaseCode = releaseCode,
-                    receiverModel = firstCollectedOrder.receiver.run(ReceiverModel::from),
-                    orderNumbers = collectedOrders.map { it.orderNumber },
                     orderedAt = firstCollectedOrder.orderedAt,
                     collectedAt = firstCollectedOrder.collectedAt,
                     trackingNumber = trackingNumber,

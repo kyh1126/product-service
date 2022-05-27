@@ -4,11 +4,11 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.smartfoodnet.apiclient.response.NosnosDeliveryAgencyInfoModel
 import com.smartfoodnet.fnproduct.claim.model.vo.ExchangeStatus
 import com.smartfoodnet.fnproduct.claim.model.vo.ReturnStatus
-import com.smartfoodnet.fnproduct.order.model.ReceiverModel
 import com.smartfoodnet.fnproduct.order.vo.DeliveryType
 import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import com.smartfoodnet.fnproduct.order.vo.OrderUploadType
 import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
+import com.smartfoodnet.fnproduct.release.model.dto.SimpleOrderInfoDto
 import com.smartfoodnet.fnproduct.release.model.vo.TrackingNumberStatus
 import io.swagger.annotations.ApiModelProperty
 import java.time.LocalDateTime
@@ -20,11 +20,8 @@ data class ReleaseInfoModel(
     @ApiModelProperty(value = "화주(고객)사 ID", example = "11")
     var partnerId: Long,
 
-    @ApiModelProperty(value = "NOSNOS 발주 id")
-    var orderId: Long,
-
-    @ApiModelProperty(value = "출고번호")
-    var orderCode: String,
+    @JsonUnwrapped
+    var simpleOrderInfo: SimpleOrderInfoDto,
 
     @ApiModelProperty(value = "출고상태 (NEW:신규주문/ORDER_CONFIRM:주문접수완료/BEFORE_RELEASE_REQUEST:출고준비중/RELEASE_REQUESTED:출고작업중(1/3)/RELEASE_ORDERED:출고작업중(2/3)/RELEASE_IN_PROGRESS:출고작업중(3/3)/IN_TRANSIT:배송중/COMPLETE:배송완료/RELEASE_PAUSED:출고정지/RELEASE_CANCELLED:출고취소/CANCEL:주문취소)")
     var orderStatus: OrderStatus,
@@ -65,9 +62,6 @@ data class ReleaseInfoModel(
     )
     var deliveryType: DeliveryType,
 
-    @JsonUnwrapped
-    var receiverModel: ReceiverModel,
-
     @ApiModelProperty(value = "쇼핑몰 이름")
     var storeName: String,
 
@@ -82,9 +76,6 @@ data class ReleaseInfoModel(
 
     @ApiModelProperty(value = "묶음번호")
     var bundleNumber: String,
-
-    @ApiModelProperty(value = "주문번호")
-    var orderNumbers: List<String> = emptyList(),
 ) {
     companion object {
         fun fromEntity(
@@ -100,8 +91,7 @@ data class ReleaseInfoModel(
                 ReleaseInfoModel(
                     id = id!!,
                     partnerId = partnerId,
-                    orderId = orderId,
-                    orderCode = orderCode,
+                    simpleOrderInfo = SimpleOrderInfoDto.from(orderId, orderCode, collectedOrders),
                     orderStatus = releaseStatus.orderStatus,
                     releaseId = releaseId,
                     releaseCode = releaseCode,
@@ -113,12 +103,10 @@ data class ReleaseInfoModel(
                     returnStatus = claim?.returnStatus ?: ReturnStatus.UNREGISTERED,
                     exchangeStatus = claim?.exchangeStatus ?: ExchangeStatus.UNREGISTERED,
                     deliveryType = firstCollectedOrder.deliveryType,
-                    receiverModel = firstCollectedOrder.receiver.run(ReceiverModel::from),
                     storeName = firstCollectedOrder.storeName,
                     storeIcon = firstCollectedOrder.storeIcon,
                     uploadType = firstCollectedOrder.uploadType,
                     bundleNumber = firstCollectedOrder.bundleNumber,
-                    orderNumbers = collectedOrders.map { it.orderNumber },
                 )
             }
         }
