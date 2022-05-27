@@ -1,32 +1,31 @@
 package com.smartfoodnet.fnproduct.release.model.response
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped
+import com.smartfoodnet.fnproduct.claim.model.vo.ExchangeStatus
+import com.smartfoodnet.fnproduct.claim.model.vo.ReturnStatus
 import com.smartfoodnet.fnproduct.order.entity.CollectedOrder
 import com.smartfoodnet.fnproduct.order.entity.ConfirmProduct
 import com.smartfoodnet.fnproduct.order.vo.DeliveryType
 import com.smartfoodnet.fnproduct.order.vo.OrderStatus
 import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
 import com.smartfoodnet.fnproduct.release.entity.ReleaseProduct
+import com.smartfoodnet.fnproduct.release.model.dto.SimpleOrderInfoDto
+import com.smartfoodnet.fnproduct.release.model.vo.PausedBy
 import io.swagger.annotations.ApiModelProperty
 import java.time.LocalDateTime
 
 data class OrderProductModel(
-    @ApiModelProperty(value = "NOSNOS 발주 id")
-    var orderId: Long,
-
-    @ApiModelProperty(value = "출고번호")
-    var orderCode: String,
-
-    @ApiModelProperty(value = "주문번호")
-    var orderNumbers: List<String>,
-
-    @ApiModelProperty(value = "배송방식")
-    val deliveryType: DeliveryType,
+    @JsonUnwrapped
+    var simpleOrderInfo: SimpleOrderInfoDto,
 
     @ApiModelProperty(value = "NOSNOS 출고 id")
     var releaseId: Long? = null,
 
     @ApiModelProperty(value = "릴리즈코드")
     var releaseCode: String? = null,
+
+    @ApiModelProperty(value = "배송방식")
+    val deliveryType: DeliveryType,
 
     @ApiModelProperty(value = "출고상태")
     var orderStatus: OrderStatus,
@@ -36,6 +35,30 @@ data class OrderProductModel(
 
     @ApiModelProperty(value = "송장번호부여일시")
     var trackingNumberCreatedAt: LocalDateTime? = null,
+
+    @ApiModelProperty(value = "주문수집일시")
+    var collectedAt: LocalDateTime? = null,
+
+    @ApiModelProperty(value = "반품상태 (UNREGISTERED:미등록/RETURN_REQUESTED:반품요청/RETURN_IN_PROGRESS:반품진행/RETURN_INBOUND_COMPLETED:반품입고완료/RETURN_CANCELLED:반품취소)")
+    var returnStatus: ReturnStatus,
+
+    @ApiModelProperty(value = "교환출고상태 (UNREGISTERED:미등록/EXCHANGE_RELEASE_IN_PROGRESS:교환출고중/EXCHANGE_DELIVERY_COMPLETED:교환배송완료)")
+    var exchangeStatus: ExchangeStatus,
+
+    @ApiModelProperty(value = "출고중지일시")
+    var pausedAt: LocalDateTime,
+
+    @ApiModelProperty(value = "출고중지사유")
+    var pausedReason: String? = null,
+
+    @ApiModelProperty(value = "출고중지당사자")
+    var pausedBy: PausedBy? = null,
+
+    @ApiModelProperty(value = "기존 출고번호")
+    var previousOrderCode: String? = null,
+
+    @ApiModelProperty(value = "재출고 출고번호")
+    var nextOrderCode: String? = null,
 
     @ApiModelProperty(value = "기본상품 ID")
     var basicProductId: Long,
@@ -62,15 +85,21 @@ data class OrderProductModel(
 
             return releaseInfo.run {
                 OrderProductModel(
-                    orderId = orderId,
-                    orderCode = orderCode,
-                    orderNumbers = collectedOrders.map { it.orderNumber },
-                    deliveryType = firstCollectedOrder.deliveryType,
+                    simpleOrderInfo = SimpleOrderInfoDto.from(orderId, orderCode, collectedOrders),
                     releaseId = releaseId,
                     releaseCode = releaseCode,
+                    deliveryType = firstCollectedOrder.deliveryType,
                     orderStatus = releaseStatus.orderStatus,
                     trackingNumber = trackingNumber,
                     trackingNumberCreatedAt = trackingNumberCreatedAt,
+                    collectedAt = firstCollectedOrder.collectedAt,
+                    returnStatus = claim?.returnStatus ?: ReturnStatus.UNREGISTERED,
+                    exchangeStatus = claim?.exchangeStatus ?: ExchangeStatus.UNREGISTERED,
+                    pausedAt = pausedAt!!,
+                    pausedReason = pausedReason,
+                    pausedBy = pausedBy,
+                    previousOrderCode = previousOrderCode,
+                    nextOrderCode = nextOrderCode,
                     basicProductId = releaseProduct.basicProduct.id!!,
                     basicProductName = releaseProduct.basicProduct.name!!,
                     basicProductCode = releaseProduct.basicProduct.code!!,
@@ -89,15 +118,21 @@ data class OrderProductModel(
 
             return releaseInfo.run {
                 OrderProductModel(
-                    orderId = orderId,
-                    orderCode = orderCode,
-                    orderNumbers = collectedOrders.map { it.orderNumber },
-                    deliveryType = firstCollectedOrder.deliveryType,
+                    simpleOrderInfo = SimpleOrderInfoDto.from(orderId, orderCode, collectedOrders),
                     releaseId = releaseId,
                     releaseCode = releaseCode,
+                    deliveryType = firstCollectedOrder.deliveryType,
                     orderStatus = releaseStatus.orderStatus,
                     trackingNumber = trackingNumber,
                     trackingNumberCreatedAt = trackingNumberCreatedAt,
+                    collectedAt = firstCollectedOrder.collectedAt,
+                    returnStatus = claim?.returnStatus ?: ReturnStatus.UNREGISTERED,
+                    exchangeStatus = claim?.exchangeStatus ?: ExchangeStatus.UNREGISTERED,
+                    pausedAt = pausedAt!!,
+                    pausedReason = pausedReason,
+                    pausedBy = pausedBy,
+                    previousOrderCode = previousOrderCode,
+                    nextOrderCode = nextOrderCode,
                     basicProductId = confirmProduct.basicProduct.id!!,
                     basicProductName = confirmProduct.basicProduct.name!!,
                     basicProductCode = confirmProduct.basicProduct.code!!,

@@ -4,7 +4,10 @@ import com.smartfoodnet.common.model.response.CommonResponse
 import com.smartfoodnet.common.model.response.PageResponse
 import com.smartfoodnet.fnproduct.release.model.request.ReOrderCreateModel
 import com.smartfoodnet.fnproduct.release.model.request.ReleaseInfoSearchCondition
-import com.smartfoodnet.fnproduct.release.model.response.*
+import com.smartfoodnet.fnproduct.release.model.response.OrderConfirmProductModel
+import com.smartfoodnet.fnproduct.release.model.response.OrderProductModel
+import com.smartfoodnet.fnproduct.release.model.response.PausedReleaseInfoModel
+import com.smartfoodnet.fnproduct.release.model.response.ReleaseInfoModel
 import com.smartfoodnet.fnproduct.release.model.vo.DeliveryAgency
 import io.swagger.annotations.Api
 import io.swagger.v3.oas.annotations.Operation
@@ -84,7 +87,7 @@ class ReleaseController(
     fun getPausedOrderProducts(
         @Parameter(description = "출고번호") @RequestParam(required = false) orderCode: String? = null,
         @Parameter(description = "릴리즈코드") @RequestParam(required = false) releaseCode: String? = null,
-    ): List<PausedOrderProductModel> {
+    ): List<OrderProductModel> {
         return when {
             orderCode != null ->
                 releaseInfoService.getPausedOrderProductsByOrderCode(orderCode)

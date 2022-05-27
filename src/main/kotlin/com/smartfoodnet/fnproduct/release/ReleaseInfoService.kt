@@ -23,7 +23,10 @@ import com.smartfoodnet.fnproduct.release.model.dto.OrderReleaseInfoDto
 import com.smartfoodnet.fnproduct.release.model.request.ReOrderCreateModel
 import com.smartfoodnet.fnproduct.release.model.request.ReleaseInfoSearchCondition
 import com.smartfoodnet.fnproduct.release.model.request.ReleaseStatusSearchCondition
-import com.smartfoodnet.fnproduct.release.model.response.*
+import com.smartfoodnet.fnproduct.release.model.response.OrderConfirmProductModel
+import com.smartfoodnet.fnproduct.release.model.response.OrderProductModel
+import com.smartfoodnet.fnproduct.release.model.response.PausedReleaseInfoModel
+import com.smartfoodnet.fnproduct.release.model.response.ReleaseInfoModel
 import com.smartfoodnet.fnproduct.release.model.vo.DeliveryAgency
 import com.smartfoodnet.fnproduct.release.model.vo.DeliveryAgency.Companion.getDeliveryAgencyByName
 import com.smartfoodnet.fnproduct.release.model.vo.DeliveryStatus
@@ -130,7 +133,7 @@ class ReleaseInfoService(
         return getOrderProducts(releaseInfo)
     }
 
-    fun getPausedOrderProductsByOrderCode(orderCode: String): List<PausedOrderProductModel> {
+    fun getPausedOrderProductsByOrderCode(orderCode: String): List<OrderProductModel> {
         val releaseInfoList = releaseInfoRepository.findAllByReleaseStatuses(
             ReleaseStatusSearchCondition(
                 orderCode = orderCode,
@@ -140,7 +143,7 @@ class ReleaseInfoService(
         return releaseInfoList.flatMap(::getPausedOrderProducts)
     }
 
-    fun getPausedOrderProductsByReleaseCode(releaseCode: String): List<PausedOrderProductModel> {
+    fun getPausedOrderProductsByReleaseCode(releaseCode: String): List<OrderProductModel> {
         val releaseInfo = releaseInfoRepository.findAllByReleaseStatuses(
             ReleaseStatusSearchCondition(
                 releaseCode = releaseCode,
@@ -159,12 +162,12 @@ class ReleaseInfoService(
             }
     }
 
-    fun getPausedOrderProducts(releaseInfo: ReleaseInfo): List<PausedOrderProductModel> {
+    fun getPausedOrderProducts(releaseInfo: ReleaseInfo): List<OrderProductModel> {
         return releaseInfo.releaseProducts
-            .map { PausedOrderProductModel.fromEntity(it, releaseInfo) }
+            .map { OrderProductModel.fromEntity(it, releaseInfo) }
             .ifEmpty {
                 val confirmProducts = getConfirmProducts(releaseInfo)
-                confirmProducts.map { PausedOrderProductModel.fromEntity(it, releaseInfo) }
+                confirmProducts.map { OrderProductModel.fromEntity(it, releaseInfo) }
             }
     }
 
