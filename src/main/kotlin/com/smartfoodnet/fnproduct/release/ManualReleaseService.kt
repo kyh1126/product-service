@@ -125,6 +125,7 @@ class ManualReleaseService(
             orderUniqueKey = orderUniqueKey,
             uploadType = manualOrderRequest.uploadType
         )
+
         collectedOrderRepository.save(collectedOrder)
 
         return collectedOrder
