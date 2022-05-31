@@ -12,8 +12,9 @@ enum class ShippingMethodType(
     companion object {
         fun isParcel(value: Int?) = fromValue(value) == PARCEL
 
-        private fun fromValue(value: Int?): ShippingMethodType? {
+        private fun fromValue(value: Int?): ShippingMethodType {
             return values().firstOrNull { it.value == value }
+                ?: throw IllegalArgumentException("Format $value is illegal")
         }
     }
 }
