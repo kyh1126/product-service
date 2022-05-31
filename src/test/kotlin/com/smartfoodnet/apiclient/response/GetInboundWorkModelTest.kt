@@ -25,11 +25,12 @@ internal class GetInboundWorkModelTest {
             val inboundWorkModel: GetInboundWorkModel =
                 GetInboundWorkModel.testModel("20230104", null)
             val basicProduct: BasicProduct = BasicProduct(
+                type = BasicProductType.BASIC,
+                barcodeYn = "N",
                 expirationDateInfo = ExpirationDateInfo("Y", "Y", 30),
                 singleDimension = SingleDimension.default,
                 boxDimension = BoxDimension.default
             ).also {
-                it.type = BasicProductType.BASIC
                 it.expirationDateManagementYn = "Y"
             }
             val inboundExpectedDetail: InboundExpectedDetail = InboundExpectedDetail(
@@ -51,11 +52,12 @@ internal class GetInboundWorkModelTest {
             val inboundWorkModel: GetInboundWorkModel =
                 GetInboundWorkModel.testModel(null, "20230104")
             val basicProduct: BasicProduct = BasicProduct(
+                type = BasicProductType.BASIC,
+                barcodeYn = "N",
                 expirationDateInfo = ExpirationDateInfo("Y", "Y", 30),
                 singleDimension = SingleDimension.default,
                 boxDimension = BoxDimension.default
             ).also {
-                it.type = BasicProductType.BASIC
                 it.expirationDateManagementYn = "Y"
             }
             val inboundExpectedDetail: InboundExpectedDetail = InboundExpectedDetail(
@@ -77,11 +79,12 @@ internal class GetInboundWorkModelTest {
             val inboundWorkModel: GetInboundWorkModel =
                 GetInboundWorkModel.testModel(null, null)
             val basicProduct: BasicProduct = BasicProduct(
+                type = BasicProductType.BASIC,
+                barcodeYn = "N",
                 expirationDateInfo = ExpirationDateInfo("Y", "Y", 30),
                 singleDimension = SingleDimension.default,
                 boxDimension = BoxDimension.default
             ).also {
-                it.type = BasicProductType.BASIC
                 it.expirationDateManagementYn = "Y"
             }
             val inboundExpectedDetail: InboundExpectedDetail = InboundExpectedDetail(
@@ -102,11 +105,12 @@ internal class GetInboundWorkModelTest {
             val inboundWorkModel: GetInboundWorkModel =
                 GetInboundWorkModel.testModel(null, date)
             val basicProduct: BasicProduct = BasicProduct(
+                type = BasicProductType.BASIC,
+                barcodeYn = "N",
                 expirationDateInfo = ExpirationDateInfo("Y", "N", 30),
                 singleDimension = SingleDimension.default,
                 boxDimension = BoxDimension.default
             ).also {
-                it.type = BasicProductType.BASIC
                 it.expirationDateManagementYn = "Y"
             }
             val inboundExpectedDetail: InboundExpectedDetail = InboundExpectedDetail(
@@ -127,11 +131,12 @@ internal class GetInboundWorkModelTest {
             val inboundWorkModel: GetInboundWorkModel =
                 GetInboundWorkModel.testModel(date, null)
             val basicProduct: BasicProduct = BasicProduct(
+                type = BasicProductType.BASIC,
+                barcodeYn = "N",
                 expirationDateInfo = ExpirationDateInfo("N", "Y", 30),
                 singleDimension = SingleDimension.default,
                 boxDimension = BoxDimension.default
             ).also {
-                it.type = BasicProductType.BASIC
                 it.expirationDateManagementYn = "Y"
             }
             val inboundExpectedDetail: InboundExpectedDetail = InboundExpectedDetail(
@@ -152,11 +157,12 @@ internal class GetInboundWorkModelTest {
             val inboundWorkModel: GetInboundWorkModel =
                 GetInboundWorkModel.testModel(date, date)
             val basicProduct: BasicProduct = BasicProduct(
+                type = BasicProductType.BASIC,
+                barcodeYn = "N",
                 expirationDateInfo = null,
                 singleDimension = SingleDimension.default,
                 boxDimension = BoxDimension.default
             ).also {
-                it.type = BasicProductType.BASIC
                 it.expirationDateManagementYn = "N"
             }
             val inboundExpectedDetail: InboundExpectedDetail = InboundExpectedDetail(

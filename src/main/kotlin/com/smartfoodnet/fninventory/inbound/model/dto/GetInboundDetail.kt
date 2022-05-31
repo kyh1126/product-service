@@ -18,8 +18,8 @@ data class InboundBasicProductModel(
         fun toDto(basicProduct: BasicProduct): InboundBasicProductModel {
             return basicProduct.run {
                 InboundBasicProductModel(
-                    basicProductId = id!!,
-                    basicProductName = name!!,
+                    basicProductId = id,
+                    basicProductName = name,
                     basicProductCode = code!!
                 )
             }

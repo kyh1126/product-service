@@ -22,7 +22,7 @@ data class PackageProductMappingDetailModel(
             return packageProductMapping.run {
                 PackageProductMappingDetailModel(
                     id = id,
-                    packageProductModel = BasicProductSimpleModel.fromEntity(packageProduct!!),
+                    packageProductModel = BasicProductSimpleModel.fromEntity(packageProduct),
                     basicProductModel = BasicProductSimpleModel.fromEntity(selectedBasicProduct),
                     quantity = quantity,
                 )

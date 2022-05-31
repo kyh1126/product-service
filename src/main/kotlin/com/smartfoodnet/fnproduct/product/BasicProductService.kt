@@ -342,8 +342,8 @@ class BasicProductService(
     ) {
         if (request.activeYn == "Y") return
 
-        packageProductFinder.getPackageProductByBasicProduct(basicProduct.id)?.let {
-            if (it.activeYn == "N") return
+        packageProductFinder.getPackageProductByBasicProduct(basicProduct.id).forEach {
+            if (it.activeYn == "N") return@forEach
             it.inactivate()
             log.info("기본상품(${basicProduct.id})에 의한 모음상품(${it.id}) 비활성화")
         }

@@ -1,7 +1,6 @@
 package com.smartfoodnet.fninventory.stock.dto
 
 import com.smartfoodnet.apiclient.response.NosnosStockModel
-import com.smartfoodnet.common.formatToBasicIsoDate
 import com.smartfoodnet.fninventory.stock.model.AvailableStockModel
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
 import com.smartfoodnet.fnproduct.product.entity.PackageProductMapping
@@ -56,5 +55,5 @@ class BasicProductAvailableStock(
 
 data class QuantityPerBasicProduct(
     val basicProduct: BasicProduct,
-    val quantity : Int
+    val quantity: Int
 )

@@ -52,7 +52,7 @@ data class PreShippingProductModel(
                 PreShippingProductModel(
                     memberId = partnerId!!,
                     productCode = code,
-                    productName = name!!,
+                    productName = name,
                     upc = barcode,
                     manageCode3 = handlingTemperature?.desc,
                     singleWidth = singleDimension.width,
