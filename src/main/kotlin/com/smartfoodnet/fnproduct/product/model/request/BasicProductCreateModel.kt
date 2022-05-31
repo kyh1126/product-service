@@ -1,9 +1,7 @@
 package com.smartfoodnet.fnproduct.product.model.request
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped
-import com.smartfoodnet.fnproduct.product.entity.BasicProduct
-import com.smartfoodnet.fnproduct.product.entity.BasicProductCategory
-import com.smartfoodnet.fnproduct.product.entity.SubsidiaryMaterialCategory
+import com.smartfoodnet.fnproduct.product.entity.*
 import com.smartfoodnet.fnproduct.product.model.vo.BasicProductType
 import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
 import com.smartfoodnet.fnproduct.warehouse.entity.InWarehouse
@@ -97,6 +95,8 @@ class BasicProductCreateModel {
     ): BasicProduct {
         return BasicProduct(
             partnerId = partnerId,
+            type = type,
+            barcodeYn = barcodeYn,
             code = code,
             barcode = barcode,
             basicProductCategory = basicProductCategory,
@@ -105,17 +105,23 @@ class BasicProductCreateModel {
             warehouse = inWarehouse,
             supplyPrice = supplyPrice,
             expirationDateInfo = expirationDateInfoModel?.toEntity(),
-            singleDimension = singleDimensionCreateModel.toEntity(),
-            boxDimension = boxDimensionCreateModel.toEntity(),
+            singleDimension = getSingleDimension(),
+            boxDimension = getBoxDimension(),
             piecesPerBox = piecesPerBox,
             piecesPerPalette = piecesPerPalette,
             imageUrl = imageUrl,
             activeYn = activeYn
         ).also {
-            it.type = type
-            it.barcodeYn = barcodeYn
             it.name = name
             it.expirationDateManagementYn = expirationDateManagementYn
         }
     }
+
+    private fun getSingleDimension() =
+        if (type == BasicProductType.CUSTOM_SUB) SingleDimension.default
+        else singleDimensionCreateModel.toEntity()
+
+    private fun getBoxDimension() =
+        if (type == BasicProductType.CUSTOM_SUB) BoxDimension.default
+        else boxDimensionCreateModel.toEntity()
 }

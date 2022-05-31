@@ -10,9 +10,9 @@ import org.springframework.transaction.annotation.Transactional
 class PackageProductFinder(
     private val packageProductMappingRepository: PackageProductMappingRepository,
 ) {
-    fun getPackageProductByBasicProduct(basicProductId: Long): BasicProduct? {
-        val packageProductMapping =
+    fun getPackageProductByBasicProduct(basicProductId: Long): List<BasicProduct> {
+        val packageProductMappings =
             packageProductMappingRepository.findBySelectedBasicProduct_Id(basicProductId)
-        return packageProductMapping?.packageProduct
+        return packageProductMappings.map { it.packageProduct }
     }
 }

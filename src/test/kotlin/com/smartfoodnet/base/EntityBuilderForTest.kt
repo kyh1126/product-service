@@ -128,6 +128,8 @@ fun buildBasicProduct_SUB(
 ): BasicProduct {
     return BasicProduct(
         partnerId = partnerId,
+        type = BasicProductType.SUB,
+        barcodeYn = "N",
         subsidiaryMaterialCategory = subsidiaryMaterialCategory,
         warehouse = buildWarehouse(partnerId),
         supplyPrice = 120,
@@ -135,8 +137,6 @@ fun buildBasicProduct_SUB(
         singleDimension = SingleDimension.default,
         boxDimension = BoxDimension.default
     ).also {
-        it.type = BasicProductType.SUB
-        it.barcodeYn = "N"
         it.name = name
         it.expirationDateManagementYn = "N"
     }

@@ -25,7 +25,7 @@ data class PackageProductMappingModel(
             return packageProductMapping.run {
                 PackageProductMappingModel(
                     id = id,
-                    packageProductId = packageProduct!!.id!!,
+                    packageProductId = packageProduct.id,
                     basicProductModel = selectedBasicProduct,
                     quantity = quantity,
                 )

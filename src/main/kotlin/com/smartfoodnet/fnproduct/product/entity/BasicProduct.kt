@@ -14,6 +14,13 @@ class BasicProduct(
     @Column(name = "partner_id")
     var partnerId: Long? = null,
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false)
+    val type: BasicProductType,
+
+    @Column(name = "barcode_yn", nullable = false)
+    val barcodeYn: String,
+
     @Column(name = "code")
     var code: String? = null,
 
@@ -83,18 +90,28 @@ class BasicProduct(
     @Column(name = "id", nullable = false)
     val id: Long = 0
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "type", nullable = false)
-    lateinit var type: BasicProductType
-
-    @Column(name = "barcode_yn", nullable = false)
-    lateinit var barcodeYn: String
-
     @Column(name = "name", nullable = false)
     lateinit var name: String
 
     @Column(name = "expiration_date_management_yn", nullable = false)
     lateinit var expirationDateManagementYn: String
+
+    constructor(partnerId: Long, code: String, activeYn: String, name: String) : this(
+        partnerId = partnerId,
+        type = BasicProductType.PACKAGE,
+        barcodeYn = "N",
+        code = code,
+        handlingTemperature = HandlingTemperatureType.MIX,
+        expirationDateInfo = ExpirationDateInfo.default,
+        activeYn = activeYn,
+        singleDimension = SingleDimension.default,
+        boxDimension = BoxDimension.default
+    ) {
+        apply {
+            this.name = name
+            this.expirationDateManagementYn = "N"
+        }
+    }
 
     fun addSubsidiaryMaterialMappings(subsidiaryMaterialMapping: SubsidiaryMaterialMapping) {
         subsidiaryMaterialMappings.add(subsidiaryMaterialMapping)
