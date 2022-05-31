@@ -1,10 +1,6 @@
 package com.smartfoodnet.fnproduct.product.model.request
 
 import com.smartfoodnet.fnproduct.product.entity.BasicProduct
-import com.smartfoodnet.fnproduct.product.entity.BoxDimension
-import com.smartfoodnet.fnproduct.product.entity.ExpirationDateInfo
-import com.smartfoodnet.fnproduct.product.entity.SingleDimension
-import com.smartfoodnet.fnproduct.product.model.vo.HandlingTemperatureType
 import io.swagger.annotations.ApiModelProperty
 import javax.validation.constraints.NotEmpty
 import javax.validation.constraints.NotNull
@@ -29,16 +25,6 @@ class BasicProductPackageCreateModel {
     val activeYn: String = "Y"
 
     fun toEntity(code: String): BasicProduct {
-        return BasicProduct(
-            partnerId = partnerId,
-            code = code,
-            handlingTemperature = HandlingTemperatureType.MIX,
-            expirationDateInfo = ExpirationDateInfo.default,
-            activeYn = activeYn,
-            singleDimension = SingleDimension.default,
-            boxDimension = BoxDimension.default
-        ).also {
-            it.setPackageProductDefault(this)
-        }
+        return BasicProduct(partnerId!!, code, activeYn, name)
     }
 }

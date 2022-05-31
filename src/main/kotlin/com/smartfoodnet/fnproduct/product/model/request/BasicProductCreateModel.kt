@@ -95,6 +95,8 @@ class BasicProductCreateModel {
     ): BasicProduct {
         return BasicProduct(
             partnerId = partnerId,
+            type = type,
+            barcodeYn = barcodeYn,
             code = code,
             barcode = barcode,
             basicProductCategory = basicProductCategory,
@@ -110,8 +112,6 @@ class BasicProductCreateModel {
             imageUrl = imageUrl,
             activeYn = activeYn
         ).also {
-            it.type = type
-            it.barcodeYn = barcodeYn
             it.name = name
             it.expirationDateManagementYn = expirationDateManagementYn
         }
