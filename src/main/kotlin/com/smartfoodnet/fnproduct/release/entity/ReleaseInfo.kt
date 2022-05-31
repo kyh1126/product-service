@@ -91,13 +91,20 @@ class ReleaseInfo(
         releaseProduct.releaseInfo = this
     }
 
+    /**
+     * nosnos 에 의해서만 실행된다.
+     * nosnos 로 인한 출고중지상태 후처리는 processPausedReleaseInfo 메소드가 담당한다.
+     *
+     * @see com.smartfoodnet.fnproduct.release.ReleaseInfoStoreService.processPausedReleaseInfo
+     */
     fun update(
         request: NosnosReleaseModel,
         releaseProductRequests: Set<ReleaseProduct>,
         uploadType: OrderUploadType,
+        shippingMethodId: Int?,
         pausedBy: PausedBy = PausedBy.NOSNOS
     ) {
-        releaseStatus = ReleaseStatus.fromReleaseStatus(request.releaseStatus!!)
+        releaseStatus = ReleaseStatus.fromNosnosReleaseStatus(request.releaseStatus!!, shippingMethodId)
         deliveryAgencyId = request.deliveryAgencyId
         trackingNumber = request.trackingNumber
         if (trackingNumber != null) {

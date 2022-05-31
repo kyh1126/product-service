@@ -56,7 +56,7 @@ class ReleaseInfoStoreService(
             val releaseInfoByReleaseId = targetReleaseInfoList.associateBy { it.releaseId }
             val releaseId = model.releaseId!!
             val releaseItemModels = itemModelsByReleaseId[releaseId] ?: emptyList()
-            val releaseModelDto = ReleaseModelDto(model, releaseItemModels)
+            val releaseModelDto = ReleaseModelDto(model, releaseItemModels, confirmOrder)
 
             when {
                 // Case1: releaseInfo 테이블 내 releaseId 가 있는 경우
@@ -82,8 +82,7 @@ class ReleaseInfoStoreService(
                     createReleaseInfo(
                         releaseModelDto,
                         basicProductByShippingProductId,
-                        firstTargetReleaseInfo,
-                        confirmOrder
+                        firstTargetReleaseInfo
                     )
                 }
             }
@@ -206,7 +205,7 @@ class ReleaseInfoStoreService(
         releaseModelDto: ReleaseModelDto,
         basicProductByShippingProductId: Map<Long, BasicProduct>
     ): ReleaseInfo? {
-        val (releaseModel, releaseItemModels) = releaseModelDto
+        val (releaseModel, releaseItemModels, confirmOrder) = releaseModelDto
 
         val targetReleaseInfo = releaseInfoEntity
             ?: (releaseInfoRepository.findByReleaseId(releaseId) ?: return null)
@@ -220,7 +219,7 @@ class ReleaseInfoStoreService(
             basicProductByShippingProductId
         )
 
-        targetReleaseInfo.update(releaseModel, releaseProducts, getUploadType(targetReleaseInfo))
+        targetReleaseInfo.update(releaseModel, releaseProducts, getUploadType(targetReleaseInfo), confirmOrder.shippingMethodType)
         return targetReleaseInfo
     }
 
@@ -228,9 +227,8 @@ class ReleaseInfoStoreService(
         releaseModelDto: ReleaseModelDto,
         basicProductByShippingProductId: Map<Long, BasicProduct>,
         firstTargetReleaseInfo: ReleaseInfo,
-        confirmOrder: ConfirmOrder,
     ): ReleaseInfo {
-        val (releaseModel, releaseItemModels) = releaseModelDto
+        val (releaseModel, releaseItemModels, confirmOrder) = releaseModelDto
 
         // 릴리즈상품 저장
         val releaseProducts = createOrUpdateReleaseProducts(

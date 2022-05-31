@@ -1,9 +1,10 @@
 package com.smartfoodnet.fnproduct.release.model.vo
 
 import com.smartfoodnet.fnproduct.order.vo.OrderStatus
+import com.smartfoodnet.fnproduct.order.vo.ShippingMethodType
 import java.util.*
 
-enum class ReleaseStatus(val releaseStatus: Int?, val description: String, val orderStatus: OrderStatus) {
+enum class ReleaseStatus(val nosnosReleaseStatus: Int?, val description: String, val orderStatus: OrderStatus) {
     BEFORE_RELEASE_REQUEST(null, "출고요청전", OrderStatus.BEFORE_RELEASE_REQUEST),
     RELEASE_REQUESTED(1, "출고요청", OrderStatus.RELEASE_REQUESTED),
     RELEASE_ORDERED(3, "출고지시", OrderStatus.RELEASE_ORDERED),
@@ -23,9 +24,15 @@ enum class ReleaseStatus(val releaseStatus: Int?, val description: String, val o
         val NOSNOS_CANCELLED_STATUSES: EnumSet<ReleaseStatus> =
             EnumSet.of(RELEASE_PAUSED, RELEASE_CANCELLED)
 
-        fun fromReleaseStatus(releaseStatus: Int): ReleaseStatus {
-            return values().firstOrNull { it.releaseStatus == releaseStatus }
-                ?: throw IllegalArgumentException("Format $releaseStatus is illegal")
+        fun fromNosnosReleaseStatus(nosnosReleaseStatus: Int, shippingMethodId: Int?): ReleaseStatus {
+            val releaseStatus = values().firstOrNull { it.nosnosReleaseStatus == nosnosReleaseStatus }
+                ?: throw IllegalArgumentException("Format $nosnosReleaseStatus is illegal")
+
+            // 택배 외 출고방식의 경우, 배송완료로 처리 (배송중 x)
+            if (releaseStatus == DELIVERY_IN_TRANSIT && !ShippingMethodType.isParcel(shippingMethodId)) {
+                return DELIVERY_COMPLETED
+            }
+            return releaseStatus
         }
 
         fun fromOrderStatus(orderStatus: OrderStatus?): ReleaseStatus? {

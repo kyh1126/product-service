@@ -43,6 +43,12 @@ data class NosnosReleaseModel(
     val shippingMessage: String? = null,
     val channelId: Int? = null,
 ) {
+    /**
+     * nosnos 에 의해서만 실행된다.
+     * nosnos 로 인한 출고중지 상태 후처리는 processPausedReleaseInfo 메소드가 담당한다.
+     *
+     * @see com.smartfoodnet.fnproduct.release.ReleaseInfoStoreService.processPausedReleaseInfo
+     */
     fun toEntity(
         releaseProducts: Set<ReleaseProduct>,
         uploadType: OrderUploadType,
@@ -55,16 +61,12 @@ data class NosnosReleaseModel(
             confirmOrder = confirmOrder,
             releaseId = releaseId!!,
             releaseCode = releaseCode!!,
-            releaseStatus = ReleaseStatus.fromReleaseStatus(releaseStatus!!),
+            releaseStatus = ReleaseStatus.fromNosnosReleaseStatus(releaseStatus!!, shippingMethodId),
             deliveryAgencyId = deliveryAgencyId,
             trackingNumber = trackingNumber,
         )
 
         return releaseInfo.apply {
-            if (releaseStatus == ReleaseStatus.RELEASE_PAUSED) {
-                this.pausedBy = pausedBy
-            }
-
             if (trackingNumber != null) {
                 trackingNumberStatus = TrackingNumberStatus.getInitialStatus(uploadType)
                 trackingNumberCreatedAt = LocalDateTime.now()
