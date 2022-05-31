@@ -11,6 +11,7 @@ import com.smartfoodnet.fnproduct.release.entity.ReleaseInfo
 import com.smartfoodnet.fnproduct.release.entity.ReleaseProduct
 import com.smartfoodnet.fnproduct.release.model.dto.SimpleOrderInfoDto
 import com.smartfoodnet.fnproduct.release.model.vo.PausedBy
+import com.smartfoodnet.fnproduct.release.model.vo.TrackingNumberStatus
 import io.swagger.annotations.ApiModelProperty
 import java.time.LocalDateTime
 
@@ -32,6 +33,12 @@ data class OrderProductModel(
 
     @ApiModelProperty(value = "송장번호")
     var trackingNumber: String? = null,
+
+    @ApiModelProperty(
+        value = "쇼핑몰송장등록 (NONE:송장없음/REGISTERED:자동등록성공/REGISTER_FAILED:자동등록실패/BEFORE_REGISTER:자동등록전/WAITING_CALLBACK:자동등록전(콜백대기중)/EXCEL_REGISTER:수기등록)",
+        allowableValues = "NONE,REGISTERED,REGISTER_FAILED,BEFORE_REGISTER,WAITING_CALLBACK,EXCEL_REGISTER"
+    )
+    var trackingNumberStatus: TrackingNumberStatus,
 
     @ApiModelProperty(value = "송장번호부여일시")
     var trackingNumberCreatedAt: LocalDateTime? = null,
@@ -91,6 +98,7 @@ data class OrderProductModel(
                     deliveryType = firstCollectedOrder.deliveryType,
                     orderStatus = releaseStatus.orderStatus,
                     trackingNumber = trackingNumber,
+                    trackingNumberStatus = trackingNumberStatus,
                     trackingNumberCreatedAt = trackingNumberCreatedAt,
                     collectedAt = firstCollectedOrder.collectedAt,
                     returnStatus = claim?.returnStatus ?: ReturnStatus.UNREGISTERED,
@@ -124,6 +132,7 @@ data class OrderProductModel(
                     deliveryType = firstCollectedOrder.deliveryType,
                     orderStatus = releaseStatus.orderStatus,
                     trackingNumber = trackingNumber,
+                    trackingNumberStatus = trackingNumberStatus,
                     trackingNumberCreatedAt = trackingNumberCreatedAt,
                     collectedAt = firstCollectedOrder.collectedAt,
                     returnStatus = claim?.returnStatus ?: ReturnStatus.UNREGISTERED,
